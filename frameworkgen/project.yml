@@ -1,0 +1,12 @@
+name: DummyApp
+options:
+  bundleIdPrefix: com.my.dummy.app
+targets:
+  DummyApp:
+    type: application
+    platform: iOS
+    deploymentTarget: "13.0"
+    sources: [DummyApp]
+    configFiles:
+      Debug: xcconfig/DummyApp.debug.xcconfig
+      Release: xcconfig/DummyApp.release.xcconfig
