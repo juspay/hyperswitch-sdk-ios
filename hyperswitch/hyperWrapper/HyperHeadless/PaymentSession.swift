@@ -76,11 +76,11 @@ public class PaymentSession {
     }
     
     private func parseGetPaymentMethodData(_ readableMap: NSDictionary) -> Any? {
-        let tag = readableMap["TAG"] as? Int ?? -1
+        let tag = readableMap["TAG"] as? String ?? ""
         let dataObject = readableMap["_0"] as? [String: Any]
         
         switch tag {
-        case 0:
+        case "SAVEDLISTCARD":
             if let it = dataObject {
                 return Card(
                     isDefaultPaymentMethod: it["isDefaultPaymentMethod"] as? Bool ?? false,
@@ -93,7 +93,7 @@ public class PaymentSession {
                     cardHolderName: it["cardHolderName"] as? String ?? ""
                 )
             }
-        case 1:
+        case "SAVEDLISTWALLET":
             if let it = dataObject {
                 return Wallet(
                     isDefaultPaymentMethod: it["isDefaultPaymentMethod"] as? Bool ?? false,
