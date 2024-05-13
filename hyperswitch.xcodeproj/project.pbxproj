@@ -32,6 +32,8 @@
 		793083F12A0DAA4200E78310 /* HyperAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 793083F02A0DAA4200E78310 /* HyperAPI.swift */; };
 		7938D81B2A4EF45000286CEE /* PaymentMethodParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7938D81A2A4EF45000286CEE /* PaymentMethodParams.swift */; };
 		7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7996A8322BA1FDD000394FAF /* hyperswitch.bundle */; };
+		799979AB2BF2463F00C54EA4 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 799979AA2BF2463F00C54EA4 /* PrivacyInfo.xcprivacy */; };
+		799979AD2BF2466300C54EA4 /* Codepush.plist in Resources */ = {isa = PBXBuildFile; fileRef = 799979AC2BF2466300C54EA4 /* Codepush.plist */; };
 		8555309A140D17CD8EBCC522 /* libPods-hyperswitch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 521DF526E22C43EB241343D5 /* libPods-hyperswitch.a */; };
 		DC4AC9F2296D6D6C00E0D2A6 /* PaymentCardTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4AC9F1296D6D6C00E0D2A6 /* PaymentCardTextField.swift */; };
 		DC4AC9F5296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4AC9F4296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift */; };
@@ -88,6 +90,8 @@
 		793083F02A0DAA4200E78310 /* HyperAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperAPI.swift; sourceTree = "<group>"; };
 		7938D81A2A4EF45000286CEE /* PaymentMethodParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodParams.swift; sourceTree = "<group>"; };
 		7996A8322BA1FDD000394FAF /* hyperswitch.bundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hyperswitch.bundle; sourceTree = "<group>"; };
+		799979AA2BF2463F00C54EA4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = SOURCE_ROOT; };
+		799979AC2BF2466300C54EA4 /* Codepush.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Codepush.plist; sourceTree = "<group>"; };
 		DC4AC9F1296D6D6C00E0D2A6 /* PaymentCardTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCardTextField.swift; sourceTree = "<group>"; };
 		DC4AC9F4296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentCardTextField+SwiftUI.swift"; sourceTree = "<group>"; };
 		DC5D0111294731480017C67A /* PaymentSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentSheet.swift; sourceTree = "<group>"; };
@@ -141,6 +145,7 @@
 		66486F90294355BD00150E4F /* hyperswitch */ = {
 			isa = PBXGroup;
 			children = (
+				799979AA2BF2463F00C54EA4 /* PrivacyInfo.xcprivacy */,
 				66486FA22943580F00150E4F /* AppDelegate.swift */,
 				66486F91294355BD00150E4F /* hyperApp.swift */,
 				66486F93294355BD00150E4F /* ContentView.swift */,
@@ -247,6 +252,7 @@
 		DC5D012C29486B560017C67A /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				799979AC2BF2466300C54EA4 /* Codepush.plist */,
 				7996A8322BA1FDD000394FAF /* hyperswitch.bundle */,
 			);
 			path = Resources;
@@ -326,7 +332,9 @@
 				66486F99294355BE00150E4F /* Preview Assets.xcassets in Resources */,
 				7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */,
 				7929D8662A616279006BD77E /* Main.storyboard in Resources */,
+				799979AB2BF2463F00C54EA4 /* PrivacyInfo.xcprivacy in Resources */,
 				66486F96294355BE00150E4F /* Assets.xcassets in Resources */,
+				799979AD2BF2466300C54EA4 /* Codepush.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
