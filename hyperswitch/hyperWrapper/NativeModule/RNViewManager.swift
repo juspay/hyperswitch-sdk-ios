@@ -43,27 +43,65 @@ class RNViewManager: NSObject {
         
     }
 }
+
+private func getInfoPlist(_ key: String) -> String? {
+    guard let infoDictionary = Bundle.main.infoDictionary,
+          let value = infoDictionary[key] as? String, !value.isEmpty else {
+        return nil
+    }
+    return value
+}
+
+private func getPlist(_ key: String) -> String? {
+    guard let plistPath = Bundle(for: RNViewManager.self).path(forResource: "Codepush", ofType: "plist"),
+          let plistData = try? Data(contentsOf: URL(fileURLWithPath: plistPath)),
+          let plist = try? PropertyListSerialization.propertyList(from: plistData, options: [], format: nil) as? [String: Any],
+          let value = plist[key] as? String, !value.isEmpty else {
+        return nil
+    }
+    return value
+}
+
 private func CodepushAPI() {
-    CodePush.overrideAppVersion(ProcessInfo.processInfo.environment["HyperVersion"])
-    CodePush.setDeploymentKey(ProcessInfo.processInfo.environment["CodePushDeploymentKey"])
+    if let hyperVersion = getInfoPlist("HyperVersion"), !hyperVersion.isEmpty{
+        print(hyperVersion)
+        CodePush.overrideAppVersion(hyperVersion)
+    }
+    else {
+        if let hyperVersionInSDK = getPlist("HyperVersion"){
+            print(hyperVersionInSDK)
+            CodePush.overrideAppVersion(hyperVersionInSDK)
+        }
+    }
+    
+    if let codePushDeploymentKey = getInfoPlist("CodePushDeploymentKey"), !codePushDeploymentKey.isEmpty {
+        print(codePushDeploymentKey)
+        CodePush.setDeploymentKey(codePushDeploymentKey)
+    }
+    else {
+        if let codePushDeploymentKeyInSDK = getPlist("CodePushDeploymentKey"){
+            print(codePushDeploymentKeyInSDK)
+            CodePush.setDeploymentKey(codePushDeploymentKeyInSDK)
+        }
+    }
 }
 
 extension RNViewManager: RCTBridgeDelegate {
     func sourceURL(for bridge: RCTBridge!) -> URL! {
-        switch ProcessInfo.processInfo.environment["HYPERSWITCH_JS_SOURCE"] {
-        case "LOCAL_HOSTED_FOR_SIMULATOR":
-            return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
-        case "LOCAL_HOSTED_FOR_PHYSICAL_DEVICE":
-            return URL(string: "http://<ip>:8081/index.bundle?platform=ios") /// replace <ip> with your ip
-        case "LOCAL_BUNDLE":
-            return Bundle.main.url(forResource: "hyperswitch",
-                                   withExtension: "bundle")
+        switch getInfoPlist("HyperswitchSource") {
+        case "LocalHosted":
+            if let ip = getInfoPlist("HyperswitchSourceIP") {
+                return URL(string: "http://"+ip+":8081/index.bundle?platform=ios")
+            } else {
+                return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+            }
+        case "LocalBundle":
+            return Bundle.main.url(forResource: "hyperswitch", withExtension: "bundle")
         default:
             CodepushAPI()
-            if let codePushURL = CodePush.bundleURL(forResource: "hyperswitch", withExtension: "bundle", subdirectory: "/Frameworks/Hyperswitch.framework"){
-                return codePushURL
-            }
-            return Bundle.main.url(forResource: "hyperswitch", withExtension: "bundle")
+            return CodePush.bundleURL(forResource: "hyperswitch",
+                                      withExtension: "bundle",
+                                      subdirectory: "/Frameworks/Hyperswitch.framework")
         }
     }
 }
