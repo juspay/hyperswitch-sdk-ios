@@ -81,3 +81,5 @@ DummyApp.tar.gz
 *.tar.gz
 
 .vscode/
+
+Gemfile.lock
