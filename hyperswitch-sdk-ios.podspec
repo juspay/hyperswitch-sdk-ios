@@ -1,4 +1,4 @@
-version = "1.0.0"
+version = '1.0.0'
 
 Pod::Spec.new do |s|
   s.name                      = 'hyperswitch-sdk-ios'
@@ -10,12 +10,12 @@ Pod::Spec.new do |s|
   s.license                   = { type: 'Apache-2.0', file: 'LICENSE' }
   s.platform                  = :ios
   s.ios.deployment_target     = '13.0'
-  s.source                    = { :git => 'https://github.com/juspay/hyperswitch-sdk-ios.git', :tag => "v#{s.version}"}
+  s.source                    = { :git => 'https://github.com/juspay/hyperswitch-sdk-ios.git', :tag => 'v#{s.version}'}
   s.module_name               = 'HyperswitchCore'
 
   s.subspec 'core' do |core|
     s.source_files = 'hyperswitch/hyperWrapper/**/*.{m,swift,h}'
-    s.resources = ["hyperswitch/hyperWrapper/Resources/Codepush.plist", "hyperswitch/hyperWrapper/Resources/hyperswitch.bundle"]
+    s.resources = ['hyperswitch/hyperWrapper/Resources/Codepush.plist', 'hyperswitch/hyperWrapper/Resources/hyperswitch.bundle']
     s.vendored_frameworks = 'frameworkgen/Frameworks/Core/*.xcframework'
   end
 
