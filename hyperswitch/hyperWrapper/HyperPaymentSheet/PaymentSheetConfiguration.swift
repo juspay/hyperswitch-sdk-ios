@@ -211,6 +211,7 @@ extension PaymentSheet {
         /// - Note: If you omit payment methods from this list, they’ll be automatically ordered by Hyperswitch after the ones you provide. Invalid payment methods are ignored.
         public var paymentMethodOrder: [String]?
         
+        /// Api key used to invoke netcetera sdk for redirection-less 3DS authentication.
         public var netceteraSDKApiKey: String?
     }
 
