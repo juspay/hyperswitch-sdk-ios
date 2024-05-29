@@ -55,6 +55,38 @@ public extension PaymentSheet {
             /// The font family of this font is used throughout PaymentSheet. PaymentSheet uses this font at multiple weights (e.g., regular, medium, semibold) if they exist.
             /// - Note: The size and weight of the font is ignored. To adjust font sizes, see `sizeScaleFactor`.
             public var base: UIFont?
+            
+            /// The size adjustment for all heading texts in PaymentSheet
+            /// Font sizes of all headings will be increased by this value from their respective default size
+            public var headingTextSizeAdjust: CGFloat?
+
+            /// The size for all sub heading texts in PaymentSheet
+            /// Font sizes of all sub headings will be increased by this value from their respective default size
+            public var subHeadingTextSizeAdjust: CGFloat?
+
+            /// The size for all placeholder texts in PaymentSheet
+            /// Font sizes of all placeholder texts will be increased by this value from their respective default size
+            public var placeholderTextSizeAdjust: CGFloat?
+
+            /// The size for all button texts in PaymentSheet
+            /// Font sizes of all button texts will be increased by this value from their respective default size
+            public var buttonTextSizeAdjust: CGFloat?
+
+            /// The size for all error texts in PaymentSheet
+            /// Font sizes of all error texts will be increased by this value from their respective default size
+            public var errorTextSizeAdjust: CGFloat?
+
+            /// The size for all link texts in PaymentSheet
+            /// Font sizes of all link texts will be increased by this value from their respective default size
+            public var linkTextSizeAdjust: CGFloat?
+
+            /// The size for all modal texts in PaymentSheet
+            /// Font sizes of all modal texts will be increased by this value from their respective default size
+            public var modalTextSizeAdjust: CGFloat?
+
+            /// The size for all card texts in PaymentSheet
+            /// Font sizes of all card texts will be increased by this value from their respective default size
+            public var cardTextSizeAdjust: CGFloat?
         }
 
         // MARK: Colors
