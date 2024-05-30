@@ -17,5 +17,27 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>montserrat.xml</string>
+		<string>montserrat_thin.ttf</string>
+		<string>montserrat_thinitalic.ttf</string>
+		<string>montserrat_extralight.ttf</string>
+		<string>montserrat_extralightitalic.ttf</string>
+		<string>montserrat_light.ttf</string>
+		<string>montserrat_lightitalic.ttf</string>
+		<string>montserrat_regular.ttf</string>
+		<string>montserrat_italic.ttf</string>
+		<string>montserrat_medium.ttf</string>
+		<string>montserrat_mediumitalic.ttf</string>
+		<string>montserrat_semibold.ttf</string>
+		<string>montserrat_semibolditalic.ttf</string>
+		<string>montserrat_bold.ttf</string>
+		<string>montserrat_bolditalic.ttf</string>
+		<string>montserrat_extrabold.ttf</string>
+		<string>montserrat_extrabolditalic.ttf</string>
+		<string>montserrat_black.ttf</string>
+		<string>montserrat_blackitalic.ttf</string>
+	</array>
 </dict>
 </plist>
