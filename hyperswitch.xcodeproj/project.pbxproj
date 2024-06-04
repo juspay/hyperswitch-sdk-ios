@@ -7,6 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		43E668682C084FB70094BD13 /* montserrat_extralight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668552C084FB60094BD13 /* montserrat_extralight.ttf */; };
+		43E668692C084FB70094BD13 /* montserrat_bolditalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668562C084FB70094BD13 /* montserrat_bolditalic.ttf */; };
+		43E6686A2C084FB70094BD13 /* montserrat_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668572C084FB70094BD13 /* montserrat_bold.ttf */; };
+		43E6686B2C084FB70094BD13 /* montserrat.xml in Resources */ = {isa = PBXBuildFile; fileRef = 43E668582C084FB70094BD13 /* montserrat.xml */; };
+		43E6686C2C084FB70094BD13 /* montserrat_italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668592C084FB70094BD13 /* montserrat_italic.ttf */; };
+		43E6686D2C084FB70094BD13 /* montserrat_medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E6685A2C084FB70094BD13 /* montserrat_medium.ttf */; };
+		43E6686E2C084FB70094BD13 /* montserrat_lightitalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E6685B2C084FB70094BD13 /* montserrat_lightitalic.ttf */; };
+		43E6686F2C084FB70094BD13 /* montserrat_extrabold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E6685C2C084FB70094BD13 /* montserrat_extrabold.ttf */; };
+		43E668702C084FB70094BD13 /* montserrat_light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E6685D2C084FB70094BD13 /* montserrat_light.ttf */; };
+		43E668712C084FB70094BD13 /* montserrat_black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E6685E2C084FB70094BD13 /* montserrat_black.ttf */; };
+		43E668722C084FB70094BD13 /* montserrat_extralightitalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E6685F2C084FB70094BD13 /* montserrat_extralightitalic.ttf */; };
+		43E668732C084FB70094BD13 /* montserrat_mediumitalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668602C084FB70094BD13 /* montserrat_mediumitalic.ttf */; };
+		43E668742C084FB70094BD13 /* montserrat_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668612C084FB70094BD13 /* montserrat_regular.ttf */; };
+		43E668752C084FB70094BD13 /* montserrat_extrabolditalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668622C084FB70094BD13 /* montserrat_extrabolditalic.ttf */; };
+		43E668762C084FB70094BD13 /* montserrat_semibold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668632C084FB70094BD13 /* montserrat_semibold.ttf */; };
+		43E668772C084FB70094BD13 /* montserrat_thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668642C084FB70094BD13 /* montserrat_thin.ttf */; };
+		43E668782C084FB70094BD13 /* montserrat_thinitalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668652C084FB70094BD13 /* montserrat_thinitalic.ttf */; };
+		43E668792C084FB70094BD13 /* montserrat_semibolditalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668662C084FB70094BD13 /* montserrat_semibolditalic.ttf */; };
+		43E6687A2C084FB70094BD13 /* montserrat_blackitalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668672C084FB70094BD13 /* montserrat_blackitalic.ttf */; };
 		43F6051E2B45FA3300BAA90E /* PaymentSheetAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43F6051D2B45FA3300BAA90E /* PaymentSheetAppearance.swift */; };
 		663F68FC29CCC93C006E91BD /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663F68FB29CCC93C006E91BD /* APIClient.swift */; };
 		66486F92294355BD00150E4F /* hyperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66486F91294355BD00150E4F /* hyperApp.swift */; };
@@ -62,6 +81,25 @@
 /* Begin PBXFileReference section */
 		090916C771BBE93EB7642D7D /* Pods-hyperswitch.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitch.release.xcconfig"; path = "Target Support Files/Pods-hyperswitch/Pods-hyperswitch.release.xcconfig"; sourceTree = "<group>"; };
 		0FD29DB06EE34B1EFB01418F /* Pods-hyperswitch.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitch.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitch/Pods-hyperswitch.debug.xcconfig"; sourceTree = "<group>"; };
+		43E668552C084FB60094BD13 /* montserrat_extralight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_extralight.ttf; sourceTree = "<group>"; };
+		43E668562C084FB70094BD13 /* montserrat_bolditalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_bolditalic.ttf; sourceTree = "<group>"; };
+		43E668572C084FB70094BD13 /* montserrat_bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_bold.ttf; sourceTree = "<group>"; };
+		43E668582C084FB70094BD13 /* montserrat.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = montserrat.xml; sourceTree = "<group>"; };
+		43E668592C084FB70094BD13 /* montserrat_italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_italic.ttf; sourceTree = "<group>"; };
+		43E6685A2C084FB70094BD13 /* montserrat_medium.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_medium.ttf; sourceTree = "<group>"; };
+		43E6685B2C084FB70094BD13 /* montserrat_lightitalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_lightitalic.ttf; sourceTree = "<group>"; };
+		43E6685C2C084FB70094BD13 /* montserrat_extrabold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_extrabold.ttf; sourceTree = "<group>"; };
+		43E6685D2C084FB70094BD13 /* montserrat_light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_light.ttf; sourceTree = "<group>"; };
+		43E6685E2C084FB70094BD13 /* montserrat_black.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_black.ttf; sourceTree = "<group>"; };
+		43E6685F2C084FB70094BD13 /* montserrat_extralightitalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_extralightitalic.ttf; sourceTree = "<group>"; };
+		43E668602C084FB70094BD13 /* montserrat_mediumitalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_mediumitalic.ttf; sourceTree = "<group>"; };
+		43E668612C084FB70094BD13 /* montserrat_regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_regular.ttf; sourceTree = "<group>"; };
+		43E668622C084FB70094BD13 /* montserrat_extrabolditalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_extrabolditalic.ttf; sourceTree = "<group>"; };
+		43E668632C084FB70094BD13 /* montserrat_semibold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_semibold.ttf; sourceTree = "<group>"; };
+		43E668642C084FB70094BD13 /* montserrat_thin.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_thin.ttf; sourceTree = "<group>"; };
+		43E668652C084FB70094BD13 /* montserrat_thinitalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_thinitalic.ttf; sourceTree = "<group>"; };
+		43E668662C084FB70094BD13 /* montserrat_semibolditalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_semibolditalic.ttf; sourceTree = "<group>"; };
+		43E668672C084FB70094BD13 /* montserrat_blackitalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_blackitalic.ttf; sourceTree = "<group>"; };
 		43F6051D2B45FA3300BAA90E /* PaymentSheetAppearance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentSheetAppearance.swift; sourceTree = "<group>"; };
 		521DF526E22C43EB241343D5 /* libPods-hyperswitch.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-hyperswitch.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		663F68FB29CCC93C006E91BD /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
@@ -124,6 +162,32 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		43E668542C084F440094BD13 /* fonts */ = {
+			isa = PBXGroup;
+			children = (
+				43E6685E2C084FB70094BD13 /* montserrat_black.ttf */,
+				43E668672C084FB70094BD13 /* montserrat_blackitalic.ttf */,
+				43E668572C084FB70094BD13 /* montserrat_bold.ttf */,
+				43E668562C084FB70094BD13 /* montserrat_bolditalic.ttf */,
+				43E6685C2C084FB70094BD13 /* montserrat_extrabold.ttf */,
+				43E668622C084FB70094BD13 /* montserrat_extrabolditalic.ttf */,
+				43E668552C084FB60094BD13 /* montserrat_extralight.ttf */,
+				43E6685F2C084FB70094BD13 /* montserrat_extralightitalic.ttf */,
+				43E668592C084FB70094BD13 /* montserrat_italic.ttf */,
+				43E6685D2C084FB70094BD13 /* montserrat_light.ttf */,
+				43E6685B2C084FB70094BD13 /* montserrat_lightitalic.ttf */,
+				43E6685A2C084FB70094BD13 /* montserrat_medium.ttf */,
+				43E668602C084FB70094BD13 /* montserrat_mediumitalic.ttf */,
+				43E668612C084FB70094BD13 /* montserrat_regular.ttf */,
+				43E668632C084FB70094BD13 /* montserrat_semibold.ttf */,
+				43E668662C084FB70094BD13 /* montserrat_semibolditalic.ttf */,
+				43E668642C084FB70094BD13 /* montserrat_thin.ttf */,
+				43E668652C084FB70094BD13 /* montserrat_thinitalic.ttf */,
+				43E668582C084FB70094BD13 /* montserrat.xml */,
+			);
+			path = fonts;
+			sourceTree = "<group>";
+		};
 		66486F85294355BD00150E4F = {
 			isa = PBXGroup;
 			children = (
@@ -153,6 +217,7 @@
 				790525792BDA73A600D49FE8 /* SwiftUIView.swift */,
 				790525702BDA66EF00D49FE8 /* HyperViewModel.swift */,
 				7929D8652A616279006BD77E /* Main.storyboard */,
+				43E668542C084F440094BD13 /* fonts */,
 				DC5D010F294731030017C67A /* hyperWrapper */,
 				66486F95294355BE00150E4F /* Assets.xcassets */,
 				66486F97294355BE00150E4F /* Preview Content */,
@@ -330,11 +395,30 @@
 			buildActionMask = 2147483647;
 			files = (
 				66486F99294355BE00150E4F /* Preview Assets.xcassets in Resources */,
+				43E6686F2C084FB70094BD13 /* montserrat_extrabold.ttf in Resources */,
+				43E668682C084FB70094BD13 /* montserrat_extralight.ttf in Resources */,
+				43E668752C084FB70094BD13 /* montserrat_extrabolditalic.ttf in Resources */,
+				43E668692C084FB70094BD13 /* montserrat_bolditalic.ttf in Resources */,
+				43E668732C084FB70094BD13 /* montserrat_mediumitalic.ttf in Resources */,
+				43E668702C084FB70094BD13 /* montserrat_light.ttf in Resources */,
+				43E668722C084FB70094BD13 /* montserrat_extralightitalic.ttf in Resources */,
 				799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */,
 				7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */,
+				43E668782C084FB70094BD13 /* montserrat_thinitalic.ttf in Resources */,
+				43E6686E2C084FB70094BD13 /* montserrat_lightitalic.ttf in Resources */,
+				43E668792C084FB70094BD13 /* montserrat_semibolditalic.ttf in Resources */,
 				7929D8662A616279006BD77E /* Main.storyboard in Resources */,
+				43E6686B2C084FB70094BD13 /* montserrat.xml in Resources */,
+				43E668762C084FB70094BD13 /* montserrat_semibold.ttf in Resources */,
+				43E668772C084FB70094BD13 /* montserrat_thin.ttf in Resources */,
 				66486F96294355BE00150E4F /* Assets.xcassets in Resources */,
+				43E668712C084FB70094BD13 /* montserrat_black.ttf in Resources */,
+				43E6687A2C084FB70094BD13 /* montserrat_blackitalic.ttf in Resources */,
+				43E668742C084FB70094BD13 /* montserrat_regular.ttf in Resources */,
+				43E6686D2C084FB70094BD13 /* montserrat_medium.ttf in Resources */,
 				799979AD2BF2466300C54EA4 /* Codepush.plist in Resources */,
+				43E6686C2C084FB70094BD13 /* montserrat_italic.ttf in Resources */,
+				43E6686A2C084FB70094BD13 /* montserrat_bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
