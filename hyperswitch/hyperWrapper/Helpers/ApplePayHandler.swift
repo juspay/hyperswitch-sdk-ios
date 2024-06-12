@@ -9,7 +9,7 @@ import Foundation
 import PassKit
 import React
 
-class ApplePayHandler: NSObject {
+internal class ApplePayHandler: NSObject {
     
     var paymentController: PKPaymentAuthorizationController?
     var paymentStatus: PKPaymentAuthorizationStatus? = nil
@@ -19,66 +19,73 @@ class ApplePayHandler: NSObject {
     func startPayment(rnMessage: String, rnCallback: @escaping RCTResponseSenderBlock) {
         
         callback = rnCallback
+        var supportedNetworks: [PKPaymentNetwork]?
+        var requiredBillingContactFields:Set<PKContactField> = [.emailAddress, .phoneNumber, .postalAddress, .name] //remove
+        var requiredShippingContactFields:Set<PKContactField> = [.emailAddress, .phoneNumber, .postalAddress, .name] //remove
+        
         
         guard let dict = rnMessage.toJSON() as? [String: AnyObject] else {
             rnCallback([["status": "Error"]])
             return
         }
         
-        guard let session_token_data = dict["session_token_data"],
-              let payment_request_data = dict["payment_request_data"] else {
+        guard let payment_request_data = dict["payment_request_data"] else {
             rnCallback([["status": "Error"]])
             return
         }
         
-        guard let total1 = payment_request_data["total"] as? [String: AnyObject] else {
+        guard let countryCode = payment_request_data["country_code"] as? String else {
             rnCallback([["status": "Error"]])
             return
         }
         
-        guard let amount = total1["amount"] as? String,
-              let label = total1["label"] as? String,
-              let type = total1["type"] as? String else {
+        guard let currencyCode = payment_request_data["currency_code"] as? String else {
+            rnCallback([["status": "Error"]])
+            return
+        }
+        guard let total = payment_request_data["total"] as? [String: AnyObject] else {
             rnCallback([["status": "Error"]])
             return
         }
         
-        guard let merchant_capabilities_array = payment_request_data["merchant_capabilities"] as? Array<String>,
-              let supported_networks_array = payment_request_data["supported_networks"] as? Array<String> else {
+        guard let amount = total["amount"] as? String,
+              let label = total["label"] as? String,
+              let type = total["type"] as? String else {
             rnCallback([["status": "Error"]])
             return
         }
         
-        guard let merchantIdentifier = payment_request_data["merchant_identifier"] as? String,
-              let countryCode = payment_request_data["country_code"] as? String,
-              let currencyCode = payment_request_data["currency_code"] as? String else {
+        guard let merchant_capabilities_array = payment_request_data["merchant_capabilities"] as? Array<String> else {
             rnCallback([["status": "Error"]])
             return
         }
         
-        let total = PKPaymentSummaryItem(label: label, amount: NSDecimalNumber(string: amount), type: (type == "final") ? .final : .pending)
-        
-        let supportedNetworks = supported_networks_array.map { (string) -> PKPaymentNetwork in
-            if string == "visa" {
-                return .visa
-            } else if string == "masterCard" {
-                return .masterCard
-            } else if string == "amex" {
-                return .amex
-            } else if string == "discover" {
-                return .discover
-            }
-            return .quicPay
+        if let supported_networks_array = payment_request_data["supported_networks"] as? Array<String> {
+            supportedNetworks = supported_networks_array.compactMap { PKPaymentNetwork(rawValue: $0.capitalized) }
         }
         
+        guard let merchantIdentifier = payment_request_data["merchant_identifier"] as? String else{
+            rnCallback([["status": "Error"]])
+            return
+        }
+        
+        if let required_billing_contact_fields = payment_request_data["required_billing_contact_fields"] as? Array<String> {
+            requiredBillingContactFields = Set(required_billing_contact_fields.compactMap { PKContactField(rawValue: $0) })
+        }
+        
+        if let required_shipping_contact_fields = payment_request_data["required_shipping_contact_fields"] as? Array<String> {
+            requiredShippingContactFields = Set(required_shipping_contact_fields.compactMap { PKContactField(rawValue: $0) })
+        }
+        
+        let paymentSummaryItems = PKPaymentSummaryItem(label: label, amount: NSDecimalNumber(string: amount), type: (type == "final") ? .final : .pending)
         let paymentRequest = PKPaymentRequest()
-        paymentRequest.paymentSummaryItems = [total]
+        paymentRequest.paymentSummaryItems = [paymentSummaryItems]
         paymentRequest.merchantIdentifier = merchantIdentifier
         paymentRequest.countryCode = countryCode
         paymentRequest.currencyCode = currencyCode
-        paymentRequest.requiredShippingContactFields = [.phoneNumber, .emailAddress]
-        paymentRequest.supportedNetworks = supportedNetworks
-        
+        paymentRequest.requiredShippingContactFields = requiredShippingContactFields
+        paymentRequest.requiredBillingContactFields = requiredBillingContactFields
+        paymentRequest.supportedNetworks = supportedNetworks ?? []
         for val in merchant_capabilities_array {
             paymentRequest.merchantCapabilities = (val == "supports3DS") ? .capability3DS : .capabilityDebit
         }
@@ -128,7 +135,8 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
                         "network": payment.token.paymentMethod.network ?? "",
                         "display_name": payment.token.paymentMethod.displayName ?? ""
                     ],
-                    "transaction_identifier": payment.token.transactionIdentifier
+                    "transaction_identifier": payment.token.transactionIdentifier,
+                    "billing_contact": convertPKContactToDictionary(payment.shippingContact)
                 ]
             ])
         }
@@ -147,7 +155,44 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
             }
         }
     }
-    
+    func convertPKContactToDictionary(_ contact: PKContact?) -> [String: Any] {
+        var contactDict = [String: Any]()
+        
+        if let name = contact?.name {
+            var nameDict = [String: Any]()
+            nameDict["givenName"] = name.givenName
+            nameDict["familyName"] = name.familyName
+            nameDict["namePrefix"] = name.namePrefix
+            nameDict["nameSuffix"] = name.nameSuffix
+            nameDict["nickname"] = name.nickname
+            nameDict["middleName"] = name.middleName
+            //nameDict["phoneticRepresentation"] = name.phoneticRepresentation
+            contactDict["name"] = nameDict
+        }
+        
+        if let postalAddress = contact?.postalAddress {
+            var addressDict = [String: Any]()
+            addressDict["street"] = postalAddress.street
+            addressDict["city"] = postalAddress.city
+            addressDict["state"] = postalAddress.state
+            addressDict["postalCode"] = postalAddress.postalCode
+            addressDict["country"] = postalAddress.country
+            addressDict["subLocality"] = postalAddress.subLocality
+            addressDict["subAdministrativeArea"] = postalAddress.subAdministrativeArea
+            addressDict["isoCountryCode"] = postalAddress.isoCountryCode
+            contactDict["postalAddress"] = addressDict
+        }
+        
+        if let phoneNumber = contact?.phoneNumber {
+            contactDict["phoneNumber"] = phoneNumber.stringValue
+        }
+        
+        if let emailAddress = contact?.emailAddress {
+            contactDict["emailAddress"] = emailAddress
+        }
+        
+        return contactDict
+    }
 }
 
 extension String {

@@ -62,8 +62,8 @@ class HyperHeadless: RCTEventEmitter {
     }
     
     @objc
-    func getPaymentSession(_ rnMessage: NSDictionary, _ rnMessage2: NSArray, _ rnCallback: @escaping RCTResponseSenderBlock) {
-        PaymentSession.shared?.getPaymentSession(getPaymentMethodData: rnMessage, callback: rnCallback)
+    func getPaymentSession(_ rnMessage: NSDictionary, _ rnMessage2: NSDictionary, _ rnMessage3: NSArray, _ rnCallback: @escaping RCTResponseSenderBlock) {
+        PaymentSession.shared?.getPaymentSession(getPaymentMethodData: rnMessage, getPaymentMethodData2: rnMessage2, getPaymentMethodDataArray: rnMessage3, callback: rnCallback)
     }
     
     @objc

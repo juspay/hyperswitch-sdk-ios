@@ -17,11 +17,11 @@ public class PaymentSession {
     
     static var viewController: UIViewController?
     static var clientSecret: String?
-    public var completion: ((@escaping () -> Any?, @escaping(@escaping (PaymentResult) -> Void) -> Void) -> Void)?
+    public var completion: ((PaymentSessionHandler) -> Void)?
     var completion2: ((PaymentResult) -> Void)?
     static var shared: PaymentSession?
     
-    init() {}
+    public init() {}
     
     public convenience init(viewController: UIViewController?=nil, clientSecret: String) {
         self.init()
@@ -32,24 +32,59 @@ public class PaymentSession {
         
     }
     
-    public func initSavedPaymentMethodSession(_ function1: ((@escaping () -> Any?, @escaping (@escaping (PaymentResult) -> Void) -> Void) -> Void)?) {
-        completion = function1
+    public func getCustomerSavedPaymentMethods(func1: @escaping (PaymentSessionHandler) -> Void) {
+        completion = func1
         RNViewManager.sharedInstance2.reinvalidateBridge()
         let _ = RNViewManager.sharedInstance2.viewForModule("dummy", initialProperties: [:])
     }
     
-    func getPaymentSession(getPaymentMethodData: NSDictionary, callback: @escaping RCTResponseSenderBlock) {
+    func getPaymentSession(getPaymentMethodData: NSDictionary, getPaymentMethodData2: NSDictionary, getPaymentMethodDataArray: NSArray, callback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
-            func getCustomerDefaultSavedPaymentMethodData() -> Any? {
-                return self.parseGetPaymentMethodData(getPaymentMethodData)
-            }
-            
-            func confirmWithCustomerDefaultPaymentMethod(resultHandler: @escaping (PaymentResult) -> Void) {
-                self.completion2 = resultHandler
-                callback([])
-            }
-            
-            self.completion?(getCustomerDefaultSavedPaymentMethodData, confirmWithCustomerDefaultPaymentMethod)
+            let handler = PaymentSessionHandler(
+                getCustomerDefaultSavedPaymentMethodData: {
+                    return self.parseGetPaymentMethodData(getPaymentMethodData)
+                },
+                getCustomerLastUsedPaymentMethodData: {
+                    return self.parseGetPaymentMethodData(getPaymentMethodData2)
+                },
+                getCustomerSavedPaymentMethodData: {
+                    var array = [PaymentMethod]()
+                    for i in 0..<getPaymentMethodDataArray.count {
+                        if let map = getPaymentMethodDataArray[i] as? NSDictionary {
+                            array.append(self.parseGetPaymentMethodData(map))
+                        }
+                    }
+                    return array
+                },
+                confirmWithCustomerDefaultPaymentMethod: { cvc, resultHandler in
+                    if let map = getPaymentMethodData["_0"] as? NSDictionary,
+                       let paymentToken = map["payment_token"] as? String {
+                            self.completion2 = resultHandler
+                            var map = [String: Any]()
+                            map["paymentToken"] = paymentToken
+                            map["cvc"] = cvc
+                            callback([map])
+                    }
+                },
+                confirmWithCustomerLastUsedPaymentMethod: { cvc, resultHandler in
+                    if let map = getPaymentMethodData2["_0"] as? NSDictionary,
+                       let paymentToken = map["payment_token"] as? String {
+                            self.completion2 = resultHandler
+                            var map = [String: Any]()
+                            map["paymentToken"] = paymentToken
+                            map["cvc"] = cvc
+                            callback([map])
+                    }
+                },
+                confirmWithCustomerPaymentToken: { paymentToken, cvc, resultHandler in
+                        self.completion2 = resultHandler
+                        var map = [String: Any]()
+                        map["paymentToken"] = paymentToken
+                        map["cvc"] = cvc
+                        callback([map])
+                }
+            )
+            self.completion?(handler)
         }
     }
     
@@ -75,7 +110,7 @@ public class PaymentSession {
         }
     }
     
-    private func parseGetPaymentMethodData(_ readableMap: NSDictionary) -> Any? {
+    private func parseGetPaymentMethodData(_ readableMap: NSDictionary) -> PaymentMethod {
         let tag = readableMap["TAG"] as? String ?? ""
         let dataObject = readableMap["_0"] as? [String: Any]
         
@@ -90,7 +125,10 @@ public class PaymentSession {
                     expiryDate: it["expiry_date"] as? String ?? "",
                     cardNumber: it["cardNumber"] as? String ?? "",
                     nickName: it["nick_name"] as? String ?? "",
-                    cardHolderName: it["cardHolderName"] as? String ?? ""
+                    cardHolderName: it["cardHolderName"] as? String ?? "",
+                    requiresCVV: it["requiresCVV"] as? Bool ?? false,
+                    created: it["created"] as? String ?? "",
+                    lastUsedAt: it["lastUsedAt"] as? String ?? ""
                 )
             }
         case "SAVEDLISTWALLET":
@@ -98,18 +136,19 @@ public class PaymentSession {
                 return Wallet(
                     isDefaultPaymentMethod: it["isDefaultPaymentMethod"] as? Bool ?? false,
                     paymentToken: it["payment_token"] as? String ?? "",
-                    walletType: it["walletType"] as? String ?? ""
+                    walletType: it["walletType"] as? String ?? "",
+                    created: it["created"] as? String ?? "",
+                    lastUsedAt: it["lastUsedAt"] as? String ?? ""
                 )
             }
         default:
             return PMError(code: readableMap["code"] as? String ?? "",message: readableMap["message"] as? String ?? "No default type found")
         }
-        
-        return nil
+        return PMError(code: "01", message: "No default type found")
     }
 }
 
-public struct Card {
+public struct Card: PaymentMethod{
     public let isDefaultPaymentMethod: Bool
     public let paymentToken: String
     public let cardScheme: String
@@ -118,6 +157,9 @@ public struct Card {
     public let cardNumber: String
     public let nickName: String
     public let cardHolderName: String
+    public let requiresCVV: Bool
+    public let created: String
+    public let lastUsedAt: String
     
     public func toHashMap() -> [String: Any] {
         return [
@@ -128,33 +170,83 @@ public struct Card {
             "expiryDate": expiryDate,
             "cardNumber": cardNumber,
             "nickName": nickName,
-            "cardHolderName": cardHolderName
+            "cardHolderName": cardHolderName,
+            "requiresCVV": requiresCVV,
+            "created": created,
+            "lastUsedAt": lastUsedAt
         ]
     }
 }
 
-public struct Wallet {
+public struct Wallet: PaymentMethod {
     public let isDefaultPaymentMethod: Bool
     public let paymentToken: String
     public let walletType: String
+    public let created: String
+    public let lastUsedAt: String
     
     public func toHashMap() -> [String: Any] {
         return [
             "isDefaultPaymentMethod": isDefaultPaymentMethod,
             "paymentToken": paymentToken,
-            "walletType": walletType
+            "walletType": walletType,
+            "created": created,
+            "lastUsedAt": lastUsedAt
         ]
     }
 }
 
-public struct PMError {
+public struct PMError: PaymentMethod {
+    
+    public let isDefaultPaymentMethod: Bool = false
+    public let paymentToken: String = ""
+    public let created: String = ""
+    public let lastUsedAt: String = ""
     public let code: String
     public let message: String
     
     public func toHashMap() -> [String: Any] {
         return [
             "code": code,
-            "message": message
+            "message": message,
+            "isDefaultPaymentMethod": isDefaultPaymentMethod,
+            "paymentToken": paymentToken,
+            "created": created,
+            "lastUsedAt": lastUsedAt
         ]
     }
 }
+
+public struct PaymentSessionHandler {
+    let getCustomerDefaultSavedPaymentMethodData: () -> PaymentMethod
+    let getCustomerLastUsedPaymentMethodData: () -> PaymentMethod
+    let getCustomerSavedPaymentMethodData: () -> [PaymentMethod]
+    let confirmWithCustomerDefaultPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+    let confirmWithCustomerLastUsedPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+    let confirmWithCustomerPaymentToken: (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+    
+    init(
+        getCustomerDefaultSavedPaymentMethodData: @escaping () -> PaymentMethod,
+        getCustomerLastUsedPaymentMethodData: @escaping () -> PaymentMethod,
+        getCustomerSavedPaymentMethodData: @escaping () -> [PaymentMethod],
+        confirmWithCustomerDefaultPaymentMethod: @escaping (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void,
+        confirmWithCustomerLastUsedPaymentMethod: @escaping (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void,
+        confirmWithCustomerPaymentToken: @escaping (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+    ) {
+        self.getCustomerDefaultSavedPaymentMethodData = getCustomerDefaultSavedPaymentMethodData
+        self.getCustomerLastUsedPaymentMethodData = getCustomerLastUsedPaymentMethodData
+        self.getCustomerSavedPaymentMethodData = getCustomerSavedPaymentMethodData
+        self.confirmWithCustomerDefaultPaymentMethod = confirmWithCustomerDefaultPaymentMethod
+        self.confirmWithCustomerLastUsedPaymentMethod = confirmWithCustomerLastUsedPaymentMethod
+        self.confirmWithCustomerPaymentToken = confirmWithCustomerPaymentToken
+    }
+}
+
+public protocol PaymentMethod {
+    var isDefaultPaymentMethod: Bool { get }
+    var paymentToken: String { get }
+    var created: String { get }
+    var lastUsedAt: String { get }
+    func toHashMap() -> [String: Any]
+}
+

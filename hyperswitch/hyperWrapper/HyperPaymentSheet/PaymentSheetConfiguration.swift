@@ -137,21 +137,25 @@ extension PaymentSheet {
         /// The default value is the name of your app, using CFBundleDisplayName or CFBundleName
         public var merchantDisplayName: String = Bundle.displayName ?? ""
         
-        //
-        // toggle to disable SaveCard CheckBox
+        ///
+        /// toggle to disable SaveCard CheckBox
         public var displaySavedPaymentMethodsCheckbox: Bool? = true
 
-        //
-        // toggle to disable SavedCard Screen
+        ///
+        /// toggle to disable SavedCard Screen
         public var displaySavedPaymentMethods: Bool? = true
         
-        //
-        // toggle to disable Branding
+        ///
+        /// toggle to disable Branding
         public var disableBranding: Bool? = false
         
-        //
-        // add custom placeholder text
+        ///
+        /// add custom placeholder text
         public var placeholder: PlaceHolder = PlaceHolder()
+        
+        ///
+        /// toggle to  disable Default Saved Payment Icon
+        public var displayDefaultSavedPaymentIcon: Bool? = true
         
         /// A URL that redirects back to your app that PaymentSheet can use to auto-dismiss
         /// web views used for additional authentication, e.g. 3DS2
