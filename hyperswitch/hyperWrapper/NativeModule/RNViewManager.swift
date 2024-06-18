@@ -64,23 +64,19 @@ private func getPlist(_ key: String) -> String? {
 
 private func CodepushAPI() {
     if let hyperVersion = getInfoPlist("HyperVersion"), !hyperVersion.isEmpty{
-        print(hyperVersion)
         CodePush.overrideAppVersion(hyperVersion)
     }
     else {
         if let hyperVersionInSDK = getPlist("HyperVersion"){
-            print(hyperVersionInSDK)
             CodePush.overrideAppVersion(hyperVersionInSDK)
         }
     }
     
     if let codePushDeploymentKey = getInfoPlist("CodePushDeploymentKey"), !codePushDeploymentKey.isEmpty {
-        print(codePushDeploymentKey)
         CodePush.setDeploymentKey(codePushDeploymentKey)
     }
     else {
         if let codePushDeploymentKeyInSDK = getPlist("CodePushDeploymentKey"){
-            print(codePushDeploymentKeyInSDK)
             CodePush.setDeploymentKey(codePushDeploymentKeyInSDK)
         }
     }

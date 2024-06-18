@@ -32,13 +32,13 @@ public class PaymentSession {
         
     }
     
-    public func getCustomerSavedPaymentMethods(func1: @escaping (PaymentSessionHandler) -> Void) {
+    public func getCustomerSavedPaymentMethods(_ func1: @escaping (PaymentSessionHandler) -> Void) {
         completion = func1
         RNViewManager.sharedInstance2.reinvalidateBridge()
         let _ = RNViewManager.sharedInstance2.viewForModule("dummy", initialProperties: [:])
     }
     
-    func getPaymentSession(getPaymentMethodData: NSDictionary, getPaymentMethodData2: NSDictionary, getPaymentMethodDataArray: NSArray, callback: @escaping RCTResponseSenderBlock) {
+    public func getPaymentSession(getPaymentMethodData: NSDictionary, getPaymentMethodData2: NSDictionary, getPaymentMethodDataArray: NSArray, callback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
             let handler = PaymentSessionHandler(
                 getCustomerDefaultSavedPaymentMethodData: {
@@ -218,12 +218,12 @@ public struct PMError: PaymentMethod {
 }
 
 public struct PaymentSessionHandler {
-    let getCustomerDefaultSavedPaymentMethodData: () -> PaymentMethod
-    let getCustomerLastUsedPaymentMethodData: () -> PaymentMethod
-    let getCustomerSavedPaymentMethodData: () -> [PaymentMethod]
-    let confirmWithCustomerDefaultPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
-    let confirmWithCustomerLastUsedPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
-    let confirmWithCustomerPaymentToken: (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+    public let getCustomerDefaultSavedPaymentMethodData: () -> PaymentMethod
+    public let getCustomerLastUsedPaymentMethodData: () -> PaymentMethod
+    public let getCustomerSavedPaymentMethodData: () -> [PaymentMethod]
+    public let confirmWithCustomerDefaultPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+    public let confirmWithCustomerLastUsedPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+    public let confirmWithCustomerPaymentToken: (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
     
     init(
         getCustomerDefaultSavedPaymentMethodData: @escaping () -> PaymentMethod,
