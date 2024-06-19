@@ -67,8 +67,8 @@ class HyperHeadless: RCTEventEmitter {
     }
     
     @objc
-    func exitHeadless(_ rnMessage: NSDictionary) {
-        PaymentSession.shared?.exitHeadless(message: rnMessage)
+    func exitHeadless(_ rnMessage: String) {
+        PaymentSession.shared?.exitHeadless(rnMessage: rnMessage)
     }
     
 }

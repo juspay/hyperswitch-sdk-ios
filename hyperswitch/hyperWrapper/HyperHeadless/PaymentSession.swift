@@ -89,24 +89,39 @@ public class PaymentSession {
     }
     
     
-    func exitHeadless(message: NSDictionary) {
+    func exitHeadless(rnMessage: String) {
         DispatchQueue.main.async {
-            guard let status = message["status"] as? String else {
-                self.completion2?(.failed(error: NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message" : "An error has occurred."])))
-                return
+            if let data = rnMessage.data(using: .utf8) {
+                do {
+                    if let message = try JSONSerialization.jsonObject(with: data, options: []) as? [String: String] {
+                        guard let status = message["status"] else {
+                            self.completion2?(.failed(error: NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message" : "An error has occurred."])))
+                            return
+                        }
+                        switch status {
+                        case "cancelled":
+                            self.completion2?(.canceled(data: status))
+                        case "failed", "requires_payment_method":
+                            let domain = (message["code"]) != "" ? message["code"] : "UNKNOWN_ERROR"
+                            let errorMessage = message["message"] ?? "An error has occurred."
+                            let userInfo = ["message": errorMessage]
+                            self.completion2?(.failed(error: NSError(domain: domain ?? "UNKNOWN_ERROR", code: 0, userInfo: userInfo)))
+                        default:
+                            self.completion2?(.completed(data: status))
+                        }
+                    } else {
+                        let domain = "UNKNOWN_ERROR"
+                        let errorMessage = "An error has occurred."
+                        let userInfo = ["message": errorMessage]
+                        self.completion2?(.failed(error: NSError(domain: domain , code: 0, userInfo: userInfo)))
+                    }
+                } catch {
+                    let domain = "UNKNOWN_ERROR"
+                    let errorMessage = "An error has occurred."
+                    let userInfo = ["message": errorMessage]
+                    self.completion2?(.failed(error: NSError(domain: domain , code: 0, userInfo: userInfo)))
+                }
             }
-            switch status {
-            case "cancelled":
-                self.completion2?(.canceled(data: status))
-            case "failed", "requires_payment_method":
-                let domain = (message["code"] as? String) != "" ? message["code"] as? String : "UNKNOWN_ERROR"
-                let errorMessage = message["message"] as? String ?? "An error has occurred."
-                let userInfo = ["message": errorMessage]
-                self.completion2?(.failed(error: NSError(domain: domain ?? "UNKNOWN_ERROR", code: 0, userInfo: userInfo)))
-            default:
-                self.completion2?(.completed(data: status))
-            }
-            
         }
     }
     
