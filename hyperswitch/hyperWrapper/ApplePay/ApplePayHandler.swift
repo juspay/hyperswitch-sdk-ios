@@ -13,11 +13,10 @@ internal class ApplePayHandler: NSObject {
     
     var paymentController: PKPaymentAuthorizationController?
     var paymentStatus: PKPaymentAuthorizationStatus? = nil
-    var callback: RCTDirectEventBlock?
+    var callback: RCTResponseSenderBlock?
     
-    // Method to start an Apple Pay payment
-    func startPayment(rnMessage: String, rnCallback: @escaping RCTDirectEventBlock) {
-        
+    func startPayment(rnMessage: String, rnCallback: @escaping RCTResponseSenderBlock) {
+ 
         callback = rnCallback
         var supportedNetworks: [PKPaymentNetwork]?
         var requiredBillingContactFields:Set<PKContactField> = [.emailAddress, .phoneNumber, .postalAddress, .name] //remove
@@ -25,38 +24,38 @@ internal class ApplePayHandler: NSObject {
         
         
         guard let dict = rnMessage.toJSON() as? [String: AnyObject] else {
-            rnCallback(["status": "Error"])
+            rnCallback([["status": "Error"]])
             return
         }
         
         guard let payment_request_data = dict["payment_request_data"] else {
-            rnCallback(["status": "Error"])
+            rnCallback([["status": "Error"]])
             return
         }
         
         guard let countryCode = payment_request_data["country_code"] as? String else {
-            rnCallback(["status": "Error"])
+            rnCallback([["status": "Error"]])
             return
         }
         
         guard let currencyCode = payment_request_data["currency_code"] as? String else {
-            rnCallback(["status": "Error"])
+            rnCallback([["status": "Error"]])
             return
         }
         guard let total = payment_request_data["total"] as? [String: AnyObject] else {
-            rnCallback(["status": "Error"])
+            rnCallback([["status": "Error"]])
             return
         }
         
         guard let amount = total["amount"] as? String,
               let label = total["label"] as? String,
               let type = total["type"] as? String else {
-            rnCallback(["status": "Error"])
+            rnCallback([["status": "Error"]])
             return
         }
         
         guard let merchant_capabilities_array = payment_request_data["merchant_capabilities"] as? Array<String> else {
-            rnCallback(["status": "Error"])
+            rnCallback([["status": "Error"]])
             return
         }
         
@@ -65,7 +64,7 @@ internal class ApplePayHandler: NSObject {
         }
         
         guard let merchantIdentifier = payment_request_data["merchant_identifier"] as? String else{
-            rnCallback(["status": "Error"])
+            rnCallback([["status": "Error"]])
             return
         }
         
@@ -97,7 +96,7 @@ internal class ApplePayHandler: NSObject {
             if presented {
                 self.paymentStatus = nil
             } else {
-                rnCallback(["status": "Error"])
+                rnCallback([["status": "Error"]])
             }
         })
     }
@@ -127,7 +126,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
             }
             
             self.callback?(
-                [
+                [[
                     "status": "Success",
                     "payment_data": dataString,
                     "payment_method": [
@@ -137,7 +136,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
                     ],
                     "transaction_identifier": payment.token.transactionIdentifier,
                     "billing_contact": convertPKContactToDictionary(payment.shippingContact)
-                ]
+                ]]
             )
         }
         
@@ -148,9 +147,9 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         controller.dismiss {
             DispatchQueue.main.async {
                 if self.paymentStatus == .failure {
-                    self.callback?(["status": "Failed"])
+                    self.callback?([["status": "Failed"]])
                 } else if self.paymentStatus == nil {
-                    self.callback?(["status": "Cancelled"])
+                    self.callback?([["status": "Cancelled"]])
                 }
             }
         }

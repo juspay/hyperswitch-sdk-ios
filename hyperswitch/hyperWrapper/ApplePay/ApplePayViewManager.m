@@ -6,7 +6,6 @@ RCT_EXPORT_VIEW_PROPERTY(buttonStyle, NSString)
 RCT_EXPORT_VIEW_PROPERTY(buttonType, NSString)
 RCT_EXPORT_VIEW_PROPERTY(color, NSString)
 RCT_EXPORT_VIEW_PROPERTY(cornerRadius,CGFloat)
-RCT_EXPORT_VIEW_PROPERTY(requestData, NSString)
 RCT_EXPORT_VIEW_PROPERTY(onPaymentResultCallback, RCTDirectEventBlock)
 
 @end

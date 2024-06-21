@@ -15,7 +15,7 @@ RCT_EXTERN_METHOD(launchWidgetPaymentSheet: (NSDictionary) rnMessage :(RCTRespon
 
 RCT_EXTERN_METHOD(exitWidgetPaymentsheet: (nonnull NSNumber *)reactTag :(NSString)rnMessage :(BOOL)reset)
 
-RCT_EXTERN_METHOD(launchApplePay: (NSString)rnMessage :(RCTDirectEventBlock)rnCallback)
+RCT_EXTERN_METHOD(launchApplePay: (NSString)rnMessage :(RCTResponseSenderBlock)rnCallback)
 
 @end
 

@@ -24,7 +24,6 @@ class ApplePayView : UIView {
     
     private var button: PKPaymentButton?
     private var paymentHandler = ApplePayHandler()
-    private var applePayRequestData: String?
     @objc private var onPaymentResultCallback: RCTDirectEventBlock?
     
     @objc var buttonStyle: String = "" {
@@ -45,11 +44,6 @@ class ApplePayView : UIView {
     @objc var cornerRadius: CGFloat = 0.0 {
         didSet {
             setButton(setButtonType: buttonType, setButtonStyle: buttonStyle, setButtonCornerRadius: cornerRadius)
-        }
-    }
-    @objc var requestData: String = "" {
-        didSet {
-            applePayRequestData = requestData
         }
     }
     
@@ -115,10 +109,9 @@ class ApplePayView : UIView {
     
     @objc private func touchUpInside(_ button: PKPaymentButton) {
         if let onPaymentResultCallback = onPaymentResultCallback {
-            if let data = applePayRequestData {
-                paymentHandler.startPayment(rnMessage: data, rnCallback: onPaymentResultCallback)
-            }
+            onPaymentResultCallback(nil)
         }
+
     }
     
     override func layoutSubviews() {
