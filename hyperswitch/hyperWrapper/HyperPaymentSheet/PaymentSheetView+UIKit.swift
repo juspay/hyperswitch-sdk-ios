@@ -8,6 +8,18 @@
 import Foundation
 import React
 
+class PaymentSheetUIViewController: UIViewController{
+    override var shouldAutorotate: Bool {
+        return false
+    }
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return UIInterfaceOrientationMask.portrait
+    }
+    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+        return UIInterfaceOrientation.portrait
+    }
+}
+
 /// Extension on the PaymentSheet class to handle the presentation of the payment sheet view.
 extension PaymentSheet {
     
@@ -21,7 +33,7 @@ extension PaymentSheet {
         RNViewManager.sharedInstance.responseHandler = self
         
         /// Create a new UIViewController to present the payment sheet view.
-        let paymentSheetViewController = UIViewController()
+        let paymentSheetViewController = PaymentSheetUIViewController()
         
         /// Set the modal presentation style to cover the entire screen.
         paymentSheetViewController.modalPresentationStyle = .overFullScreen
