@@ -13,10 +13,10 @@ internal class ApplePayHandler: NSObject {
     
     var paymentController: PKPaymentAuthorizationController?
     var paymentStatus: PKPaymentAuthorizationStatus? = nil
-    var callback: RCTResponseSenderBlock?
+    var callback: RCTDirectEventBlock?
     
     // Method to start an Apple Pay payment
-    func startPayment(rnMessage: String, rnCallback: @escaping RCTResponseSenderBlock) {
+    func startPayment(rnMessage: String, rnCallback: @escaping RCTDirectEventBlock) {
         
         callback = rnCallback
         var supportedNetworks: [PKPaymentNetwork]?
@@ -25,38 +25,38 @@ internal class ApplePayHandler: NSObject {
         
         
         guard let dict = rnMessage.toJSON() as? [String: AnyObject] else {
-            rnCallback([["status": "Error"]])
+            rnCallback(["status": "Error"])
             return
         }
         
         guard let payment_request_data = dict["payment_request_data"] else {
-            rnCallback([["status": "Error"]])
+            rnCallback(["status": "Error"])
             return
         }
         
         guard let countryCode = payment_request_data["country_code"] as? String else {
-            rnCallback([["status": "Error"]])
+            rnCallback(["status": "Error"])
             return
         }
         
         guard let currencyCode = payment_request_data["currency_code"] as? String else {
-            rnCallback([["status": "Error"]])
+            rnCallback(["status": "Error"])
             return
         }
         guard let total = payment_request_data["total"] as? [String: AnyObject] else {
-            rnCallback([["status": "Error"]])
+            rnCallback(["status": "Error"])
             return
         }
         
         guard let amount = total["amount"] as? String,
               let label = total["label"] as? String,
               let type = total["type"] as? String else {
-            rnCallback([["status": "Error"]])
+            rnCallback(["status": "Error"])
             return
         }
         
         guard let merchant_capabilities_array = payment_request_data["merchant_capabilities"] as? Array<String> else {
-            rnCallback([["status": "Error"]])
+            rnCallback(["status": "Error"])
             return
         }
         
@@ -65,7 +65,7 @@ internal class ApplePayHandler: NSObject {
         }
         
         guard let merchantIdentifier = payment_request_data["merchant_identifier"] as? String else{
-            rnCallback([["status": "Error"]])
+            rnCallback(["status": "Error"])
             return
         }
         
@@ -76,7 +76,7 @@ internal class ApplePayHandler: NSObject {
         if let required_shipping_contact_fields = payment_request_data["required_shipping_contact_fields"] as? Array<String> {
             requiredShippingContactFields = Set(required_shipping_contact_fields.compactMap { PKContactField(rawValue: $0) })
         }
-        
+             
         let paymentSummaryItems = PKPaymentSummaryItem(label: label, amount: NSDecimalNumber(string: amount), type: (type == "final") ? .final : .pending)
         let paymentRequest = PKPaymentRequest()
         paymentRequest.paymentSummaryItems = [paymentSummaryItems]
@@ -97,7 +97,7 @@ internal class ApplePayHandler: NSObject {
             if presented {
                 self.paymentStatus = nil
             } else {
-                rnCallback([["status": "Error"]])
+                rnCallback(["status": "Error"])
             }
         })
     }
@@ -126,7 +126,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
             default: paymentType = "unknown"
             }
             
-            self.callback?([
+            self.callback?(
                 [
                     "status": "Success",
                     "payment_data": dataString,
@@ -138,7 +138,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
                     "transaction_identifier": payment.token.transactionIdentifier,
                     "billing_contact": convertPKContactToDictionary(payment.shippingContact)
                 ]
-            ])
+            )
         }
         
         completion(paymentStatus ?? .failure)
@@ -148,9 +148,9 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         controller.dismiss {
             DispatchQueue.main.async {
                 if self.paymentStatus == .failure {
-                    self.callback?([["status": "Failed"]])
+                    self.callback?(["status": "Failed"])
                 } else if self.paymentStatus == nil {
-                    self.callback?([["status": "Cancelled"]])
+                    self.callback?(["status": "Cancelled"])
                 }
             }
         }
