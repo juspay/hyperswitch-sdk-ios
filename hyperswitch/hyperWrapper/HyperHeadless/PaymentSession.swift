@@ -15,43 +15,45 @@ import UIKit
 
 public class PaymentSession {
     
-    static var viewController: UIViewController?
-    static var clientSecret: String?
-    public var completion: ((PaymentSessionHandler) -> Void)?
-    var completion2: ((PaymentResult) -> Void)?
-    static var shared: PaymentSession?
+    fileprivate static var completion: ((PaymentResult) -> Void)?
+    internal static var headlessCompletion: ((PaymentSessionHandler) -> Void)?
+    internal static var paymentIntentClientSecret: String?
     
-    public init() {}
-    
-    public convenience init(viewController: UIViewController?=nil, clientSecret: String) {
-        self.init()
-        
-        PaymentSession.viewController = viewController
-        PaymentSession.clientSecret = clientSecret
-        PaymentSession.shared = self
-        
+    public init(publishableKey: String, customBackendUrl: String? = nil, customParams: [String : Any]? = nil, customLogUrl: String? = nil){
+        APIClient.shared.publishableKey = publishableKey
+        APIClient.shared.customBackendUrl = customBackendUrl
+        APIClient.shared.customLogUrl = customLogUrl
+        APIClient.shared.customParams = customParams
     }
     
-    public func getCustomerSavedPaymentMethods(_ func1: @escaping (PaymentSessionHandler) -> Void) {
-        completion = func1
+    public func initPaymentSession(paymentIntentClientSecret: String){
+        PaymentSession.paymentIntentClientSecret = paymentIntentClientSecret
+    }
+    
+    public func presentPaymentSheet(viewController: UIViewController, configuration: PaymentSheet.Configuration, completion: @escaping (PaymentSheetResult) -> ()){
+        let paymentSheet = PaymentSheet(paymentIntentClientSecret: PaymentSession.paymentIntentClientSecret ?? "", configuration: configuration)
+        paymentSheet.present(from: viewController, completion: completion)
+    }
+    public func getCustomerSavedPaymentMethods(_ func_: @escaping (PaymentSessionHandler) -> Void) {
+        PaymentSession.headlessCompletion = func_
         RNViewManager.sharedInstance2.reinvalidateBridge()
         let _ = RNViewManager.sharedInstance2.viewForModule("dummy", initialProperties: [:])
     }
     
-    public func getPaymentSession(getPaymentMethodData: NSDictionary, getPaymentMethodData2: NSDictionary, getPaymentMethodDataArray: NSArray, callback: @escaping RCTResponseSenderBlock) {
+    internal static func getPaymentSession(getPaymentMethodData: NSDictionary, getPaymentMethodData2: NSDictionary, getPaymentMethodDataArray: NSArray, callback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
             let handler = PaymentSessionHandler(
                 getCustomerDefaultSavedPaymentMethodData: {
-                    return self.parseGetPaymentMethodData(getPaymentMethodData)
+                    return parseGetPaymentMethodData(getPaymentMethodData)
                 },
                 getCustomerLastUsedPaymentMethodData: {
-                    return self.parseGetPaymentMethodData(getPaymentMethodData2)
+                    return parseGetPaymentMethodData(getPaymentMethodData2)
                 },
                 getCustomerSavedPaymentMethodData: {
                     var array = [PaymentMethod]()
                     for i in 0..<getPaymentMethodDataArray.count {
                         if let map = getPaymentMethodDataArray[i] as? NSDictionary {
-                            array.append(self.parseGetPaymentMethodData(map))
+                            array.append(parseGetPaymentMethodData(map))
                         }
                     }
                     return array
@@ -59,73 +61,73 @@ public class PaymentSession {
                 confirmWithCustomerDefaultPaymentMethod: { cvc, resultHandler in
                     if let map = getPaymentMethodData["_0"] as? NSDictionary,
                        let paymentToken = map["payment_token"] as? String {
-                            self.completion2 = resultHandler
-                            var map = [String: Any]()
-                            map["paymentToken"] = paymentToken
-                            map["cvc"] = cvc
-                            callback([map])
+                        self.completion = resultHandler
+                        var map = [String: Any]()
+                        map["paymentToken"] = paymentToken
+                        map["cvc"] = cvc
+                        callback([map])
                     }
                 },
                 confirmWithCustomerLastUsedPaymentMethod: { cvc, resultHandler in
                     if let map = getPaymentMethodData2["_0"] as? NSDictionary,
                        let paymentToken = map["payment_token"] as? String {
-                            self.completion2 = resultHandler
-                            var map = [String: Any]()
-                            map["paymentToken"] = paymentToken
-                            map["cvc"] = cvc
-                            callback([map])
-                    }
-                },
-                confirmWithCustomerPaymentToken: { paymentToken, cvc, resultHandler in
-                        self.completion2 = resultHandler
+                        self.completion = resultHandler
                         var map = [String: Any]()
                         map["paymentToken"] = paymentToken
                         map["cvc"] = cvc
                         callback([map])
+                    }
+                },
+                confirmWithCustomerPaymentToken: { paymentToken, cvc, resultHandler in
+                    self.completion = resultHandler
+                    var map = [String: Any]()
+                    map["paymentToken"] = paymentToken
+                    map["cvc"] = cvc
+                    callback([map])
                 }
             )
-            self.completion?(handler)
+            self.headlessCompletion?(handler)
         }
     }
     
     
-    func exitHeadless(rnMessage: String) {
+    internal static func exitHeadless(rnMessage: String) {
         DispatchQueue.main.async {
             if let data = rnMessage.data(using: .utf8) {
                 do {
                     if let message = try JSONSerialization.jsonObject(with: data, options: []) as? [String: String] {
                         guard let status = message["status"] else {
-                            self.completion2?(.failed(error: NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message" : "An error has occurred."])))
+                            completion?(.failed(error: NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message" : "An error has occurred."])))
                             return
                         }
                         switch status {
                         case "cancelled":
-                            self.completion2?(.canceled(data: status))
+                            completion?(.canceled(data: status))
                         case "failed", "requires_payment_method":
                             let domain = (message["code"]) != "" ? message["code"] : "UNKNOWN_ERROR"
                             let errorMessage = message["message"] ?? "An error has occurred."
                             let userInfo = ["message": errorMessage]
-                            self.completion2?(.failed(error: NSError(domain: domain ?? "UNKNOWN_ERROR", code: 0, userInfo: userInfo)))
+                            completion?(.failed(error: NSError(domain: domain ?? "UNKNOWN_ERROR", code: 0, userInfo: userInfo)))
                         default:
-                            self.completion2?(.completed(data: status))
+                            completion?(.completed(data: status))
                         }
                     } else {
                         let domain = "UNKNOWN_ERROR"
                         let errorMessage = "An error has occurred."
                         let userInfo = ["message": errorMessage]
-                        self.completion2?(.failed(error: NSError(domain: domain , code: 0, userInfo: userInfo)))
+                        self.completion?(.failed(error: NSError(domain: domain , code: 0, userInfo: userInfo)))
                     }
                 } catch {
                     let domain = "UNKNOWN_ERROR"
                     let errorMessage = "An error has occurred."
                     let userInfo = ["message": errorMessage]
-                    self.completion2?(.failed(error: NSError(domain: domain , code: 0, userInfo: userInfo)))
+                    self.completion?(.failed(error: NSError(domain: domain , code: 0, userInfo: userInfo)))
                 }
             }
         }
     }
     
-    private func parseGetPaymentMethodData(_ readableMap: NSDictionary) -> PaymentMethod {
+    private static func parseGetPaymentMethodData(_ readableMap: NSDictionary) -> PaymentMethod {
         let tag = readableMap["TAG"] as? String ?? ""
         let dataObject = readableMap["_0"] as? [String: Any]
         
@@ -212,7 +214,6 @@ public struct Wallet: PaymentMethod {
 }
 
 public struct PMError: PaymentMethod {
-    
     public let isDefaultPaymentMethod: Bool = false
     public let paymentToken: String = ""
     public let created: String = ""

@@ -13,16 +13,30 @@ struct ContentView: View {
     var body: some View {
         VStack {
             Picker(selection: $selectedSegment, label: Text("")) {
-                Text("UIKit View").tag(0)
-                Text("SwiftUI View").tag(1)
+                Text("Headless View").tag(0)
+                Text("UIKit View").tag(1)
+                Text("SwiftUI View").tag(2)
             }.pickerStyle(SegmentedPickerStyle())
             if selectedSegment == 0 {
+                HeadlessView()
+            }
+            else if selectedSegment == 1{
                 UIKitView()
             }
             else {
                 SwiftUIView()
             }
         }
+    }
+}
+struct HeadlessView: UIViewControllerRepresentable {
+    typealias UIViewControllerType = HeadlessViewController
+    
+    func makeUIViewController(context: Context) -> HeadlessViewController {
+        return HeadlessViewController()
+    }
+    
+    func updateUIViewController(_ uiViewController: HeadlessViewController, context: Context) {
     }
 }
 

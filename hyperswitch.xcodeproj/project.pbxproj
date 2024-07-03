@@ -53,6 +53,7 @@
 		7938D81B2A4EF45000286CEE /* PaymentMethodParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7938D81A2A4EF45000286CEE /* PaymentMethodParams.swift */; };
 		7954A4472C23A44B00FEC02D /* ApplePayViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7954A4462C23A44B00FEC02D /* ApplePayViewManager.m */; };
 		7954A44A2C23A49A00FEC02D /* ApplePayViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7954A4492C23A49A00FEC02D /* ApplePayViewManager.swift */; };
+		79728FB92C3412BB00CA8C10 /* HeadlessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */; };
 		7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7996A8322BA1FDD000394FAF /* hyperswitch.bundle */; };
 		799979AD2BF2466300C54EA4 /* Codepush.plist in Resources */ = {isa = PBXBuildFile; fileRef = 799979AC2BF2466300C54EA4 /* Codepush.plist */; };
 		799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */; };
@@ -130,6 +131,7 @@
 		7938D81A2A4EF45000286CEE /* PaymentMethodParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodParams.swift; sourceTree = "<group>"; };
 		7954A4462C23A44B00FEC02D /* ApplePayViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ApplePayViewManager.m; sourceTree = "<group>"; };
 		7954A4492C23A49A00FEC02D /* ApplePayViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayViewManager.swift; sourceTree = "<group>"; };
+		79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlessViewController.swift; sourceTree = "<group>"; };
 		7996A8322BA1FDD000394FAF /* hyperswitch.bundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hyperswitch.bundle; sourceTree = "<group>"; };
 		799979AC2BF2466300C54EA4 /* Codepush.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Codepush.plist; sourceTree = "<group>"; };
 		799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -218,6 +220,7 @@
 				66486F91294355BD00150E4F /* hyperApp.swift */,
 				66486F93294355BD00150E4F /* ContentView.swift */,
 				DC5D011D294844900017C67A /* ViewController.swift */,
+				79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */,
 				790525792BDA73A600D49FE8 /* SwiftUIView.swift */,
 				790525702BDA66EF00D49FE8 /* HyperViewModel.swift */,
 				7929D8652A616279006BD77E /* Main.storyboard */,
@@ -504,6 +507,7 @@
 			files = (
 				793083F12A0DAA4200E78310 /* HyperAPI.swift in Sources */,
 				7954A4472C23A44B00FEC02D /* ApplePayViewManager.m in Sources */,
+				79728FB92C3412BB00CA8C10 /* HeadlessViewController.swift in Sources */,
 				66486FA92943580F00150E4F /* AppDelegate.swift in Sources */,
 				790BA8272B99DB5E006678FD /* PaymentSession.swift in Sources */,
 				7905257A2BDA73A600D49FE8 /* SwiftUIView.swift in Sources */,

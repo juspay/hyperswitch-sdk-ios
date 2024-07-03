@@ -13,6 +13,7 @@ class HyperViewModel: ObservableObject {
     
     @Published var paymentSheet: PaymentSheet?
     @Published var paymentResult: PaymentSheetResult?
+    @Published var paymentSession: PaymentSession?
     
     func preparePaymentSheet() {
         
@@ -47,6 +48,8 @@ class HyperViewModel: ObservableObject {
                         
             DispatchQueue.main.async {
                 self.paymentSheet = PaymentSheet(paymentIntentClientSecret: paymentIntentClientSecret, configuration: configuration)
+                self.paymentSession = PaymentSession(publishableKey: publishableKey)
+                self.paymentSession?.initPaymentSession(paymentIntentClientSecret: paymentIntentClientSecret)
             }
         })
         task.resume()

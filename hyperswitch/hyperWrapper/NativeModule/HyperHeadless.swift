@@ -42,7 +42,7 @@ class HyperHeadless: RCTEventEmitter {
     @objc
     func initialisePaymentSession (_ rnCallback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
-            if PaymentSession.shared?.completion != nil {
+            if PaymentSession.headlessCompletion != nil {
                 let hyperParams = [
                     "appId": Bundle.main.bundleIdentifier,
                     "ip": nil,
@@ -51,7 +51,7 @@ class HyperHeadless: RCTEventEmitter {
                 ]
                 
                 let props: [String: Any] = [
-                    "clientSecret": PaymentSession.clientSecret as Any,
+                    "clientSecret": PaymentSession.paymentIntentClientSecret as Any,
                     "publishableKey": APIClient.shared.publishableKey as Any,
                     "hyperParams": hyperParams,
                     "customBackendUrl": APIClient.shared.customBackendUrl as Any,
@@ -63,12 +63,12 @@ class HyperHeadless: RCTEventEmitter {
     
     @objc
     func getPaymentSession(_ rnMessage: NSDictionary, _ rnMessage2: NSDictionary, _ rnMessage3: NSArray, _ rnCallback: @escaping RCTResponseSenderBlock) {
-        PaymentSession.shared?.getPaymentSession(getPaymentMethodData: rnMessage, getPaymentMethodData2: rnMessage2, getPaymentMethodDataArray: rnMessage3, callback: rnCallback)
+        PaymentSession.getPaymentSession(getPaymentMethodData: rnMessage, getPaymentMethodData2: rnMessage2, getPaymentMethodDataArray: rnMessage3, callback: rnCallback)
     }
     
     @objc
     func exitHeadless(_ rnMessage: String) {
-        PaymentSession.shared?.exitHeadless(rnMessage: rnMessage)
+        PaymentSession.exitHeadless(rnMessage: rnMessage)
     }
     
 }
