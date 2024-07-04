@@ -7,99 +7,73 @@
 
 import SwiftUI
 import UIKit
+import Combine
 
 class HeadlessViewController: UIViewController {
     
-    var statusLabel = UILabel()
-    var headlessbutton = UIButton()
-    var getData = UIButton()
-    var confirmButton = UIButton()
-    var Image = UIImageView()
-    var headlessbuttonConfig = UIButton.Configuration.filled()
-    var getDataConfig = UIButton.Configuration.filled()
-    var confirmButtonConfig = UIButton.Configuration.filled()
-    var handler: PaymentSessionHandler?
-    @Published var flag = false
-    @ObservedObject var hyperModel = HyperViewModel()
+    @ObservedObject var hyperViewModel = HyperViewModel()
+    
+    private let statusLabel = UILabel()
+    private let stackView = UIStackView()
+    private let scrollView = UIScrollView()
+    
+    private let headlessbutton = UIButton()
+    private let getDefault = UIButton()
+    private let getLast = UIButton()
+    private let getData = UIButton()
+    private let confirmDefault = UIButton()
+    private let confirmLast = UIButton()
+    private let confirm = UIButton()
+    private let reloadButton = UIButton()
+    
+    private var headlessbuttonConfig = UIButton.Configuration.filled()
+    private var getDefaultConfig = UIButton.Configuration.filled()
+    private var getLastConfig = UIButton.Configuration.filled()
+    private var getDataConfig = UIButton.Configuration.filled()
+    private var confirmDefaultConfig = UIButton.Configuration.filled()
+    private var confirmLastConfig = UIButton.Configuration.filled()
+    private var confirmConfig = UIButton.Configuration.filled()
+    private var reloadButtonConfiguration = UIButton.Configuration.plain()
+    
+    private var handler: PaymentSessionHandler?
+    private var cancellables = Set<AnyCancellable>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        hyperModel.preparePaymentSheet()
-        
-        Image.image = UIImage(systemName: "arrow.3.trianglepath")
-        Image.contentMode = .scaleAspectFill
-        let tap = UITapGestureRecognizer(target: self, action: #selector(reload))
-        Image.addGestureRecognizer(tap)
-        Image.isUserInteractionEnabled = true
-        view.addSubview(Image)
-        Image.translatesAutoresizingMaskIntoConstraints = false
-        Image.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        Image.topAnchor.constraint(equalTo: view.topAnchor, constant: 40).isActive = true
-        Image.widthAnchor.constraint(equalToConstant: 32).isActive = true
-        Image.heightAnchor.constraint(equalToConstant: 32).isActive = true
-        
-        headlessbutton.setTitle("init headless", for: .normal)
-        headlessbutton.setTitleColor(.white, for: .normal)
-        headlessbuttonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
-        headlessbutton.configuration = headlessbuttonConfig
-        headlessbutton.layer.cornerRadius = 10
-        headlessbutton.addTarget(self, action: #selector(launchHeadless), for: .touchUpInside)
-        view.addSubview(headlessbutton)
-        headlessbutton.translatesAutoresizingMaskIntoConstraints = false
-        headlessbutton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        headlessbutton.centerYAnchor.constraint(equalTo: view.centerYAnchor,constant: -60).isActive = true
-        
-        getData.isEnabled = false
-        getData.setTitle("getCustomerSavedPaymentMethodData", for: .normal)
-        getData.setTitleColor(.white, for: .normal)
-        getData.addTarget(self, action: #selector(getCustomerSavedPaymentMethodData), for: .touchUpInside)
-        getDataConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
-        getData.configuration = getDataConfig
-        getData.layer.cornerRadius = 10
-        view.addSubview(getData)
-        getData.translatesAutoresizingMaskIntoConstraints = false
-        getData.topAnchor.constraint(equalTo: headlessbutton.bottomAnchor, constant: 20).isActive = true
-        getData.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        
-        confirmButton.isEnabled = false
-        confirmButton.setTitle("confirm headless", for: .normal)
-        confirmButton.setTitleColor(.white, for: .normal)
-        confirmButton.addTarget(self, action: #selector(confirmWithCustomerDefaultPaymentMethod), for: .touchUpInside)
-        confirmButtonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
-        confirmButton.configuration = confirmButtonConfig
-        confirmButton.layer.cornerRadius = 10
-        view.addSubview(confirmButton)
-        confirmButton.translatesAutoresizingMaskIntoConstraints = false
-        confirmButton.topAnchor.constraint(equalTo: getData.bottomAnchor, constant: 20).isActive = true
-        confirmButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        
-        statusLabel.textAlignment = .center
-        statusLabel.numberOfLines = 15
-        statusLabel.font = .systemFont(ofSize: 15)
-        view.addSubview(statusLabel)
-        statusLabel.translatesAutoresizingMaskIntoConstraints = false
-        statusLabel.topAnchor.constraint(equalTo: confirmButton.bottomAnchor, constant: 30).isActive = true
-        statusLabel.heightAnchor.constraint(equalToConstant: 150).isActive = true
-        statusLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
-        statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
-        
+        self.view.backgroundColor = UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 0.2)
+        viewFrame()
+        hyperViewModel.preparePaymentSheet()
+        asyncBind()
+    }
+    
+    private func asyncBind() {
+        hyperViewModel.$status
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                switch status {
+                case .loading:
+                    self?.statusLabel.text = "Loading..."
+                case .success:
+                    self?.statusLabel.text = "Connected to Server"
+                case .failure(let message):
+                    self?.statusLabel.text = message
+                }
+            }
+            .store(in: &cancellables)
     }
     
     @objc
-    func reload()
-    {
-        hyperModel.preparePaymentSheet()
-        Image.isUserInteractionEnabled = false
-        self.statusLabel.text = ""
-        UIView.animate(withDuration: 1.4, animations: {
-            self.Image.transform = self.Image.transform.rotated(by: .pi*3)
+    func reload(_ sender: Any) {
+        hyperViewModel.preparePaymentSheet()
+        self.reloadButton.isUserInteractionEnabled = false
+        UIView.animate(withDuration: 1.6, animations: {
+            self.reloadButton.backgroundColor = .white
         }) { (_) in
-            self.Image.isUserInteractionEnabled = true
+            self.reloadButton.backgroundColor = .systemBlue
+            self.reloadButton.isUserInteractionEnabled = true
         }
     }
     
-
     
     func initSavedPaymentMethodSessionCallback(handler: PaymentSessionHandler)-> Void {
         self.handler = handler
@@ -107,21 +81,24 @@ class HeadlessViewController: UIViewController {
     
     
     @objc func launchHeadless(_ sender: Any) {
-        hyperModel.paymentSession?.getCustomerSavedPaymentMethods(initSavedPaymentMethodSessionCallback)
+        hyperViewModel.paymentSession?.getCustomerSavedPaymentMethods(initSavedPaymentMethodSessionCallback)
+        getDefault.isEnabled = true
+        getLast.isEnabled = true
         getData.isEnabled = true
+
     }
     
-    @objc func getCustomerSavedPaymentMethodData(_ sender: Any) {
+    @objc func getCustomerDefaultSavedPaymentMethodData(_ sender: Any) {
         let paymentMethod = self.handler?.getCustomerDefaultSavedPaymentMethodData()
         switch paymentMethod {
         case let card as Card:
             print(["type": "card", "message": card.toHashMap()])
             self.statusLabel.text = "card → \(card.toHashMap())"
-            confirmButton.isEnabled = true
+            confirmDefault.isEnabled = true
         case let wallet as Wallet:
             print(["type": "wallet", "message": wallet.toHashMap()])
             self.statusLabel.text = "wallet → \(wallet.toHashMap())"
-            confirmButton.isEnabled = true
+            confirmDefault.isEnabled = true
         case let error as PMError:
             print(["type": "error", "message": error.toHashMap()])
             self.statusLabel.text = "error → \(error.toHashMap())"
@@ -131,8 +108,64 @@ class HeadlessViewController: UIViewController {
         }
     }
     
+    @objc func getCustomerLastUsedPaymentMethodData(_ sender: Any) {
+        let paymentMethod = self.handler?.getCustomerLastUsedPaymentMethodData()
+        switch paymentMethod {
+        case let card as Card:
+            print(["type": "card", "message": card.toHashMap()])
+            self.statusLabel.text = "card → \(card.toHashMap())"
+            confirmLast.isEnabled = true
+        case let wallet as Wallet:
+            print(["type": "wallet", "message": wallet.toHashMap()])
+            self.statusLabel.text = "wallet → \(wallet.toHashMap())"
+            confirmLast.isEnabled = true
+        case let error as PMError:
+            print(["type": "error", "message": error.toHashMap()])
+            self.statusLabel.text = "error → \(error.toHashMap())"
+        default:
+            print(["type": "error", "message": ["code": "0", "message": "No Payment Method Available"]])
+            self.statusLabel.text = "error → No Payment Method Available"
+        }
+    }
+    
+    @objc func getCustomerSavedPaymentMethodData(_ sender: Any) {
+        let paymentMethod = self.handler?.getCustomerSavedPaymentMethodData()
+        
+        guard let pm = paymentMethod else{
+            print(["type": "error", "message": ["code": "0", "message": "No Payment Method Available"]])
+            self.statusLabel.text = "error → No Payment Method Available"
+            return
+        }
+        for paymentMethods in pm{
+            switch paymentMethods {
+            case let card as Card:
+                print(["type": "card", "message": card.toHashMap()])
+                self.statusLabel.text = "card → \(card.toHashMap())"
+                confirm.isEnabled = true
+            case let wallet as Wallet:
+                print(["type": "wallet", "message": wallet.toHashMap()])
+                self.statusLabel.text = "wallet → \(wallet.toHashMap())"
+                confirm.isEnabled = true
+            case let error as PMError:
+                print(["type": "error", "message": error.toHashMap()])
+                self.statusLabel.text = "error → \(error.toHashMap())"
+            default:
+                print(["type": "error", "message": ["code": "0", "message": "No Payment Method Available"]])
+                self.statusLabel.text = "error → No Payment Method Available"
+            }
+        }
+    }
+    
     @objc func confirmWithCustomerDefaultPaymentMethod(_ sender: Any) {
         handler?.confirmWithCustomerDefaultPaymentMethod(nil ,resultHandler)
+    }
+    
+    @objc func confirmWithCustomerLastUsedPaymentMethod(_ sender: Any) {
+        handler?.confirmWithCustomerLastUsedPaymentMethod(nil ,resultHandler)
+    }
+    
+    @objc func confirmWithCustomerPaymentToken(_ sender: Any) {
+//        handler?.confirmWithCustomerPaymentToken(<#T##String#>, <#T##String?#>, <#T##(PaymentResult) -> Void#>)
     }
     
     func resultHandler(_ paymentResult: PaymentResult) {
@@ -147,5 +180,96 @@ class HeadlessViewController: UIViewController {
             print(["type": "failed", "message": "\(error)"])
             self.statusLabel.text = "failed → \(error)"
         }
+    }
+}
+
+extension HeadlessViewController {
+    func viewFrame(){   
+        stackView.axis  = .vertical
+        stackView.alignment = .fill
+        stackView.distribution = .equalCentering
+        stackView.spacing = 20.0
+        stackView.addArrangedSubview(reloadButton)
+        stackView.addArrangedSubview(headlessbutton)
+        stackView.addArrangedSubview(getDefault)
+        stackView.addArrangedSubview(getLast)
+        stackView.addArrangedSubview(getData)
+        stackView.addArrangedSubview(confirmDefault)
+        stackView.addArrangedSubview(confirmLast)
+        stackView.addArrangedSubview(confirm)
+        stackView.addArrangedSubview(statusLabel)
+        view.addSubview(stackView)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60).isActive = true
+        stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
+        stackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 80).isActive = true
+        stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        
+        reloadButton.setTitle("Reload Client Secret", for: .normal)
+        reloadButton.setTitleColor(.white, for: .normal)
+        reloadButtonConfiguration.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        reloadButton.configuration = reloadButtonConfiguration
+        reloadButton.layer.cornerRadius = 10
+        reloadButton.backgroundColor = .systemBlue
+        reloadButton.addTarget(self, action: #selector(reload(_:)), for: .touchUpInside)
+        
+        headlessbutton.setTitle("Initialize Headless", for: .normal)
+        headlessbutton.setTitleColor(.white, for: .normal)
+        headlessbuttonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        headlessbutton.configuration = headlessbuttonConfig
+        headlessbutton.layer.cornerRadius = 10
+        headlessbutton.addTarget(self, action: #selector(launchHeadless), for: .touchUpInside)
+
+        getDefault.isEnabled = false
+        getDefault.setTitle("Get Default Data", for: .normal)
+        getDefault.setTitleColor(.white, for: .normal)
+        getDefault.addTarget(self, action: #selector(getCustomerDefaultSavedPaymentMethodData), for: .touchUpInside)
+        getDefaultConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        getDefault.configuration = getDefaultConfig
+        getDefault.layer.cornerRadius = 10
+        
+        getLast.isEnabled = false
+        getLast.setTitle("Get Last Used Data", for: .normal)
+        getLast.setTitleColor(.white, for: .normal)
+        getLast.addTarget(self, action: #selector(getCustomerLastUsedPaymentMethodData), for: .touchUpInside)
+        getLastConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        getLast.configuration = getLastConfig
+        getLast.layer.cornerRadius = 10
+        
+        getData.isEnabled = false
+        getData.setTitle("Get Data", for: .normal)
+        getData.setTitleColor(.white, for: .normal)
+        getData.addTarget(self, action: #selector(getCustomerSavedPaymentMethodData), for: .touchUpInside)
+        getDataConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        getData.configuration = getDataConfig
+        getData.layer.cornerRadius = 10
+        
+        confirmDefault.isEnabled = false
+        confirmDefault.setTitle("Confirm With Default", for: .normal)
+        confirmDefault.setTitleColor(.white, for: .normal)
+        confirmDefault.addTarget(self, action: #selector(confirmWithCustomerDefaultPaymentMethod), for: .touchUpInside)
+        confirmDefaultConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        confirmDefault.configuration = confirmDefaultConfig
+        confirmDefault.layer.cornerRadius = 10
+        
+        confirmLast.isEnabled = false
+        confirmLast.setTitle("Confirm With Last Used", for: .normal)
+        confirmLast.setTitleColor(.white, for: .normal)
+        confirmLast.addTarget(self, action: #selector(confirmWithCustomerLastUsedPaymentMethod), for: .touchUpInside)
+        confirmLastConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        confirmLast.configuration = confirmLastConfig
+        confirmLast.layer.cornerRadius = 10
+        
+        confirm.isEnabled = false
+        confirm.setTitle("Confirm With Payment Token", for: .normal)
+        confirm.setTitleColor(.white, for: .normal)
+        confirm.addTarget(self, action: #selector(confirmWithCustomerPaymentToken), for: .touchUpInside)
+        confirmConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        confirm.configuration = confirmConfig
+        confirm.layer.cornerRadius = 10
+        
+        statusLabel.textAlignment = .center
+        statusLabel.numberOfLines = 15
+        statusLabel.font = .systemFont(ofSize: 15)
     }
 }

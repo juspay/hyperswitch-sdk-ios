@@ -14,6 +14,13 @@ class HyperViewModel: ObservableObject {
     @Published var paymentSheet: PaymentSheet?
     @Published var paymentResult: PaymentSheetResult?
     @Published var paymentSession: PaymentSession?
+    @Published var status: APIStatus = .loading
+    
+    enum APIStatus {
+        case loading
+        case success
+        case failure(String)
+    }
     
     func preparePaymentSheet() {
         
@@ -21,33 +28,28 @@ class HyperViewModel: ObservableObject {
         request.httpMethod = "GET"
         
         let task = URLSession.shared.dataTask(with: request, completionHandler: { [weak self] (data, response, error) in
+            if let error = error {
+                self?.status = .failure(error.localizedDescription)
+                return
+            }
+            
+            guard let httpResponse = response as? HTTPURLResponse,
+                  (200...299).contains(httpResponse.statusCode) else {
+                self?.status = .failure("API Status Failed")
+                return
+            }
+            
             guard let data = data,
                   let json = try? JSONSerialization.jsonObject(with: data) as? [String : Any],
                   let paymentIntentClientSecret = json["clientSecret"] as? String,
                   let publishableKey = json["publishableKey"] as? String,
                   let self = self else {
-                // Handle error
+                self?.status = .failure("API Serialization/Decode failure")
                 return
             }
-            
-            APIClient.shared.publishableKey = publishableKey
-            var configuration = PaymentSheet.Configuration()
-            configuration.displaySavedPaymentMethods = true
-            
-            var appearance = PaymentSheet.Appearance()
-            appearance.font.base = UIFont(name: "montserrat", size: UIFont.systemFontSize)!
-            appearance.font.sizeScaleFactor = 1.0
-            appearance.shadow = .disabled
-            appearance.colors.background = UIColor(red: 0.96, green: 0.97, blue: 0.98, alpha: 1.00)
-            appearance.colors.primary = UIColor(red: 0.55, green: 0.74, blue: 0.00, alpha: 1.00)
-            appearance.primaryButton.cornerRadius = 32
-            configuration.appearance = appearance
-            configuration.primaryButtonLabel = "Purchase ($2.00)"
-            configuration.savedPaymentSheetHeaderLabel = "Payment methods"
-            configuration.paymentSheetHeaderLabel = "Select payment method"
-                        
+                                    
             DispatchQueue.main.async {
-                self.paymentSheet = PaymentSheet(paymentIntentClientSecret: paymentIntentClientSecret, configuration: configuration)
+                self.status = .success
                 self.paymentSession = PaymentSession(publishableKey: publishableKey)
                 self.paymentSession?.initPaymentSession(paymentIntentClientSecret: paymentIntentClientSecret)
             }

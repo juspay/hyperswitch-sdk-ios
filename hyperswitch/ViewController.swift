@@ -7,20 +7,23 @@
 
 import UIKit
 import SwiftUI
+import Combine
 
 class ViewController: UIViewController {
     
     @ObservedObject var hyperViewModel = HyperViewModel()
-    var reloadButton = UIButton()
-    var reloadButtonConfiguration = UIButton.Configuration.plain()
-    var paymentSheetButton = UIButton()
-    var paymentSheetButtonConfiguration = UIButton.Configuration.plain()
-    var statusLabel = UILabel()
+    private var reloadButton = UIButton()
+    private var reloadButtonConfiguration = UIButton.Configuration.plain()
+    private var paymentSheetButton = UIButton()
+    private var paymentSheetButtonConfiguration = UIButton.Configuration.plain()
+    private var statusLabel = UILabel()
+    private var cancellables = Set<AnyCancellable>()
     
     override func viewDidLoad() {
         self.view.backgroundColor = UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 0.2)
         super.viewDidLoad()
         hyperViewModel.preparePaymentSheet()
+        asyncBind()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -28,9 +31,41 @@ class ViewController: UIViewController {
         viewFrame()
     }
     
-    @objc 
+    private func asyncBind() {
+        hyperViewModel.$status
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] status in
+                switch status {
+                case .loading:
+                    self?.statusLabel.text = "Loading..."
+                case .success:
+                    self?.statusLabel.text = "Connected to Server"
+                case .failure(let message):
+                    self?.statusLabel.text = message
+                }
+            }
+            .store(in: &cancellables)
+    }
+    
+    @objc
     func openPaymentSheet(_ sender: Any) {
-        hyperViewModel.paymentSheet?.present(from: self, completion: { result in
+        
+        var configuration = PaymentSheet.Configuration()
+        configuration.primaryButtonLabel = "Purchase ($2.00)"
+        configuration.savedPaymentSheetHeaderLabel = "Payment methods"
+        configuration.paymentSheetHeaderLabel = "Select payment method"
+        configuration.displaySavedPaymentMethods = true
+        
+        var appearance = PaymentSheet.Appearance()
+        appearance.font.base = UIFont(name: "montserrat", size: UIFont.systemFontSize)!
+        appearance.font.sizeScaleFactor = 1.0
+        appearance.shadow = .disabled
+        appearance.colors.background = UIColor(red: 0.96, green: 0.97, blue: 0.98, alpha: 1.00)
+        appearance.colors.primary = UIColor(red: 0.55, green: 0.74, blue: 0.00, alpha: 1.00)
+        appearance.primaryButton.cornerRadius = 32
+        configuration.appearance = appearance
+
+        hyperViewModel.paymentSession?.presentPaymentSheet(viewController: self, configuration: configuration, completion: { result in
             DispatchQueue.main.async {
                 switch result {
                 case .completed:

@@ -15,9 +15,20 @@ import UIKit
 
 public class PaymentSession {
     
-    fileprivate static var completion: ((PaymentResult) -> Void)?
+    private static var completion: ((PaymentResult) -> Void)?
+    private static var hasResponded = false
     internal static var headlessCompletion: ((PaymentSessionHandler) -> Void)?
     internal static var paymentIntentClientSecret: String?
+    
+    private static func safeResolve(_ callback: @escaping RCTResponseSenderBlock,_ result: [Any],_ resultHandler: @escaping (PaymentResult) -> Void){
+        guard !PaymentSession.hasResponded else {
+            print("Warning: Attempt to resolve callback more than once")
+            resultHandler(.failed(error: NSError(domain: "Not Initialised", code: 0, userInfo: ["message" : "An error has occurred."])))
+            return
+        }
+        PaymentSession.hasResponded = true
+        callback(result)
+    }
     
     public init(publishableKey: String, customBackendUrl: String? = nil, customParams: [String : Any]? = nil, customLogUrl: String? = nil){
         APIClient.shared.publishableKey = publishableKey
@@ -35,6 +46,7 @@ public class PaymentSession {
         paymentSheet.present(from: viewController, completion: completion)
     }
     public func getCustomerSavedPaymentMethods(_ func_: @escaping (PaymentSessionHandler) -> Void) {
+        PaymentSession.hasResponded = false
         PaymentSession.headlessCompletion = func_
         RNViewManager.sharedInstance2.reinvalidateBridge()
         let _ = RNViewManager.sharedInstance2.viewForModule("dummy", initialProperties: [:])
@@ -65,7 +77,7 @@ public class PaymentSession {
                         var map = [String: Any]()
                         map["paymentToken"] = paymentToken
                         map["cvc"] = cvc
-                        callback([map])
+                        self.safeResolve(callback, [map], resultHandler)
                     }
                 },
                 confirmWithCustomerLastUsedPaymentMethod: { cvc, resultHandler in
@@ -75,7 +87,7 @@ public class PaymentSession {
                         var map = [String: Any]()
                         map["paymentToken"] = paymentToken
                         map["cvc"] = cvc
-                        callback([map])
+                        self.safeResolve(callback, [map], resultHandler)
                     }
                 },
                 confirmWithCustomerPaymentToken: { paymentToken, cvc, resultHandler in
@@ -83,7 +95,7 @@ public class PaymentSession {
                     var map = [String: Any]()
                     map["paymentToken"] = paymentToken
                     map["cvc"] = cvc
-                    callback([map])
+                    self.safeResolve(callback, [map], resultHandler)
                 }
             )
             self.headlessCompletion?(handler)

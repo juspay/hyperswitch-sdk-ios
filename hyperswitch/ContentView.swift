@@ -13,18 +13,18 @@ struct ContentView: View {
     var body: some View {
         VStack {
             Picker(selection: $selectedSegment, label: Text("")) {
-                Text("Headless View").tag(0)
-                Text("UIKit View").tag(1)
-                Text("SwiftUI View").tag(2)
+                Text("UIKit View").tag(0)
+                Text("SwiftUI View").tag(1)
+                Text("Headless View").tag(2)
             }.pickerStyle(SegmentedPickerStyle())
             if selectedSegment == 0 {
-                HeadlessView()
-            }
-            else if selectedSegment == 1{
                 UIKitView()
             }
-            else {
+            else if selectedSegment == 1{
                 SwiftUIView()
+            }
+            else {
+                HeadlessView()
             }
         }
     }
