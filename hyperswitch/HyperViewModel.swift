@@ -11,7 +11,6 @@ class HyperViewModel: ObservableObject {
     
     let backendUrl = URL(string: "http://localhost:5252/create-payment-intent")!
     
-    @Published var paymentSheet: PaymentSheet?
     @Published var paymentResult: PaymentSheetResult?
     @Published var paymentSession: PaymentSession?
     @Published var status: APIStatus = .loading

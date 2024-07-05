@@ -15,28 +15,32 @@ extension PaymentSheet {
     /// A SwiftUI View struct that represents a button for presenting the payment sheet.
     @available(iOS 13.0, *)
     public struct PaymentButton<Content: View>: View {
-        private let paymentSheet: PaymentSheet
+        private let paymentSession: PaymentSession
+        private let configuration: Configuration
         private let content: Content
+        private let completion: (PaymentSheetResult) -> ()
         
         @Environment(\.viewController) private var viewControllerHolder: UIViewController?
         
         /// Initializer for the PaymentButton.
         public init(
-            paymentSheet: PaymentSheet,
+            paymentSession: PaymentSession,
+            configuration: Configuration,
             onCompletion: @escaping (PaymentSheetResult) -> Void,
             @ViewBuilder content: () -> Content
         ) {
-            self.paymentSheet = paymentSheet
-            self.paymentSheet.completion = onCompletion
+            self.paymentSession = paymentSession
+            self.configuration = configuration
+            self.completion = onCompletion
             self.content = content()
         }
         
         /// The body of the PaymentButton view.
         public var body: some View {
             Button(action: {
-                RNViewManager.sharedInstance.responseHandler = self.paymentSheet
-                self.viewControllerHolder?.present(style: .overCurrentContext) {
-                    PaymentSheetPresenter(paymentSheet: self.paymentSheet)
+                if let vc = viewControllerHolder {
+                    let paymentSheet = PaymentSheet(paymentIntentClientSecret: PaymentSession.paymentIntentClientSecret ?? "", configuration: configuration)
+                    paymentSheet.present(from: vc, completion: completion)
                 }
             }) {
                 content

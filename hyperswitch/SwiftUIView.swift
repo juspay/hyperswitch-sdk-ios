@@ -24,8 +24,9 @@ struct SwiftUIView: View {
                      .foregroundColor(.white)
                      .cornerRadius(10.0)
                 Spacer()
-                    if let paymentSheet = hyperViewModel.paymentSheet {
-                        PaymentSheet.PaymentButton(paymentSheet: paymentSheet, onCompletion: hyperViewModel.onPaymentCompletion) {
+                    if let paymentSession = hyperViewModel.paymentSession {
+                        PaymentSheet.PaymentButton(paymentSession: paymentSession, configuration: SwiftUIView.setupConfiguration()
+                                                   , onCompletion: hyperViewModel.onPaymentCompletion) {
                             Text("Launch Payment Sheet")
                                 .padding(.vertical, 11)
                                 .padding(.horizontal, 58)
@@ -52,4 +53,22 @@ struct SwiftUIView: View {
              .padding(.top, 80)
         }
     }
+    static func setupConfiguration() -> PaymentSheet.Configuration {
+            var configuration = PaymentSheet.Configuration()
+            configuration.primaryButtonLabel = "Purchase ($2.00)"
+            configuration.savedPaymentSheetHeaderLabel = "Payment methods"
+            configuration.paymentSheetHeaderLabel = "Select payment method"
+            configuration.displaySavedPaymentMethods = true
+            
+            var appearance = PaymentSheet.Appearance()
+            appearance.font.base = UIFont(name: "montserrat", size: UIFont.systemFontSize)!
+            appearance.font.sizeScaleFactor = 1.0
+            appearance.shadow = .disabled
+            appearance.colors.background = UIColor(red: 0.96, green: 0.97, blue: 0.98, alpha: 1.00)
+            appearance.colors.primary = UIColor(red: 0.55, green: 0.74, blue: 0.00, alpha: 1.00)
+            appearance.primaryButton.cornerRadius = 32
+            configuration.appearance = appearance
+            
+            return configuration
+        }
 }
