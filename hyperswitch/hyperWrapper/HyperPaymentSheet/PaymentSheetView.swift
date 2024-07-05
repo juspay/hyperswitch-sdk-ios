@@ -9,7 +9,7 @@ import Foundation
 import React
 
 /// Extension on the PaymentSheet class to handle the creation of the React Native root view for the payment sheet.
-extension PaymentSheet {
+internal extension PaymentSheet {
     
     /// Method to get the root view for the payment sheet based on the configured properties.
     func getRootView() -> RCTRootView {

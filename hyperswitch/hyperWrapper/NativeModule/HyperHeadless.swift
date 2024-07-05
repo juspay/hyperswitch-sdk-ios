@@ -10,37 +10,39 @@ import React
 
 
 @objc(HyperHeadless)
-class HyperHeadless: RCTEventEmitter {
+internal class HyperHeadless: RCTEventEmitter {
     
-    public static var shared:HyperHeadless?
+    internal static var shared:HyperHeadless?
     
-    public var setNativeProps: RCTResponseSenderBlock?
-    public var confirmWithDefault: RCTResponseSenderBlock?
-    public var defaultPMData: ((NSDictionary?) -> Void)?
+    private var setNativeProps: RCTResponseSenderBlock?
+    private var confirmWithDefault: RCTResponseSenderBlock?
+    private var defaultPMData: ((NSDictionary?) -> Void)?
     
-    override init() {
+    internal override init() {
         super.init()
         HyperHeadless.shared = self
     }
     
     @objc
-    override static func requiresMainQueueSetup() -> Bool {
+    internal override static func requiresMainQueueSetup() -> Bool {
         return true
     }
     
-    @objc override func supportedEvents() -> [String] {
+    @objc 
+    internal override func supportedEvents() -> [String] {
         return ["test"]
     }
     
-    @objc func confirm(data: [String: Any]) {
+    @objc 
+    private func confirm(data: [String: Any]) {
         self.sendEvent(withName: "test", body: data)
     }
     
     @objc
-    func sendMessageToNative(_ rnMessage: String) {}
+    private func sendMessageToNative(_ rnMessage: String) {}
     
     @objc
-    func initialisePaymentSession (_ rnCallback: @escaping RCTResponseSenderBlock) {
+    private func initialisePaymentSession (_ rnCallback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
             if PaymentSession.headlessCompletion != nil {
                 let hyperParams = [
@@ -62,12 +64,12 @@ class HyperHeadless: RCTEventEmitter {
     }
     
     @objc
-    func getPaymentSession(_ rnMessage: NSDictionary, _ rnMessage2: NSDictionary, _ rnMessage3: NSArray, _ rnCallback: @escaping RCTResponseSenderBlock) {
+    private func getPaymentSession(_ rnMessage: NSDictionary, _ rnMessage2: NSDictionary, _ rnMessage3: NSArray, _ rnCallback: @escaping RCTResponseSenderBlock) {
         PaymentSession.getPaymentSession(getPaymentMethodData: rnMessage, getPaymentMethodData2: rnMessage2, getPaymentMethodDataArray: rnMessage3, callback: rnCallback)
     }
     
     @objc
-    func exitHeadless(_ rnMessage: String) {
+    private func exitHeadless(_ rnMessage: String) {
         PaymentSession.exitHeadless(rnMessage: rnMessage)
     }
     

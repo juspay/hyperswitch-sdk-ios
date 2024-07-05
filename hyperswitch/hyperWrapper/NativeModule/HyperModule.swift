@@ -9,12 +9,11 @@ import Foundation
 import React
 
 @objc(HyperModule)
-class HyperModule: RCTEventEmitter {
+internal class HyperModule: RCTEventEmitter {
     
-    let applePayPaymentHandler = ApplePayHandler()
-    let expressCheckoutHandler = ExpressCheckoutLauncher()
-    public static var shared:HyperModule?
-    var paymentSheetViewController:UIViewController?
+    private let applePayPaymentHandler = ApplePayHandler()
+    private let expressCheckoutHandler = ExpressCheckoutLauncher()
+    internal static var shared:HyperModule?
     
     override init() {
         super.init()
@@ -22,15 +21,17 @@ class HyperModule: RCTEventEmitter {
     }
     
     @objc
-    override static func requiresMainQueueSetup() -> Bool {
+    internal override static func requiresMainQueueSetup() -> Bool {
         return true
     }
     
-    @objc override func supportedEvents() -> [String] {
+    @objc 
+    internal override func supportedEvents() -> [String] {
         return ["confirm", "confirmEC"]
     }
     
-    @objc func confirm(data: [String: Any]) {
+    @objc 
+    internal func confirm(data: [String: Any]) {
         self.sendEvent(withName: "confirm", body: data)
     }
     // MARK: WIP
@@ -39,11 +40,11 @@ class HyperModule: RCTEventEmitter {
     //    }
     
     @objc
-    func sendMessageToNative(_ rnMessage: String) {}
+    private func sendMessageToNative(_ rnMessage: String) {}
     
     //React Native Wrapper Function
     @objc
-    func presentPaymentSheet(_ request: NSMutableDictionary, _ callBack: @escaping RCTResponseSenderBlock) -> Void {
+    private func presentPaymentSheet(_ request: NSMutableDictionary, _ callBack: @escaping RCTResponseSenderBlock) -> Void {
         DispatchQueue.main.async {
             let paymentSheet = PaymentSheet(paymentIntentClientSecret: "", configuration: PaymentSheet.Configuration())
             paymentSheet.presentWithParams(
@@ -64,27 +65,27 @@ class HyperModule: RCTEventEmitter {
     }
     
     @objc
-    func launchWidgetPaymentSheet(_ request: NSMutableDictionary, _ callback: @escaping RCTResponseSenderBlock) -> Void {
+    private func launchWidgetPaymentSheet(_ request: NSMutableDictionary, _ callback: @escaping RCTResponseSenderBlock) -> Void {
         expressCheckoutHandler.launchPaymentSheet(paymentResult: request,callBack: callback)
     }
     
     @objc
-    func launchApplePay (_ rnMessage: String, _ rnCallback: @escaping RCTResponseSenderBlock) {
+    private func launchApplePay (_ rnMessage: String, _ rnCallback: @escaping RCTResponseSenderBlock) {
         applePayPaymentHandler.startPayment(rnMessage: rnMessage, rnCallback: rnCallback)
     }
     
     @objc
-    func exitPaymentsheet(_ reactTag: NSNumber, _ rnMessage: String, _ reset: Bool) {
+    private func exitPaymentsheet(_ reactTag: NSNumber, _ rnMessage: String, _ reset: Bool) {
         exitSheet(rnMessage)
     }
     
     @objc
-    func exitWidgetPaymentsheet(_ reactTag: NSNumber, _ rnMessage: String, _ reset: Bool) {
+    private func exitWidgetPaymentsheet(_ reactTag: NSNumber, _ rnMessage: String, _ reset: Bool) {
         exitSheet(rnMessage)
     }
     
     @objc
-    func exitCardForm(_ rnMessage: String) {
+    private func exitCardForm(_ rnMessage: String) {
         var response: String?
         var error: NSError?
         
@@ -110,8 +111,8 @@ class HyperModule: RCTEventEmitter {
         }
     }
     
-    
-    func exitSheet(_ rnMessage: String) {
+    @objc
+    private func exitSheet(_ rnMessage: String) {
         var response: String?
         var error: NSError?
         

@@ -9,7 +9,7 @@ import PassKit
 import UIKit
 
 @objc(ApplePayViewManager)
-class ApplePayViewManager: RCTViewManager {
+internal class ApplePayViewManager: RCTViewManager {
     
     override func view() -> (ApplePayView) {
         return ApplePayView()
@@ -20,7 +20,7 @@ class ApplePayViewManager: RCTViewManager {
     }
 }
 
-class ApplePayView : UIView {
+internal class ApplePayView : UIView {
     
     private var button: PKPaymentButton?
     private var paymentHandler = ApplePayHandler()
@@ -114,7 +114,7 @@ class ApplePayView : UIView {
 
     }
     
-    override func layoutSubviews() {
+    internal override func layoutSubviews() {
         super.layoutSubviews()
         button?.frame = bounds
     }

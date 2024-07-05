@@ -15,7 +15,7 @@ internal class ApplePayHandler: NSObject {
     var paymentStatus: PKPaymentAuthorizationStatus? = .failure
     var callback: RCTResponseSenderBlock?
     
-    func startPayment(rnMessage: String, rnCallback: @escaping RCTResponseSenderBlock) {
+    internal func startPayment(rnMessage: String, rnCallback: @escaping RCTResponseSenderBlock) {
         
         callback = rnCallback
         var requiredBillingContactFields:Set<PKContactField>?
@@ -122,10 +122,10 @@ internal class ApplePayHandler: NSObject {
 extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
     
     /// Handle successful payment authorization
-    func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController, didAuthorizePayment payment: PKPayment, handler completion: @escaping (PKPaymentAuthorizationResult) -> Void) {
+    internal func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController, didAuthorizePayment payment: PKPayment, handler completion: @escaping (PKPaymentAuthorizationResult) -> Void) {
         
         let errors = [Error]()
-        var status = PKPaymentAuthorizationStatus.success
+        let status = PKPaymentAuthorizationStatus.success
         self.paymentStatus = status
         
         let dataString = payment.token.paymentData.base64EncodedString()
@@ -156,7 +156,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         completion(PKPaymentAuthorizationResult(status: paymentStatus ?? .failure, errors: errors))
     }
     /// Handle completion of the payment authorization flow
-    func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
+    internal func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
         controller.dismiss {
             DispatchQueue.main.async {
                 if self.paymentStatus == .failure {
@@ -219,7 +219,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
     }
 }
 
-extension String {
+private extension String {
     func toJSON() -> Any? {
         guard let data = self.data(using: .utf8, allowLossyConversion: false) else { return nil }
         return try? JSONSerialization.jsonObject(with: data, options: .mutableContainers)

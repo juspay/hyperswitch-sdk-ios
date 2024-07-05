@@ -8,27 +8,27 @@
 import Foundation
 import React
 
-class PaymentSheetUIViewController: UIViewController{
-    override var shouldAutorotate: Bool {
+private class PaymentSheetUIViewController: UIViewController{
+    fileprivate override var shouldAutorotate: Bool {
         return false
     }
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    fileprivate override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.portrait
     }
-    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+    fileprivate override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
         return UIInterfaceOrientation.portrait
     }
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {}
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {}
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {}
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {}
+    fileprivate override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {}
+    fileprivate override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {}
+    fileprivate override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {}
+    fileprivate override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {}
 }
 
 /// Extension on the PaymentSheet class to handle the presentation of the payment sheet view.
-extension PaymentSheet {
+internal extension PaymentSheet {
     
     /// Method to present the payment sheet view with a given root view and completion handler.
-    func presentWithRootView(from presentingViewController: UIViewController, rootView: RCTRootView, completion: @escaping (PaymentSheetResult) -> ()) {
+    private func presentWithRootView(from presentingViewController: UIViewController, rootView: RCTRootView, completion: @escaping (PaymentSheetResult) -> ()) {
         
         /// Set the completion closure for handling the payment sheet result.
         self.completion = completion
@@ -50,14 +50,14 @@ extension PaymentSheet {
     }
     
     /// Method to present the payment sheet view with the default configuration.
-    public func present(from presentingViewController: UIViewController, completion: @escaping (PaymentSheetResult) -> ()) {
+    func present(from presentingViewController: UIViewController, completion: @escaping (PaymentSheetResult) -> ()) {
         
         // Present the payment sheet view with the root view obtained from the getRootView() method.
         self.presentWithRootView(from: presentingViewController, rootView: self.getRootView(), completion: completion)
     }
     
     /// Method to present the payment sheet view with custom parameters.
-    public func presentWithParams(from presentingViewController: UIViewController, props: [String: Any], completion: @escaping ((PaymentSheetResult) -> ())) {
+    func presentWithParams(from presentingViewController: UIViewController, props: [String: Any], completion: @escaping ((PaymentSheetResult) -> ())) {
         
         // Present the payment sheet view with the root view obtained from the getRootViewWithParams() method.
         self.presentWithRootView(from: presentingViewController, rootView: self.getRootViewWithParams(props: props), completion: completion)

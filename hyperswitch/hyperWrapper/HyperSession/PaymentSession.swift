@@ -5,7 +5,7 @@
 //  Created by Harshit Srivastava on 07/03/24.
 //
 
-import UIKit
+import Foundation
 
 @frozen public enum PaymentResult {
     case completed(data: String)

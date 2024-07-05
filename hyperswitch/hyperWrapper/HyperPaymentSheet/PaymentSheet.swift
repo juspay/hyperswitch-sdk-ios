@@ -17,22 +17,20 @@ import Foundation
 /// PaymentSheet is a class that handles the presentation and management of a payment sheet interface.
 public class PaymentSheet {
     
-    /// The configuration object that holds the settings for the payment sheet.
-    public let configuration: Configuration?
-    
     /// The initializer method that sets up the payment sheet with the required parameters.
-    public required init(paymentIntentClientSecret: String, configuration: Configuration, themes: String? = nil, defaultView: Bool? = nil) {
+    internal required init(paymentIntentClientSecret: String, configuration: Configuration, themes: String? = nil, defaultView: Bool? = nil) {
         self.intentClientSecret = paymentIntentClientSecret
         self.configuration = configuration
         self.themes = themes
         self.defaultView = defaultView
     }
     
-    let intentClientSecret: String
-    var completion: ((PaymentSheetResult) -> ())?
-    
-    let themes: String?
-    let defaultView: Bool?
+    /// The configuration object that holds the settings for the payment sheet.
+    internal let configuration: Configuration?
+    internal let intentClientSecret: String
+    internal var completion: ((PaymentSheetResult) -> ())?
+    internal let themes: String?
+    internal let defaultView: Bool?
 }
 
 /// An extension that conforms to the RNResponseHandler protocol, which handles the response from the payment sheet operation.

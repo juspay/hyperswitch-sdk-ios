@@ -11,24 +11,25 @@ import React
 import CodePush
 #endif
 
-protocol RNResponseHandler {
+internal protocol RNResponseHandler {
     func didReceiveResponse(response: String?, error: Error?) -> Void
 }
 
-class RNViewManager: NSObject {
+internal class RNViewManager: NSObject {
     
-    var rootView: RCTRootView?
-    var responseHandler: RNResponseHandler?
-    var userAgent: String?
+    internal var responseHandler: RNResponseHandler?
+    internal var rootView: RCTRootView?
+
+    private var userAgent: String?
     
-    lazy var bridge: RCTBridge = {
+    private lazy var bridge: RCTBridge = {
         RCTBridge.init(delegate: self, launchOptions: nil)
     }()
     
-    static let sharedInstance = RNViewManager()
-    static let sharedInstance2 = RNViewManager()
+    internal static let sharedInstance = RNViewManager()
+    internal static let sharedInstance2 = RNViewManager()
     
-    func viewForModule(_ moduleName: String, initialProperties: [String : Any]?) -> RCTRootView {
+    internal func viewForModule(_ moduleName: String, initialProperties: [String : Any]?) -> RCTRootView {
         let rootView: RCTRootView = RCTRootView(
             bridge: bridge,
             moduleName: moduleName,
@@ -37,7 +38,7 @@ class RNViewManager: NSObject {
         return rootView
     }
     
-    func reinvalidateBridge(){
+    internal func reinvalidateBridge(){
         self.bridge.invalidate()
         self.bridge = RCTBridge.init(delegate: self, launchOptions: nil)
         
