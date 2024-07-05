@@ -1,3 +1,10 @@
+//
+//  ApplePayViewManager.m
+//  Hyperswitch
+//
+//  Created by Harshit Srivastava on 20/06/24.
+//
+
 #import <React/RCTViewManager.h>
 
 @interface RCT_EXTERN_MODULE(ApplePayViewManager, RCTViewManager)

@@ -12,12 +12,12 @@ public class PaymentHandler: NSObject {
     @objc public class func shared() -> PaymentHandler {
         return PaymentHandler.sharedHandler
     }
-    public init(apiClient: APIClient = .shared)
+    internal init(apiClient: APIClient = .shared)
     {
         self.apiClient = apiClient
         super.init()
     }
-    public var apiClient: APIClient
+    internal var apiClient: APIClient
     
     @objc(confirmPayment:withAuthenticationContext:completion:)
     public func confirmPayment(
