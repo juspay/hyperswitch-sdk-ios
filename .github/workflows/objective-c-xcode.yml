@@ -23,17 +23,19 @@ jobs:
       - name: Create Release
         env:
           CI_COMMIT_MESSAGE: Continuous Integration
-          TOKEN: ${{ secrets.USER_NAME }}
+          USER_EMAIL: ${{ secrets.USER_EMAIL }}
+          USER_NAME: ${{ secrets.USER_NAME }}
+          TOKEN: ${{ secrets.TOKEN }}
         run: |
-          git config --global user.email "${{env.TOKEN}}"
+          git config --global user.email "${{env.USER_EMAIL}}"
+          git config --global user.name "${{env.USER_NAME}}"
           git add -A
           git commit -m "${{ env.CI_COMMIT_MESSAGE }}"
           VERSION=$(grep -E '^version = "(.+)"$' hyperswitch-sdk-ios.podspec | sed 's/^version = "\(.*\)"$/\1/')
-          git tag "$VERSION"
+          git tag "v$VERSION"
           git push --tags
       - name: Cocoapods Lint & Upload
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
         run: |
-          pod lib lint --allow-warnings 
           pod trunk push hyperswitch-sdk-ios.podspec --allow-warnings
