@@ -15,7 +15,7 @@ internal class ApplePayHandler: NSObject {
     var paymentStatus: PKPaymentAuthorizationStatus? = .failure
     var callback: RCTResponseSenderBlock?
     
-    internal func startPayment(rnMessage: String, rnCallback: @escaping RCTResponseSenderBlock) {
+    internal func startPayment(rnMessage: String, rnCallback: @escaping RCTResponseSenderBlock, presentCallback: @escaping RCTResponseSenderBlock) {
         
         callback = rnCallback
         var requiredBillingContactFields:Set<PKContactField>?
@@ -109,6 +109,7 @@ internal class ApplePayHandler: NSObject {
         paymentController = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
         paymentController?.delegate = self
         paymentController?.present(completion: { presented in
+            presentCallback([])
             if presented {
                 self.paymentStatus = nil
             } else {
