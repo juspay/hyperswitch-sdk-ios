@@ -44,7 +44,7 @@ internal class HyperHeadless: RCTEventEmitter {
     @objc
     private func initialisePaymentSession (_ rnCallback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
-            if PaymentSession.headlessCompletion != nil {
+            if PaymentSession.headlessCompletion != nil, !PaymentSession.isPresented {
                 let hyperParams = [
                     "appId": Bundle.main.bundleIdentifier,
                     "sdkVersion" : "0.1.0",

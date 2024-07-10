@@ -41,7 +41,6 @@ internal class RNViewManager: NSObject {
     internal func reinvalidateBridge(){
         self.bridge.invalidate()
         self.bridge = RCTBridge.init(delegate: self, launchOptions: nil)
-        
     }
 }
 

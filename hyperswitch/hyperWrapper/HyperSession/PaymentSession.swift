@@ -16,7 +16,8 @@ import Foundation
 public class PaymentSession {
     
     private static var completion: ((PaymentResult) -> Void)?
-    private static var hasResponded = false
+    private static var hasResponded: Bool = false
+    internal static var isPresented: Bool = false
     internal static var headlessCompletion: ((PaymentSessionHandler) -> Void)?
     internal static var paymentIntentClientSecret: String?
     
@@ -42,11 +43,13 @@ public class PaymentSession {
     }
     
     public func presentPaymentSheet(viewController: UIViewController, configuration: PaymentSheet.Configuration, completion: @escaping (PaymentSheetResult) -> ()){
+        PaymentSession.isPresented = true
         let paymentSheet = PaymentSheet(paymentIntentClientSecret: PaymentSession.paymentIntentClientSecret ?? "", configuration: configuration)
         paymentSheet.present(from: viewController, completion: completion)
     }
     public func getCustomerSavedPaymentMethods(_ func_: @escaping (PaymentSessionHandler) -> Void) {
         PaymentSession.hasResponded = false
+        PaymentSession.isPresented = false
         PaymentSession.headlessCompletion = func_
         RNViewManager.sharedInstance2.reinvalidateBridge()
         let _ = RNViewManager.sharedInstance2.viewForModule("dummy", initialProperties: [:])
