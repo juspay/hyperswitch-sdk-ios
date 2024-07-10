@@ -27,6 +27,7 @@ jobs:
           USER_NAME: ${{ secrets.USER_NAME }}
           TOKEN: ${{ secrets.TOKEN }}
         run: |
+          rm -rf package.json yarn.lock frameworkgen/PrivacyInfo.xcprivacy
           git config --global user.email "${{env.USER_EMAIL}}"
           git config --global user.name "${{env.USER_NAME}}"
           git add -A
@@ -38,4 +39,5 @@ jobs:
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
         run: |
+          pod spec lint --allow-warnings
           pod trunk push hyperswitch-sdk-ios.podspec --allow-warnings
