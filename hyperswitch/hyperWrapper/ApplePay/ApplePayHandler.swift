@@ -21,6 +21,11 @@ internal class ApplePayHandler: NSObject {
         var requiredBillingContactFields:Set<PKContactField>?
         var requiredShippingContactFields:Set<PKContactField>?
         
+        guard PKPaymentAuthorizationController.canMakePayments() else {
+            rnCallback([["status": "Error"]])
+            return
+        }
+        
         guard let dict = rnMessage.toJSON() as? [String: AnyObject] else {
             rnCallback([["status": "Error"]])
             return
