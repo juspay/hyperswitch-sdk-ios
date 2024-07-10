@@ -47,6 +47,7 @@ internal class HyperHeadless: RCTEventEmitter {
             if PaymentSession.headlessCompletion != nil {
                 let hyperParams = [
                     "appId": Bundle.main.bundleIdentifier,
+                    "sdkVersion" : "0.1.0",
                     "ip": nil,
                     "user-agent": WKWebView().value(forKey: "userAgent"),
                     "launchTime": Int(Date().timeIntervalSince1970 * 1000)

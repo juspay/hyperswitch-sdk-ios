@@ -17,9 +17,10 @@ internal extension PaymentSheet {
         /// Get the configuration dictionary from the configuration object.
         let configuration = self.configuration?.toDictionary()
         
-        /// Create a dictionary of hyperParams with app ID, country, IP address, user agent, default view, and launch time.
+        /// Create a dictionary of hyperParams with app ID, sdkVersion, country, IP address, user agent, default view, and launch time.
         let hyperParams = [
             "appId" : Bundle.main.bundleIdentifier,
+            "sdkVersion" : "0.1.0",
             "country" : NSLocale.current.regionCode,
             "ip": nil,
             "user-agent": WKWebView().value(forKey: "userAgent"),
@@ -53,6 +54,7 @@ internal extension PaymentSheet {
         let params = props["hyperParams"] as? [String: Any] ?? [:]
         let hyperParams = [
             "appId" : Bundle.main.bundleIdentifier,
+            "sdkVersion" : "0.1.0",
             "country" : NSLocale.current.regionCode,
             "ip": nil,
             "user-agent": WKWebView().value(forKey: "userAgent"),
