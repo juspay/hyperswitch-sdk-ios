@@ -1,5 +1,18 @@
 # Hyperswitch iOS SDK
 
+## Usage 
+
+```ruby
+pod 'hyperswitch-sdk-ios'
+```
+
+## Subspecs
+
+```ruby
+pod 'hyperswitch-sdk-ios/scancard'
+pod 'hyperswitch-sdk-ios', :subspecs => ['subspec1', 'subspec2']
+```
+
 This repository hosts the essential components of the Hyperswitch SDK iOS, it is a submodule repo for [hyperswitch-client-core](https://github.com/juspay/hyperswitch-client-core), in order to complete the setup please clone hyperswitch-client-core and follow the instruction given in the README.
 
 ## Configuring Local Development Environment
