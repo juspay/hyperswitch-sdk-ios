@@ -14,17 +14,19 @@ Pod::Spec.new do |s|
   s.module_name               = 'Hyperswitch'
 
   s.subspec 'core' do |core|
-    s.source_files = 'hyperswitch/hyperWrapper/**/*.{m,swift,h}'
-    s.resources = ['hyperswitch/hyperWrapper/Resources/Codepush.plist', 'hyperswitch/hyperWrapper/Resources/hyperswitch.bundle']
-    s.vendored_frameworks = 'frameworkgen/Frameworks/Core/*.xcframework'
+    core.source_files = 'hyperswitch/hyperWrapper/**/*.{m,swift,h}'
+    core.resources = ['hyperswitch/hyperWrapper/Resources/CodePush.plist', 'hyperswitch/hyperWrapper/Resources/hyperswitch.bundle']
+    core.vendored_frameworks = 'frameworkgen/Frameworks/Core/*.xcframework'
   end
 
   s.subspec 'sentry' do |sentry|
     sentry.vendored_frameworks = 'frameworkgen/Frameworks/Sentry/*.xcframework'
+    sentry.dependency 'hyperswitch-sdk-ios/core'
   end
 
-  s.subspec 'scan-card' do |scancard|
+  s.subspec 'scancard' do |scancard|
     scancard.vendored_frameworks = 'frameworkgen/Frameworks/ScanCard/*.xcframework'
+    scancard.dependency 'hyperswitch-sdk-ios/core'
   end
 
   s.default_subspec = 'core'

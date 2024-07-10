@@ -54,8 +54,8 @@
 		7954A44A2C23A49A00FEC02D /* ApplePayViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7954A4492C23A49A00FEC02D /* ApplePayViewManager.swift */; };
 		79728FB92C3412BB00CA8C10 /* HeadlessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */; };
 		7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7996A8322BA1FDD000394FAF /* hyperswitch.bundle */; };
-		799979AD2BF2466300C54EA4 /* Codepush.plist in Resources */ = {isa = PBXBuildFile; fileRef = 799979AC2BF2466300C54EA4 /* Codepush.plist */; };
 		799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */; };
+		79BF5A5B2C3EA2D6006546D6 /* CodePush.plist in Resources */ = {isa = PBXBuildFile; fileRef = 79BF5A5A2C3EA2D6006546D6 /* CodePush.plist */; };
 		DC4AC9F2296D6D6C00E0D2A6 /* PaymentCardTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4AC9F1296D6D6C00E0D2A6 /* PaymentCardTextField.swift */; };
 		DC4AC9F5296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4AC9F4296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift */; };
 		DC5D0114294731480017C67A /* PaymentSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D0111294731480017C67A /* PaymentSheet.swift */; };
@@ -131,8 +131,8 @@
 		7954A4492C23A49A00FEC02D /* ApplePayViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayViewManager.swift; sourceTree = "<group>"; };
 		79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlessViewController.swift; sourceTree = "<group>"; };
 		7996A8322BA1FDD000394FAF /* hyperswitch.bundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hyperswitch.bundle; sourceTree = "<group>"; };
-		799979AC2BF2466300C54EA4 /* Codepush.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Codepush.plist; sourceTree = "<group>"; };
 		799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		79BF5A5A2C3EA2D6006546D6 /* CodePush.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = CodePush.plist; sourceTree = "<group>"; };
 		DC4AC9F1296D6D6C00E0D2A6 /* PaymentCardTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCardTextField.swift; sourceTree = "<group>"; };
 		DC4AC9F4296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentCardTextField+SwiftUI.swift"; sourceTree = "<group>"; };
 		DC5D0111294731480017C67A /* PaymentSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentSheet.swift; sourceTree = "<group>"; };
@@ -339,8 +339,8 @@
 		DC5D012C29486B560017C67A /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				799979AC2BF2466300C54EA4 /* Codepush.plist */,
 				7996A8322BA1FDD000394FAF /* hyperswitch.bundle */,
+				79BF5A5A2C3EA2D6006546D6 /* CodePush.plist */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -414,6 +414,7 @@
 				43E668752C084FB70094BD13 /* montserrat_extrabolditalic.ttf in Resources */,
 				43E668692C084FB70094BD13 /* montserrat_bolditalic.ttf in Resources */,
 				43E668732C084FB70094BD13 /* montserrat_mediumitalic.ttf in Resources */,
+				79BF5A5B2C3EA2D6006546D6 /* CodePush.plist in Resources */,
 				43E668702C084FB70094BD13 /* montserrat_light.ttf in Resources */,
 				43E668722C084FB70094BD13 /* montserrat_extralightitalic.ttf in Resources */,
 				799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */,
@@ -430,7 +431,6 @@
 				43E6687A2C084FB70094BD13 /* montserrat_blackitalic.ttf in Resources */,
 				43E668742C084FB70094BD13 /* montserrat_regular.ttf in Resources */,
 				43E6686D2C084FB70094BD13 /* montserrat_medium.ttf in Resources */,
-				799979AD2BF2466300C54EA4 /* Codepush.plist in Resources */,
 				43E6686C2C084FB70094BD13 /* montserrat_italic.ttf in Resources */,
 				43E6686A2C084FB70094BD13 /* montserrat_bold.ttf in Resources */,
 			);
