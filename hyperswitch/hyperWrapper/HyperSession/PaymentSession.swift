@@ -57,6 +57,7 @@ public class PaymentSession {
     
     internal static func getPaymentSession(getPaymentMethodData: NSDictionary, getPaymentMethodData2: NSDictionary, getPaymentMethodDataArray: NSArray, callback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
+            PaymentSession.hasResponded = false
             let handler = PaymentSessionHandler(
                 getCustomerDefaultSavedPaymentMethodData: {
                     return parseGetPaymentMethodData(getPaymentMethodData)

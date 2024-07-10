@@ -13,6 +13,7 @@ internal class HyperModule: RCTEventEmitter {
     
     private let applePayPaymentHandler = ApplePayHandler()
     private let expressCheckoutHandler = ExpressCheckoutLauncher()
+    private var presentCallback: RCTResponseSenderBlock? = nil
     internal static var shared:HyperModule?
     
     override init() {
@@ -70,9 +71,18 @@ internal class HyperModule: RCTEventEmitter {
     }
     
     @objc
-    private func launchApplePay (_ rnMessage: String, _ rnCallback: @escaping RCTResponseSenderBlock, _ startCallback: @escaping RCTResponseSenderBlock, _ presentCallback: @escaping RCTResponseSenderBlock) {
-        startCallback([])
-        applePayPaymentHandler.startPayment(rnMessage: rnMessage, rnCallback: rnCallback, presentCallback: presentCallback)
+    private func launchApplePay (_ rnMessage: String, _ rnCallback: @escaping RCTResponseSenderBlock) {
+        applePayPaymentHandler.startPayment(rnMessage: rnMessage, rnCallback: rnCallback, presentCallback: self.presentCallback)
+    }
+    
+    @objc
+    private func startApplePay (_ rnMessage: String, _ rnCallback: @escaping RCTResponseSenderBlock) {
+        rnCallback([])
+    }
+    
+    @objc
+    private func presentApplePay (_ rnMessage: String, _ rnCallback: @escaping RCTResponseSenderBlock) {
+        self.presentCallback = rnCallback
     }
     
     @objc
