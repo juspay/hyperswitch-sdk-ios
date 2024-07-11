@@ -3,8 +3,8 @@
 <plist version="1.0">
 <dict>
 	<key>HyperVersion</key>
-	<string></string>
-	<key>CodePushDeploymentKey</key>
-	<string></string>
+	<string>0.1.1</string>
+	<key>HyperCodePushDeploymentKey</key>
+	<string>yZTNACi0PyEWubHxz37YGkU6jsJ64usNFMJ_l</string>
 </dict>
 </plist>

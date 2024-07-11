@@ -253,9 +253,9 @@ public struct PaymentSessionHandler {
     public let getCustomerDefaultSavedPaymentMethodData: () -> PaymentMethod
     public let getCustomerLastUsedPaymentMethodData: () -> PaymentMethod
     public let getCustomerSavedPaymentMethodData: () -> [PaymentMethod]
-    public let confirmWithCustomerDefaultPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
-    public let confirmWithCustomerLastUsedPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
-    public let confirmWithCustomerPaymentToken: (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+    private let confirmWithCustomerDefaultPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+    private let confirmWithCustomerLastUsedPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+    private let confirmWithCustomerPaymentToken: (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
     
     init(
         getCustomerDefaultSavedPaymentMethodData: @escaping () -> PaymentMethod,
@@ -271,6 +271,18 @@ public struct PaymentSessionHandler {
         self.confirmWithCustomerDefaultPaymentMethod = confirmWithCustomerDefaultPaymentMethod
         self.confirmWithCustomerLastUsedPaymentMethod = confirmWithCustomerLastUsedPaymentMethod
         self.confirmWithCustomerPaymentToken = confirmWithCustomerPaymentToken
+    }
+    
+    public func confirmWithCustomerDefaultPaymentMethod(resultHandler: @escaping (PaymentResult) -> Void) {
+        confirmWithCustomerDefaultPaymentMethod(nil, resultHandler)
+    }
+    
+    public func confirmWithCustomerLastUsedPaymentMethod(resultHandler: @escaping (PaymentResult) -> Void) {
+        confirmWithCustomerLastUsedPaymentMethod(nil, resultHandler)
+    }
+    
+    public func confirmWithCustomerPaymentToken(paymentToken: String, resultHandler: @escaping (PaymentResult) -> Void) {
+        confirmWithCustomerPaymentToken(paymentToken, nil, resultHandler)
     }
 }
 

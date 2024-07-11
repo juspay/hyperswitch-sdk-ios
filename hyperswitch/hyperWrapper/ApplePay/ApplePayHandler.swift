@@ -11,7 +11,6 @@ import React
 
 internal class ApplePayHandler: NSObject {
     
-    var paymentController: PKPaymentAuthorizationController?
     var paymentStatus: PKPaymentAuthorizationStatus? = .failure
     var callback: RCTResponseSenderBlock?
     
@@ -21,54 +20,66 @@ internal class ApplePayHandler: NSObject {
         var requiredBillingContactFields:Set<PKContactField>?
         var requiredShippingContactFields:Set<PKContactField>?
         
-        guard PKPaymentAuthorizationController.canMakePayments() else {
-            rnCallback([["status": "Error"]])
-            return
-        }
-        
         guard let dict = rnMessage.toJSON() as? [String: AnyObject] else {
+            presentCallback?([])
             rnCallback([["status": "Error"]])
             return
         }
         
         guard let payment_request_data = dict["payment_request_data"] else {
-            rnCallback([["status": "Error"]])
+            presentCallback?([])
+            callback?([["status": "Error"]])
+            callback = nil
             return
         }
         
         guard let countryCode = payment_request_data["country_code"] as? String else {
-            rnCallback([["status": "Error"]])
+            presentCallback?([])
+            callback?([["status": "Error"]])
+            callback = nil
             return
         }
         
         guard let currencyCode = payment_request_data["currency_code"] as? String else {
-            rnCallback([["status": "Error"]])
+            presentCallback?([])
+            callback?([["status": "Error"]])
+            callback = nil
             return
         }
         guard let total = payment_request_data["total"] as? [String: AnyObject] else {
-            rnCallback([["status": "Error"]])
+            presentCallback?([])
+            callback?([["status": "Error"]])
+            callback = nil
             return
         }
         
         guard let amount = total["amount"] as? String,
               let label = total["label"] as? String,
               let type = total["type"] as? String else {
-            rnCallback([["status": "Error"]])
+            presentCallback?([])
+            callback?([["status": "Error"]])
+            callback = nil
             return
         }
         
         guard let merchant_capabilities_array = payment_request_data["merchant_capabilities"] as? Array<String> else {
-            rnCallback([["status": "Error"]])
+            presentCallback?([])
+            callback?([["status": "Error"]])
+            callback = nil
             return
         }
         
         guard let merchantIdentifier = payment_request_data["merchant_identifier"] as? String else{
-            rnCallback([["status": "Error"]])
+            presentCallback?([])
+            callback?([["status": "Error"]])
+            callback = nil
             return
         }
         
         guard let supported_networks_array = payment_request_data["supported_networks"] as? Array<String> else{
-            rnCallback([["status": "Error"]])
+            presentCallback?([])
+            callback?([["status": "Error"]])
+            callback = nil
             return
         }
         
@@ -111,14 +122,25 @@ internal class ApplePayHandler: NSObject {
         }
         
         /// Create and present the PKPaymentAuthorizationController
-        paymentController = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
-        paymentController?.delegate = self
-        paymentController?.present(completion: { presented in
+        guard
+            PKPaymentAuthorizationController.canMakePayments(),
+            !paymentRequest.merchantIdentifier.isEmpty,
+            PKPaymentAuthorizationViewController(paymentRequest: paymentRequest) != nil
+        else {
+            presentCallback?([])
+            callback?([["status": "Error"]])
+            callback = nil
+            return
+        }
+        let paymentController = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
+        paymentController.delegate = self
+        paymentController.present(completion: { presented in
             presentCallback?([])
             if presented {
                 self.paymentStatus = nil
             } else {
-                rnCallback([["status": "Error"]])
+                self.callback?([["status": "Error"]])
+                self.callback = nil
             }
         })
     }
