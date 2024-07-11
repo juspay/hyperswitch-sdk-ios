@@ -20,7 +20,7 @@ internal extension PaymentSheet {
         /// Create a dictionary of hyperParams with app ID, sdkVersion, country, IP address, user agent, default view, and launch time.
         let hyperParams = [
             "appId" : Bundle.main.bundleIdentifier,
-            "sdkVersion" : "0.1.1",
+            "sdkVersion" : "0.1.2",
             "country" : NSLocale.current.regionCode,
             "ip": nil,
             "user-agent": WKWebView().value(forKey: "userAgent"),
@@ -54,7 +54,7 @@ internal extension PaymentSheet {
         let params = props["hyperParams"] as? [String: Any] ?? [:]
         let hyperParams = [
             "appId" : Bundle.main.bundleIdentifier,
-            "sdkVersion" : "0.1.1",
+            "sdkVersion" : "0.1.2",
             "country" : NSLocale.current.regionCode,
             "ip": nil,
             "user-agent": WKWebView().value(forKey: "userAgent"),

@@ -42,11 +42,22 @@ public class PaymentSession {
         PaymentSession.paymentIntentClientSecret = paymentIntentClientSecret
     }
     
+    public func presentPaymentSheet(viewController: UIViewController, completion: @escaping (PaymentSheetResult) -> ()){
+        presentPaymentSheet(viewController: viewController, configuration: PaymentSheet.Configuration(), completion: completion)
+    }
+    
     public func presentPaymentSheet(viewController: UIViewController, configuration: PaymentSheet.Configuration, completion: @escaping (PaymentSheetResult) -> ()){
         PaymentSession.isPresented = true
         let paymentSheet = PaymentSheet(paymentIntentClientSecret: PaymentSession.paymentIntentClientSecret ?? "", configuration: configuration)
         paymentSheet.present(from: viewController, completion: completion)
     }
+    
+    public func presentPaymentSheetWithParams(viewController: UIViewController, params: [String: Any], completion: @escaping (PaymentSheetResult) -> ()){
+        PaymentSession.isPresented = true
+        let paymentSheet = PaymentSheet(paymentIntentClientSecret: PaymentSession.paymentIntentClientSecret ?? "", configuration: PaymentSheet.Configuration())
+        paymentSheet.presentWithParams(from: viewController, props: params, completion: completion)
+    }
+    
     public func getCustomerSavedPaymentMethods(_ func_: @escaping (PaymentSessionHandler) -> Void) {
         PaymentSession.hasResponded = false
         PaymentSession.isPresented = false
