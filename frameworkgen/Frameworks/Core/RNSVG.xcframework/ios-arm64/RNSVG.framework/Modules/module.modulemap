@@ -1,0 +1,6 @@
+framework module RNSVG {
+  umbrella header "RNSVG-umbrella.h"
+
+  export *
+  module * { export * }
+}

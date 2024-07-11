@@ -1,0 +1,6 @@
+framework module react_native_klarna_inapp_sdk {
+  umbrella header "react-native-klarna-inapp-sdk-umbrella.h"
+
+  export *
+  module * { export * }
+}

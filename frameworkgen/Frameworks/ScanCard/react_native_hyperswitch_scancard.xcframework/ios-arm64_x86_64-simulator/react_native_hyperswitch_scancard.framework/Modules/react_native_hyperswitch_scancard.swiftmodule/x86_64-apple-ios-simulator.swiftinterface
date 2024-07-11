@@ -1,0 +1,69 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 5.10 (swiftlang-5.10.0.13 clang-1500.3.9.4)
+// swift-module-flags: -target x86_64-apple-ios13.0-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name react_native_hyperswitch_scancard
+import AVFoundation
+import AVKit
+import Accelerate
+import CoreGraphics
+import CoreML
+import Foundation
+import Swift
+import UIKit
+import VideoToolbox
+import Vision
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+import os.log
+import os
+@_exported import react_native_hyperswitch_scancard
+public protocol BundleLocatorProtocol {
+  static var internalClass: Swift.AnyClass { get }
+  static var bundleName: Swift.String { get }
+  static var resourcesBundle: Foundation.Bundle { get }
+}
+extension react_native_hyperswitch_scancard.BundleLocatorProtocol {
+  public static func computeResourcesBundle() -> Foundation.Bundle
+}
+@frozen public enum CardScanSheetResult {
+  case completed(card: react_native_hyperswitch_scancard.ScannedCard)
+  case canceled
+  case failed(error: any Swift.Error)
+}
+public class CardScanSheet {
+  public init()
+  public func present(from presentingViewController: UIKit.UIViewController, completion: @escaping (react_native_hyperswitch_scancard.CardScanSheetResult) -> Swift.Void, animated: Swift.Bool = true)
+  @objc deinit
+}
+public enum CardScanSheetError : Swift.Error {
+  case invalidClientSecret
+  case unknown(debugDescription: Swift.String)
+}
+extension react_native_hyperswitch_scancard.CardScanSheetError : Foundation.LocalizedError {
+  public var localizedDescription: Swift.String {
+    get
+  }
+}
+extension react_native_hyperswitch_scancard.CardScanSheetError : Swift.CustomDebugStringConvertible {
+  public var debugDescription: Swift.String {
+    get
+  }
+}
+@_hasMissingDesignatedInitializers public class CreditCardOcrImplementation {
+  @objc deinit
+}
+public struct ScannedCard : Swift.Equatable {
+  public let pan: Swift.String
+  public let expiryMonth: Swift.String?
+  public let expiryYear: Swift.String?
+  public let name: Swift.String?
+  public static func == (a: react_native_hyperswitch_scancard.ScannedCard, b: react_native_hyperswitch_scancard.ScannedCard) -> Swift.Bool
+}
+@_hasMissingDesignatedInitializers @available(macOS 10.13.2, iOS 11.2, tvOS 11.2, watchOS 4.2, *)
+public class SSDOcr {
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers public class SSDOcrDetect {
+  public static func loadModelFromBundle() -> react_native_hyperswitch_scancard.SSDOcr?
+  @objc deinit
+}
