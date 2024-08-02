@@ -199,8 +199,8 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
     private func mapToPKContactField(_ string: String) -> PKContactField? {
         switch string {
         case "postalAddress": return .postalAddress
-        case "emailAddress": return .emailAddress
-        case "phoneNumber": return .phoneNumber
+        case "email": return .emailAddress
+        case "phone": return .phoneNumber
         case "name": return .name
         case "phoneticName": return .phoneticName
         default: return nil
