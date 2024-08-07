@@ -1718,1036 +1718,1036 @@
   },
   "ConstValues": [
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/ActiveStateComputation.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/ActiveStateComputation.swift",
       "kind": "Array",
       "offset": 2114,
       "length": 2,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/ActiveStateComputation.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/ActiveStateComputation.swift",
       "kind": "BooleanLiteral",
       "offset": 2136,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/AppState.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/AppState.swift",
       "kind": "IntegerLiteral",
       "offset": 85,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/AppState.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/AppState.swift",
       "kind": "BooleanLiteral",
       "offset": 128,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/Utils\/AtomicPropertyWrapper.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/Utils\/AtomicPropertyWrapper.swift",
       "kind": "IntegerLiteral",
       "offset": 200,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 66,
       "length": 10,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 86,
       "length": 4,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 100,
       "length": 8,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 118,
       "length": 8,
       "value": "4"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 136,
       "length": 3,
       "value": "5"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 149,
       "length": 10,
       "value": "6"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 169,
       "length": 8,
       "value": "7"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 187,
       "length": 7,
       "value": "8"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 66,
       "length": 10,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 86,
       "length": 4,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 100,
       "length": 8,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 118,
       "length": 8,
       "value": "4"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 136,
       "length": 3,
       "value": "5"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 149,
       "length": 10,
       "value": "6"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 169,
       "length": 8,
       "value": "7"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 187,
       "length": 7,
       "value": "8"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 66,
       "length": 10,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 86,
       "length": 4,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 100,
       "length": 8,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 118,
       "length": 8,
       "value": "4"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 136,
       "length": 3,
       "value": "5"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 149,
       "length": 10,
       "value": "6"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 169,
       "length": 8,
       "value": "7"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardNetwork.swift",
       "kind": "IntegerLiteral",
       "offset": 187,
       "length": 7,
       "value": "8"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardVerify\/CardScanBundleLocator.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardVerify\/CardScanBundleLocator.swift",
       "kind": "StringLiteral",
       "offset": 186,
       "length": 27,
       "value": "\"HyperswitchScanCardBundle\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/CardScanSheet.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/CardScanSheet.swift",
       "kind": "BooleanLiteral",
       "offset": 1006,
       "length": 4,
       "value": "true"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
       "kind": "IntegerLiteral",
       "offset": 65,
       "length": 5,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
       "kind": "IntegerLiteral",
       "offset": 80,
       "length": 7,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
       "kind": "IntegerLiteral",
       "offset": 97,
       "length": 7,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
       "kind": "IntegerLiteral",
       "offset": 65,
       "length": 5,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
       "kind": "IntegerLiteral",
       "offset": 80,
       "length": 7,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
       "kind": "IntegerLiteral",
       "offset": 97,
       "length": 7,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
       "kind": "IntegerLiteral",
       "offset": 65,
       "length": 5,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
       "kind": "IntegerLiteral",
       "offset": 80,
       "length": 7,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CardType.swift",
       "kind": "IntegerLiteral",
       "offset": 97,
       "length": 7,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardVerify\/CreditCard.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardVerify\/CreditCard.swift",
       "kind": "StringLiteral",
       "offset": 25,
       "length": 10,
       "value": "\"react_native_hyperswitch_scancard.CreditCard\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/CreditCardOcrImplementation.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/CreditCardOcrImplementation.swift",
       "kind": "IntegerLiteral",
       "offset": 430,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/CreditCardOcrImplementation.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/CreditCardOcrImplementation.swift",
       "kind": "FloatLiteral",
       "offset": 458,
       "length": 3,
       "value": "0.0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/CreditCardOcrResult.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/CreditCardOcrResult.swift",
       "kind": "StringLiteral",
       "offset": 177,
       "length": 19,
       "value": "\"react_native_hyperswitch_scancard.CreditCardOcrResult\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
       "kind": "IntegerLiteral",
       "offset": 74,
       "length": 1,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
       "kind": "IntegerLiteral",
       "offset": 110,
       "length": 1,
       "value": "4"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
       "kind": "IntegerLiteral",
       "offset": 143,
       "length": 2,
       "value": "16"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
       "kind": "IntegerLiteral",
       "offset": 191,
       "length": 2,
       "value": "15"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
       "kind": "IntegerLiteral",
       "offset": 234,
       "length": 2,
       "value": "14"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
       "kind": "Array",
       "offset": 287,
       "length": 12,
       "value": "[\"34\", \"37\"]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
       "kind": "Array",
       "offset": 344,
       "length": 82,
       "value": "[\"300\", \"301\", \"302\", \"303\", \"304\", \"305\", \"309\", \"36\", \"38\", \"39\"]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
       "kind": "Array",
       "offset": 469,
       "length": 20,
       "value": "[\"6011\", \"64\", \"65\"]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
       "kind": "Array",
       "offset": 527,
       "length": 6,
       "value": "[\"35\"]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
       "kind": "Array",
       "offset": 578,
       "length": 256,
       "value": "[\"2221\", \"2222\", \"2223\", \"2224\", \"2225\", \"2226\", \"2227\", \"2228\", \"2229\", \"223\", \"224\", \"225\", \"226\", \"227\", \"228\", \"229\", \"23\", \"24\", \"25\", \"26\", \"270\", \"271\", \"2720\", \"50\", \"51\", \"52\", \"53\", \"54\", \"55\", \"67\"]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
       "kind": "Array",
       "offset": 877,
       "length": 6,
       "value": "[\"62\"]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
       "kind": "Array",
       "offset": 922,
       "length": 5,
       "value": "[\"4\"]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CardUtils\/CreditCardUtils.swift",
       "kind": "Array",
       "offset": 973,
       "length": 2,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/DetectedAllBoxes.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/DetectedAllBoxes.swift",
       "kind": "Array",
       "offset": 138,
       "length": 2,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/DetectedAllOcrBoxes.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/DetectedAllOcrBoxes.swift",
       "kind": "Array",
       "offset": 108,
       "length": 2,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/ErrorCorrection.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/ErrorCorrection.swift",
       "kind": "IntegerLiteral",
       "offset": 103,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/ErrorCorrection.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/ErrorCorrection.swift",
       "kind": "Dictionary",
       "offset": 138,
       "length": 3,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/ErrorCorrection.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/ErrorCorrection.swift",
       "kind": "Dictionary",
       "offset": 176,
       "length": 3,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/ErrorCorrection.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/ErrorCorrection.swift",
       "kind": "Dictionary",
       "offset": 211,
       "length": 3,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/FadeInAnimation.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/FadeInAnimation.swift",
       "kind": "FloatLiteral",
       "offset": 82,
       "length": 3,
       "value": "0.4"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/MainLoopStateMachine.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/MainLoopStateMachine.swift",
       "kind": "FloatLiteral",
       "offset": 704,
       "length": 3,
       "value": "2.0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/MainLoopStateMachine.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/MainLoopStateMachine.swift",
       "kind": "BooleanLiteral",
       "offset": 1898,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/MainLoopStateMachine.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/MainLoopStateMachine.swift",
       "kind": "FloatLiteral",
       "offset": 1938,
       "length": 3,
       "value": "2.0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/MainLoopStateMachine.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/MainLoopStateMachine.swift",
       "kind": "FloatLiteral",
       "offset": 1975,
       "length": 3,
       "value": "4.0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/NonNameWords.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/NonNameWords.swift",
       "kind": "Array",
       "offset": 215,
       "length": 1033,
       "value": "[\"customer\", \"debit\", \"visa\", \"mastercard\", \"navy\", \"american\", \"express\", \"thru\", \"good\", \"authorized\", \"signature\", \"wells\", \"navy\", \"credit\", \"federal\", \"union\", \"bank\", \"valid\", \"validfrom\", \"validthru\", \"llc\", \"business\", \"netspend\", \"goodthru\", \"chase\", \"fargo\", \"hsbc\", \"usaa\", \"chaseo\", \"commerce\", \"last\", \"of\", \"lastdayof\", \"check\", \"card\", \"inc\", \"first\", \"member\", \"since\", \"american\", \"express\", \"republic\", \"bmo\", \"capital\", \"one\", \"capitalone\", \"platinum\", \"expiry\", \"date\", \"expiration\", \"cash\", \"back\", \"td\", \"access\", \"international\", \"interac\", \"nterac\", \"entreprise\", \"business\", \"md\", \"enterprise\", \"fifth\", \"third\", \"fifththird\", \"world\", \"rewards\", \"citi\", \"member\", \"cardmember\", \"cardholder\", \"valued\", \"since\", \"membersince\", \"cardmembersince\", \"cardholdersince\", \"freedom\", \"quicksilver\", \"penfed\", \"use\", \"this\", \"card\", \"is\", \"subject\", \"to\", \"the\", \"inc\", \"not\", \"transferable\", \"gto\", \"mgy\", \"sign\"]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrDD.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrDD.swift",
       "kind": "Array",
       "offset": 104,
       "length": 2,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrDDUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrDDUtils.swift",
       "kind": "FloatLiteral",
       "offset": 74,
       "length": 3,
       "value": "2.0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrDDUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrDDUtils.swift",
       "kind": "FloatLiteral",
       "offset": 125,
       "length": 3,
       "value": "1.2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrDDUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrDDUtils.swift",
       "kind": "IntegerLiteral",
       "offset": 164,
       "length": 2,
       "value": "12"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrDDUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrDDUtils.swift",
       "kind": "IntegerLiteral",
       "offset": 205,
       "length": 2,
       "value": "16"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrDDUtils.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrDDUtils.swift",
       "kind": "IntegerLiteral",
       "offset": 254,
       "length": 1,
       "value": "4"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/OcrMainLoop.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/OcrMainLoop.swift",
       "kind": "Array",
       "offset": 5406,
       "length": 2,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/OcrMainLoop.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/OcrMainLoop.swift",
       "kind": "IntegerLiteral",
       "offset": 5434,
       "length": 1,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/OcrMainLoop.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/OcrMainLoop.swift",
       "kind": "Array",
       "offset": 5491,
       "length": 2,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/OcrMainLoop.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/OcrMainLoop.swift",
       "kind": "StringLiteral",
       "offset": 5536,
       "length": 18,
       "value": "\"OcrMainLoopMutex\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/OcrMainLoop.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/OcrMainLoop.swift",
       "kind": "BooleanLiteral",
       "offset": 5579,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/OcrMainLoop.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/OcrMainLoop.swift",
       "kind": "Array",
       "offset": 5634,
       "length": 2,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/OcrMainLoop.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/OcrMainLoop.swift",
       "kind": "BooleanLiteral",
       "offset": 5661,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
       "kind": "IntegerLiteral",
       "offset": 552,
       "length": 2,
       "value": "24"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
       "kind": "IntegerLiteral",
       "offset": 595,
       "length": 2,
       "value": "38"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
       "kind": "IntegerLiteral",
       "offset": 699,
       "length": 2,
       "value": "12"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
       "kind": "IntegerLiteral",
       "offset": 744,
       "length": 2,
       "value": "19"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
       "kind": "IntegerLiteral",
       "offset": 900,
       "length": 2,
       "value": "31"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
       "kind": "IntegerLiteral",
       "offset": 938,
       "length": 2,
       "value": "31"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
       "kind": "IntegerLiteral",
       "offset": 1097,
       "length": 2,
       "value": "16"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
       "kind": "IntegerLiteral",
       "offset": 1137,
       "length": 2,
       "value": "16"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
       "kind": "IntegerLiteral",
       "offset": 1293,
       "length": 1,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
       "kind": "IntegerLiteral",
       "offset": 1593,
       "length": 1,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
       "kind": "IntegerLiteral",
       "offset": 1797,
       "length": 2,
       "value": "14"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
       "kind": "IntegerLiteral",
       "offset": 1836,
       "length": 2,
       "value": "30"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
       "kind": "IntegerLiteral",
       "offset": 1875,
       "length": 2,
       "value": "45"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
       "kind": "FloatLiteral",
       "offset": 5580,
       "length": 3,
       "value": "0.0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/OcrPriorsGen.swift",
       "kind": "FloatLiteral",
       "offset": 5602,
       "length": 3,
       "value": "1.0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/PostDetectionAlgorithm.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/PostDetectionAlgorithm.swift",
       "kind": "IntegerLiteral",
       "offset": 477,
       "length": 1,
       "value": "4"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/PostDetectionAlgorithm.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/PostDetectionAlgorithm.swift",
       "kind": "IntegerLiteral",
       "offset": 504,
       "length": 1,
       "value": "5"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/PostDetectionAlgorithm.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/PostDetectionAlgorithm.swift",
       "kind": "IntegerLiteral",
       "offset": 534,
       "length": 2,
       "value": "20"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/PostDetectionAlgorithm.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/PostDetectionAlgorithm.swift",
       "kind": "IntegerLiteral",
       "offset": 567,
       "length": 1,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/PostDetectionAlgorithm.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/PostDetectionAlgorithm.swift",
       "kind": "IntegerLiteral",
       "offset": 599,
       "length": 1,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/PostDetectionAlgorithm.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/PostDetectionAlgorithm.swift",
       "kind": "IntegerLiteral",
       "offset": 641,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/PostDetectionAlgorithm.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/PostDetectionAlgorithm.swift",
       "kind": "IntegerLiteral",
       "offset": 681,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
       "kind": "BooleanLiteral",
       "offset": 693,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
       "kind": "BooleanLiteral",
       "offset": 728,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
       "kind": "BooleanLiteral",
       "offset": 807,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
       "kind": "BooleanLiteral",
       "offset": 854,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
       "kind": "StringLiteral",
       "offset": 919,
       "length": 17,
       "value": "\"CardScanMlQueue\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
       "kind": "IntegerLiteral",
       "offset": 1006,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
       "kind": "FloatLiteral",
       "offset": 1837,
       "length": 4,
       "value": "10.0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
       "kind": "BooleanLiteral",
       "offset": 1881,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
       "kind": "BooleanLiteral",
       "offset": 1986,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
       "kind": "BooleanLiteral",
       "offset": 2096,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanBaseViewController.swift",
       "kind": "StringLiteral",
       "offset": 141,
       "length": 22,
       "value": "\"react_native_hyperswitch_scancard.ScanBaseViewController\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanConfiguration.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanConfiguration.swift",
       "kind": "IntegerLiteral",
       "offset": 70,
       "length": 8,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanConfiguration.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanConfiguration.swift",
       "kind": "IntegerLiteral",
       "offset": 70,
       "length": 8,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanConfiguration.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanConfiguration.swift",
       "kind": "IntegerLiteral",
       "offset": 70,
       "length": 8,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanConfiguration.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanConfiguration.swift",
       "kind": "BooleanLiteral",
       "offset": 144,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanConfiguration.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/ScanConfiguration.swift",
       "kind": "BooleanLiteral",
       "offset": 201,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/SimpleScanViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/SimpleScanViewController.swift",
       "kind": "StringLiteral",
       "offset": 4074,
       "length": 11,
       "value": "\"Scan Card\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/SimpleScanViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/SimpleScanViewController.swift",
       "kind": "StringLiteral",
       "offset": 4132,
       "length": 22,
       "value": "\"Enable camera access\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/SimpleScanViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/SimpleScanViewController.swift",
       "kind": "StringLiteral",
       "offset": 4213,
       "length": 61,
       "value": "\"To scan your card you'll need to update your phone settings\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/SimpleScanViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/SimpleScanViewController.swift",
       "kind": "StringLiteral",
       "offset": 4310,
       "length": 7,
       "value": "\"Close\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/SimpleScanViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/SimpleScanViewController.swift",
       "kind": "StringLiteral",
       "offset": 4353,
       "length": 7,
       "value": "\"Torch\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/SimpleScanViewController.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/SimpleScanViewController.swift",
       "kind": "FloatLiteral",
       "offset": 4610,
       "length": 3,
       "value": "4.0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/SSDCreditCardOcr.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/CreditCardOcr\/SSDCreditCardOcr.swift",
       "kind": "StringLiteral",
       "offset": 20,
       "length": 16,
       "value": "\"react_native_hyperswitch_scancard.SSDCreditCardOcr\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLModels\/SSDOcr.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLModels\/SSDOcr.swift",
       "kind": "StringLiteral",
       "offset": 2648,
       "length": 8,
       "value": "\"scores\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLModels\/SSDOcr.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLModels\/SSDOcr.swift",
       "kind": "StringLiteral",
       "offset": 2955,
       "length": 7,
       "value": "\"boxes\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLModels\/SSDOcr.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLModels\/SSDOcr.swift",
       "kind": "StringLiteral",
       "offset": 3262,
       "length": 8,
       "value": "\"filter\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
       "kind": "StringLiteral",
       "offset": 223,
       "length": 8,
       "value": "\"SSDOcr\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
       "kind": "StringLiteral",
       "offset": 265,
       "length": 10,
       "value": "\"mlmodelc\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
       "kind": "FloatLiteral",
       "offset": 335,
       "length": 3,
       "value": "0.5"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
       "kind": "IntegerLiteral",
       "offset": 366,
       "length": 3,
       "value": "600"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
       "kind": "IntegerLiteral",
       "offset": 398,
       "length": 3,
       "value": "375"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
       "kind": "FloatLiteral",
       "offset": 433,
       "length": 4,
       "value": "0.45"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
       "kind": "FloatLiteral",
       "offset": 471,
       "length": 4,
       "value": "0.39"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
       "kind": "FloatLiteral",
       "offset": 506,
       "length": 3,
       "value": "0.5"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
       "kind": "FloatLiteral",
       "offset": 542,
       "length": 3,
       "value": "0.1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
       "kind": "FloatLiteral",
       "offset": 576,
       "length": 3,
       "value": "0.2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
       "kind": "IntegerLiteral",
       "offset": 604,
       "length": 3,
       "value": "200"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
       "kind": "IntegerLiteral",
       "offset": 623,
       "length": 2,
       "value": "20"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
       "kind": "Array",
       "offset": 705,
       "length": 2,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/MLRuntime\/SSDOcrDetect.swift",
       "kind": "BooleanLiteral",
       "offset": 745,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/Extensions\/UIImage+pixelBuffer.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/Extensions\/UIImage+pixelBuffer.swift",
       "kind": "IntegerLiteral",
       "offset": 6308,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/Extensions\/UIImage+pixelBuffer.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/Extensions\/UIImage+pixelBuffer.swift",
       "kind": "IntegerLiteral",
       "offset": 6894,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/VideoFeed.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/VideoFeed.swift",
       "kind": "BooleanLiteral",
       "offset": 347,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/repo\/release2\/hyperswitch-client-core\/ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/VideoFeed.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasewed\/hyperswitch-sdk-ios\/node_modules\/react-native-hyperswitch-scancard\/ios\/HyperswitchScanCard\/Source\/UI\/VideoFeed.swift",
       "kind": "StringLiteral",
       "offset": 405,
       "length": 15,

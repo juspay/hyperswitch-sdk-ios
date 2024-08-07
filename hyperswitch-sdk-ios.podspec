@@ -30,7 +30,8 @@ Pod::Spec.new do |s|
   end
 
   s.subspec 'netcetera3ds' do |netcetera3ds|
-    netcetera3ds.vendored_frameworks = 'frameworkgen/Frameworks/Netcetera/*.xcframework'
+    netcetera3ds.source_files = '3ds/Source/**/*.{m,swift,h}'
+    netcetera3ds.vendored_frameworks = '3ds/Frameworks/*.xcframework'
     netcetera3ds.dependency 'hyperswitch-sdk-ios/core'
   end
 
