@@ -1,4 +1,4 @@
-version = "0.1.2"
+version = "0.1.3"
 
 Pod::Spec.new do |s|
   s.name                      = 'hyperswitch-sdk-ios'
@@ -27,6 +27,11 @@ Pod::Spec.new do |s|
   s.subspec 'scancard' do |scancard|
     scancard.vendored_frameworks = 'frameworkgen/Frameworks/ScanCard/*.xcframework'
     scancard.dependency 'hyperswitch-sdk-ios/core'
+  end
+
+  s.subspec 'netcetera3ds' do |netcetera3ds|
+    netcetera3ds.vendored_frameworks = 'frameworkgen/Frameworks/Netcetera/*.xcframework'
+    netcetera3ds.dependency 'hyperswitch-sdk-ios/core'
   end
 
   s.default_subspec = 'core'

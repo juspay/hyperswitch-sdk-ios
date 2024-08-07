@@ -8,6 +8,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.AUTORELEASE_PAT }}
       - name: Dependency Install
         run: |
           curl -o package.json -L https://raw.githubusercontent.com/juspay/hyperswitch-client-core/main/package.json
@@ -25,7 +28,6 @@ jobs:
           CI_COMMIT_MESSAGE: Continuous Integration
           USER_EMAIL: ${{ secrets.USER_EMAIL }}
           USER_NAME: ${{ secrets.USER_NAME }}
-          TOKEN: ${{ secrets.TOKEN }}
         run: |
           rm -rf package.json yarn.lock frameworkgen/PrivacyInfo.xcprivacy
           git config --global user.email "${{env.USER_EMAIL}}"
@@ -35,6 +37,7 @@ jobs:
           VERSION=$(grep -E '^version = "(.+)"$' hyperswitch-sdk-ios.podspec | sed 's/^version = "\(.*\)"$/\1/')
           git tag "v$VERSION"
           git push --tags
+          git push
       - name: Cocoapods Lint & Upload
         env:
           COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
