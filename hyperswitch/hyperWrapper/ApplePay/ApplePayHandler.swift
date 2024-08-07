@@ -178,7 +178,8 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
                     "display_name": payment.token.paymentMethod.displayName ?? ""
                 ],
                 "transaction_identifier": payment.token.transactionIdentifier,
-                "billing_contact": convertPKContactToDictionary(payment.billingContact)
+                "billing_contact": convertPKContactToDictionary(payment.billingContact),
+                "shipping_contact": convertPKContactToDictionary(payment.shippingContact)
             ]]
         )
         completion(PKPaymentAuthorizationResult(status: paymentStatus ?? .failure, errors: errors))
