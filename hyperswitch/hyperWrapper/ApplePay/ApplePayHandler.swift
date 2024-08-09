@@ -22,33 +22,33 @@ internal class ApplePayHandler: NSObject {
         
         guard let dict = rnMessage.toJSON() as? [String: AnyObject] else {
             presentCallback?([])
-            rnCallback([["status": "Error"]])
+            rnCallback([["status": "Error", "message": "01"]])
             return
         }
         
         guard let payment_request_data = dict["payment_request_data"] else {
             presentCallback?([])
-            callback?([["status": "Error"]])
+            callback?([["status": "Error", "message": "02"]])
             callback = nil
             return
         }
         
         guard let countryCode = payment_request_data["country_code"] as? String else {
             presentCallback?([])
-            callback?([["status": "Error"]])
+            callback?([["status": "Error", "message": "03"]])
             callback = nil
             return
         }
         
         guard let currencyCode = payment_request_data["currency_code"] as? String else {
             presentCallback?([])
-            callback?([["status": "Error"]])
+            callback?([["status": "Error", "message": "04"]])
             callback = nil
             return
         }
         guard let total = payment_request_data["total"] as? [String: AnyObject] else {
             presentCallback?([])
-            callback?([["status": "Error"]])
+            callback?([["status": "Error", "message": "05"]])
             callback = nil
             return
         }
@@ -57,28 +57,28 @@ internal class ApplePayHandler: NSObject {
               let label = total["label"] as? String,
               let type = total["type"] as? String else {
             presentCallback?([])
-            callback?([["status": "Error"]])
+            callback?([["status": "Error", "message": "06"]])
             callback = nil
             return
         }
         
         guard let merchant_capabilities_array = payment_request_data["merchant_capabilities"] as? Array<String> else {
             presentCallback?([])
-            callback?([["status": "Error"]])
+            callback?([["status": "Error", "message": "07"]])
             callback = nil
             return
         }
         
         guard let merchantIdentifier = payment_request_data["merchant_identifier"] as? String else{
             presentCallback?([])
-            callback?([["status": "Error"]])
+            callback?([["status": "Error", "message": "08"]])
             callback = nil
             return
         }
         
         guard let supported_networks_array = payment_request_data["supported_networks"] as? Array<String> else{
             presentCallback?([])
-            callback?([["status": "Error"]])
+            callback?([["status": "Error", "message": "09"]])
             callback = nil
             return
         }
@@ -128,7 +128,7 @@ internal class ApplePayHandler: NSObject {
             PKPaymentAuthorizationViewController(paymentRequest: paymentRequest) != nil
         else {
             presentCallback?([])
-            callback?([["status": "Error"]])
+            callback?([["status": "Error", "message": "10"]])
             callback = nil
             return
         }
@@ -139,7 +139,7 @@ internal class ApplePayHandler: NSObject {
             if presented {
                 self.paymentStatus = nil
             } else {
-                self.callback?([["status": "Error"]])
+                self.callback?([["status": "Error", "message": "11"]])
                 self.callback = nil
             }
         })
