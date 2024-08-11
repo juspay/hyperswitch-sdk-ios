@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		2F389A7F6F3B6F802D10A30B /* libPods-hyperswitch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD852A30CC81610842AC24EE /* libPods-hyperswitch.a */; };
+		435B65342C4FBE9A005DC36A /* nca_demo_root.crt in Resources */ = {isa = PBXBuildFile; fileRef = 435B65332C4FBE9A005DC36A /* nca_demo_root.crt */; };
+		43B06D6E2C688B13000F7F6F /* ApplePayUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B06D692C688B13000F7F6F /* ApplePayUtils.swift */; };
+		43B06D6F2C688B13000F7F6F /* ApplePayButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B06D6A2C688B13000F7F6F /* ApplePayButtonView.swift */; };
+		43B06D712C688B13000F7F6F /* ApplePayButtonManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B06D6C2C688B13000F7F6F /* ApplePayButtonManager.swift */; };
+		43B06D722C688B13000F7F6F /* ApplePayButtonManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 43B06D6D2C688B13000F7F6F /* ApplePayButtonManager.m */; };
+		43B06DBD2C688E40000F7F6F /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43B06DBB2C688E40000F7F6F /* Errors.swift */; };
 		43E668682C084FB70094BD13 /* montserrat_extralight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668552C084FB60094BD13 /* montserrat_extralight.ttf */; };
 		43E668692C084FB70094BD13 /* montserrat_bolditalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668562C084FB70094BD13 /* montserrat_bolditalic.ttf */; };
 		43E6686A2C084FB70094BD13 /* montserrat_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668572C084FB70094BD13 /* montserrat_bold.ttf */; };
@@ -50,8 +56,6 @@
 		793083EB2A0DA9E300E78310 /* PaymentHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 793083EA2A0DA9E300E78310 /* PaymentHandler.swift */; };
 		793083ED2A0DA9F100E78310 /* PaymentIntentParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 793083EC2A0DA9F100E78310 /* PaymentIntentParams.swift */; };
 		7938D81B2A4EF45000286CEE /* PaymentMethodParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7938D81A2A4EF45000286CEE /* PaymentMethodParams.swift */; };
-		7954A4472C23A44B00FEC02D /* ApplePayViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7954A4462C23A44B00FEC02D /* ApplePayViewManager.m */; };
-		7954A44A2C23A49A00FEC02D /* ApplePayViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7954A4492C23A49A00FEC02D /* ApplePayViewManager.swift */; };
 		79728FB92C3412BB00CA8C10 /* HeadlessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */; };
 		7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7996A8322BA1FDD000394FAF /* hyperswitch.bundle */; };
 		799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */; };
@@ -82,6 +86,12 @@
 
 /* Begin PBXFileReference section */
 		20DD7F56147F45CBE8EA06B8 /* Pods-hyperswitch.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitch.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitch/Pods-hyperswitch.debug.xcconfig"; sourceTree = "<group>"; };
+		435B65332C4FBE9A005DC36A /* nca_demo_root.crt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = nca_demo_root.crt; sourceTree = "<group>"; };
+		43B06D692C688B13000F7F6F /* ApplePayUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplePayUtils.swift; sourceTree = "<group>"; };
+		43B06D6A2C688B13000F7F6F /* ApplePayButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplePayButtonView.swift; sourceTree = "<group>"; };
+		43B06D6C2C688B13000F7F6F /* ApplePayButtonManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplePayButtonManager.swift; sourceTree = "<group>"; };
+		43B06D6D2C688B13000F7F6F /* ApplePayButtonManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ApplePayButtonManager.m; sourceTree = "<group>"; };
+		43B06DBB2C688E40000F7F6F /* Errors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
 		43E668552C084FB60094BD13 /* montserrat_extralight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_extralight.ttf; sourceTree = "<group>"; };
 		43E668562C084FB70094BD13 /* montserrat_bolditalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_bolditalic.ttf; sourceTree = "<group>"; };
 		43E668572C084FB70094BD13 /* montserrat_bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_bold.ttf; sourceTree = "<group>"; };
@@ -127,8 +137,6 @@
 		793083EA2A0DA9E300E78310 /* PaymentHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentHandler.swift; sourceTree = "<group>"; };
 		793083EC2A0DA9F100E78310 /* PaymentIntentParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentIntentParams.swift; sourceTree = "<group>"; };
 		7938D81A2A4EF45000286CEE /* PaymentMethodParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodParams.swift; sourceTree = "<group>"; };
-		7954A4462C23A44B00FEC02D /* ApplePayViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ApplePayViewManager.m; sourceTree = "<group>"; };
-		7954A4492C23A49A00FEC02D /* ApplePayViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayViewManager.swift; sourceTree = "<group>"; };
 		79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlessViewController.swift; sourceTree = "<group>"; };
 		7996A8322BA1FDD000394FAF /* hyperswitch.bundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hyperswitch.bundle; sourceTree = "<group>"; };
 		799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -213,6 +221,7 @@
 		66486F90294355BD00150E4F /* hyperswitch */ = {
 			isa = PBXGroup;
 			children = (
+				435B65332C4FBE9A005DC36A /* nca_demo_root.crt */,
 				799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */,
 				66486FA22943580F00150E4F /* AppDelegate.swift */,
 				66486F91294355BD00150E4F /* hyperApp.swift */,
@@ -276,8 +285,11 @@
 		7954A4452C23A42200FEC02D /* ApplePay */ = {
 			isa = PBXGroup;
 			children = (
-				7954A4462C23A44B00FEC02D /* ApplePayViewManager.m */,
-				7954A4492C23A49A00FEC02D /* ApplePayViewManager.swift */,
+				43B06DBB2C688E40000F7F6F /* Errors.swift */,
+				43B06D6D2C688B13000F7F6F /* ApplePayButtonManager.m */,
+				43B06D6C2C688B13000F7F6F /* ApplePayButtonManager.swift */,
+				43B06D6A2C688B13000F7F6F /* ApplePayButtonView.swift */,
+				43B06D692C688B13000F7F6F /* ApplePayUtils.swift */,
 				66C2F89A29444E6700ACD32D /* ApplePayHandler.swift */,
 			);
 			path = ApplePay;
@@ -433,6 +445,7 @@
 				43E6686D2C084FB70094BD13 /* montserrat_medium.ttf in Resources */,
 				43E6686C2C084FB70094BD13 /* montserrat_italic.ttf in Resources */,
 				43E6686A2C084FB70094BD13 /* montserrat_bold.ttf in Resources */,
+				435B65342C4FBE9A005DC36A /* nca_demo_root.crt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -502,14 +515,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7954A4472C23A44B00FEC02D /* ApplePayViewManager.m in Sources */,
 				79728FB92C3412BB00CA8C10 /* HeadlessViewController.swift in Sources */,
 				66486FA92943580F00150E4F /* AppDelegate.swift in Sources */,
 				790BA8272B99DB5E006678FD /* PaymentSession.swift in Sources */,
 				7905257A2BDA73A600D49FE8 /* SwiftUIView.swift in Sources */,
 				DC5D0114294731480017C67A /* PaymentSheet.swift in Sources */,
 				DC5D0115294731480017C67A /* PaymentSheetView+SwiftUI.swift in Sources */,
-				7954A44A2C23A49A00FEC02D /* ApplePayViewManager.swift in Sources */,
+				43B06D712C688B13000F7F6F /* ApplePayButtonManager.swift in Sources */,
 				792D6A082B99C215001598CD /* HyperHeadless.swift in Sources */,
 				66486FAB2943580F00150E4F /* HyperModule.swift in Sources */,
 				66486FAD2943580F00150E4F /* HyperModule.m in Sources */,
@@ -517,12 +529,16 @@
 				663F68FC29CCC93C006E91BD /* APIClient.swift in Sources */,
 				793083ED2A0DA9F100E78310 /* PaymentIntentParams.swift in Sources */,
 				66C2F89B29444E6700ACD32D /* ApplePayHandler.swift in Sources */,
+				43B06D722C688B13000F7F6F /* ApplePayButtonManager.m in Sources */,
 				66486F94294355BD00150E4F /* ContentView.swift in Sources */,
+				43B06D6E2C688B13000F7F6F /* ApplePayUtils.swift in Sources */,
+				43B06DBD2C688E40000F7F6F /* Errors.swift in Sources */,
 				792D69F62B95E942001598CD /* ExpressCheckoutLauncher.swift in Sources */,
 				DC5D011E294844900017C67A /* ViewController.swift in Sources */,
 				DC4AC9F2296D6D6C00E0D2A6 /* PaymentCardTextField.swift in Sources */,
 				7938D81B2A4EF45000286CEE /* PaymentMethodParams.swift in Sources */,
 				DC5D0125294847E90017C67A /* PaymentSheetView+UIKit.swift in Sources */,
+				43B06D6F2C688B13000F7F6F /* ApplePayButtonView.swift in Sources */,
 				66486FA72943580F00150E4F /* SwiftUIManager.swift in Sources */,
 				DCF9779029517BBB00596F78 /* DictionaryConverter.swift in Sources */,
 				792D69F82B95E94C001598CD /* ExpressCheckoutWidget.swift in Sources */,
