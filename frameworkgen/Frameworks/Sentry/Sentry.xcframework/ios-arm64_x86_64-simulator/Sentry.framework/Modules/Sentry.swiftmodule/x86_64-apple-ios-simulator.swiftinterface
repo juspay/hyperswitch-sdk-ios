@@ -5,9 +5,12 @@ import AVFoundation
 import CoreGraphics
 import Foundation
 import MetricKit
+import ObjectiveC.NSObjCRuntime
+import ObjectiveC
 @_exported import Sentry
 import Swift
 import UIKit
+import WebKit
 import _Concurrency
 import _StringProcessing
 import _SwiftConcurrencyShims
@@ -57,6 +60,11 @@ extension Swift.FixedWidthInteger {
     get
   }
 }
+extension Sentry.SentryLevel : Swift.CustomStringConvertible {
+  public var description: Swift.String {
+    get
+  }
+}
 @_hasMissingDesignatedInitializers @objc public class SentryMetricsAPI : ObjectiveC.NSObject {
   @objc public func increment(key: Swift.String, value: Swift.Double = 1.0, unit: Sentry.MeasurementUnit = .none, tags: [Swift.String : Swift.String] = [:])
   @objc public func gauge(key: Swift.String, value: Swift.Double, unit: Sentry.MeasurementUnit = .none, tags: [Swift.String : Swift.String] = [:])
@@ -79,12 +87,14 @@ extension Swift.FixedWidthInteger {
     }
   }
   @objc public var sessionSampleRate: Swift.Float
-  @objc public var errorSampleRate: Swift.Float
+  @objc public var onErrorSampleRate: Swift.Float
   @objc public var redactAllText: Swift.Bool
   @objc public var redactAllImages: Swift.Bool
   public var quality: Sentry.SentryReplayOptions.SentryReplayQuality
+  @objc public var redactViewTypes: [Swift.AnyClass]
+  @objc public var ignoreRedactViewTypes: [Swift.AnyClass]
   @objc override dynamic public init()
-  @objc public init(sessionSampleRate: Swift.Float = 0, errorSampleRate: Swift.Float = 0, redactAllText: Swift.Bool = true, redactAllImages: Swift.Bool = true)
+  @objc public init(sessionSampleRate: Swift.Float = 0, onErrorSampleRate: Swift.Float = 0, redactAllText: Swift.Bool = true, redactAllImages: Swift.Bool = true)
   @objc deinit
 }
 @objc public enum SentryTransactionNameSource : Swift.Int {
@@ -99,6 +109,10 @@ extension Swift.FixedWidthInteger {
   public var rawValue: Swift.Int {
     get
   }
+}
+extension UIKit.UIView {
+  @_Concurrency.MainActor(unsafe) public func sentryReplayRedact()
+  @_Concurrency.MainActor(unsafe) public func sentryReplayIgnore()
 }
 extension Sentry.SentryLevel : Swift.Equatable {}
 extension Sentry.SentryLevel : Swift.Hashable {}
