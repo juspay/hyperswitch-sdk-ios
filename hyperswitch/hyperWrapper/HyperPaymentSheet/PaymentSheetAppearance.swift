@@ -37,7 +37,32 @@ public extension PaymentSheet {
         /// The shadow used for inputs and tabs in PaymentSheet
         /// - Note: Set this to `.disabled` to disable shadows
         public var shadow: Shadow?
-
+        
+        public var theme: Theme?
+        
+        public enum Theme {
+            case `default`
+            case light
+            case dark
+            case minimal
+            case flatMinimal
+            
+            var themeLabel: String {
+                switch self {
+                    case .`default`:
+                        return "Default"
+                    case .light:
+                        return "Light"
+                    case .dark:
+                        return "Dark"
+                    case .minimal:
+                        return "Minimal"
+                    case .flatMinimal:
+                        return "FlatMinimal"
+                }
+            }
+        }
+        
         // MARK: Fonts
 
         /// Describes the appearance of fonts in PaymentSheet
@@ -129,6 +154,12 @@ public extension PaymentSheet {
             
             /// The color used to indicate errors or destructive actions in PaymentSheet
             public var danger: UIColor?
+            
+            /// The color used to indicate Loader Background Color
+            public var loaderBackground: UIColor?
+            
+            /// The color used to indicate Loader Foreground Color
+            public var loaderForeground: UIColor?
         }
 
         // MARK: Shadow
