@@ -322,6 +322,13 @@
         "moduleName": "Sentry"
       },
       {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "Sentry"
+      },
+      {
         "kind": "TypeDecl",
         "name": "SentryId",
         "printedName": "SentryId",
@@ -1983,8 +1990,10 @@
                 "mangledName": "$s6Sentry0A13ReplayOptionsC0aB7QualityO3lowyA2EmF",
                 "moduleName": "Sentry",
                 "declAttributes": [
-                  "RawDocComment"
-                ]
+                  "RawDocComment",
+                  "ObjC"
+                ],
+                "fixedbinaryorder": 0
               },
               {
                 "kind": "Var",
@@ -2023,8 +2032,10 @@
                 "mangledName": "$s6Sentry0A13ReplayOptionsC0aB7QualityO6mediumyA2EmF",
                 "moduleName": "Sentry",
                 "declAttributes": [
-                  "RawDocComment"
-                ]
+                  "RawDocComment",
+                  "ObjC"
+                ],
+                "fixedbinaryorder": 1
               },
               {
                 "kind": "Var",
@@ -2063,8 +2074,10 @@
                 "mangledName": "$s6Sentry0A13ReplayOptionsC0aB7QualityO4highyA2EmF",
                 "moduleName": "Sentry",
                 "declAttributes": [
-                  "RawDocComment"
-                ]
+                  "RawDocComment",
+                  "ObjC"
+                ],
+                "fixedbinaryorder": 2
               },
               {
                 "kind": "Constructor",
@@ -2145,6 +2158,7 @@
             "moduleName": "Sentry",
             "declAttributes": [
               "AccessControl",
+              "ObjC",
               "RawDocComment"
             ],
             "enumRawTypeName": "Int",
@@ -2578,14 +2592,15 @@
               }
             ],
             "declKind": "Var",
-            "usr": "s:6Sentry0A13ReplayOptionsC7qualityAC0aB7QualityOvp",
+            "usr": "c:@M@Sentry@objc(cs)SentryReplayOptions(py)quality",
             "mangledName": "$s6Sentry0A13ReplayOptionsC7qualityAC0aB7QualityOvp",
             "moduleName": "Sentry",
             "declAttributes": [
               "HasInitialValue",
               "HasStorage",
               "AccessControl",
-              "RawDocComment"
+              "RawDocComment",
+              "ObjC"
             ],
             "hasStorage": true,
             "accessors": [
@@ -2602,10 +2617,13 @@
                   }
                 ],
                 "declKind": "Accessor",
-                "usr": "s:6Sentry0A13ReplayOptionsC7qualityAC0aB7QualityOvg",
+                "usr": "c:@M@Sentry@objc(cs)SentryReplayOptions(im)quality",
                 "mangledName": "$s6Sentry0A13ReplayOptionsC7qualityAC0aB7QualityOvg",
                 "moduleName": "Sentry",
                 "implicit": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
                 "accessorKind": "get"
               },
               {
@@ -2626,10 +2644,13 @@
                   }
                 ],
                 "declKind": "Accessor",
-                "usr": "s:6Sentry0A13ReplayOptionsC7qualityAC0aB7QualityOvs",
+                "usr": "c:@M@Sentry@objc(cs)SentryReplayOptions(im)setQuality:",
                 "mangledName": "$s6Sentry0A13ReplayOptionsC7qualityAC0aB7QualityOvs",
                 "moduleName": "Sentry",
                 "implicit": true,
+                "declAttributes": [
+                  "ObjC"
+                ],
                 "accessorKind": "set"
               },
               {
@@ -4035,987 +4056,987 @@
   },
   "ConstValues": [
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/BucketsMetricsAggregator.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/BucketsMetricsAggregator.swift",
       "kind": "IntegerLiteral",
       "offset": 231,
       "length": 2,
       "value": "10"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/BucketsMetricsAggregator.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/BucketsMetricsAggregator.swift",
       "kind": "IntegerLiteral",
       "offset": 1062,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/BucketsMetricsAggregator.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/BucketsMetricsAggregator.swift",
       "kind": "Dictionary",
       "offset": 1127,
       "length": 3,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/BucketsMetricsAggregator.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/BucketsMetricsAggregator.swift",
       "kind": "IntegerLiteral",
       "offset": 1438,
       "length": 5,
       "value": "1000"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/BucketsMetricsAggregator.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/BucketsMetricsAggregator.swift",
       "kind": "FloatLiteral",
       "offset": 1483,
       "length": 4,
       "value": "10.0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/BucketsMetricsAggregator.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/BucketsMetricsAggregator.swift",
       "kind": "FloatLiteral",
       "offset": 1528,
       "length": 3,
       "value": "0.5"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/CounterMetric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/CounterMetric.swift",
       "kind": "IntegerLiteral",
       "offset": 103,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/CounterMetric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/CounterMetric.swift",
       "kind": "StringLiteral",
       "offset": 25,
       "length": 13,
       "value": "\"Sentry.CounterMetric\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/DistributionMetric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/DistributionMetric.swift",
       "kind": "StringLiteral",
       "offset": 25,
       "length": 18,
       "value": "\"Sentry.DistributionMetric\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/GaugeMetric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/GaugeMetric.swift",
       "kind": "IntegerLiteral",
       "offset": 217,
       "length": 1,
       "value": "5"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/GaugeMetric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/GaugeMetric.swift",
       "kind": "StringLiteral",
       "offset": 25,
       "length": 11,
       "value": "\"Sentry.GaugeMetric\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/LocalMetricsAggregator.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/LocalMetricsAggregator.swift",
       "kind": "Dictionary",
       "offset": 428,
       "length": 3,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
       "kind": "StringLiteral",
       "offset": 530,
       "length": 3,
       "value": "\"c\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
       "kind": "StringLiteral",
       "offset": 551,
       "length": 3,
       "value": "\"g\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
       "kind": "StringLiteral",
       "offset": 579,
       "length": 3,
       "value": "\"d\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
       "kind": "StringLiteral",
       "offset": 598,
       "length": 3,
       "value": "\"s\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
       "kind": "StringLiteral",
       "offset": 530,
       "length": 3,
       "value": "\"c\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
       "kind": "StringLiteral",
       "offset": 551,
       "length": 3,
       "value": "\"g\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
       "kind": "StringLiteral",
       "offset": 579,
       "length": 3,
       "value": "\"d\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
       "kind": "StringLiteral",
       "offset": 598,
       "length": 3,
       "value": "\"s\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
       "kind": "StringLiteral",
       "offset": 530,
       "length": 3,
       "value": "\"c\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
       "kind": "StringLiteral",
       "offset": 551,
       "length": 3,
       "value": "\"g\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
       "kind": "StringLiteral",
       "offset": 579,
       "length": 3,
       "value": "\"d\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/Metric.swift",
       "kind": "StringLiteral",
       "offset": 598,
       "length": 3,
       "value": "\"s\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Extensions\/NumberExtensions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Extensions\/NumberExtensions.swift",
       "kind": "IntegerLiteral",
       "offset": 170,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/SentryBaggageSerialization.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/SentryBaggageSerialization.swift",
       "kind": "IntegerLiteral",
       "offset": 131,
       "length": 5,
       "value": "8192"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/SentryExperimentalOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/SentryExperimentalOptions.swift",
       "kind": "IntegerLiteral",
       "offset": 224,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/SentryExperimentalOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/SentryExperimentalOptions.swift",
       "kind": "IntegerLiteral",
       "offset": 246,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/SentryFileContents.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/SentryFileContents.swift",
       "kind": "StringLiteral",
       "offset": 38,
       "length": 18,
       "value": "\"Sentry.SentryFileContents\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Protocol\/SentryId.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/FramesTracking\/SentryFramesDelayResult.swift",
+      "kind": "StringLiteral",
+      "offset": 38,
+      "length": 23,
+      "value": "\"Sentry.SentryFramesDelayResult\""
+    },
+    {
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Protocol\/SentryId.swift",
       "kind": "StringLiteral",
       "offset": 210,
       "length": 38,
       "value": "\"00000000-0000-0000-0000-000000000000\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
       "kind": "Array",
       "offset": 128,
       "length": 54,
       "value": "[\"none\", \"debug\", \"info\", \"warning\", \"error\", \"fatal\"]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
       "kind": "IntegerLiteral",
       "offset": 232,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
       "kind": "IntegerLiteral",
       "offset": 355,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
       "kind": "IntegerLiteral",
       "offset": 406,
       "length": 1,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
       "kind": "IntegerLiteral",
       "offset": 463,
       "length": 1,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
       "kind": "IntegerLiteral",
       "offset": 516,
       "length": 1,
       "value": "4"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
       "kind": "IntegerLiteral",
       "offset": 569,
       "length": 1,
       "value": "5"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
       "kind": "IntegerLiteral",
       "offset": 232,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
       "kind": "IntegerLiteral",
       "offset": 355,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
       "kind": "IntegerLiteral",
       "offset": 406,
       "length": 1,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
       "kind": "IntegerLiteral",
       "offset": 463,
       "length": 1,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
       "kind": "IntegerLiteral",
       "offset": 516,
       "length": 1,
       "value": "4"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Helper\/Log\/SentryLevel.swift",
       "kind": "IntegerLiteral",
       "offset": 569,
       "length": 1,
       "value": "5"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Tools\/SentryLog.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Tools\/SentryLog.swift",
       "kind": "BooleanLiteral",
       "offset": 139,
       "length": 4,
       "value": "true"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsAPI.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsAPI.swift",
       "kind": "FloatLiteral",
       "offset": 2102,
       "length": 3,
       "value": "1.0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsAPI.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsAPI.swift",
       "kind": "Dictionary",
       "offset": 2163,
       "length": 3,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsAPI.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsAPI.swift",
       "kind": "Dictionary",
       "offset": 2785,
       "length": 3,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsAPI.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsAPI.swift",
       "kind": "Dictionary",
       "offset": 3408,
       "length": 3,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsAPI.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsAPI.swift",
       "kind": "Dictionary",
       "offset": 4020,
       "length": 3,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsAPI.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsAPI.swift",
       "kind": "Dictionary",
       "offset": 4754,
       "length": 3,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsAPI.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsAPI.swift",
       "kind": "StringLiteral",
       "offset": 861,
       "length": 16,
       "value": "\"Sentry.SentryMetricsAPI\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsClient.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SentryMetricsClient.swift",
       "kind": "StringLiteral",
       "offset": 74,
       "length": 19,
       "value": "\"Sentry.SentryMetricsClient\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/MetricKit\/SentryMXCallStackTree.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/MetricKit\/SentryMXCallStackTree.swift",
       "kind": "StringLiteral",
       "offset": 225,
       "length": 21,
       "value": "\"Sentry.SentryMXCallStackTree\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/MetricKit\/SentryMXCallStackTree.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/MetricKit\/SentryMXCallStackTree.swift",
       "kind": "StringLiteral",
       "offset": 697,
       "length": 17,
       "value": "\"Sentry.SentryMXCallStack\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/MetricKit\/SentryMXCallStackTree.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/MetricKit\/SentryMXCallStackTree.swift",
       "kind": "StringLiteral",
       "offset": 1123,
       "length": 13,
       "value": "\"Sentry.SentryMXFrame\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/MetricKit\/SentryMXManager.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/MetricKit\/SentryMXManager.swift",
       "kind": "BooleanLiteral",
       "offset": 1357,
       "length": 4,
       "value": "true"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/MetricKit\/SentryMXManager.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/MetricKit\/SentryMXManager.swift",
       "kind": "StringLiteral",
       "offset": 1206,
       "length": 15,
       "value": "\"Sentry.SentryMXManager\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryOnDemandReplay.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryOnDemandReplay.swift",
       "kind": "IntegerLiteral",
       "offset": 566,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryOnDemandReplay.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryOnDemandReplay.swift",
       "kind": "IntegerLiteral",
       "offset": 1005,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryOnDemandReplay.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryOnDemandReplay.swift",
       "kind": "IntegerLiteral",
       "offset": 1025,
       "length": 6,
       "value": "20000"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryOnDemandReplay.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryOnDemandReplay.swift",
       "kind": "IntegerLiteral",
       "offset": 1052,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryOnDemandReplay.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryOnDemandReplay.swift",
       "kind": "StringLiteral",
       "offset": 433,
       "length": 20,
       "value": "\"Sentry.SentryOnDemandReplay\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "IntegerLiteral",
-      "offset": 419,
+      "offset": 429,
       "length": 6,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "IntegerLiteral",
-      "offset": 529,
+      "offset": 539,
       "length": 4,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "IntegerLiteral",
-      "offset": 419,
+      "offset": 429,
       "length": 6,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "IntegerLiteral",
-      "offset": 529,
+      "offset": 539,
       "length": 4,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
-      "kind": "IntegerLiteral",
-      "offset": 419,
-      "length": 6,
-      "value": "1"
-    },
-    {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
-      "kind": "IntegerLiteral",
-      "offset": 529,
-      "length": 4,
-      "value": "2"
-    },
-    {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "BooleanLiteral",
-      "offset": 1488,
+      "offset": 1498,
       "length": 4,
       "value": "true"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "BooleanLiteral",
-      "offset": 1721,
+      "offset": 1731,
       "length": 4,
       "value": "true"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "IntegerLiteral",
-      "offset": 3029,
+      "offset": 3039,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "IntegerLiteral",
-      "offset": 3045,
+      "offset": 3055,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "IntegerLiteral",
-      "offset": 2981,
+      "offset": 2991,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "IntegerLiteral",
-      "offset": 3190,
+      "offset": 3200,
       "length": 2,
       "value": "30"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "IntegerLiteral",
-      "offset": 3325,
+      "offset": 3335,
       "length": 1,
       "value": "5"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "IntegerLiteral",
-      "offset": 3437,
+      "offset": 3447,
       "length": 5,
       "value": "3600"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "IntegerLiteral",
-      "offset": 3972,
+      "offset": 3982,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "IntegerLiteral",
-      "offset": 4002,
+      "offset": 4012,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "BooleanLiteral",
-      "offset": 4027,
+      "offset": 4037,
       "length": 4,
       "value": "true"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayOptions.swift",
       "kind": "BooleanLiteral",
-      "offset": 4057,
+      "offset": 4067,
       "length": 4,
       "value": "true"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayRecording.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayRecording.swift",
       "kind": "StringLiteral",
       "offset": 158,
       "length": 6,
       "value": "\"h264\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayRecording.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayRecording.swift",
       "kind": "StringLiteral",
       "offset": 204,
       "length": 5,
       "value": "\"mp4\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayRecording.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayRecording.swift",
       "kind": "StringLiteral",
       "offset": 253,
       "length": 10,
       "value": "\"constant\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayRecording.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayRecording.swift",
       "kind": "StringLiteral",
       "offset": 81,
       "length": 21,
       "value": "\"Sentry.SentryReplayRecording\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayType.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayType.swift",
       "kind": "IntegerLiteral",
       "offset": 80,
       "length": 6,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayType.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryReplayType.swift",
       "kind": "IntegerLiteral",
       "offset": 80,
       "length": 6,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebBreadcrumbEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebBreadcrumbEvent.swift",
       "kind": "StringLiteral",
       "offset": 68,
       "length": 26,
       "value": "\"Sentry.SentryRRWebBreadcrumbEvent\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebCustomEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebCustomEvent.swift",
       "kind": "StringLiteral",
       "offset": 38,
       "length": 22,
       "value": "\"Sentry.SentryRRWebCustomEvent\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 117,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 136,
       "length": 1,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 154,
       "length": 1,
       "value": "4"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 174,
       "length": 1,
       "value": "5"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 117,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 136,
       "length": 1,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 154,
       "length": 1,
       "value": "4"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 174,
       "length": 1,
       "value": "5"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebEvent.swift",
       "kind": "StringLiteral",
       "offset": 281,
       "length": 16,
       "value": "\"Sentry.SentryRRWebEvent\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebMetaEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebMetaEvent.swift",
       "kind": "StringLiteral",
       "offset": 38,
       "length": 20,
       "value": "\"Sentry.SentryRRWebMetaEvent\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebSpanEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebSpanEvent.swift",
       "kind": "StringLiteral",
       "offset": 74,
       "length": 20,
       "value": "\"Sentry.SentryRRWebSpanEvent\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 105,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 126,
       "length": 1,
       "value": "7"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 147,
       "length": 1,
       "value": "8"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 168,
       "length": 1,
       "value": "9"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 105,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 126,
       "length": 1,
       "value": "7"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 147,
       "length": 1,
       "value": "8"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 168,
       "length": 1,
       "value": "9"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 105,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 126,
       "length": 1,
       "value": "7"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 147,
       "length": 1,
       "value": "8"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
       "kind": "IntegerLiteral",
       "offset": 168,
       "length": 1,
       "value": "9"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
       "kind": "StringLiteral",
       "offset": 263,
       "length": 15,
       "value": "\"Sentry.RRWebTouchEvent\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebTouchEvent.swift",
       "kind": "StringLiteral",
       "offset": 749,
       "length": 14,
       "value": "\"Sentry.RRWebMoveEvent\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebVideoEvent.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/RRWeb\/SentryRRWebVideoEvent.swift",
       "kind": "StringLiteral",
       "offset": 81,
       "length": 21,
       "value": "\"Sentry.SentryRRWebVideoEvent\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentrySessionReplay.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentrySessionReplay.swift",
       "kind": "BooleanLiteral",
-      "offset": 700,
+      "offset": 714,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentrySessionReplay.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentrySessionReplay.swift",
       "kind": "Array",
-      "offset": 982,
+      "offset": 996,
       "length": 2,
       "value": "[]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentrySessionReplay.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentrySessionReplay.swift",
       "kind": "IntegerLiteral",
-      "offset": 1080,
+      "offset": 1094,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentrySessionReplay.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentrySessionReplay.swift",
       "kind": "BooleanLiteral",
-      "offset": 1121,
+      "offset": 1135,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentrySessionReplay.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentrySessionReplay.swift",
       "kind": "BooleanLiteral",
-      "offset": 1168,
+      "offset": 1182,
       "length": 5,
       "value": "false"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentrySessionReplay.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentrySessionReplay.swift",
+      "kind": "BooleanLiteral",
+      "offset": 1227,
+      "length": 5,
+      "value": "false"
+    },
+    {
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentrySessionReplay.swift",
       "kind": "StringLiteral",
-      "offset": 631,
+      "offset": 645,
       "length": 19,
       "value": "\"Sentry.SentrySessionReplay\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentrySRDefaultBreadcrumbConverter.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentrySRDefaultBreadcrumbConverter.swift",
       "kind": "Array",
       "offset": 319,
       "length": 148,
       "value": "[\"status_code\", \"method\", \"response_body_size\", \"request_body_size\", \"http.query\", \"http.fragment\"]"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryTouchTracker.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryTouchTracker.swift",
       "kind": "IntegerLiteral",
       "offset": 910,
       "length": 1,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryTouchTracker.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryTouchTracker.swift",
       "kind": "StringLiteral",
       "offset": 97,
       "length": 18,
       "value": "\"Sentry.SentryTouchTracker\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
       "kind": "IntegerLiteral",
       "offset": 136,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
       "kind": "IntegerLiteral",
       "offset": 195,
       "length": 3,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
       "kind": "IntegerLiteral",
       "offset": 258,
       "length": 5,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
       "kind": "IntegerLiteral",
       "offset": 322,
       "length": 4,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
       "kind": "IntegerLiteral",
       "offset": 390,
       "length": 9,
       "value": "4"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
       "kind": "IntegerLiteral",
       "offset": 458,
       "length": 10,
       "value": "5"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
       "kind": "IntegerLiteral",
       "offset": 136,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
       "kind": "IntegerLiteral",
       "offset": 195,
       "length": 3,
       "value": "1"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
       "kind": "IntegerLiteral",
       "offset": 258,
       "length": 5,
       "value": "2"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
       "kind": "IntegerLiteral",
       "offset": 322,
       "length": 4,
       "value": "3"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
       "kind": "IntegerLiteral",
       "offset": 390,
       "length": 9,
       "value": "4"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/Performance\/SentryTransactionNameSource.swift",
       "kind": "IntegerLiteral",
       "offset": 458,
       "length": 10,
       "value": "5"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryVideoInfo.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Integrations\/SessionReplay\/SentryVideoInfo.swift",
       "kind": "StringLiteral",
       "offset": 38,
       "length": 15,
       "value": "\"Sentry.SentryVideoInfo\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SetMetric.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Metrics\/SetMetric.swift",
       "kind": "StringLiteral",
       "offset": 25,
       "length": 9,
       "value": "\"Sentry.SetMetric\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Tools\/UIRedactBuilder.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Tools\/UIRedactBuilder.swift",
       "kind": "IntegerLiteral",
-      "offset": 7133,
+      "offset": 7414,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Tools\/UIRedactBuilder.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Tools\/UIRedactBuilder.swift",
       "kind": "IntegerLiteral",
-      "offset": 7196,
+      "offset": 7477,
       "length": 1,
       "value": "0"
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Tools\/UrlSanitized.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Tools\/UrlSanitized.swift",
       "kind": "StringLiteral",
       "offset": 106,
       "length": 12,
       "value": "\"[Filtered]\""
     },
     {
-      "filePath": "\/Users\/harshit.srivastava\/releasenow\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Tools\/UrlSanitized.swift",
+      "filePath": "\/Users\/harshit.srivastava\/releasedi\/hyperswitch-sdk-ios\/frameworkgen\/Pods\/Sentry\/Sources\/Swift\/Tools\/UrlSanitized.swift",
       "kind": "StringLiteral",
       "offset": 38,
       "length": 12,

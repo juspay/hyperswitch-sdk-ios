@@ -5,10 +5,9 @@ export SRCROOT
 
 set -euo pipefail
 
-excluded_frameworks=("Pods_DummyApp" "DummyApp")
+excluded_frameworks=("Pods_DummyApp" "DummyApp", "react-native-hyperswitch-netcetera-3ds")
 sentry_frameworks=("Sentry" "SentryPrivate" "RNSentry")
 scancard_frameworks=("react_native_hyperswitch_scancard")
-netcetera_frameworks=("react-native-hyperswitch-netcetera-3ds")
 
 function unzip_archives() {
   PLATFORM="$1"
@@ -44,12 +43,6 @@ function create_xcframework() {
       -framework ./build/iphonesimulator/$basename \
       -framework ./build/iphoneos/$basename \
       -output $SRCROOT/Frameworks/ScanCard/$framework_name.xcframework
-
-    elif [[ " ${netcetera_frameworks[*]} " =~ " ${framework_name} " ]]; then
-      xcodebuild -create-xcframework \
-      -framework ./build/iphonesimulator/$basename \
-      -framework ./build/iphoneos/$basename \
-      -output $SRCROOT/Frameworks/Netcetera/$framework_name.xcframework
 
     else
       xcodebuild -create-xcframework \

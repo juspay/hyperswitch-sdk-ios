@@ -76,7 +76,7 @@ extension Sentry.SentryLevel : Swift.CustomStringConvertible {
   @objc deinit
 }
 @objc @_inheritsConvenienceInitializers @objcMembers public class SentryReplayOptions : ObjectiveC.NSObject {
-  public enum SentryReplayQuality : Swift.Int {
+  @objc public enum SentryReplayQuality : Swift.Int {
     case low
     case medium
     case high
@@ -90,7 +90,7 @@ extension Sentry.SentryLevel : Swift.CustomStringConvertible {
   @objc public var onErrorSampleRate: Swift.Float
   @objc public var redactAllText: Swift.Bool
   @objc public var redactAllImages: Swift.Bool
-  public var quality: Sentry.SentryReplayOptions.SentryReplayQuality
+  @objc public var quality: Sentry.SentryReplayOptions.SentryReplayQuality
   @objc public var redactViewTypes: [Swift.AnyClass]
   @objc public var ignoreRedactViewTypes: [Swift.AnyClass]
   @objc override dynamic public init()

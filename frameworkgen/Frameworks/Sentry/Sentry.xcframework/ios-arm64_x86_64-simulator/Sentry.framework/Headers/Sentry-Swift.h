@@ -277,6 +277,7 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 #if __has_warning("-Watimport-in-framework-header")
 #pragma clang diagnostic ignored "-Watimport-in-framework-header"
 #endif
+@import CoreFoundation;
 @import Foundation;
 @import MetricKit;
 @import ObjectiveC;
@@ -398,6 +399,17 @@ SWIFT_CLASS("_TtC6Sentry18SentryFileContents")
 @property (nonatomic, readonly, copy) NSString * _Nonnull path;
 @property (nonatomic, readonly, copy) NSData * _Nonnull contents;
 - (nonnull instancetype)initWithPath:(NSString * _Nonnull)path contents:(NSData * _Nonnull)contents OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
++ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+@end
+
+
+SWIFT_CLASS("_TtC6Sentry23SentryFramesDelayResult")
+@interface SentryFramesDelayResult : NSObject
+/// The frames delay for the passed time period. If frame delay can’t be calculated this is -1.
+@property (nonatomic, readonly) CFTimeInterval delayDuration;
+@property (nonatomic, readonly) NSUInteger framesContributingToDelayCount;
+- (nonnull instancetype)initWithDelayDuration:(CFTimeInterval)delayDuration framesCount:(NSUInteger)framesCount OBJC_DESIGNATED_INITIALIZER;
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
@@ -721,6 +733,7 @@ SWIFT_CLASS("_TtC6Sentry17SentryReplayEvent")
 - (NSDictionary<NSString *, id> * _Nonnull)serialize SWIFT_WARN_UNUSED_RESULT;
 @end
 
+enum SentryReplayQuality : NSInteger;
 
 SWIFT_CLASS("_TtC6Sentry19SentryReplayOptions")
 @interface SentryReplayOptions : NSObject <SentryRedactOptions>
@@ -758,6 +771,9 @@ SWIFT_CLASS("_TtC6Sentry19SentryReplayOptions")
 /// note:
 /// The default is true
 @property (nonatomic) BOOL redactAllImages;
+/// Indicates the quality of the replay.
+/// The higher the quality, the higher the CPU and bandwidth usage.
+@property (nonatomic) enum SentryReplayQuality quality;
 /// A list of custom UIView subclasses that need
 /// to be masked during session replay.
 /// By default Sentry already mask text elements from UIKit
@@ -799,6 +815,19 @@ SWIFT_CLASS("_TtC6Sentry19SentryReplayOptions")
 - (nonnull instancetype)initWithSessionSampleRate:(float)sessionSampleRate onErrorSampleRate:(float)onErrorSampleRate redactAllText:(BOOL)redactAllText redactAllImages:(BOOL)redactAllImages OBJC_DESIGNATED_INITIALIZER;
 - (nonnull instancetype)initWithDictionary:(NSDictionary<NSString *, id> * _Nonnull)dictionary;
 @end
+
+/// Enum to define the quality of the session replay.
+typedef SWIFT_ENUM(NSInteger, SentryReplayQuality, open) {
+/// Video Scale: 80%
+/// Bit Rate: 20.000
+  SentryReplayQualityLow = 0,
+/// Video Scale: 100%
+/// Bit Rate: 40.000
+  SentryReplayQualityMedium = 1,
+/// Video Scale: 100%
+/// Bit Rate: 60.000
+  SentryReplayQualityHigh = 2,
+};
 
 
 SWIFT_CLASS("_TtC6Sentry21SentryReplayRecording")
@@ -855,11 +884,13 @@ SWIFT_CLASS("_TtC6Sentry19SentrySessionReplay")
 @interface SentrySessionReplay : NSObject
 @property (nonatomic, readonly) BOOL isFullSession;
 @property (nonatomic, readonly, strong) SentryId * _Nullable sessionReplayId;
+@property (nonatomic, readonly) BOOL isSessionPaused;
 @property (nonatomic, readonly) BOOL isRunning;
 @property (nonatomic, strong) id <SentryViewScreenshotProvider> _Nonnull screenshotProvider;
 @property (nonatomic, strong) id <SentryReplayBreadcrumbConverter> _Nonnull breadcrumbConverter;
 - (nonnull instancetype)initWithReplayOptions:(SentryReplayOptions * _Nonnull)replayOptions replayFolderPath:(NSURL * _Nonnull)replayFolderPath screenshotProvider:(id <SentryViewScreenshotProvider> _Nonnull)screenshotProvider replayMaker:(id <SentryReplayVideoMaker> _Nonnull)replayMaker breadcrumbConverter:(id <SentryReplayBreadcrumbConverter> _Nonnull)breadcrumbConverter touchTracker:(SentryTouchTracker * _Nullable)touchTracker dateProvider:(SentryCurrentDateProvider * _Nonnull)dateProvider delegate:(id <SentrySessionReplayDelegate> _Nonnull)delegate dispatchQueue:(SentryDispatchQueueWrapper * _Nonnull)dispatchQueue displayLinkWrapper:(SentryDisplayLinkWrapper * _Nonnull)displayLinkWrapper OBJC_DESIGNATED_INITIALIZER;
 - (void)startWithRootView:(UIView * _Nonnull)rootView fullSession:(BOOL)fullSession;
+- (void)pause;
 - (void)stop;
 - (void)resume;
 - (void)captureReplayForEvent:(SentryEvent * _Nonnull)event;
@@ -871,7 +902,7 @@ SWIFT_CLASS("_TtC6Sentry19SentrySessionReplay")
 
 SWIFT_PROTOCOL("_TtP6Sentry27SentrySessionReplayDelegate_")
 @protocol SentrySessionReplayDelegate <NSObject>
-- (BOOL)sessionReplayIsFullSession SWIFT_WARN_UNUSED_RESULT;
+- (BOOL)sessionReplayShouldCaptureReplayForError SWIFT_WARN_UNUSED_RESULT;
 - (void)sessionReplayNewSegmentWithReplayEvent:(SentryReplayEvent * _Nonnull)replayEvent replayRecording:(SentryReplayRecording * _Nonnull)replayRecording videoUrl:(NSURL * _Nonnull)videoUrl;
 - (void)sessionReplayStartedWithReplayId:(SentryId * _Nonnull)replayId;
 - (NSArray<SentryBreadcrumb *> * _Nonnull)breadcrumbsForSessionReplay SWIFT_WARN_UNUSED_RESULT;
@@ -1254,6 +1285,7 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 #if __has_warning("-Watimport-in-framework-header")
 #pragma clang diagnostic ignored "-Watimport-in-framework-header"
 #endif
+@import CoreFoundation;
 @import Foundation;
 @import MetricKit;
 @import ObjectiveC;
@@ -1375,6 +1407,17 @@ SWIFT_CLASS("_TtC6Sentry18SentryFileContents")
 @property (nonatomic, readonly, copy) NSString * _Nonnull path;
 @property (nonatomic, readonly, copy) NSData * _Nonnull contents;
 - (nonnull instancetype)initWithPath:(NSString * _Nonnull)path contents:(NSData * _Nonnull)contents OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
++ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+@end
+
+
+SWIFT_CLASS("_TtC6Sentry23SentryFramesDelayResult")
+@interface SentryFramesDelayResult : NSObject
+/// The frames delay for the passed time period. If frame delay can’t be calculated this is -1.
+@property (nonatomic, readonly) CFTimeInterval delayDuration;
+@property (nonatomic, readonly) NSUInteger framesContributingToDelayCount;
+- (nonnull instancetype)initWithDelayDuration:(CFTimeInterval)delayDuration framesCount:(NSUInteger)framesCount OBJC_DESIGNATED_INITIALIZER;
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
@@ -1698,6 +1741,7 @@ SWIFT_CLASS("_TtC6Sentry17SentryReplayEvent")
 - (NSDictionary<NSString *, id> * _Nonnull)serialize SWIFT_WARN_UNUSED_RESULT;
 @end
 
+enum SentryReplayQuality : NSInteger;
 
 SWIFT_CLASS("_TtC6Sentry19SentryReplayOptions")
 @interface SentryReplayOptions : NSObject <SentryRedactOptions>
@@ -1735,6 +1779,9 @@ SWIFT_CLASS("_TtC6Sentry19SentryReplayOptions")
 /// note:
 /// The default is true
 @property (nonatomic) BOOL redactAllImages;
+/// Indicates the quality of the replay.
+/// The higher the quality, the higher the CPU and bandwidth usage.
+@property (nonatomic) enum SentryReplayQuality quality;
 /// A list of custom UIView subclasses that need
 /// to be masked during session replay.
 /// By default Sentry already mask text elements from UIKit
@@ -1776,6 +1823,19 @@ SWIFT_CLASS("_TtC6Sentry19SentryReplayOptions")
 - (nonnull instancetype)initWithSessionSampleRate:(float)sessionSampleRate onErrorSampleRate:(float)onErrorSampleRate redactAllText:(BOOL)redactAllText redactAllImages:(BOOL)redactAllImages OBJC_DESIGNATED_INITIALIZER;
 - (nonnull instancetype)initWithDictionary:(NSDictionary<NSString *, id> * _Nonnull)dictionary;
 @end
+
+/// Enum to define the quality of the session replay.
+typedef SWIFT_ENUM(NSInteger, SentryReplayQuality, open) {
+/// Video Scale: 80%
+/// Bit Rate: 20.000
+  SentryReplayQualityLow = 0,
+/// Video Scale: 100%
+/// Bit Rate: 40.000
+  SentryReplayQualityMedium = 1,
+/// Video Scale: 100%
+/// Bit Rate: 60.000
+  SentryReplayQualityHigh = 2,
+};
 
 
 SWIFT_CLASS("_TtC6Sentry21SentryReplayRecording")
@@ -1832,11 +1892,13 @@ SWIFT_CLASS("_TtC6Sentry19SentrySessionReplay")
 @interface SentrySessionReplay : NSObject
 @property (nonatomic, readonly) BOOL isFullSession;
 @property (nonatomic, readonly, strong) SentryId * _Nullable sessionReplayId;
+@property (nonatomic, readonly) BOOL isSessionPaused;
 @property (nonatomic, readonly) BOOL isRunning;
 @property (nonatomic, strong) id <SentryViewScreenshotProvider> _Nonnull screenshotProvider;
 @property (nonatomic, strong) id <SentryReplayBreadcrumbConverter> _Nonnull breadcrumbConverter;
 - (nonnull instancetype)initWithReplayOptions:(SentryReplayOptions * _Nonnull)replayOptions replayFolderPath:(NSURL * _Nonnull)replayFolderPath screenshotProvider:(id <SentryViewScreenshotProvider> _Nonnull)screenshotProvider replayMaker:(id <SentryReplayVideoMaker> _Nonnull)replayMaker breadcrumbConverter:(id <SentryReplayBreadcrumbConverter> _Nonnull)breadcrumbConverter touchTracker:(SentryTouchTracker * _Nullable)touchTracker dateProvider:(SentryCurrentDateProvider * _Nonnull)dateProvider delegate:(id <SentrySessionReplayDelegate> _Nonnull)delegate dispatchQueue:(SentryDispatchQueueWrapper * _Nonnull)dispatchQueue displayLinkWrapper:(SentryDisplayLinkWrapper * _Nonnull)displayLinkWrapper OBJC_DESIGNATED_INITIALIZER;
 - (void)startWithRootView:(UIView * _Nonnull)rootView fullSession:(BOOL)fullSession;
+- (void)pause;
 - (void)stop;
 - (void)resume;
 - (void)captureReplayForEvent:(SentryEvent * _Nonnull)event;
@@ -1848,7 +1910,7 @@ SWIFT_CLASS("_TtC6Sentry19SentrySessionReplay")
 
 SWIFT_PROTOCOL("_TtP6Sentry27SentrySessionReplayDelegate_")
 @protocol SentrySessionReplayDelegate <NSObject>
-- (BOOL)sessionReplayIsFullSession SWIFT_WARN_UNUSED_RESULT;
+- (BOOL)sessionReplayShouldCaptureReplayForError SWIFT_WARN_UNUSED_RESULT;
 - (void)sessionReplayNewSegmentWithReplayEvent:(SentryReplayEvent * _Nonnull)replayEvent replayRecording:(SentryReplayRecording * _Nonnull)replayRecording videoUrl:(NSURL * _Nonnull)videoUrl;
 - (void)sessionReplayStartedWithReplayId:(SentryId * _Nonnull)replayId;
 - (NSArray<SentryBreadcrumb *> * _Nonnull)breadcrumbsForSessionReplay SWIFT_WARN_UNUSED_RESULT;
