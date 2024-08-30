@@ -91,7 +91,7 @@ extension PaymentSheet {
         public var allowsPaymentMethodsRequiringShippingAddress: Bool = false
         
         /// The APIClient instance used to make requests to Hyperswitch
-        internal var apiClient: APIClient = APIClient.shared
+//        internal var apiClient: APIClient = APIClient.shared
         
         /// Configuration related to Apple Pay
         /// If set, PaymentSheet displays Apple Pay as a payment option

@@ -5,6 +5,8 @@
 //  Created by Harshit Srivastava on 10/05/23.
 //
 
+import Foundation
+
 @objc internal class APIClient: NSObject {
     
     @objc(sharedClient) public static let shared: APIClient = {

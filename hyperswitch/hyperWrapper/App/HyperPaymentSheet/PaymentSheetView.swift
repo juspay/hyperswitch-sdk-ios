@@ -20,7 +20,7 @@ internal extension PaymentSheet {
         /// Create a dictionary of hyperParams with app ID, sdkVersion, country, IP address, user agent, default view, and launch time.
         let hyperParams = [
             "appId" : Bundle.main.bundleIdentifier,
-            "sdkVersion" : "0.1.2",
+            "sdkVersion" : "0.1.6",
             "country" : NSLocale.current.regionCode,
             "ip": nil,
             "user-agent": WKWebView().value(forKey: "userAgent"),
@@ -53,7 +53,7 @@ internal extension PaymentSheet {
         let params = props["hyperParams"] as? [String: Any] ?? [:]
         let hyperParams = [
             "appId" : Bundle.main.bundleIdentifier,
-            "sdkVersion" : "0.1.2",
+            "sdkVersion" : "0.1.6",
             "country" : NSLocale.current.regionCode,
             "ip": nil,
             "user-agent": WKWebView().value(forKey: "userAgent"),
@@ -66,5 +66,22 @@ internal extension PaymentSheet {
         let rootView =  RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": modifiedProps]);
         rootView.backgroundColor = UIColor.clear
         return rootView
+    }
+}
+
+/// An extension that conforms to the RNResponseHandler protocol, which handles the response from the payment sheet operation.
+extension PaymentSheet: RNResponseHandler {
+    func didReceiveResponse(response: String?, error: Error?) {
+        if let completion = completion {
+            if let error = error {
+                completion(.failed(error: error))
+            }
+            else if (response == "cancelled"){
+                completion(.canceled(data: "cancelled"))
+            }
+            else {
+                completion(.completed(data: response ?? "failed"))
+            }
+        }
     }
 }

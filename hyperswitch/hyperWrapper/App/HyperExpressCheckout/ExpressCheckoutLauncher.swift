@@ -52,7 +52,7 @@ public class ExpressCheckoutLauncher {
             
             let hyperParams = [
                 "appId" : Bundle.main.bundleIdentifier,
-                "sdkVersion" : "0.1.2",
+                "sdkVersion" : "0.1.6",
                 "country" : NSLocale.current.regionCode,
                 "ip": nil,
                 "user-agent": WKWebView().value(forKey: "userAgent"),

@@ -56,6 +56,22 @@
 		7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7996A8322BA1FDD000394FAF /* hyperswitch.bundle */; };
 		799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */; };
 		79BF5A5B2C3EA2D6006546D6 /* CodePush.plist in Resources */ = {isa = PBXBuildFile; fileRef = 79BF5A5A2C3EA2D6006546D6 /* CodePush.plist */; };
+		79EAB0132C81CCDA006B40AD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EAB0122C81CCDA006B40AD /* AppDelegate.swift */; };
+		79EAB0172C81CCDA006B40AD /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EAB0162C81CCDA006B40AD /* ViewController.swift */; };
+		79EAB01C2C81CCDC006B40AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 79EAB01B2C81CCDC006B40AD /* Assets.xcassets */; };
+		79EAB0242C81CCDC006B40AD /* hyperswitchAppClip.app in Embed App Clips */ = {isa = PBXBuildFile; fileRef = 79EAB0102C81CCDA006B40AD /* hyperswitchAppClip.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		79EAB0292C81CDCE006B40AD /* HyperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790525702BDA66EF00D49FE8 /* HyperViewModel.swift */; };
+		79EAB02B2C81CDEA006B40AD /* PaymentSheetConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D0113294731480017C67A /* PaymentSheetConfiguration.swift */; };
+		79EAB02C2C81CDEC006B40AD /* PaymentSheetAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43F6051D2B45FA3300BAA90E /* PaymentSheetAppearance.swift */; };
+		79EAB0322C81CF2E006B40AD /* PaymentSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D0111294731480017C67A /* PaymentSheet.swift */; };
+		79EAB0332C81CF50006B40AD /* DictionaryConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF9778F29517BBB00596F78 /* DictionaryConverter.swift */; };
+		79EAB0342C81CF59006B40AD /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663F68FB29CCC93C006E91BD /* APIClient.swift */; };
+		79EAB03A2C81D152006B40AD /* PaymentSession+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EAB0392C81D152006B40AD /* PaymentSession+UIKit.swift */; };
+		79EAB03F2C81D292006B40AD /* PaymentSheetView+AppClip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EAB03D2C81D283006B40AD /* PaymentSheetView+AppClip.swift */; };
+		79EAB0402C81D2FA006B40AD /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EAB00A2C81CC06006B40AD /* WebViewController.swift */; };
+		79EAB0412C81D330006B40AD /* PaymentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790BA8262B99DB5E006678FD /* PaymentSession.swift */; };
+		79EAB0432C81D4AA006B40AD /* PaymentSessionTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EAB0422C81D4AA006B40AD /* PaymentSessionTypes.swift */; };
+		79EAB0462C81D5C9006B40AD /* PaymentSession+AppClip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EAB0442C81D5AC006B40AD /* PaymentSession+AppClip.swift */; };
 		DC4AC9F2296D6D6C00E0D2A6 /* PaymentCardTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4AC9F1296D6D6C00E0D2A6 /* PaymentCardTextField.swift */; };
 		DC4AC9F5296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4AC9F4296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift */; };
 		DC5D0114294731480017C67A /* PaymentSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D0111294731480017C67A /* PaymentSheet.swift */; };
@@ -67,7 +83,28 @@
 		DCF9779029517BBB00596F78 /* DictionaryConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF9778F29517BBB00596F78 /* DictionaryConverter.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		79EAB0222C81CCDC006B40AD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 66486F86294355BD00150E4F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 79EAB00F2C81CCDA006B40AD;
+			remoteInfo = hyperswitchAppClip;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXCopyFilesBuildPhase section */
+		79EAB0282C81CCDC006B40AD /* Embed App Clips */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/AppClips";
+			dstSubfolderSpec = 16;
+			files = (
+				79EAB0242C81CCDC006B40AD /* hyperswitchAppClip.app in Embed App Clips */,
+			);
+			name = "Embed App Clips";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		79FAC1072A5D5FB0004479E4 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -133,6 +170,17 @@
 		7996A8322BA1FDD000394FAF /* hyperswitch.bundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hyperswitch.bundle; sourceTree = "<group>"; };
 		799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		79BF5A5A2C3EA2D6006546D6 /* CodePush.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = CodePush.plist; sourceTree = "<group>"; };
+		79EAB00A2C81CC06006B40AD /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
+		79EAB0102C81CCDA006B40AD /* hyperswitchAppClip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hyperswitchAppClip.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		79EAB0122C81CCDA006B40AD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		79EAB0162C81CCDA006B40AD /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		79EAB01B2C81CCDC006B40AD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		79EAB0202C81CCDC006B40AD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		79EAB0212C81CCDC006B40AD /* hyperswitchAppClip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = hyperswitchAppClip.entitlements; sourceTree = "<group>"; };
+		79EAB0392C81D152006B40AD /* PaymentSession+UIKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSession+UIKit.swift"; sourceTree = "<group>"; };
+		79EAB03D2C81D283006B40AD /* PaymentSheetView+AppClip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSheetView+AppClip.swift"; sourceTree = "<group>"; };
+		79EAB0422C81D4AA006B40AD /* PaymentSessionTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSessionTypes.swift; sourceTree = "<group>"; };
+		79EAB0442C81D5AC006B40AD /* PaymentSession+AppClip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSession+AppClip.swift"; sourceTree = "<group>"; };
 		DC4AC9F1296D6D6C00E0D2A6 /* PaymentCardTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCardTextField.swift; sourceTree = "<group>"; };
 		DC4AC9F4296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentCardTextField+SwiftUI.swift"; sourceTree = "<group>"; };
 		DC5D0111294731480017C67A /* PaymentSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentSheet.swift; sourceTree = "<group>"; };
@@ -151,6 +199,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				2F389A7F6F3B6F802D10A30B /* libPods-hyperswitch.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		79EAB00D2C81CCDA006B40AD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,6 +251,7 @@
 			isa = PBXGroup;
 			children = (
 				66486F90294355BD00150E4F /* hyperswitch */,
+				79EAB0112C81CCDA006B40AD /* hyperswitchAppClip */,
 				66486F8F294355BD00150E4F /* Products */,
 				255968CC569349C97C21931C /* Pods */,
 				6DC6686963C3EEB79CF73BA0 /* Frameworks */,
@@ -206,6 +262,7 @@
 			isa = PBXGroup;
 			children = (
 				66486F8E294355BD00150E4F /* hyperswitch.app */,
+				79EAB0102C81CCDA006B40AD /* hyperswitchAppClip.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -249,7 +306,8 @@
 		790BA8252B99DB37006678FD /* HyperSession */ = {
 			isa = PBXGroup;
 			children = (
-				790BA8262B99DB5E006678FD /* PaymentSession.swift */,
+				79EAB0392C81D152006B40AD /* PaymentSession+UIKit.swift */,
+				79EAB0422C81D4AA006B40AD /* PaymentSessionTypes.swift */,
 			);
 			path = HyperSession;
 			sourceTree = "<group>";
@@ -263,16 +321,6 @@
 			path = HyperExpressCheckout;
 			sourceTree = "<group>";
 		};
-		792D69F92B95EA8D001598CD /* Helpers */ = {
-			isa = PBXGroup;
-			children = (
-				66486FA02943580F00150E4F /* SwiftUIManager.swift */,
-				DCF9778F29517BBB00596F78 /* DictionaryConverter.swift */,
-				663F68FB29CCC93C006E91BD /* APIClient.swift */,
-			);
-			path = Helpers;
-			sourceTree = "<group>";
-		};
 		7954A4452C23A42200FEC02D /* ApplePay */ = {
 			isa = PBXGroup;
 			children = (
@@ -281,6 +329,55 @@
 				66C2F89A29444E6700ACD32D /* ApplePayHandler.swift */,
 			);
 			path = ApplePay;
+			sourceTree = "<group>";
+		};
+		79EAB0112C81CCDA006B40AD /* hyperswitchAppClip */ = {
+			isa = PBXGroup;
+			children = (
+				79EAB0122C81CCDA006B40AD /* AppDelegate.swift */,
+				79EAB0162C81CCDA006B40AD /* ViewController.swift */,
+				79EAB01B2C81CCDC006B40AD /* Assets.xcassets */,
+				79EAB0202C81CCDC006B40AD /* Info.plist */,
+				79EAB0212C81CCDC006B40AD /* hyperswitchAppClip.entitlements */,
+			);
+			path = hyperswitchAppClip;
+			sourceTree = "<group>";
+		};
+		79EAB09A2C81EEBC006B40AD /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				790BA8262B99DB5E006678FD /* PaymentSession.swift */,
+				DC5D0111294731480017C67A /* PaymentSheet.swift */,
+				DC5D0113294731480017C67A /* PaymentSheetConfiguration.swift */,
+				43F6051D2B45FA3300BAA90E /* PaymentSheetAppearance.swift */,
+				DCF9778F29517BBB00596F78 /* DictionaryConverter.swift */,
+				663F68FB29CCC93C006E91BD /* APIClient.swift */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
+		79EAB09B2C81EECB006B40AD /* AppClip */ = {
+			isa = PBXGroup;
+			children = (
+				79EAB00A2C81CC06006B40AD /* WebViewController.swift */,
+				79EAB0442C81D5AC006B40AD /* PaymentSession+AppClip.swift */,
+				79EAB03D2C81D283006B40AD /* PaymentSheetView+AppClip.swift */,
+			);
+			path = AppClip;
+			sourceTree = "<group>";
+		};
+		79EAB09E2C81F0B9006B40AD /* App */ = {
+			isa = PBXGroup;
+			children = (
+				7954A4452C23A42200FEC02D /* ApplePay */,
+				DC5D0117294738870017C67A /* NativeModule */,
+				790BA8252B99DB37006678FD /* HyperSession */,
+				DC5D0110294731480017C67A /* HyperPaymentSheet */,
+				DC4AC9F3296D737300E0D2A6 /* HyperPaymentCardTextField */,
+				792D69F42B95E91D001598CD /* HyperExpressCheckout */,
+				DC5D012C29486B560017C67A /* Resources */,
+			);
+			path = App;
 			sourceTree = "<group>";
 		};
 		DC4AC9F3296D737300E0D2A6 /* HyperPaymentCardTextField */ = {
@@ -298,14 +395,9 @@
 		DC5D010F294731030017C67A /* hyperWrapper */ = {
 			isa = PBXGroup;
 			children = (
-				7954A4452C23A42200FEC02D /* ApplePay */,
-				DC5D0117294738870017C67A /* NativeModule */,
-				DC5D0110294731480017C67A /* HyperPaymentSheet */,
-				DC4AC9F3296D737300E0D2A6 /* HyperPaymentCardTextField */,
-				792D69F42B95E91D001598CD /* HyperExpressCheckout */,
-				790BA8252B99DB37006678FD /* HyperSession */,
-				792D69F92B95EA8D001598CD /* Helpers */,
-				DC5D012C29486B560017C67A /* Resources */,
+				79EAB09E2C81F0B9006B40AD /* App */,
+				79EAB09B2C81EECB006B40AD /* AppClip */,
+				79EAB09A2C81EEBC006B40AD /* Common */,
 			);
 			path = hyperWrapper;
 			sourceTree = "<group>";
@@ -313,12 +405,10 @@
 		DC5D0110294731480017C67A /* HyperPaymentSheet */ = {
 			isa = PBXGroup;
 			children = (
-				43F6051D2B45FA3300BAA90E /* PaymentSheetAppearance.swift */,
-				DC5D0111294731480017C67A /* PaymentSheet.swift */,
 				DC5D0126294853A90017C67A /* PaymentSheetView.swift */,
 				DC5D0124294847E90017C67A /* PaymentSheetView+UIKit.swift */,
 				DC5D0112294731480017C67A /* PaymentSheetView+SwiftUI.swift */,
-				DC5D0113294731480017C67A /* PaymentSheetConfiguration.swift */,
+				66486FA02943580F00150E4F /* SwiftUIManager.swift */,
 			);
 			path = HyperPaymentSheet;
 			sourceTree = "<group>";
@@ -359,15 +449,34 @@
 				79FAC1072A5D5FB0004479E4 /* Embed Frameworks */,
 				7BD306F62448EF26A2339DBF /* [CP] Embed Pods Frameworks */,
 				0D646CB340E41DC422DAE9D9 /* [CP] Copy Pods Resources */,
+				79EAB0282C81CCDC006B40AD /* Embed App Clips */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				79EAB0232C81CCDC006B40AD /* PBXTargetDependency */,
 			);
 			name = hyperswitch;
 			productName = orca;
 			productReference = 66486F8E294355BD00150E4F /* hyperswitch.app */;
 			productType = "com.apple.product-type.application";
+		};
+		79EAB00F2C81CCDA006B40AD /* hyperswitchAppClip */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 79EAB0252C81CCDC006B40AD /* Build configuration list for PBXNativeTarget "hyperswitchAppClip" */;
+			buildPhases = (
+				79EAB00C2C81CCDA006B40AD /* Sources */,
+				79EAB00D2C81CCDA006B40AD /* Frameworks */,
+				79EAB00E2C81CCDA006B40AD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = hyperswitchAppClip;
+			productName = hyperswitchAppClip;
+			productReference = 79EAB0102C81CCDA006B40AD /* hyperswitchAppClip.app */;
+			productType = "com.apple.product-type.application.on-demand-install-capable";
 		};
 /* End PBXNativeTarget section */
 
@@ -376,12 +485,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1410;
+				LastSwiftUpdateCheck = 1540;
 				LastUpgradeCheck = 1410;
 				TargetAttributes = {
 					66486F8D294355BD00150E4F = {
 						CreatedOnToolsVersion = 14.1;
 						LastSwiftMigration = 1410;
+					};
+					79EAB00F2C81CCDA006B40AD = {
+						CreatedOnToolsVersion = 15.4;
 					};
 				};
 			};
@@ -399,6 +511,7 @@
 			projectRoot = "";
 			targets = (
 				66486F8D294355BD00150E4F /* hyperswitch */,
+				79EAB00F2C81CCDA006B40AD /* hyperswitchAppClip */,
 			);
 		};
 /* End PBXProject section */
@@ -433,6 +546,14 @@
 				43E6686D2C084FB70094BD13 /* montserrat_medium.ttf in Resources */,
 				43E6686C2C084FB70094BD13 /* montserrat_italic.ttf in Resources */,
 				43E6686A2C084FB70094BD13 /* montserrat_bold.ttf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		79EAB00E2C81CCDA006B40AD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				79EAB01C2C81CCDC006B40AD /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -515,11 +636,13 @@
 				66486FAD2943580F00150E4F /* HyperModule.m in Sources */,
 				790525712BDA66EF00D49FE8 /* HyperViewModel.swift in Sources */,
 				663F68FC29CCC93C006E91BD /* APIClient.swift in Sources */,
+				79EAB0432C81D4AA006B40AD /* PaymentSessionTypes.swift in Sources */,
 				793083ED2A0DA9F100E78310 /* PaymentIntentParams.swift in Sources */,
 				66C2F89B29444E6700ACD32D /* ApplePayHandler.swift in Sources */,
 				66486F94294355BD00150E4F /* ContentView.swift in Sources */,
 				792D69F62B95E942001598CD /* ExpressCheckoutLauncher.swift in Sources */,
 				DC5D011E294844900017C67A /* ViewController.swift in Sources */,
+				79EAB03A2C81D152006B40AD /* PaymentSession+UIKit.swift in Sources */,
 				DC4AC9F2296D6D6C00E0D2A6 /* PaymentCardTextField.swift in Sources */,
 				7938D81B2A4EF45000286CEE /* PaymentMethodParams.swift in Sources */,
 				DC5D0125294847E90017C67A /* PaymentSheetView+UIKit.swift in Sources */,
@@ -537,7 +660,34 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		79EAB00C2C81CCDA006B40AD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				79EAB0172C81CCDA006B40AD /* ViewController.swift in Sources */,
+				79EAB0462C81D5C9006B40AD /* PaymentSession+AppClip.swift in Sources */,
+				79EAB0402C81D2FA006B40AD /* WebViewController.swift in Sources */,
+				79EAB02B2C81CDEA006B40AD /* PaymentSheetConfiguration.swift in Sources */,
+				79EAB0332C81CF50006B40AD /* DictionaryConverter.swift in Sources */,
+				79EAB0322C81CF2E006B40AD /* PaymentSheet.swift in Sources */,
+				79EAB0292C81CDCE006B40AD /* HyperViewModel.swift in Sources */,
+				79EAB02C2C81CDEC006B40AD /* PaymentSheetAppearance.swift in Sources */,
+				79EAB0412C81D330006B40AD /* PaymentSession.swift in Sources */,
+				79EAB03F2C81D292006B40AD /* PaymentSheetView+AppClip.swift in Sources */,
+				79EAB0132C81CCDA006B40AD /* AppDelegate.swift in Sources */,
+				79EAB0342C81CF59006B40AD /* APIClient.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		79EAB0232C81CCDC006B40AD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 79EAB00F2C81CCDA006B40AD /* hyperswitchAppClip */;
+			targetProxy = 79EAB0222C81CCDC006B40AD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		66486F9A294355BE00150E4F /* Debug */ = {
@@ -673,6 +823,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 20DD7F56147F45CBE8EA06B8 /* Pods-hyperswitch.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
@@ -702,7 +853,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "hyperswitch/hyperWrapper/NativeModule/hyper-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "hyperswitch/hyperWrapper/App/NativeModule/hyper-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -713,6 +864,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 74EB35840F48F59D07289D99 /* Pods-hyperswitch.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
@@ -743,7 +895,84 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "hyperswitch/hyperWrapper/NativeModule/hyper-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "hyperswitch/hyperWrapper/App/NativeModule/hyper-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		79EAB0262C81CCDC006B40AD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = hyperswitchAppClip/hyperswitchAppClip.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YM9U73Z2JM;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = hyperswitchAppClip/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = hyperswitch;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.hyperswitch.Clip;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		79EAB0272C81CCDC006B40AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = hyperswitchAppClip/hyperswitchAppClip.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = YM9U73Z2JM;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = hyperswitchAppClip/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = hyperswitch;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = io.hyperswitch.Clip;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -766,6 +995,15 @@
 			buildConfigurations = (
 				66486F9D294355BE00150E4F /* Debug */,
 				66486F9E294355BE00150E4F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		79EAB0252C81CCDC006B40AD /* Build configuration list for PBXNativeTarget "hyperswitchAppClip" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				79EAB0262C81CCDC006B40AD /* Debug */,
+				79EAB0272C81CCDC006B40AD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
