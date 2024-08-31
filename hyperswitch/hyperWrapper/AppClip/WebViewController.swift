@@ -48,25 +48,22 @@ internal class WebViewController: UIViewController {
         
         let configuration = WKWebViewConfiguration()
         configuration.userContentController = contentController
+        configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+        configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
         
-        webView = WKWebView(frame: .zero, configuration: configuration)
+        webView = WKWebView(frame: self.view.bounds, configuration: configuration)
         
         webView.uiDelegate = self
+        webView.navigationDelegate = self
         
         webView.translatesAutoresizingMaskIntoConstraints = false
         webView.backgroundColor = .clear
         webView.isOpaque = false
         webView.scrollView.isScrollEnabled = false
         webView.scrollView.bounces = false
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
         
         view.addSubview(webView)
-        
-        NSLayoutConstraint.activate([
-            webView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            webView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            webView.widthAnchor.constraint(equalTo: view.widthAnchor),
-            webView.heightAnchor.constraint(equalTo: view.heightAnchor)
-        ])
         
         guard let baseUrl = baseUrl else {
             return
@@ -84,10 +81,8 @@ internal class WebViewController: UIViewController {
             callback(.failed(error: error))
             return
         }
-        
-        let escapedJsonString = jsonString.replacingOccurrences(of: "'", with: "\\'")
-        
-        let jsCode = "window.postMessage('\(escapedJsonString)', '*');"
+
+        let jsCode = "window.postMessage('\(jsonString)', '*');"
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.webView.evaluateJavaScript(jsCode) { (result, error) in
@@ -109,29 +104,25 @@ internal class WebViewController: UIViewController {
     }
 }
 extension WebViewController: WKUIDelegate {
-    
     internal func webView(_ webView: WKWebView,
                           runJavaScriptAlertPanelWithMessage message: String,
                           initiatedByFrame frame: WKFrameInfo,
                           completionHandler: @escaping () -> Void) {
-        
         DispatchQueue.main.async {
             let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
             let title = NSLocalizedString("OK", comment: "OK Button")
             let ok = UIAlertAction(title: title, style: .default) { (action: UIAlertAction) -> Void in
                 alert.dismiss(animated: true, completion: nil)
+                completionHandler()
             }
             alert.addAction(ok)
             self.present(alert, animated: true)
-            completionHandler()
         }
     }
 }
 
 extension WebViewController: WKScriptMessageHandler {
-    
     internal func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        
         if message.name == "sdkInitialised" {
             self.sendProps()
         }
@@ -159,5 +150,30 @@ extension WebViewController: WKScriptMessageHandler {
             }
             callback(result)
         }
+    }
+}
+
+extension WebViewController: WKNavigationDelegate {
+    func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+        if navigationAction.targetFrame == nil {
+            let webView = WKWebView(frame: self.view.bounds, configuration: configuration)
+            webView.uiDelegate = self
+            webView.navigationDelegate = self
+            
+            webView.translatesAutoresizingMaskIntoConstraints = false
+            webView.backgroundColor = .clear
+            webView.isOpaque = false
+            webView.scrollView.isScrollEnabled = false
+            webView.scrollView.bounces = false
+            webView.scrollView.contentInsetAdjustmentBehavior = .never
+            
+            self.view.addSubview(webView)
+            return webView
+        }
+        return nil
+    }
+    
+    func webViewDidClose(_ webView: WKWebView) {
+        webView.removeFromSuperview()
     }
 }
