@@ -45,7 +45,8 @@ internal class WebViewController: UIViewController {
         let contentController = WKUserContentController()
         contentController.add(self, name: "sdkInitialised")
         contentController.add(self, name: "exitPaymentSheet")
-        
+        contentController.add(self, name: "launchScanCard")
+
         let configuration = WKWebViewConfiguration()
         configuration.userContentController = contentController
         configuration.defaultWebpagePreferences.allowsContentJavaScript = true
@@ -149,6 +150,40 @@ extension WebViewController: WKScriptMessageHandler {
                 result = .completed(data: status)
             }
             callback(result)
+        }
+        if message.name == "launchScanCard" {
+            
+//            let cardScanSheet = CardScanSheet()
+//            cardScanSheet.present(from: self) { result in
+//                
+//                switch result {
+//                case .completed(var card as ScannedCard?):
+//                    message["pan"] = card?.pan
+//                    message["expiryMonth"] =  card?.expiryMonth
+//                    message["expiryYear"] =  card?.expiryYear
+//                    callback["status"] = "Succeeded"
+//                    callback["data"] = message
+//                case .canceled:
+//                    callback["status"] = "Cancelled"
+//                case .failed(let error):
+//                    callback["status"] = "Failed"
+//                    
+//                }
+//                jsCode = callback
+//            }
+            
+            let jsCode = "window.postMessage('{\"scanCardData\":{\"status\":\"Succeeded\",\"data\":{\"pan\":\"4242424242424242\", \"expiryMonth\":\"10\", \"expiryYear\":\"25\"}}}', '*');"
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                self?.webView.evaluateJavaScript(jsCode) { (result, error) in
+                    if let _ = error {
+                        let error = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
+                        self?.callback(.failed(error: error))
+                    } else {
+                        // Message Sent
+                    }
+                }
+            }
         }
     }
 }
