@@ -303,6 +303,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		790575ED2C85CF5E0097C6F4 /* hyperClipWrapper */ = {
+			isa = PBXGroup;
+			children = (
+				79EAB09B2C81EECB006B40AD /* AppClip */,
+			);
+			path = hyperClipWrapper;
+			sourceTree = "<group>";
+		};
 		790BA8252B99DB37006678FD /* HyperSession */ = {
 			isa = PBXGroup;
 			children = (
@@ -334,6 +342,7 @@
 		79EAB0112C81CCDA006B40AD /* hyperswitchAppClip */ = {
 			isa = PBXGroup;
 			children = (
+				790575ED2C85CF5E0097C6F4 /* hyperClipWrapper */,
 				79EAB0122C81CCDA006B40AD /* AppDelegate.swift */,
 				79EAB0162C81CCDA006B40AD /* ViewController.swift */,
 				79EAB01B2C81CCDC006B40AD /* Assets.xcassets */,
@@ -396,7 +405,6 @@
 			isa = PBXGroup;
 			children = (
 				79EAB09E2C81F0B9006B40AD /* App */,
-				79EAB09B2C81EECB006B40AD /* AppClip */,
 				79EAB09A2C81EEBC006B40AD /* Common */,
 			);
 			path = hyperWrapper;

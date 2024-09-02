@@ -25,9 +25,11 @@ internal class WebViewController: UIViewController {
     private var props: [String: Any]?
     private var completion: ((PaymentSheetResult) -> ())?
     
+    typealias scanCallback = ([[String: Any]]) -> ()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureWebView()
+        configureWebView()        
     }
     
     init(props: [String : Any], completion: ((PaymentSheetResult) -> ())?) {
@@ -96,11 +98,57 @@ internal class WebViewController: UIViewController {
             }
         }
     }
+    private func sendScanCardData(scanProps: [String: Any]?) {
+        
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: scanProps as Any, options: []),
+              let jsonString = String(data: jsonData, encoding: .utf8) else {
+            let error = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
+            callback(.failed(error: error))
+            return
+        }
+        
+        let escapedJsonString = jsonString.replacingOccurrences(of: "'", with: "\\'")
+        
+        let jsCode = "window.postMessage('\(escapedJsonString)', '*');"
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            self?.webView.evaluateJavaScript(jsCode) { (result, error) in
+                if let _ = error {
+                    let error = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
+                    self?.callback(.failed(error: error))
+                } else {
+                    // Message Sent
+                }
+            }
+        }
+    }
     private func callback(_ result: PaymentSheetResult) {
         DispatchQueue.main.async { [weak self] in
             self?.completion?(result)
             self?.webView.stopLoading()
             self?.dismiss(animated: false)
+        }
+    }
+    func launchScanCard(vc: UIViewController) {
+        DispatchQueue.main.async {
+            var message: [String:Any] = [:]
+            var callback: [String:Any] = [:]
+            let cardScanSheet = CardScanSheet()
+//            cardScanSheet.present(from: vc) { result in
+//                switch result {
+//                case .completed(var card as ScannedCard?):
+//                    message["pan"] = card?.pan
+//                    message["expiryMonth"] =  card?.expiryMonth
+//                    message["expiryYear"] =  card?.expiryYear
+//                    callback["status"] = "Succeeded"
+//                    callback["data"] = message
+//                case .canceled:
+//                    callback["status"] = "Cancelled"
+//                case .failed(let error):
+//                    callback["status"] = "Failed"
+//                }
+//                self.sendScanCardData(scanProps: callback)
+//            }
         }
     }
 }
@@ -127,6 +175,9 @@ extension WebViewController: WKScriptMessageHandler {
         if message.name == "sdkInitialised" {
             self.sendProps()
         }
+        if message.name == "launchScanCard" {
+            launchScanCard(vc: self)
+        }
         if message.name == "exitPaymentSheet" {
             guard let body = message.body as? String,
                   let data = body.data(using: .utf8),
@@ -151,40 +202,40 @@ extension WebViewController: WKScriptMessageHandler {
             }
             callback(result)
         }
-        if message.name == "launchScanCard" {
+//         if message.name == "launchScanCard" {
             
-//            let cardScanSheet = CardScanSheet()
-//            cardScanSheet.present(from: self) { result in
-//                
-//                switch result {
-//                case .completed(var card as ScannedCard?):
-//                    message["pan"] = card?.pan
-//                    message["expiryMonth"] =  card?.expiryMonth
-//                    message["expiryYear"] =  card?.expiryYear
-//                    callback["status"] = "Succeeded"
-//                    callback["data"] = message
-//                case .canceled:
-//                    callback["status"] = "Cancelled"
-//                case .failed(let error):
-//                    callback["status"] = "Failed"
-//                    
-//                }
-//                jsCode = callback
-//            }
+// //            let cardScanSheet = CardScanSheet()
+// //            cardScanSheet.present(from: self) { result in
+// //                
+// //                switch result {
+// //                case .completed(var card as ScannedCard?):
+// //                    message["pan"] = card?.pan
+// //                    message["expiryMonth"] =  card?.expiryMonth
+// //                    message["expiryYear"] =  card?.expiryYear
+// //                    callback["status"] = "Succeeded"
+// //                    callback["data"] = message
+// //                case .canceled:
+// //                    callback["status"] = "Cancelled"
+// //                case .failed(let error):
+// //                    callback["status"] = "Failed"
+// //                    
+// //                }
+// //                jsCode = callback
+// //            }
             
-            let jsCode = "window.postMessage('{\"scanCardData\":{\"status\":\"Succeeded\",\"data\":{\"pan\":\"4242424242424242\", \"expiryMonth\":\"10\", \"expiryYear\":\"25\"}}}', '*');"
+//             let jsCode = "window.postMessage('{\"scanCardData\":{\"status\":\"Succeeded\",\"data\":{\"pan\":\"4242424242424242\", \"expiryMonth\":\"10\", \"expiryYear\":\"25\"}}}', '*');"
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                self?.webView.evaluateJavaScript(jsCode) { (result, error) in
-                    if let _ = error {
-                        let error = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
-                        self?.callback(.failed(error: error))
-                    } else {
-                        // Message Sent
-                    }
-                }
-            }
-        }
+//             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+//                 self?.webView.evaluateJavaScript(jsCode) { (result, error) in
+//                     if let _ = error {
+//                         let error = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
+//                         self?.callback(.failed(error: error))
+//                     } else {
+//                         // Message Sent
+//                     }
+//                 }
+//             }
+//         }
     }
 }
 
@@ -210,5 +261,5 @@ extension WebViewController: WKNavigationDelegate {
     
     func webViewDidClose(_ webView: WKWebView) {
         webView.removeFromSuperview()
-    }
+    }  
 }

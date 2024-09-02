@@ -18,6 +18,8 @@ Pod::Spec.new do |s|
     core.resources = ['hyperswitch/hyperWrapper/App/Resources/CodePush.plist', 'hyperswitch/hyperWrapper/App/Resources/hyperswitch.bundle']
     core.vendored_frameworks = 'frameworkgen/Frameworks/Core/*.xcframework'
     core.dependency 'hyperswitch-sdk-ios/common'
+    core.dependency 'Hyperswitch-Hermes'
+    core.dependency 'KlarnaMobileSDK'
   end
 
   s.subspec 'sentry' do |sentry|
@@ -37,7 +39,7 @@ Pod::Spec.new do |s|
   end
 
   s.subspec 'appclip' do |appclip|
-    appclip.source_files = 'hyperswitch/hyperWrapper/AppClip/*.{m,swift,h}'
+    appclip.source_files = 'hyperswitchAppClip/hyperClipWrapper/AppClip/**/*.{m,swift,h}'
     appclip.dependency 'hyperswitch-sdk-ios/common'
   end
 
@@ -46,6 +48,4 @@ Pod::Spec.new do |s|
   end
 
   s.default_subspec = 'core', 'common'
-  s.dependency 'Hyperswitch-Hermes'
-  s.dependency 'KlarnaMobileSDK'
 end
