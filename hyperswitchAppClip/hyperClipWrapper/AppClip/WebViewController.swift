@@ -29,7 +29,7 @@ internal class WebViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        configureWebView()        
+        configureWebView()
     }
     
     init(props: [String : Any], completion: ((PaymentSheetResult) -> ())?) {
@@ -48,10 +48,15 @@ internal class WebViewController: UIViewController {
         contentController.add(self, name: "sdkInitialised")
         contentController.add(self, name: "exitPaymentSheet")
         contentController.add(self, name: "launchScanCard")
-
+        contentController.add(self, name: "launchApplePay")
+        
         let configuration = WKWebViewConfiguration()
         configuration.userContentController = contentController
-        configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+        if #available(iOS 14.0, *) {
+            configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+        } else {
+            configuration.preferences.javaScriptEnabled = true
+        }
         configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
         
         webView = WKWebView(frame: self.view.bounds, configuration: configuration)
@@ -84,7 +89,7 @@ internal class WebViewController: UIViewController {
             callback(.failed(error: error))
             return
         }
-
+        
         let jsCode = "window.postMessage('\(jsonString)', '*');"
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
@@ -134,22 +139,26 @@ internal class WebViewController: UIViewController {
             var message: [String:Any] = [:]
             var callback: [String:Any] = [:]
             let cardScanSheet = CardScanSheet()
-//            cardScanSheet.present(from: vc) { result in
-//                switch result {
-//                case .completed(var card as ScannedCard?):
-//                    message["pan"] = card?.pan
-//                    message["expiryMonth"] =  card?.expiryMonth
-//                    message["expiryYear"] =  card?.expiryYear
-//                    callback["status"] = "Succeeded"
-//                    callback["data"] = message
-//                case .canceled:
-//                    callback["status"] = "Cancelled"
-//                case .failed(let error):
-//                    callback["status"] = "Failed"
-//                }
-//                self.sendScanCardData(scanProps: callback)
-//            }
+            cardScanSheet.present(from: vc) { result in
+                switch result {
+                case .completed(var card as ScannedCard?):
+                    message["pan"] = card?.pan
+                    message["expiryMonth"] =  card?.expiryMonth
+                    message["expiryYear"] =  card?.expiryYear
+                    callback["status"] = "Succeeded"
+                    callback["scanCardData"] = message
+                case .canceled:
+                    callback["status"] = "Cancelled"
+                case .failed(let error):
+                    callback["status"] = "Failed"
+                }
+                self.sendScanCardData(scanProps: callback)
+            }
         }
+    }
+    func launchApplePay() {
+        let handler = ApplePayHandler()
+        handler.startPayment(rnMessage: , rnCallback: )
     }
 }
 extension WebViewController: WKUIDelegate {
@@ -178,6 +187,13 @@ extension WebViewController: WKScriptMessageHandler {
         if message.name == "launchScanCard" {
             launchScanCard(vc: self)
         }
+        if message.name == "launchApplePay" {
+            guard let body = message.body as? String,
+                  let data = body.data(using: .utf8),
+                  let jsonDictionary = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: String] else {
+                return
+            }
+        }
         if message.name == "exitPaymentSheet" {
             guard let body = message.body as? String,
                   let data = body.data(using: .utf8),
@@ -202,40 +218,6 @@ extension WebViewController: WKScriptMessageHandler {
             }
             callback(result)
         }
-//         if message.name == "launchScanCard" {
-            
-// //            let cardScanSheet = CardScanSheet()
-// //            cardScanSheet.present(from: self) { result in
-// //                
-// //                switch result {
-// //                case .completed(var card as ScannedCard?):
-// //                    message["pan"] = card?.pan
-// //                    message["expiryMonth"] =  card?.expiryMonth
-// //                    message["expiryYear"] =  card?.expiryYear
-// //                    callback["status"] = "Succeeded"
-// //                    callback["data"] = message
-// //                case .canceled:
-// //                    callback["status"] = "Cancelled"
-// //                case .failed(let error):
-// //                    callback["status"] = "Failed"
-// //                    
-// //                }
-// //                jsCode = callback
-// //            }
-            
-//             let jsCode = "window.postMessage('{\"scanCardData\":{\"status\":\"Succeeded\",\"data\":{\"pan\":\"4242424242424242\", \"expiryMonth\":\"10\", \"expiryYear\":\"25\"}}}', '*');"
-            
-//             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-//                 self?.webView.evaluateJavaScript(jsCode) { (result, error) in
-//                     if let _ = error {
-//                         let error = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
-//                         self?.callback(.failed(error: error))
-//                     } else {
-//                         // Message Sent
-//                     }
-//                 }
-//             }
-//         }
     }
 }
 
@@ -261,5 +243,5 @@ extension WebViewController: WKNavigationDelegate {
     
     func webViewDidClose(_ webView: WKWebView) {
         webView.removeFromSuperview()
-    }  
+    }
 }
