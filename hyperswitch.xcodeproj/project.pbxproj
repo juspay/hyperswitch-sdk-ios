@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2F389A7F6F3B6F802D10A30B /* libPods-hyperswitch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FD852A30CC81610842AC24EE /* libPods-hyperswitch.a */; };
+		4365207C2C8768B90006C856 /* ApplePayHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4365207B2C8768B90006C856 /* ApplePayHandler.swift */; };
 		43E668682C084FB70094BD13 /* montserrat_extralight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668552C084FB60094BD13 /* montserrat_extralight.ttf */; };
 		43E668692C084FB70094BD13 /* montserrat_bolditalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668562C084FB70094BD13 /* montserrat_bolditalic.ttf */; };
 		43E6686A2C084FB70094BD13 /* montserrat_bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668572C084FB70094BD13 /* montserrat_bold.ttf */; };
@@ -119,6 +120,7 @@
 
 /* Begin PBXFileReference section */
 		20DD7F56147F45CBE8EA06B8 /* Pods-hyperswitch.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitch.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitch/Pods-hyperswitch.debug.xcconfig"; sourceTree = "<group>"; };
+		4365207B2C8768B90006C856 /* ApplePayHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplePayHandler.swift; sourceTree = "<group>"; };
 		43E668552C084FB60094BD13 /* montserrat_extralight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_extralight.ttf; sourceTree = "<group>"; };
 		43E668562C084FB70094BD13 /* montserrat_bolditalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_bolditalic.ttf; sourceTree = "<group>"; };
 		43E668572C084FB70094BD13 /* montserrat_bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_bold.ttf; sourceTree = "<group>"; };
@@ -368,6 +370,7 @@
 		79EAB09B2C81EECB006B40AD /* AppClip */ = {
 			isa = PBXGroup;
 			children = (
+				4365207B2C8768B90006C856 /* ApplePayHandler.swift */,
 				79EAB00A2C81CC06006B40AD /* WebViewController.swift */,
 				79EAB0442C81D5AC006B40AD /* PaymentSession+AppClip.swift */,
 				79EAB03D2C81D283006B40AD /* PaymentSheetView+AppClip.swift */,
@@ -676,6 +679,7 @@
 				79EAB0462C81D5C9006B40AD /* PaymentSession+AppClip.swift in Sources */,
 				79EAB0402C81D2FA006B40AD /* WebViewController.swift in Sources */,
 				79EAB02B2C81CDEA006B40AD /* PaymentSheetConfiguration.swift in Sources */,
+				4365207C2C8768B90006C856 /* ApplePayHandler.swift in Sources */,
 				79EAB0332C81CF50006B40AD /* DictionaryConverter.swift in Sources */,
 				79EAB0322C81CF2E006B40AD /* PaymentSheet.swift in Sources */,
 				79EAB0292C81CDCE006B40AD /* HyperViewModel.swift in Sources */,

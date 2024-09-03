@@ -111,10 +111,8 @@ internal class WebViewController: UIViewController {
             callback(.failed(error: error))
             return
         }
-        
-        let escapedJsonString = jsonString.replacingOccurrences(of: "'", with: "\\'")
-        
-        let jsCode = "window.postMessage('\(escapedJsonString)', '*');"
+                
+        let jsCode = "window.postMessage('\(jsonString)', '*');"
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.webView.evaluateJavaScript(jsCode) { (result, error) in
@@ -127,6 +125,35 @@ internal class WebViewController: UIViewController {
             }
         }
     }
+    
+    public func sendApplePayData(props: [[String: Any]]) {
+        
+        let applePayProps = [
+            "applePayData" : props[0]
+        ]
+        
+        guard let jsonData = try? JSONSerialization.data(withJSONObject: applePayProps as Any, options: []),
+              let jsonString = String(data: jsonData, encoding: .utf8) else {
+            let error = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
+            callback(.failed(error: error))
+            return
+        }
+        
+        
+        let jsCode = "window.postMessage('\(jsonString)', '*');"
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+            self?.webView.evaluateJavaScript(jsCode) { (result, error) in
+                if let _ = error {
+                    let error = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
+                    self?.callback(.failed(error: error))
+                } else {
+                    // Message Sent
+                }
+            }
+        }
+    }
+    
     private func callback(_ result: PaymentSheetResult) {
         DispatchQueue.main.async { [weak self] in
             self?.completion?(result)
@@ -135,30 +162,26 @@ internal class WebViewController: UIViewController {
         }
     }
     func launchScanCard(vc: UIViewController) {
-        DispatchQueue.main.async {
-            var message: [String:Any] = [:]
-            var callback: [String:Any] = [:]
-            let cardScanSheet = CardScanSheet()
-            cardScanSheet.present(from: vc) { result in
-                switch result {
-                case .completed(var card as ScannedCard?):
-                    message["pan"] = card?.pan
-                    message["expiryMonth"] =  card?.expiryMonth
-                    message["expiryYear"] =  card?.expiryYear
-                    callback["status"] = "Succeeded"
-                    callback["scanCardData"] = message
-                case .canceled:
-                    callback["status"] = "Cancelled"
-                case .failed(let error):
-                    callback["status"] = "Failed"
-                }
-                self.sendScanCardData(scanProps: callback)
-            }
-        }
-    }
-    func launchApplePay() {
-        let handler = ApplePayHandler()
-        handler.startPayment(rnMessage: , rnCallback: )
+//        DispatchQueue.main.async {
+//            var message: [String:Any] = [:]
+//            var callback: [String:Any] = [:]
+//            let cardScanSheet = CardScanSheet()
+//            cardScanSheet.present(from: vc) { result in
+//                switch result {
+//                case .completed(var card as ScannedCard?):
+//                    message["pan"] = card?.pan
+//                    message["expiryMonth"] =  card?.expiryMonth
+//                    message["expiryYear"] =  card?.expiryYear
+//                    callback["status"] = "Succeeded"
+//                    callback["scanCardData"] = message
+//                case .canceled:
+//                    callback["status"] = "Cancelled"
+//                case .failed(let error):
+//                    callback["status"] = "Failed"
+//                }
+//                self.sendScanCardData(scanProps: callback)
+//            }
+//        }
     }
 }
 extension WebViewController: WKUIDelegate {
@@ -188,11 +211,10 @@ extension WebViewController: WKScriptMessageHandler {
             launchScanCard(vc: self)
         }
         if message.name == "launchApplePay" {
-            guard let body = message.body as? String,
-                  let data = body.data(using: .utf8),
-                  let jsonDictionary = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: String] else {
+            guard let body = message.body as? String else {
                 return
             }
+            ApplePayHandler().startPayment(rnMessage: body, rnCallback: sendApplePayData)
         }
         if message.name == "exitPaymentSheet" {
             guard let body = message.body as? String,
