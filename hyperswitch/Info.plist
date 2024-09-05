@@ -39,5 +39,10 @@
 		<string>montserrat_black.ttf</string>
 		<string>montserrat_blackitalic.ttf</string>
 	</array>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>AccentColor</string>
+	</dict>
 </dict>
 </plist>

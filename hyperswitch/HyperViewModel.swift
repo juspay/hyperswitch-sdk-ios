@@ -28,13 +28,17 @@ class HyperViewModel: ObservableObject {
         
         let task = URLSession.shared.dataTask(with: request, completionHandler: { [weak self] (data, response, error) in
             if let error = error {
-                self?.status = .failure(error.localizedDescription)
+                DispatchQueue.main.async {
+                    self?.status = .failure(error.localizedDescription)
+                }
                 return
             }
             
             guard let httpResponse = response as? HTTPURLResponse,
                   (200...299).contains(httpResponse.statusCode) else {
-                self?.status = .failure("API Status Failed")
+                DispatchQueue.main.async {
+                    self?.status = .failure("API Status Failed")
+                }
                 return
             }
             
@@ -43,10 +47,12 @@ class HyperViewModel: ObservableObject {
                   let paymentIntentClientSecret = json["clientSecret"] as? String,
                   let publishableKey = json["publishableKey"] as? String,
                   let self = self else {
-                self?.status = .failure("API Serialization/Decode failure")
+                DispatchQueue.main.async {
+                    self?.status = .failure("API Serialization/Decode failure")
+                }
                 return
             }
-                                    
+            
             DispatchQueue.main.async {
                 self.status = .success
                 self.paymentSession = PaymentSession(publishableKey: publishableKey)
