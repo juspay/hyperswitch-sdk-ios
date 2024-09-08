@@ -7,6 +7,7 @@
 
 import Foundation
 import React
+import WebKit
 
 
 @objc(HyperHeadless)
