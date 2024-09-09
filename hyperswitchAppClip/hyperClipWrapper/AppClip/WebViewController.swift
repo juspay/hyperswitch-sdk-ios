@@ -164,24 +164,24 @@ internal class WebViewController: UIViewController {
     }
     func launchScanCard(vc: UIViewController) {
         DispatchQueue.main.async {
-            var message: [String:Any] = [:]
-            var callback: [String:Any] = [:]
-            let cardScanSheet = CardScanSheet()
-            cardScanSheet.present(from: vc) { result in
-                switch result {
-                case .completed(var card as ScannedCard?):
-                    message["pan"] = card?.pan
-                    message["expiryMonth"] =  card?.expiryMonth
-                    message["expiryYear"] =  card?.expiryYear
-                    callback["status"] = "Succeeded"
-                    callback["scanCardData"] = message
-                case .canceled:
-                    callback["status"] = "Cancelled"
-                case .failed(let error):
-                    callback["status"] = "Failed"
-                }
-                self.sendScanCardData(scanProps: callback)
-            }
+//            var message: [String:Any] = [:]
+//            var callback: [String:Any] = [:]
+//            let cardScanSheet = CardScanSheet()
+//            cardScanSheet.present(from: vc) { result in
+//                switch result {
+//                case .completed(var card as ScannedCard?):
+//                    message["pan"] = card?.pan
+//                    message["expiryMonth"] =  card?.expiryMonth
+//                    message["expiryYear"] =  card?.expiryYear
+//                    callback["status"] = "Succeeded"
+//                    callback["scanCardData"] = message
+//                case .canceled:
+//                    callback["status"] = "Cancelled"
+//                case .failed(let error):
+//                    callback["status"] = "Failed"
+//                }
+//                self.sendScanCardData(scanProps: callback)
+//            }
         }
     }
 }
