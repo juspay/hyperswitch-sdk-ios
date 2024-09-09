@@ -163,7 +163,7 @@ internal class WebViewController: UIViewController {
         }
     }
     func launchScanCard(vc: UIViewController) {
-//        DispatchQueue.main.async {
+        DispatchQueue.main.async {
 //            var message: [String:Any] = [:]
 //            var callback: [String:Any] = [:]
 //            let cardScanSheet = CardScanSheet()
@@ -182,7 +182,7 @@ internal class WebViewController: UIViewController {
 //                }
 //                self.sendScanCardData(scanProps: callback)
 //            }
-//        }
+        }
     }
 }
 extension WebViewController: WKUIDelegate {
