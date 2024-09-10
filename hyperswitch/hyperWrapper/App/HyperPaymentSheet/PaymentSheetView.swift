@@ -7,6 +7,7 @@
 
 import Foundation
 import React
+import WebKit
 
 /// Extension on the PaymentSheet class to handle the creation of the React Native root view for the payment sheet.
 internal extension PaymentSheet {

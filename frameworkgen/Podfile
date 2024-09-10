@@ -27,5 +27,10 @@ target 'DummyApp' do
       :mac_catalyst_enabled => false
     )
     __apply_Xcode_12_5_M1_post_install_workaround(installer)
+    installer.pods_project.targets.each do |target|
+      if target.name == "react-native-hyperswitch-netcetera-3ds"
+        target.remove_from_project
+      end
+    end
   end
 end

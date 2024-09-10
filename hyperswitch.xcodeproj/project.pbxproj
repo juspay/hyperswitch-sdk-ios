@@ -44,6 +44,7 @@
 		79052A242C8922E90011804E /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A232C8922E90011804E /* Version.swift */; };
 		79052A252C8923360011804E /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A232C8922E90011804E /* Version.swift */; };
 		79052A272C89237A0011804E /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A262C89237A0011804E /* Extensions.swift */; };
+		79052A4A2C9057D60011804E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A492C9057D60011804E /* AppDelegate.swift */; };
 		790BA8272B99DB5E006678FD /* PaymentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790BA8262B99DB5E006678FD /* PaymentSession.swift */; };
 		792D69F62B95E942001598CD /* ExpressCheckoutLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792D69F52B95E942001598CD /* ExpressCheckoutLauncher.swift */; };
 		792D69F82B95E94C001598CD /* ExpressCheckoutWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792D69F72B95E94C001598CD /* ExpressCheckoutWidget.swift */; };
@@ -159,6 +160,7 @@
 		790525792BDA73A600D49FE8 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
 		79052A232C8922E90011804E /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		79052A262C89237A0011804E /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		79052A492C9057D60011804E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		790BA8262B99DB5E006678FD /* PaymentSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSession.swift; sourceTree = "<group>"; };
 		792D69F52B95E942001598CD /* ExpressCheckoutLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressCheckoutLauncher.swift; sourceTree = "<group>"; };
 		792D69F72B95E94C001598CD /* ExpressCheckoutWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressCheckoutWidget.swift; sourceTree = "<group>"; };
@@ -274,6 +276,7 @@
 			isa = PBXGroup;
 			children = (
 				799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */,
+				79052A492C9057D60011804E /* AppDelegate.swift */,
 				66486F91294355BD00150E4F /* hyperApp.swift */,
 				66486F93294355BD00150E4F /* ContentView.swift */,
 				DC5D011D294844900017C67A /* ViewController.swift */,
@@ -459,6 +462,7 @@
 				66486F8B294355BD00150E4F /* Frameworks */,
 				66486F8C294355BD00150E4F /* Resources */,
 				79FAC1072A5D5FB0004479E4 /* Embed Frameworks */,
+				4365207D2C8CE0690006C856 /* Bundle React Native code and images */,
 				7BD306F62448EF26A2339DBF /* [CP] Embed Pods Frameworks */,
 				0D646CB340E41DC422DAE9D9 /* [CP] Copy Pods Resources */,
 				79EAB0282C81CCDC006B40AD /* Embed App Clips */,
@@ -588,6 +592,26 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		4365207D2C8CE0690006C856 /* Bundle React Native code and images */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/.xcode.env.local",
+				"$(SRCROOT)/.xcode.env",
+			);
+			name = "Bundle React Native code and images";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
+		};
 		7BD306F62448EF26A2339DBF /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -646,6 +670,7 @@
 				66486FAB2943580F00150E4F /* HyperModule.swift in Sources */,
 				66486FAD2943580F00150E4F /* HyperModule.m in Sources */,
 				790525712BDA66EF00D49FE8 /* HyperViewModel.swift in Sources */,
+				79052A4A2C9057D60011804E /* AppDelegate.swift in Sources */,
 				663F68FC29CCC93C006E91BD /* APIClient.swift in Sources */,
 				79EAB0432C81D4AA006B40AD /* PaymentSessionTypes.swift in Sources */,
 				793083ED2A0DA9F100E78310 /* PaymentIntentParams.swift in Sources */,
@@ -708,9 +733,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CC = "";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -737,6 +763,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				CXX = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -757,6 +784,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD = "";
+				LDPLUSPLUS = "";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -765,8 +794,9 @@
 				OTHER_LDFLAGS = "$(inherited)";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				USE_HERMES = true;
 			};
 			name = Debug;
 		};
@@ -774,9 +804,10 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CC = "";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++20";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -803,6 +834,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				CXX = "";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -820,6 +852,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD = "";
+				LDPLUSPLUS = "";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_CFLAGS = "$(inherited)";
@@ -829,6 +863,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				USE_HERMES = true;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -837,7 +872,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 20DD7F56147F45CBE8EA06B8 /* Pods-hyperswitch.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
@@ -876,7 +910,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 74EB35840F48F59D07289D99 /* Pods-hyperswitch.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_MODULES = YES;
