@@ -255,6 +255,7 @@
 		66486F85294355BD00150E4F = {
 			isa = PBXGroup;
 			children = (
+				DC5D010F294731030017C67A /* hyperswitchSDK */,
 				66486F90294355BD00150E4F /* hyperswitch */,
 				79EAB0112C81CCDA006B40AD /* hyperswitchAppClip */,
 				66486F8F294355BD00150E4F /* Products */,
@@ -284,7 +285,6 @@
 				790525792BDA73A600D49FE8 /* SwiftUIView.swift */,
 				790525702BDA66EF00D49FE8 /* HyperViewModel.swift */,
 				43E668542C084F440094BD13 /* fonts */,
-				DC5D010F294731030017C67A /* hyperWrapper */,
 				66486F95294355BE00150E4F /* Assets.xcassets */,
 				66486F97294355BE00150E4F /* Preview Content */,
 			);
@@ -307,12 +307,12 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		790575ED2C85CF5E0097C6F4 /* hyperClipWrapper */ = {
+		790575ED2C85CF5E0097C6F4 /* CoreLite */ = {
 			isa = PBXGroup;
 			children = (
 				79EAB09B2C81EECB006B40AD /* AppClip */,
 			);
-			path = hyperClipWrapper;
+			path = CoreLite;
 			sourceTree = "<group>";
 		};
 		790BA8252B99DB37006678FD /* HyperSession */ = {
@@ -346,7 +346,6 @@
 		79EAB0112C81CCDA006B40AD /* hyperswitchAppClip */ = {
 			isa = PBXGroup;
 			children = (
-				790575ED2C85CF5E0097C6F4 /* hyperClipWrapper */,
 				79EAB0122C81CCDA006B40AD /* AppDelegate.swift */,
 				79EAB0162C81CCDA006B40AD /* ViewController.swift */,
 				79EAB01B2C81CCDC006B40AD /* Assets.xcassets */,
@@ -356,7 +355,7 @@
 			path = hyperswitchAppClip;
 			sourceTree = "<group>";
 		};
-		79EAB09A2C81EEBC006B40AD /* Common */ = {
+		79EAB09A2C81EEBC006B40AD /* Shared */ = {
 			isa = PBXGroup;
 			children = (
 				790BA8262B99DB5E006678FD /* PaymentSession.swift */,
@@ -368,7 +367,7 @@
 				79052A232C8922E90011804E /* Version.swift */,
 				79052A262C89237A0011804E /* Extensions.swift */,
 			);
-			path = Common;
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		79EAB09B2C81EECB006B40AD /* AppClip */ = {
@@ -382,7 +381,7 @@
 			path = AppClip;
 			sourceTree = "<group>";
 		};
-		79EAB09E2C81F0B9006B40AD /* App */ = {
+		79EAB09E2C81F0B9006B40AD /* Core */ = {
 			isa = PBXGroup;
 			children = (
 				7954A4452C23A42200FEC02D /* ApplePay */,
@@ -393,7 +392,7 @@
 				792D69F42B95E91D001598CD /* HyperExpressCheckout */,
 				DC5D012C29486B560017C67A /* Resources */,
 			);
-			path = App;
+			path = Core;
 			sourceTree = "<group>";
 		};
 		DC4AC9F3296D737300E0D2A6 /* HyperPaymentCardTextField */ = {
@@ -408,13 +407,14 @@
 			path = HyperPaymentCardTextField;
 			sourceTree = "<group>";
 		};
-		DC5D010F294731030017C67A /* hyperWrapper */ = {
+		DC5D010F294731030017C67A /* hyperswitchSDK */ = {
 			isa = PBXGroup;
 			children = (
-				79EAB09E2C81F0B9006B40AD /* App */,
-				79EAB09A2C81EEBC006B40AD /* Common */,
+				79EAB09E2C81F0B9006B40AD /* Core */,
+				79EAB09A2C81EEBC006B40AD /* Shared */,
+				790575ED2C85CF5E0097C6F4 /* CoreLite */,
 			);
-			path = hyperWrapper;
+			path = hyperswitchSDK;
 			sourceTree = "<group>";
 		};
 		DC5D0110294731480017C67A /* HyperPaymentSheet */ = {
@@ -899,7 +899,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "hyperswitch/hyperWrapper/App/NativeModule/hyper-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "hyperswitchSDK/Core/NativeModule/hyper-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -938,7 +938,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "hyperswitch/hyperWrapper/App/NativeModule/hyper-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "hyperswitchSDK/Core/NativeModule/hyper-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

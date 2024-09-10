@@ -14,8 +14,8 @@ Pod::Spec.new do |s|
   s.module_name               = 'Hyperswitch'
 
   s.subspec 'core' do |core|
-    core.source_files = 'hyperswitch/hyperWrapper/App/**/*.{m,swift,h}'
-    core.resources = ['hyperswitch/hyperWrapper/App/Resources/CodePush.plist', 'hyperswitch/hyperWrapper/App/Resources/hyperswitch.bundle']
+    core.source_files = 'hyperswitchSDK/Core/**/*.{m,swift,h}'
+    core.resources = ['hyperswitchSDK/Core/Resources/CodePush.plist', 'hyperswitchSDK/Core/Resources/hyperswitch.bundle']
     core.vendored_frameworks = 'frameworkgen/Frameworks/Core/*.xcframework'
     core.dependency 'hyperswitch-sdk-ios/common'
     core.dependency 'Hyperswitch-Hermes'
@@ -28,23 +28,29 @@ Pod::Spec.new do |s|
   end
 
   s.subspec 'scancard' do |scancard|
-    scancard.vendored_frameworks = 'frameworkgen/Frameworks/ScanCard/*.xcframework'
+    scancard.source_files = 'frameworkgen/scanCard/Source/**/*.{m,swift,h}'
+    scancard.vendored_frameworks = 'frameworkgen/scanCard/Frameworks/HyperswitchScancard.xcframework'
     scancard.dependency 'hyperswitch-sdk-ios/core'
   end
 
   s.subspec 'netcetera3ds' do |netcetera3ds|
-    netcetera3ds.source_files = '3ds/Source/**/*.{m,swift,h}'
-    netcetera3ds.vendored_frameworks = '3ds/Frameworks/*.xcframework'
+    netcetera3ds.source_files = 'frameworkgen/3ds/Source/**/*.{m,swift,h}'
+    netcetera3ds.vendored_frameworks = 'frameworkgen/3ds/Frameworks/*.xcframework'
     netcetera3ds.dependency 'hyperswitch-sdk-ios/core'
   end
 
   s.subspec 'appclip' do |appclip|
-    appclip.source_files = 'hyperswitchAppClip/hyperClipWrapper/AppClip/**/*.{m,swift,h}'
+    appclip.source_files = 'hyperswitchSDK/CoreLite/AppClip/**/*.{m,swift,h}'
     appclip.dependency 'hyperswitch-sdk-ios/common'
   end
 
+  s.subspec 'appclip+scancard' do |appclip_scancard|
+    appclip_scancard.vendored_frameworks = 'frameworkgen/scanCard/Frameworks/HyperswitchScancard.xcframework'
+    appclip_scancard.dependency 'hyperswitch-sdk-ios/appclip'
+  end
+
   s.subspec 'common' do |common|
-    common.source_files = 'hyperswitch/hyperWrapper/Common/*.{m,swift,h}'
+    common.source_files = 'hyperswitchSDK/Shared/*.{m,swift,h}'
   end
 
   s.default_subspec = 'core', 'common'
