@@ -9,17 +9,14 @@
 
 #include <string>
 
-#include <ReactCommon/TurboModule.h>
 #include <jsi/jsi.h>
+#include <react/bridging/LongLivedObject.h>
 
-namespace facebook {
-namespace react {
+#include <ReactCommon/TurboModule.h>
 
-enum class TurboModuleBindingMode : uint8_t {
-  HostObject = 0,
-  Prototype = 1,
-  Eager = 2,
-};
+namespace facebook::react {
+
+class BridgelessNativeModuleProxy;
 
 /**
  * Represents the JavaScript binding for the TurboModule system.
@@ -31,26 +28,32 @@ class TurboModuleBinding {
    * Thread synchronization must be enforced externally.
    */
   static void install(
-      jsi::Runtime &runtime,
-      TurboModuleBindingMode bindingMode,
-      TurboModuleProviderFunctionType &&moduleProvider);
+      jsi::Runtime& runtime,
+      TurboModuleProviderFunctionType&& moduleProvider,
+      TurboModuleProviderFunctionType&& legacyModuleProvider = nullptr,
+      std::shared_ptr<LongLivedObjectCollection> longLivedObjectCollection =
+          nullptr);
+
+  TurboModuleBinding(
+      jsi::Runtime& runtime,
+      TurboModuleProviderFunctionType&& moduleProvider,
+      std::shared_ptr<LongLivedObjectCollection> longLivedObjectCollection);
+
+  virtual ~TurboModuleBinding();
 
  private:
-  TurboModuleBinding(
-      TurboModuleBindingMode bindingMode,
-      TurboModuleProviderFunctionType &&moduleProvider);
-  virtual ~TurboModuleBinding();
+  friend BridgelessNativeModuleProxy;
 
   /**
    * A lookup function exposed to JS to get an instance of a TurboModule
    * for the given name.
    */
-  jsi::Value getModule(jsi::Runtime &runtime, const std::string &moduleName)
+  jsi::Value getModule(jsi::Runtime& runtime, const std::string& moduleName)
       const;
 
-  TurboModuleBindingMode bindingMode_;
+  jsi::Runtime& runtime_;
   TurboModuleProviderFunctionType moduleProvider_;
+  std::shared_ptr<LongLivedObjectCollection> longLivedObjectCollection_;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

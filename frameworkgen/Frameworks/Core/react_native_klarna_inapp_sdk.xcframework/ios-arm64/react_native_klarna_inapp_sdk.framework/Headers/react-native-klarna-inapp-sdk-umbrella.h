@@ -10,7 +10,12 @@
 #endif
 #endif
 
-#import "KlarnaPaymentView.h"
+#import "RNMobileSDKUtils.h"
+#import "KlarnaCheckoutViewManager.h"
+#import "KlarnaPaymentViewManager.h"
+#import "KlarnaStandaloneWebViewManager.h"
+#import "KlarnaCheckoutViewWrapper.h"
+#import "KlarnaStandaloneWebViewWrapper.h"
 #import "PaymentViewWrapper.h"
 
 FOUNDATION_EXPORT double react_native_klarna_inapp_sdkVersionNumber;

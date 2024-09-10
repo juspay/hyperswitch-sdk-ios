@@ -13,42 +13,33 @@
 
 #import <memory>
 
-#ifndef RCT_USE_HERMES
-#if __has_include(<reacthermes/HermesExecutorFactory.h>)
-#define RCT_USE_HERMES 1
-#else
-#define RCT_USE_HERMES 0
-#endif
-#endif
-
-#if RCT_USE_HERMES
+#if USE_HERMES
+#if __has_include(<jsireact/HermesExecutorFactory.h>)
+#import <jsireact/HermesExecutorFactory.h>
+#elif __has_include(<reacthermes/HermesExecutorFactory.h>)
 #import <reacthermes/HermesExecutorFactory.h>
-#else
+#endif
+#else // USE_HERMES
 #import <React/JSCExecutorFactory.h>
-#endif
+#endif // USE_HERMES
 
-#if RCT_NEW_ARCH_ENABLED
 #import <ReactCommon/RCTTurboModuleManager.h>
-#endif
 
 // Forward declaration to decrease compilation coupling
 namespace facebook::react {
 class RuntimeScheduler;
 }
 
-#if RCT_NEW_ARCH_ENABLED
 RCT_EXTERN id<RCTTurboModule> RCTAppSetupDefaultModuleFromClass(Class moduleClass);
 
 std::unique_ptr<facebook::react::JSExecutorFactory> RCTAppSetupDefaultJsExecutorFactory(
     RCTBridge *bridge,
     RCTTurboModuleManager *turboModuleManager,
-    std::shared_ptr<facebook::react::RuntimeScheduler> const &runtimeScheduler);
+    const std::shared_ptr<facebook::react::RuntimeScheduler> &runtimeScheduler);
 
-#else
 std::unique_ptr<facebook::react::JSExecutorFactory> RCTAppSetupJsExecutorFactoryForOldArch(
     RCTBridge *bridge,
-    std::shared_ptr<facebook::react::RuntimeScheduler> const &runtimeScheduler);
-#endif
+    const std::shared_ptr<facebook::react::RuntimeScheduler> &runtimeScheduler);
 
 #endif // __cplusplus
 

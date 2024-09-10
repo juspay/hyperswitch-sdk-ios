@@ -5,12 +5,13 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#pragma once
+
 #include <functional>
 #include <memory>
 #include <shared_mutex>
 
-namespace facebook {
-namespace react {
+namespace facebook::react {
 
 /*
  * `SharedFunction` implements a pattern of a shared callable object that
@@ -27,20 +28,20 @@ class SharedFunction {
   using T = void(ArgumentT...);
 
   struct Pair {
-    Pair(std::function<T> &&function) : function(std::move(function)) {}
+    Pair(std::function<T>&& function) : function(std::move(function)) {}
     std::function<T> function;
     std::shared_mutex mutex{};
   };
 
  public:
-  SharedFunction(std::function<T> &&function = nullptr)
+  SharedFunction(std::function<T>&& function = nullptr)
       : pair_(std::make_shared<Pair>(std::move(function))) {}
 
-  SharedFunction(const SharedFunction &other) = default;
-  SharedFunction(SharedFunction &&other) noexcept = default;
+  SharedFunction(const SharedFunction& other) = default;
+  SharedFunction(SharedFunction&& other) noexcept = default;
 
-  SharedFunction &operator=(const SharedFunction &other) = default;
-  SharedFunction &operator=(SharedFunction &&other) noexcept = default;
+  SharedFunction& operator=(const SharedFunction& other) = default;
+  SharedFunction& operator=(SharedFunction&& other) noexcept = default;
 
   void assign(std::function<T> function) const {
     std::unique_lock lock(pair_->mutex);
@@ -58,5 +59,4 @@ class SharedFunction {
   std::shared_ptr<Pair> pair_;
 };
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

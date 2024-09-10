@@ -5,7 +5,7 @@ targets:
   DummyApp:
     type: application
     platform: iOS
-    deploymentTarget: "13.0"
+    deploymentTarget: "13.4"
     sources: [DummyApp]
     configFiles:
       Debug: xcconfig/DummyApp.debug.xcconfig

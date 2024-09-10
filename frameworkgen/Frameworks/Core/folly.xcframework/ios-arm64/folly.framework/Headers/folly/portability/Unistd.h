@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,15 @@
 #ifndef _WIN32
 
 #include <unistd.h>
+
+#if defined(__APPLE__) || defined(__EMSCRIPTEN__)
+using off64_t = off_t;
+
+off64_t lseek64(int fh, off64_t off, int orig);
+
+ssize_t pread64(int fd, void* buf, size_t count, off64_t offset);
+
+#endif
 
 #else
 
@@ -61,6 +70,7 @@
 namespace folly {
 namespace portability {
 namespace unistd {
+using off64_t = int64_t;
 int access(char const* fn, int am);
 int chdir(const char* path);
 int close(int fh);
@@ -76,10 +86,12 @@ int getuid();
 int isatty(int fh);
 int lockf(int fd, int cmd, off_t len);
 off_t lseek(int fh, off_t off, int orig);
+off64_t lseek64(int fh, off64_t off, int orig);
 ssize_t read(int fh, void* buf, size_t mcc);
 int rmdir(const char* path);
 int pipe(int pth[2]);
 ssize_t pread(int fd, void* buf, size_t count, off_t offset);
+ssize_t pread64(int fd, void* buf, size_t count, off64_t offset);
 ssize_t pwrite(int fd, const void* buf, size_t count, off_t offset);
 ssize_t readlink(const char* path, char* buf, size_t buflen);
 void* sbrk(intptr_t i);

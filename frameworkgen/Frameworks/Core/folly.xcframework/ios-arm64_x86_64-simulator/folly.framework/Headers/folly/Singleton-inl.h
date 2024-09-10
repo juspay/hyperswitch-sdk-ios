@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -95,7 +95,7 @@ void SingletonHolder<T>::registerSingletonMock(CreateFunc c, TeardownFunc t) {
 
 template <typename T>
 T* SingletonHolder<T>::get() {
-  if (LIKELY(
+  if (FOLLY_LIKELY(
           state_.load(std::memory_order_acquire) ==
           SingletonHolderState::Living)) {
     return instance_ptr_;
@@ -111,29 +111,29 @@ T* SingletonHolder<T>::get() {
 
 template <typename T>
 std::weak_ptr<T> SingletonHolder<T>::get_weak() {
-  if (UNLIKELY(
+  if (FOLLY_UNLIKELY(
           state_.load(std::memory_order_acquire) !=
           SingletonHolderState::Living)) {
     createInstance();
   }
 
-  return instance_weak_;
+  return instance_weak_core_cached_.get();
 }
 
 template <typename T>
 std::shared_ptr<T> SingletonHolder<T>::try_get() {
-  if (UNLIKELY(
+  if (FOLLY_UNLIKELY(
           state_.load(std::memory_order_acquire) !=
           SingletonHolderState::Living)) {
     createInstance();
   }
 
-  return instance_weak_.lock();
+  return instance_weak_core_cached_.lock();
 }
 
 template <typename T>
 folly::ReadMostlySharedPtr<T> SingletonHolder<T>::try_get_fast() {
-  if (UNLIKELY(
+  if (FOLLY_UNLIKELY(
           state_.load(std::memory_order_acquire) !=
           SingletonHolderState::Living)) {
     createInstance();
@@ -150,7 +150,7 @@ invoke_result_t<Func, T*> detail::SingletonHolder<T>::apply(Func f) {
 
 template <typename T>
 void SingletonHolder<T>::vivify() {
-  if (UNLIKELY(
+  if (FOLLY_UNLIKELY(
           state_.load(std::memory_order_relaxed) !=
           SingletonHolderState::Living)) {
     createInstance();
@@ -182,6 +182,7 @@ void SingletonHolder<T>::destroyInstance() {
     }
   }
   state_ = SingletonHolderState::Dead;
+  instance_core_cached_.reset();
   instance_.reset();
   instance_copy_.reset();
   if (destroy_baton_) {
@@ -310,8 +311,10 @@ void SingletonHolder<T>::createInstance() {
 
   instance_weak_ = instance;
   instance_ptr_ = instance.get();
+  instance_core_cached_.reset(instance);
   instance_.reset(std::move(instance));
   instance_weak_fast_ = instance_;
+  instance_weak_core_cached_.reset(instance_core_cached_);
 
   destroy_baton_ = std::move(destroy_baton);
   print_destructor_stack_trace_ = std::move(print_destructor_stack_trace);
@@ -321,6 +324,7 @@ void SingletonHolder<T>::createInstance() {
   state_.store(SingletonHolderState::Living, std::memory_order_release);
 
   vault_.creationOrder_.wlock()->push_back(type());
+  vault_.instantiatedAtLeastOnce_.wlock()->insert(type());
 }
 
 } // namespace detail

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,8 @@ struct MemoryIdler {
     /// 1 bytes.
     kDefaultStackToRetain = 1024,
   };
+
+  static bool isUnmapUnusedStackAvailable() noexcept;
 
   /// Uses madvise to discard the portion of the thread's stack that
   /// currently doesn't hold any data, trying to ensure that no page

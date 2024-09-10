@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ namespace folly {
 //  Prefer std::array when using C++17 or later.
 template <typename V, size_t N>
 struct c_array {
+  constexpr size_t size() const noexcept { return N; }
+
   V data[N];
 };
 

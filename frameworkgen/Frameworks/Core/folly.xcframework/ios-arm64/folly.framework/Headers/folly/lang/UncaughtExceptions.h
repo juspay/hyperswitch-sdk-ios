@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,45 +16,35 @@
 
 #pragma once
 
+#include <cassert>
 #include <exception>
 
-#if !defined(FOLLY_FORCE_EXCEPTION_COUNT_USE_STD) && defined(__GNUG__)
-#define FOLLY_EXCEPTION_COUNT_USE_CXA_GET_GLOBALS
-namespace __cxxabiv1 {
-// forward declaration (originally defined in unwind-cxx.h from from libstdc++)
-struct __cxa_eh_globals;
-// declared in cxxabi.h from libstdc++-v3
-#if !defined(__FreeBSD__)
-extern "C" __cxa_eh_globals* __cxa_get_globals() noexcept;
-#else
-// Signature mismatch with FreeBSD case
-extern "C" __cxa_eh_globals* __cxa_get_globals(void);
-#endif
-} // namespace __cxxabiv1
-#elif defined(FOLLY_FORCE_EXCEPTION_COUNT_USE_STD) || defined(_MSC_VER)
-#define FOLLY_EXCEPTION_COUNT_USE_STD
-#else
-// Raise an error when trying to use this on unsupported platforms.
-#error "Unsupported platform, don't include this header."
-#endif
+#include <folly/CppAttributes.h>
+#include <folly/Likely.h>
+#include <folly/Portability.h>
 
 namespace folly {
 
-/**
- * Returns the number of uncaught exceptions.
- *
- * This function is based on Evgeny Panasyuk's implementation from here:
- * http://fburl.com/15190026
- */
-inline int uncaught_exceptions() noexcept {
-#if defined(FOLLY_EXCEPTION_COUNT_USE_CXA_GET_GLOBALS)
-  // __cxa_get_globals returns a __cxa_eh_globals* (defined in unwind-cxx.h).
-  // The offset below returns __cxa_eh_globals::uncaughtExceptions.
-  return *(reinterpret_cast<unsigned int*>(
-      static_cast<char*>(static_cast<void*>(__cxxabiv1::__cxa_get_globals())) +
-      sizeof(void*)));
-#elif defined(FOLLY_EXCEPTION_COUNT_USE_STD)
+namespace detail {
+
+unsigned int* uncaught_exceptions_ptr() noexcept;
+
+} // namespace detail
+
+//  uncaught_exceptions
+//
+//  An accelerated version of std::uncaught_exceptions.
+//
+//  mimic: std::uncaught_exceptions, c++17
+[[FOLLY_ATTR_PURE]] FOLLY_EXPORT FOLLY_ALWAYS_INLINE int
+uncaught_exceptions() noexcept {
+#if defined(_CPPLIB_VER)
   return std::uncaught_exceptions();
+#elif defined(__has_feature) && !FOLLY_HAS_FEATURE(cxx_thread_local)
+  return std::uncaught_exceptions();
+#else
+  thread_local unsigned int* ct;
+  return FOLLY_LIKELY(!!ct) ? *ct : *(ct = detail::uncaught_exceptions_ptr());
 #endif
 }
 

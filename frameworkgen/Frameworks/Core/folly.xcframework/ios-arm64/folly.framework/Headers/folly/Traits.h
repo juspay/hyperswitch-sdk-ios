@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <functional>
 #include <limits>
 #include <memory>
@@ -49,6 +50,68 @@ using bool_constant = std::integral_constant<bool, B>;
 template <std::size_t I>
 using index_constant = std::integral_constant<std::size_t, I>;
 
+//  always_false
+//
+//  A variable template that is always false but requires template arguments to
+//  be provided (which are then ignored). This is useful in very specific cases
+//  where we want type-dependent expressions to defer static_assert's.
+//
+//  A common use-case is for exhaustive constexpr if branches:
+//
+//    template <typename T>
+//    void foo(T value) {
+//      if constexpr (std::is_integral_v<T>) foo_integral(value);
+//      else if constexpr (std::is_same_v<T, std::string>) foo_string(value);
+//      else static_assert(always_false<T>, "Unsupported type");
+//    }
+//
+//  If we had used static_assert(false), then this would always fail to compile,
+//  even if foo is never instantiated!
+//
+//  Another use case is if a template that is expected to always be specialized
+//  is erroneously instantiated with the base template.
+//
+//    template <typename T>
+//    struct Foo {
+//      static_assert(always_false<T>, "Unsupported type");
+//    };
+//    template <>
+//    struct Foo<int> {};
+//
+//    Foo<int> a;         // fine
+//    Foo<std::string> b; // fails! And you get a nice (custom) error message
+//
+//  This is similar to leaving the base template undefined but we get a nicer
+//  compiler error message with static_assert.
+template <typename...>
+FOLLY_INLINE_VARIABLE constexpr bool always_false = false;
+
+//  is_unbounded_array_v
+//  is_unbounded_array
+//
+//  A trait variable and type to check if a given type is an unbounded array.
+//
+//  mimic: std::is_unbounded_array_d, std::is_unbounded_array (C++20)
+template <typename T>
+FOLLY_INLINE_VARIABLE constexpr bool is_unbounded_array_v = false;
+template <typename T>
+FOLLY_INLINE_VARIABLE constexpr bool is_unbounded_array_v<T[]> = true;
+template <typename T>
+struct is_unbounded_array : bool_constant<is_unbounded_array_v<T>> {};
+
+//  is_bounded_array_v
+//  is_bounded_array
+//
+//  A trait variable and type to check if a given type is a bounded array.
+//
+//  mimic: std::is_bounded_array_d, std::is_bounded_array (C++20)
+template <typename T>
+FOLLY_INLINE_VARIABLE constexpr bool is_bounded_array_v = false;
+template <typename T, std::size_t S>
+FOLLY_INLINE_VARIABLE constexpr bool is_bounded_array_v<T[S]> = true;
+template <typename T>
+struct is_bounded_array : bool_constant<is_bounded_array_v<T>> {};
+
 namespace detail {
 
 //  is_instantiation_of_v
@@ -78,6 +141,19 @@ struct is_similar_instantiation
 
 } // namespace detail
 
+//  member_pointer_traits
+//
+//  For a member-pointer, reveals its constituent member-type and object-type.
+//
+//  Works for both member-object-pointer and member-function-pointer.
+template <typename>
+struct member_pointer_traits;
+template <typename M, typename O>
+struct member_pointer_traits<M O::*> {
+  using member_type = M;
+  using object_type = O;
+};
+
 namespace detail {
 
 struct is_constexpr_default_constructible_ {
@@ -97,7 +173,7 @@ struct is_constexpr_default_constructible_ {
   static std::true_type sfinae(T*);
   static std::false_type sfinae(void*);
   template <typename T>
-  static constexpr bool apply =
+  static constexpr bool apply = sizeof(T) &&
       decltype(sfinae(static_cast<T*>(nullptr)))::value;
 };
 
@@ -305,6 +381,8 @@ struct detected_<void_t<T<A...>>, D, T, A...> {
 //  alias value_t as std::false_type and has member type alias type as D.
 //
 //  mimic: std::experimental::detected_or, Library Fundamentals TS v2
+//
+//  Note: not resilient agaist incomplete types; may violate ODR.
 template <typename D, template <typename...> class T, typename... A>
 using detected_or = detail::detected_<void, D, T, A...>;
 
@@ -316,6 +394,8 @@ using detected_or = detail::detected_<void, D, T, A...>;
 //  Equivalent to detected_or<D, T, A...>::type.
 //
 //  mimic: std::experimental::detected_or_t, Library Fundamentals TS v2
+//
+//  Note: not resilient agaist incomplete types; may violate ODR.
 template <typename D, template <typename...> class T, typename... A>
 using detected_or_t = typename detected_or<D, T, A...>::type;
 
@@ -327,6 +407,8 @@ using detected_or_t = typename detected_or<D, T, A...>::type;
 //  Equivalent to detected_or_t<nonesuch, T, A...>.
 //
 //  mimic: std::experimental::detected_t, Library Fundamentals TS v2
+//
+//  Note: not resilient agaist incomplete types; may violate ODR.
 template <template <typename...> class T, typename... A>
 using detected_t = detected_or_t<nonesuch, T, A...>;
 
@@ -343,6 +425,8 @@ using detected_t = detected_or_t<nonesuch, T, A...>;
 //
 //  mimic: std::experimental::is_detected, std::experimental::is_detected_v,
 //    Library Fundamentals TS v2
+//
+//  Note: not resilient agaist incomplete types; may violate ODR.
 //
 //  Note: the trait type is_detected differs here by being deferred.
 template <template <typename...> class T, typename... A>
@@ -367,6 +451,37 @@ using is_trivially_copyable = std::is_trivially_copyable<T>;
 template <class T>
 FOLLY_INLINE_VARIABLE constexpr bool is_trivially_copyable_v =
     is_trivially_copyable<T>::value;
+
+//  ----
+
+namespace fallback {
+template <typename From, typename To>
+FOLLY_INLINE_VARIABLE constexpr bool is_nothrow_convertible_v =
+    (std::is_void<From>::value && std::is_void<To>::value) ||
+    ( //
+        std::is_convertible<From, To>::value &&
+        std::is_nothrow_constructible<To, From>::value);
+template <typename From, typename To>
+struct is_nothrow_convertible
+    : bool_constant<is_nothrow_convertible_v<From, To>> {};
+} // namespace fallback
+
+//  is_nothrow_convertible
+//  is_nothrow_convertible_v
+//
+//  Import or backport:
+//  * std::is_nothrow_convertible
+//  * std::is_nothrow_convertible_v
+//
+//  mimic: is_nothrow_convertible, C++20
+#if defined(__cpp_lib_is_nothrow_convertible) && \
+    __cpp_lib_is_nothrow_convertible >= 201806L
+using std::is_nothrow_convertible;
+using std::is_nothrow_convertible_v;
+#else
+using fallback::is_nothrow_convertible;
+using fallback::is_nothrow_convertible_v;
+#endif
 
 /**
  * IsRelocatable<T>::value describes the ability of moving around
@@ -406,8 +521,8 @@ FOLLY_INLINE_VARIABLE constexpr bool is_trivially_copyable_v =
  * It may be unset in a base class by overriding the typedef to false_type.
  */
 /*
- * IsZeroInitializable describes the property that default construction is the
- * same as memset(dst, 0, sizeof(T)).
+ * IsZeroInitializable describes the property that value-initialization
+ * is the same as memset(dst, 0, sizeof(T)).
  */
 
 namespace traits_detail {
@@ -497,7 +612,7 @@ struct IsNothrowSwappable
 template <class T>
 struct IsRelocatable
     : std::conditional<
-          is_detected_v<traits_detail::detect_IsRelocatable, T>,
+          sizeof(T) && is_detected_v<traits_detail::detect_IsRelocatable, T>,
           traits_detail::has_true_IsRelocatable<T>,
           // TODO add this line (and some tests for it) when we
           // upgrade to gcc 4.7
@@ -507,9 +622,14 @@ struct IsRelocatable
 template <class T>
 struct IsZeroInitializable
     : std::conditional<
-          is_detected_v<traits_detail::detect_IsZeroInitializable, T>,
+          sizeof(T) &&
+              is_detected_v<traits_detail::detect_IsZeroInitializable, T>,
           traits_detail::has_true_IsZeroInitializable<T>,
-          bool_constant<!std::is_class<T>::value>>::type {};
+          bool_constant< //
+              !std::is_class<T>::value && //
+              !std::is_union<T>::value && //
+              !std::is_member_object_pointer<T>::value && // itanium
+              true>>::type {};
 
 namespace detail {
 template <bool>
@@ -587,6 +707,32 @@ FOLLY_INLINE_VARIABLE constexpr bool is_transparent_v =
     is_detected_v<detail::is_transparent_, T>;
 template <typename T>
 struct is_transparent : bool_constant<is_transparent_v<T>> {};
+
+namespace detail {
+
+template <typename T, typename = void>
+FOLLY_INLINE_VARIABLE constexpr bool is_allocator_ = !sizeof(T);
+template <typename T>
+FOLLY_INLINE_VARIABLE constexpr bool is_allocator_<
+    T,
+    void_t<
+        typename T::value_type,
+        decltype(std::declval<T&>().allocate(std::size_t{})),
+        decltype(std::declval<T&>().deallocate(
+            static_cast<typename T::value_type*>(nullptr), std::size_t{}))>> =
+    true;
+
+} // namespace detail
+
+//  is_allocator_v
+//  is_allocator
+//
+//  A trait variable and type to test whether a type is an allocator according
+//  to the minimum protocol required by std::allocator_traits.
+template <typename T>
+FOLLY_INLINE_VARIABLE constexpr bool is_allocator_v = detail::is_allocator_<T>;
+template <typename T>
+struct is_allocator : bool_constant<is_allocator_v<T>> {};
 
 } // namespace folly
 
@@ -865,5 +1011,84 @@ struct make_unsigned<uint128_t> {
   using type = uint128_t;
 };
 #endif // FOLLY_HAVE_INT128_T
+
+namespace traits_detail {
+template <std::size_t>
+struct uint_bits_t_ {};
+template <>
+struct uint_bits_t_<8> : type_t_<std::uint8_t> {};
+template <>
+struct uint_bits_t_<16> : type_t_<std::uint16_t> {};
+template <>
+struct uint_bits_t_<32> : type_t_<std::uint32_t> {};
+template <>
+struct uint_bits_t_<64> : type_t_<std::uint64_t> {};
+#if FOLLY_HAVE_INT128_T
+template <>
+struct uint_bits_t_<128> : type_t_<uint128_t> {};
+#endif // FOLLY_HAVE_INT128_T
+} // namespace traits_detail
+
+template <std::size_t bits>
+using uint_bits_t = _t<traits_detail::uint_bits_t_<bits>>;
+
+template <std::size_t lg_bits>
+using uint_bits_lg_t = uint_bits_t<(1u << lg_bits)>;
+
+template <std::size_t bits>
+using int_bits_t = make_signed_t<uint_bits_t<bits>>;
+
+template <std::size_t lg_bits>
+using int_bits_lg_t = make_signed_t<uint_bits_lg_t<lg_bits>>;
+
+namespace traits_detail {
+
+template <std::size_t I, typename T>
+struct type_pack_element_indexed_type {
+  using type = T;
+};
+
+template <typename, typename...>
+struct type_pack_element_set;
+template <std::size_t... I, typename... T>
+struct type_pack_element_set<std::index_sequence<I...>, T...>
+    : type_pack_element_indexed_type<I, T>... {};
+template <typename... T>
+using type_pack_element_set_t =
+    type_pack_element_set<std::index_sequence_for<T...>, T...>;
+
+template <std::size_t I>
+struct type_pack_element_test {
+  template <typename T>
+  static type_pack_element_indexed_type<I, T> impl(
+      type_pack_element_indexed_type<I, T>*);
+};
+
+template <std::size_t I, typename... Ts>
+using type_pack_element_fallback = _t<decltype(type_pack_element_test<I>::impl(
+    static_cast<type_pack_element_set_t<Ts...>*>(nullptr)))>;
+
+} // namespace traits_detail
+
+#if FOLLY_HAS_BUILTIN(__type_pack_element)
+
+#if __clang__
+template <std::size_t I, typename... Ts>
+using type_pack_element_t = __type_pack_element<I, Ts...>;
+#else
+template <std::size_t I, typename... Ts>
+struct type_pack_element {
+  using type = __type_pack_element<I, Ts...>;
+};
+template <std::size_t I, typename... Ts>
+using type_pack_element_t = typename type_pack_element<I, Ts...>::type;
+#endif
+
+#else
+
+template <std::size_t I, typename... Ts>
+using type_pack_element_t = traits_detail::type_pack_element_fallback<I, Ts...>;
+
+#endif
 
 } // namespace folly

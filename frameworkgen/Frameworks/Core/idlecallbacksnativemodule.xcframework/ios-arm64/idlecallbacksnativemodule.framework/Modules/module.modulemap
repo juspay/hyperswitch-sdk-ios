@@ -1,0 +1,6 @@
+framework module idlecallbacksnativemodule {
+  umbrella header "React-idlecallbacksnativemodule-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,19 +44,19 @@ struct exception_wrapper::arg_type_<Ret (*)(Arg)> {
 };
 template <class Ret, class Class>
 struct exception_wrapper::arg_type_<Ret (Class::*)(...)> {
-  using type = AnyException;
+  using type = void;
 };
 template <class Ret, class Class>
 struct exception_wrapper::arg_type_<Ret (Class::*)(...) const> {
-  using type = AnyException;
+  using type = void;
 };
 template <class Ret>
 struct exception_wrapper::arg_type_<Ret(...)> {
-  using type = AnyException;
+  using type = void;
 };
 template <class Ret>
 struct exception_wrapper::arg_type_<Ret (*)(...)> {
-  using type = AnyException;
+  using type = void;
 };
 
 #ifdef FOLLY_HAVE_NOEXCEPT_FUNCTION_TYPE
@@ -78,19 +78,19 @@ struct exception_wrapper::arg_type_<Ret (*)(Arg) noexcept> {
 };
 template <class Ret, class Class>
 struct exception_wrapper::arg_type_<Ret (Class::*)(...) noexcept> {
-  using type = AnyException;
+  using type = void;
 };
 template <class Ret, class Class>
 struct exception_wrapper::arg_type_<Ret (Class::*)(...) const noexcept> {
-  using type = AnyException;
+  using type = void;
 };
 template <class Ret>
 struct exception_wrapper::arg_type_<Ret(...) noexcept> {
-  using type = AnyException;
+  using type = void;
 };
 template <class Ret>
 struct exception_wrapper::arg_type_<Ret (*)(...) noexcept> {
-  using type = AnyException;
+  using type = void;
 };
 #endif
 
@@ -104,236 +104,47 @@ struct exception_wrapper::with_exception_from_ex_ {
   using apply = Ex;
 };
 
-template <class Ret, class... Args>
-inline Ret exception_wrapper::noop_(Args...) {
-  return Ret();
-}
-
-inline std::type_info const* exception_wrapper::uninit_type_(
-    exception_wrapper const*) {
-  return &typeid(void);
-}
-
-template <class Ex, typename... As>
-inline exception_wrapper::Buffer::Buffer(in_place_type_t<Ex>, As&&... as_) {
-  ::new (static_cast<void*>(&buff_)) Ex(std::forward<As>(as_)...);
-}
-
-template <class Ex>
-inline Ex& exception_wrapper::Buffer::as() noexcept {
-  return *static_cast<Ex*>(static_cast<void*>(&buff_));
-}
-template <class Ex>
-inline Ex const& exception_wrapper::Buffer::as() const noexcept {
-  return *static_cast<Ex const*>(static_cast<void const*>(&buff_));
-}
-
-inline std::exception const* exception_wrapper::as_exception_or_null_(
-    std::exception const& ex) {
-  return &ex;
-}
-inline std::exception const* exception_wrapper::as_exception_or_null_(
-    AnyException) {
-  return nullptr;
-}
-
-inline void exception_wrapper::ExceptionPtr::copy_(
-    exception_wrapper const* from, exception_wrapper* to) {
-  ::new (static_cast<void*>(&to->eptr_)) ExceptionPtr(from->eptr_);
-}
-inline void exception_wrapper::ExceptionPtr::move_(
-    exception_wrapper* from, exception_wrapper* to) {
-  ::new (static_cast<void*>(&to->eptr_)) ExceptionPtr(std::move(from->eptr_));
-  delete_(from);
-}
-inline void exception_wrapper::ExceptionPtr::delete_(exception_wrapper* that) {
-  that->eptr_.~ExceptionPtr();
-  that->vptr_ = &uninit_;
-}
-[[noreturn]] inline void exception_wrapper::ExceptionPtr::throw_(
-    exception_wrapper const* that) {
-  std::rethrow_exception(that->eptr_.ptr_);
-}
-inline std::type_info const* exception_wrapper::ExceptionPtr::type_(
-    exception_wrapper const* that) {
-  return exception_ptr_get_type(that->eptr_.ptr_);
-}
-inline std::exception const* exception_wrapper::ExceptionPtr::get_exception_(
-    exception_wrapper const* that) {
-  return exception_ptr_get_object<std::exception>(that->eptr_.ptr_);
-}
-inline exception_wrapper exception_wrapper::ExceptionPtr::get_exception_ptr_(
-    exception_wrapper const* that) {
-  return *that;
-}
-
-template <class Ex>
-inline void exception_wrapper::InPlace<Ex>::copy_(
-    exception_wrapper const* from, exception_wrapper* to) {
-  ::new (static_cast<void*>(std::addressof(to->buff_.as<Ex>())))
-      Ex(from->buff_.as<Ex>());
-}
-template <class Ex>
-inline void exception_wrapper::InPlace<Ex>::move_(
-    exception_wrapper* from, exception_wrapper* to) {
-  ::new (static_cast<void*>(std::addressof(to->buff_.as<Ex>())))
-      Ex(std::move(from->buff_.as<Ex>()));
-  delete_(from);
-}
-template <class Ex>
-inline void exception_wrapper::InPlace<Ex>::delete_(exception_wrapper* that) {
-  that->buff_.as<Ex>().~Ex();
-  that->vptr_ = &uninit_;
-}
-template <class Ex>
-[[noreturn]] inline void exception_wrapper::InPlace<Ex>::throw_(
-    exception_wrapper const* that) {
-  throw that->buff_.as<Ex>();
-}
-template <class Ex>
-inline std::type_info const* exception_wrapper::InPlace<Ex>::type_(
-    exception_wrapper const*) {
-  return &typeid(Ex);
-}
-template <class Ex>
-inline std::exception const* exception_wrapper::InPlace<Ex>::get_exception_(
-    exception_wrapper const* that) {
-  return as_exception_or_null_(that->buff_.as<Ex>());
-}
-template <class Ex>
-inline exception_wrapper exception_wrapper::InPlace<Ex>::get_exception_ptr_(
-    exception_wrapper const* that) {
-  try {
-    throw_(that);
-  } catch (...) {
-    return exception_wrapper{std::current_exception()};
-  }
-}
-
-template <class Ex>
-[[noreturn]] inline void exception_wrapper::SharedPtr::Impl<Ex>::throw_()
-    const {
-  throw ex_;
-}
-template <class Ex>
-inline std::exception const*
-exception_wrapper::SharedPtr::Impl<Ex>::get_exception_() const noexcept {
-  return as_exception_or_null_(ex_);
-}
-template <class Ex>
-inline exception_wrapper
-exception_wrapper::SharedPtr::Impl<Ex>::get_exception_ptr_() const noexcept {
-  try {
-    throw_();
-  } catch (...) {
-    return exception_wrapper{std::current_exception()};
-  }
-}
-inline void exception_wrapper::SharedPtr::copy_(
-    exception_wrapper const* from, exception_wrapper* to) {
-  ::new (static_cast<void*>(std::addressof(to->sptr_))) SharedPtr(from->sptr_);
-}
-inline void exception_wrapper::SharedPtr::move_(
-    exception_wrapper* from, exception_wrapper* to) {
-  ::new (static_cast<void*>(std::addressof(to->sptr_)))
-      SharedPtr(std::move(from->sptr_));
-  delete_(from);
-}
-inline void exception_wrapper::SharedPtr::delete_(exception_wrapper* that) {
-  that->sptr_.~SharedPtr();
-  that->vptr_ = &uninit_;
-}
-[[noreturn]] inline void exception_wrapper::SharedPtr::throw_(
-    exception_wrapper const* that) {
-  that->sptr_.ptr_->throw_();
-  folly::assume_unreachable();
-}
-inline std::type_info const* exception_wrapper::SharedPtr::type_(
-    exception_wrapper const* that) {
-  return that->sptr_.ptr_->info_;
-}
-inline std::exception const* exception_wrapper::SharedPtr::get_exception_(
-    exception_wrapper const* that) {
-  return that->sptr_.ptr_->get_exception_();
-}
-inline exception_wrapper exception_wrapper::SharedPtr::get_exception_ptr_(
-    exception_wrapper const* that) {
-  return that->sptr_.ptr_->get_exception_ptr_();
-}
-
 template <class Ex, typename... As>
 inline exception_wrapper::exception_wrapper(
-    ThrownTag, in_place_type_t<Ex>, As&&... as)
-    : eptr_{std::make_exception_ptr(Ex(std::forward<As>(as)...))},
-      vptr_(&ExceptionPtr::ops_) {}
-
-template <class Ex, typename... As>
-inline exception_wrapper::exception_wrapper(
-    OnHeapTag, in_place_type_t<Ex>, As&&... as)
-    : sptr_{std::make_shared<SharedPtr::Impl<Ex>>(std::forward<As>(as)...)},
-      vptr_(&SharedPtr::ops_) {}
-
-template <class Ex, typename... As>
-inline exception_wrapper::exception_wrapper(
-    InSituTag, in_place_type_t<Ex>, As&&... as)
-    : buff_{in_place_type<Ex>, std::forward<As>(as)...},
-      vptr_(&InPlace<Ex>::ops_) {}
-
-inline exception_wrapper::exception_wrapper(exception_wrapper&& that) noexcept
-    : exception_wrapper{} {
-  (vptr_ = that.vptr_)->move_(&that, this); // Move into *this, won't throw
-}
-
-inline exception_wrapper::exception_wrapper(
-    exception_wrapper const& that) noexcept
-    : exception_wrapper{} {
-  that.vptr_->copy_(&that, this); // Copy into *this, won't throw
-  vptr_ = that.vptr_;
-}
-
-// If `this == &that`, this move assignment operator leaves the object in a
-// valid but unspecified state.
-inline exception_wrapper& exception_wrapper::operator=(
-    exception_wrapper&& that) noexcept {
-  vptr_->delete_(this); // Free the current exception
-  (vptr_ = that.vptr_)->move_(&that, this); // Move into *this, won't throw
-  return *this;
-}
-
-inline exception_wrapper& exception_wrapper::operator=(
-    exception_wrapper const& that) noexcept {
-  exception_wrapper(that).swap(*this);
-  return *this;
-}
-
-inline exception_wrapper::~exception_wrapper() {
-  reset();
-}
-
-template <class Ex>
-inline exception_wrapper::exception_wrapper(
-    std::exception_ptr const& ptr, Ex& ex) noexcept
-    : exception_wrapper{folly::copy(ptr), ex} {}
-
-template <class Ex>
-inline exception_wrapper::exception_wrapper(
-    std::exception_ptr&& ptr, Ex& ex) noexcept
-    : eptr_{std::move(ptr)}, vptr_(&ExceptionPtr::ops_) {
-  assert(eptr_.ptr_);
-  (void)ex;
-  assert(exception_ptr_get_object<Ex>(eptr_.ptr_));
-  assert(exception_ptr_get_object<Ex>(eptr_.ptr_) == &ex || kIsWindows);
-}
+    PrivateCtor, in_place_type_t<Ex>, As&&... as)
+    : ptr_{std::make_exception_ptr(Ex(std::forward<As>(as)...))} {}
 
 namespace exception_wrapper_detail {
 template <class Ex>
 Ex&& dont_slice(Ex&& ex) {
-  assert(typeid(ex) == typeid(std::decay_t<Ex>) ||
-       !"Dynamic and static exception types don't match. Exception would "
-        "be sliced when storing in exception_wrapper.");
+  assert(
+      (!type_info_of(ex) || !type_info_of<std::decay_t<Ex>>() ||
+       (*type_info_of(ex) == *type_info_of<std::decay_t<Ex>>())) &&
+      "Dynamic and static exception types don't match. Exception would "
+      "be sliced when storing in exception_wrapper.");
   return std::forward<Ex>(ex);
 }
 } // namespace exception_wrapper_detail
+
+// The libc++ and cpplib implementations do not have a move constructor or a
+// move-assignment operator. To avoid refcount operations, we must improvise.
+// The libstdc++ implementation has a move constructor and a move-assignment
+// operator but having this does no harm.
+inline std::exception_ptr exception_wrapper::extract_(
+    std::exception_ptr&& ptr) noexcept {
+  constexpr auto sz = sizeof(std::exception_ptr);
+  // assume relocatability on all platforms
+  // assume nrvo for performance
+  std::exception_ptr ret;
+  std::memcpy(static_cast<void*>(&ret), &ptr, sz);
+  std::memset(static_cast<void*>(&ptr), 0, sz);
+  return ret;
+}
+
+inline exception_wrapper::exception_wrapper(exception_wrapper&& that) noexcept
+    : ptr_{extract_(std::move(that.ptr_))} {}
+
+inline exception_wrapper::exception_wrapper(
+    std::exception_ptr const& ptr) noexcept
+    : ptr_{ptr} {}
+
+inline exception_wrapper::exception_wrapper(std::exception_ptr&& ptr) noexcept
+    : ptr_{extract_(std::move(ptr))} {}
 
 template <
     class Ex,
@@ -343,7 +154,7 @@ template <
                        exception_wrapper::IsRegularExceptionType<Ex_>>::value)>
 inline exception_wrapper::exception_wrapper(Ex&& ex)
     : exception_wrapper{
-          PlacementOf<Ex_>{},
+          PrivateCtor{},
           in_place_type<Ex_>,
           exception_wrapper_detail::dont_slice(std::forward<Ex>(ex))} {}
 
@@ -353,7 +164,7 @@ template <
     FOLLY_REQUIRES_DEF(exception_wrapper::IsRegularExceptionType<Ex_>::value)>
 inline exception_wrapper::exception_wrapper(in_place_t, Ex&& ex)
     : exception_wrapper{
-          PlacementOf<Ex_>{},
+          PrivateCtor{},
           in_place_type<Ex_>,
           exception_wrapper_detail::dont_slice(std::forward<Ex>(ex))} {}
 
@@ -363,82 +174,67 @@ template <
     FOLLY_REQUIRES_DEF(exception_wrapper::IsRegularExceptionType<Ex>::value)>
 inline exception_wrapper::exception_wrapper(in_place_type_t<Ex>, As&&... as)
     : exception_wrapper{
-          PlacementOf<Ex>{}, in_place_type<Ex>, std::forward<As>(as)...} {}
+          PrivateCtor{}, in_place_type<Ex>, std::forward<As>(as)...} {}
+
+inline exception_wrapper& exception_wrapper::operator=(
+    exception_wrapper&& that) noexcept {
+  // assume relocatability on all platforms
+  constexpr auto sz = sizeof(std::exception_ptr);
+  std::exception_ptr tmp;
+  std::memcpy(static_cast<void*>(&tmp), &ptr_, sz);
+  std::memcpy(static_cast<void*>(&ptr_), &that.ptr_, sz);
+  std::memset(static_cast<void*>(&that.ptr_), 0, sz);
+  return *this;
+}
 
 inline void exception_wrapper::swap(exception_wrapper& that) noexcept {
-  exception_wrapper tmp(std::move(that));
-  that = std::move(*this);
-  *this = std::move(tmp);
+  // assume relocatability on all platforms
+  constexpr auto sz = sizeof(std::exception_ptr);
+  aligned_storage_for_t<std::exception_ptr> storage;
+  std::memcpy(&storage, &ptr_, sz);
+  std::memcpy(static_cast<void*>(&ptr_), &that.ptr_, sz);
+  std::memcpy(static_cast<void*>(&that.ptr_), &storage, sz);
 }
 
 inline exception_wrapper::operator bool() const noexcept {
-  return vptr_ != &uninit_;
+  return !!ptr_;
 }
 
 inline bool exception_wrapper::operator!() const noexcept {
-  return !static_cast<bool>(*this);
+  return !ptr_;
 }
 
 inline void exception_wrapper::reset() {
-  vptr_->delete_(this);
+  ptr_ = {};
 }
 
 inline bool exception_wrapper::has_exception_ptr() const noexcept {
-  return vptr_ == &ExceptionPtr::ops_;
+  return !!ptr_;
 }
 
 inline std::exception* exception_wrapper::get_exception() noexcept {
-  return const_cast<std::exception*>(vptr_->get_exception_(this));
+  return exception_ptr_get_object<std::exception>(ptr_);
 }
 inline std::exception const* exception_wrapper::get_exception() const noexcept {
-  return vptr_->get_exception_(this);
+  return exception_ptr_get_object<std::exception>(ptr_);
 }
 
 template <typename Ex>
 inline Ex* exception_wrapper::get_exception() noexcept {
-  constexpr auto stdexcept = std::is_base_of<std::exception, Ex>::value;
-  if (vptr_ == &ExceptionPtr::ops_) {
-    return exception_ptr_get_object<Ex>(eptr_.ptr_);
-  } else if (!stdexcept || vptr_ == &uninit_) {
-    return nullptr;
-  } else {
-    using Target = conditional_t<stdexcept, Ex, std::exception>;
-    auto const ptr = dynamic_cast<Target*>(get_exception());
-    return reinterpret_cast<Ex*>(ptr);
-  }
+  return exception_ptr_get_object<Ex>(ptr_);
 }
 
 template <typename Ex>
 inline Ex const* exception_wrapper::get_exception() const noexcept {
-  constexpr auto stdexcept = std::is_base_of<std::exception, Ex>::value;
-  if (vptr_ == &ExceptionPtr::ops_) {
-    return exception_ptr_get_object<Ex>(eptr_.ptr_);
-  } else if (!stdexcept || vptr_ == &uninit_) {
-    return nullptr;
-  } else {
-    using Target = conditional_t<stdexcept, Ex, std::exception>;
-    auto const ptr = dynamic_cast<Target const*>(get_exception());
-    return reinterpret_cast<Ex const*>(ptr);
-  }
+  return exception_ptr_get_object<Ex>(ptr_);
 }
 
-inline std::exception_ptr exception_wrapper::to_exception_ptr() noexcept {
-  if (*this) {
-    // Computing an exception_ptr is expensive so cache the result.
-    return (*this = vptr_->get_exception_ptr_(this)).eptr_.ptr_;
-  }
-  return {};
-}
 inline std::exception_ptr exception_wrapper::to_exception_ptr() const noexcept {
-  return vptr_->get_exception_ptr_(this).eptr_.ptr_;
+  return ptr_;
 }
 
-inline std::type_info const& exception_wrapper::none() noexcept {
-  return typeid(void);
-}
-
-inline std::type_info const& exception_wrapper::type() const noexcept {
-  return *vptr_->type_(this);
+inline std::type_info const* exception_wrapper::type() const noexcept {
+  return exception_ptr_get_type(ptr_);
 }
 
 inline folly::fbstring exception_wrapper::what() const {
@@ -449,18 +245,17 @@ inline folly::fbstring exception_wrapper::what() const {
 }
 
 inline folly::fbstring exception_wrapper::class_name() const {
-  auto& ti = type();
-  return ti == none() ? "" : folly::demangle(ti);
+  auto const* const ti = type();
+  return !*this ? "" : !ti ? "<unknown>" : folly::demangle(*ti);
 }
 
 template <class Ex>
 inline bool exception_wrapper::is_compatible_with() const noexcept {
-  return get_exception<Ex>();
+  return exception_ptr_get_object<Ex>(ptr_);
 }
 
 [[noreturn]] inline void exception_wrapper::throw_exception() const {
-  vptr_->throw_(this);
-  onNoExceptionError(__func__);
+  ptr_ ? std::rethrow_exception(ptr_) : onNoExceptionError(__func__);
 }
 
 template <class Ex>
@@ -473,8 +268,7 @@ template <class Ex>
 }
 
 template <class This, class Fn>
-inline bool exception_wrapper::with_exception_(
-    This&, Fn fn_, tag_t<AnyException>) {
+inline bool exception_wrapper::with_exception_(This&, Fn fn_, tag_t<void>) {
   return void(fn_()), true;
 }
 
@@ -490,7 +284,7 @@ inline bool exception_wrapper::with_exception_(This& this_, Fn fn_) {
   using from_ex = with_exception_from_ex_;
   using from = conditional_t<std::is_void<Ex>::value, from_fn, from_ex>;
   using type = typename from::template apply<Ex, Fn>;
-  return with_exception_(this_, fn_, tag<type>);
+  return with_exception_(this_, std::move(fn_), tag<type>);
 }
 
 template <class This, class... CatchFns>

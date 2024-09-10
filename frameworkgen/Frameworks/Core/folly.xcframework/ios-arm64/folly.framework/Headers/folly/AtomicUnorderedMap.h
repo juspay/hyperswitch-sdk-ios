@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <folly/Conv.h>
 #include <folly/Likely.h>
 #include <folly/Random.h>
+#include <folly/ScopeGuard.h>
 #include <folly/Traits.h>
 #include <folly/detail/AtomicUnorderedMapUtils.h>
 #include <folly/lang/Bits.h>
@@ -266,8 +267,14 @@ struct AtomicUnorderedInsertMap {
       return std::make_pair(ConstIterator(*this, existing), false);
     }
 
-    auto idx = allocateNear(slot);
-    new (&slots_[idx].keyValue().first) Key(key);
+    // The copying of key and the calling of func can throw exceptions. Nothing
+    // else in this function can throw an exception. In the event of an
+    // exception, deallocate as if the KV was beaten in a concurrent addition.
+    const auto idx = allocateNear(slot);
+    SCOPE_FAIL { slots_[idx].stateUpdate(CONSTRUCTING, EMPTY); };
+    Key* addr = &slots_[idx].keyValue().first;
+    new (addr) Key(key);
+    SCOPE_FAIL { addr->~Key(); };
     func(static_cast<void*>(&slots_[idx].keyValue().second));
 
     while (true) {
@@ -325,8 +332,10 @@ struct AtomicUnorderedInsertMap {
     }
     return ConstIterator(*this, slot);
   }
+  const_iterator begin() const { return cbegin(); }
 
   const_iterator cend() const { return ConstIterator(*this, 0); }
+  const_iterator end() const { return cend(); }
 
  private:
   enum : IndexType {
@@ -395,7 +404,7 @@ struct AtomicUnorderedInsertMap {
   size_t mmapRequested_;
   size_t numSlots_;
 
-  /// tricky, see keyToSlodIdx
+  /// tricky, see keyToSlotIdx
   size_t slotMask_;
 
   Allocator allocator_;
@@ -440,7 +449,7 @@ struct AtomicUnorderedInsertMap {
   /// tries, starting from the specified slot.  This is pulled out so we
   /// can specialize it differently during deterministic testing
   IndexType allocationAttempt(IndexType start, IndexType tries) const {
-    if (LIKELY(tries < 8 && start + tries < numSlots_)) {
+    if (FOLLY_LIKELY(tries < 8 && start + tries < numSlots_)) {
       return IndexType(start + tries);
     } else {
       IndexType rv;
@@ -486,7 +495,7 @@ using AtomicUnorderedInsertMap64 = AtomicUnorderedInsertMap<
     uint64_t,
     Allocator>;
 
-/// MutableAtom is a tiny wrapper than gives you the option of atomically
+/// MutableAtom is a tiny wrapper that gives you the option of atomically
 /// updating values inserted into an AtomicUnorderedInsertMap<K,
 /// MutableAtom<V>>.  This relies on AtomicUnorderedInsertMap's guarantee
 /// that it doesn't move values.
@@ -497,7 +506,7 @@ struct MutableAtom {
   explicit MutableAtom(const T& init) : data(init) {}
 };
 
-/// MutableData is a tiny wrapper than gives you the option of using an
+/// MutableData is a tiny wrapper that gives you the option of using an
 /// external concurrency control mechanism to updating values inserted
 /// into an AtomicUnorderedInsertMap.
 template <typename T>

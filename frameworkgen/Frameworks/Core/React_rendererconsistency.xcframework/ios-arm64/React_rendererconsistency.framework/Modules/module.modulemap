@@ -1,0 +1,6 @@
+framework module React_rendererconsistency {
+  umbrella header "React-rendererconsistency-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -23,6 +23,7 @@
 #import "RCTInterpolationAnimatedNode.h"
 #import "RCTModuloAnimatedNode.h"
 #import "RCTMultiplicationAnimatedNode.h"
+#import "RCTObjectAnimatedNode.h"
 #import "RCTPropsAnimatedNode.h"
 #import "RCTStyleAnimatedNode.h"
 #import "RCTSubtractionAnimatedNode.h"

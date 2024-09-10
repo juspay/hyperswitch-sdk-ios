@@ -11,7 +11,10 @@
 #endif
 
 #import "BridgeNativeModulePerfLogger.h"
+#import "HermesPerfettoDataSource.h"
 #import "NativeModulePerfLogger.h"
+#import "ReactPerfetto.h"
+#import "ReactPerfettoCategories.h"
 
 FOUNDATION_EXPORT double reactperfloggerVersionNumber;
 FOUNDATION_EXPORT const unsigned char reactperfloggerVersionString[];

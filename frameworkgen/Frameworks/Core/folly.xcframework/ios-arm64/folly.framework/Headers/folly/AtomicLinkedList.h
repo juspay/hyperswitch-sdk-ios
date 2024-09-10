@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,11 @@ class AtomicLinkedList {
   AtomicLinkedList(const AtomicLinkedList&) = delete;
   AtomicLinkedList& operator=(const AtomicLinkedList&) = delete;
   AtomicLinkedList(AtomicLinkedList&& other) noexcept = default;
-  AtomicLinkedList& operator=(AtomicLinkedList&& other) = default;
+  AtomicLinkedList& operator=(AtomicLinkedList&& other) noexcept {
+    list_.reverseSweepAndAssign(
+        std::move(other.list_), [](Wrapper* node) { delete node; });
+    return *this;
+  }
 
   ~AtomicLinkedList() {
     sweep([](T&&) {});

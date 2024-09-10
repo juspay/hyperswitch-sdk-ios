@@ -1,0 +1,6 @@
+framework module React_RuntimeApple {
+  umbrella header "React-RuntimeApple-umbrella.h"
+
+  export *
+  module * { export * }
+}

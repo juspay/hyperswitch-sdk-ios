@@ -1,16 +1,18 @@
-//
-//  PaymentViewWrapper.h
-//  react-native-klarna-payment-view
-//
-//  Created by Gabriel Banfalvi on 2019-07-24.
-//
-
-#import <UIKit/UIKit.h>
-#import <React/RCTView.h>
 #import <React/RCTUIManager.h>
+#import <UIKit/UIKit.h>
+
+#if RCT_NEW_ARCH_ENABLED
+#import <React/RCTViewComponentView.h>
+#else
+#import <AVFoundation/AVFoundation.h>
+#import <React/RCTView.h>
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
+#if RCT_NEW_ARCH_ENABLED
+@interface PaymentViewWrapper : RCTViewComponentView
+#else
 @interface PaymentViewWrapper : UIView
 
 @property (nonatomic, copy) RCTDirectEventBlock onInitialized;
@@ -20,17 +22,19 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) RCTDirectEventBlock onReauthorized;
 @property (nonatomic, copy) RCTDirectEventBlock onFinalized;
 @property (nonatomic, copy) RCTDirectEventBlock onError;
+@property (nonatomic, copy) RCTDirectEventBlock onResized;
 
 @property (nonatomic, strong) NSString* category;
+@property (nonatomic, strong) NSString* returnUrl;
+
+- (void) setCategory:(NSString *)category;
+#endif
 
 #pragma mark - React Native Overrides
-- (void) setCategory:(NSString *)category;
-- (void) evaluateProps;
-- (void) initializeActualPaymentView;
 
 @property (nonatomic, weak) RCTUIManager* uiManager;
 
-- (void) initializePaymentViewWithClientToken:(NSString*)clientToken withReturnUrl:(NSString*)returnUrl;
+- (void)initializePaymentViewWithClientToken:(NSString*)clientToken withReturnUrl:(NSString*)returnUrl;
 
 - (void)loadPaymentViewWithSessionData:(nullable NSString*)sessionData;
 
@@ -43,5 +47,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)finalizePaymentViewWithSessionData:(nullable NSString*)sessionData;
 
 @end
+
 
 NS_ASSUME_NONNULL_END

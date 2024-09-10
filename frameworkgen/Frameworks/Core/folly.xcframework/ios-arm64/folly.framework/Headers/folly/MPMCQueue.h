@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -522,7 +522,7 @@ class MPMCQueue<T, Atom, true>
   }
 
   /// Try to expand the queue. Returns true if this expansion was
-  /// successful or a concurent expansion is in progress. Returns
+  /// successful or a concurrent expansion is in progress. Returns
   /// false if the queue has reached its maximum capacity or
   /// allocation has failed.
   bool tryExpand(const uint64_t state, const size_t cap) noexcept {
@@ -563,7 +563,7 @@ class MPMCQueue<T, Atom, true>
       this->dstate_.store((ticket << kSeqlockBits) + (2 * (index + 1)));
       return true;
     } else { // failed to acquire seqlock
-      // Someone acaquired the seqlock. Go back to the caller and get
+      // Someone acquired the seqlock. Go back to the caller and get
       // up-to-date info.
       return true;
     }
@@ -903,8 +903,15 @@ class MPMCQueueBase<Derived<T, Atom, Dynamic>> {
     dequeueWithTicketBase(ticket, slots_, capacity_, stride_, elem);
   }
 
-  /// If an item can be dequeued with no blocking, does so and returns
-  /// true, otherwise returns false.
+  /// If an item can be dequeued with no blocking, does so and returns true,
+  /// otherwise returns false.
+  ///
+  /// Note that if the matching write is still in progress, this may return
+  /// false even if writes that have been started later have already
+  /// completed. If an external mechanism is used for counting completed writes
+  /// (for example a semaphore) to determine when an element is ready to
+  /// dequeue, readIfNotEmpty() should be used instead, which will wait for the
+  /// write in progress.
   bool read(T& elem) noexcept {
     uint64_t ticket;
     return readAndGetTicket(ticket, elem);
@@ -999,7 +1006,7 @@ class MPMCQueueBase<Derived<T, Atom, Dynamic>> {
     Atom<int> dstride_;
   };
 
-  /// The following two memebers are used by dynamic MPMCQueue.
+  /// The following two members are used by dynamic MPMCQueue.
   /// Ideally they should be in MPMCQueue<T,Atom,true>, but we get
   /// better cache locality if they are in the same cache line as
   /// dslots_ and dstride_.

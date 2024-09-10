@@ -1,0 +1,6 @@
+framework module React_featureflagsnativemodule {
+  umbrella header "React-featureflagsnativemodule-umbrella.h"
+
+  export *
+  module * { export * }
+}

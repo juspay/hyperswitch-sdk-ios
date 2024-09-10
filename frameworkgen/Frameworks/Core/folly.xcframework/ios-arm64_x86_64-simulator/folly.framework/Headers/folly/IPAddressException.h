@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+/**
+ * Error enums and exceptions for indicating errors when dealing with IP
+ * Addresses. Used in IPAddress, IPAddressV4, and IPAddressV6.
+ *
+ * @file IPAddressException.h
+ */
+
 #pragma once
 
 #include <exception>
@@ -22,16 +29,21 @@
 
 #include <folly/CPortability.h>
 #include <folly/detail/IPAddress.h>
+#include <folly/lang/Exception.h>
 
 namespace folly {
 
 /**
  * Error codes for non-throwing interface of IPAddress family of functions.
  */
-enum class IPAddressFormatError { INVALID_IP, UNSUPPORTED_ADDR_FAMILY };
+enum class IPAddressFormatError {
+  INVALID_IP,
+  UNSUPPORTED_ADDR_FAMILY,
+  NULL_SOCKADDR,
+};
 
 /**
- * Wraps error from parsing IP/MASK string
+ * Wraps errors from parsing IP/MASK string
  */
 enum class CIDRNetworkError {
   INVALID_DEFAULT_CIDR,
@@ -42,40 +54,29 @@ enum class CIDRNetworkError {
 };
 
 /**
- * Exception for invalid IP addresses.
+ * Exception that is thrown when dealing with invalid IP addresses. A subclass
+ * of `std::runtime_error`
  */
-class FOLLY_EXPORT IPAddressFormatException : public std::exception {
+class FOLLY_EXPORT IPAddressFormatException : public std::runtime_error {
  public:
-  explicit IPAddressFormatException(std::string msg) noexcept
-      : msg_(std::move(msg)) {}
-  IPAddressFormatException(const IPAddressFormatException&) = default;
-  IPAddressFormatException(IPAddressFormatException&&) = default;
-  IPAddressFormatException& operator=(const IPAddressFormatException&) =
-      default;
-  IPAddressFormatException& operator=(IPAddressFormatException&&) = default;
-
-  ~IPAddressFormatException() noexcept override {}
-  const char* what() const noexcept override { return msg_.c_str(); }
-
- private:
-  std::string msg_;
+  using std::runtime_error::runtime_error;
 };
 
+/**
+ * Exception that is thrown when an IP Address is not of the family expected
+ * (ie, expected a V4 but is a V6). A subclass of IPAddressFormatException.
+ */
 class FOLLY_EXPORT InvalidAddressFamilyException
     : public IPAddressFormatException {
  public:
-  explicit InvalidAddressFamilyException(std::string msg) noexcept
-      : IPAddressFormatException(std::move(msg)) {}
+  explicit InvalidAddressFamilyException(const char* msg)
+      : IPAddressFormatException{msg} {}
+  explicit InvalidAddressFamilyException(const std::string& msg) noexcept
+      : IPAddressFormatException{msg} {}
   explicit InvalidAddressFamilyException(sa_family_t family) noexcept
       : InvalidAddressFamilyException(
             "Address family " + detail::familyNameStr(family) +
             " is not AF_INET or AF_INET6") {}
-  InvalidAddressFamilyException(const InvalidAddressFamilyException&) = default;
-  InvalidAddressFamilyException(InvalidAddressFamilyException&&) = default;
-  InvalidAddressFamilyException& operator=(
-      const InvalidAddressFamilyException&) = default;
-  InvalidAddressFamilyException& operator=(InvalidAddressFamilyException&&) =
-      default;
 };
 
 } // namespace folly

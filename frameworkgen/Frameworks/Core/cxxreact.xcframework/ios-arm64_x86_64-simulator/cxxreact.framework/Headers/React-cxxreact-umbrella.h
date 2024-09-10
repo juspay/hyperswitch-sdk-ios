@@ -24,6 +24,7 @@
 #import "MessageQueueThread.h"
 #import "MethodCall.h"
 #import "ModuleRegistry.h"
+#import "MoveWrapper.h"
 #import "NativeModule.h"
 #import "NativeToJsBridge.h"
 #import "RAMBundleRegistry.h"

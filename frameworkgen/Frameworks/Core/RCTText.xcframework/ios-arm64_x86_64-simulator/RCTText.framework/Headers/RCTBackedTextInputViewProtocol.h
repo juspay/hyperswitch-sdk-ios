@@ -18,6 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) NSString *placeholder;
 @property (nonatomic, strong, nullable) UIColor *placeholderColor;
 @property (nonatomic, assign, readonly) BOOL textWasPasted;
+@property (nonatomic, assign, readonly) BOOL dictationRecognizing;
 @property (nonatomic, assign) UIEdgeInsets textContainerInset;
 @property (nonatomic, strong, nullable) UIView *inputAccessoryView;
 @property (nonatomic, strong, nullable) UIView *inputView;
@@ -42,6 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 // If the change was a result of user actions (like typing or touches), we MUST notify the delegate.
 - (void)setSelectedTextRange:(nullable UITextRange *)selectedTextRange NS_UNAVAILABLE;
 - (void)setSelectedTextRange:(nullable UITextRange *)selectedTextRange notifyDelegate:(BOOL)notifyDelegate;
+- (void)scrollRangeToVisible:(NSRange)selectedTextRange;
 
 // This protocol disallows direct access to `text` property because
 // unwise usage of it can break the `attributeText` behavior.

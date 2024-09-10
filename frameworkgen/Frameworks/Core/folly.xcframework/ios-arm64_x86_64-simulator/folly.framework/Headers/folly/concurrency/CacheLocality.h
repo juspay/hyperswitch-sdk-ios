@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,15 @@
 #include <cassert>
 #include <functional>
 #include <limits>
-#include <mutex>
 #include <string>
 #include <type_traits>
-#include <unordered_map>
 #include <vector>
 
-#include <folly/Indestructible.h>
 #include <folly/Likely.h>
-#include <folly/Memory.h>
 #include <folly/Portability.h>
 #include <folly/lang/Align.h>
 #include <folly/lang/Exception.h>
+#include <folly/synchronization/AtomicRef.h>
 
 namespace folly {
 
@@ -190,7 +187,7 @@ class AccessSpreaderBase {
       kMaxCpus - 1 <= std::numeric_limits<CompactStripe>::max(),
       "stripeByCpu element type isn't wide enough");
 
-  using CompactStripeTable = std::atomic<CompactStripe>[kMaxCpus + 1][kMaxCpus];
+  using CompactStripeTable = CompactStripe[kMaxCpus + 1][kMaxCpus];
 
   struct GlobalState {
     /// For each level of splitting up to kMaxCpus, maps the cpu (mod
@@ -198,17 +195,13 @@ class AccessSpreaderBase {
     /// or modulo on the actual number of cpus, we just fill in the entire
     /// array.
     /// Keep as the first field to avoid extra + in the fastest path.
-    CompactStripeTable table;
+    mutable CompactStripeTable table;
 
     /// Points to the getcpu-like function we are using to obtain the
     /// current cpu. It should not be assumed that the returned cpu value
     /// is in range.
     std::atomic<Getcpu::Func> getcpu; // nullptr -> not initialized
   };
-  static_assert(
-      is_constexpr_default_constructible_v<GlobalState> &&
-          std::is_trivially_destructible<GlobalState>::value,
-      "unsuitable for global state");
 
   /// Always claims to be on CPU zero, node zero
   static int degenerateGetcpu(unsigned* cpu, unsigned* node, void*);
@@ -258,11 +251,12 @@ struct AccessSpreader : private detail::AccessSpreaderBase {
  private:
   struct GlobalState : detail::AccessSpreaderBase::GlobalState {};
   static_assert(
-      std::is_trivial<GlobalState>::value || kCpplibVer, "not trivial");
+      std::is_trivially_destructible<GlobalState>::value,
+      "unsuitable for global state");
 
  public:
   FOLLY_EXPORT static GlobalState& state() {
-    static GlobalState state; // trivial for zero ctor and zero dtor
+    static FOLLY_CONSTINIT GlobalState state{};
     if (FOLLY_UNLIKELY(!state.getcpu.load(std::memory_order_acquire))) {
       initialize(state);
     }
@@ -278,8 +272,9 @@ struct AccessSpreader : private detail::AccessSpreaderBase {
 
     unsigned cpu;
     s.getcpu.load(std::memory_order_relaxed)(&cpu, nullptr, nullptr);
-    return s.table[std::min(size_t(kMaxCpus), numStripes)][cpu % kMaxCpus].load(
-        std::memory_order_relaxed);
+    cpu = cpu % kMaxCpus;
+    auto& ref = s.table[std::min(size_t(kMaxCpus), numStripes)][cpu];
+    return make_atomic_ref(ref).load(std::memory_order_relaxed);
   }
 
   /// Returns the stripe associated with the current CPU.  The returned
@@ -291,22 +286,47 @@ struct AccessSpreader : private detail::AccessSpreaderBase {
   static size_t cachedCurrent(
       size_t numStripes, const GlobalState& s = state()) {
     if (kIsMobile) {
-      return current(numStripes);
+      return current(numStripes, s);
     }
-    return s.table[std::min(size_t(kMaxCpus), numStripes)][cpuCache().cpu(s)]
-        .load(std::memory_order_relaxed);
+    unsigned cpu = cpuCache().cpu(s);
+    auto& ref = s.table[std::min(size_t(kMaxCpus), numStripes)][cpu];
+    return make_atomic_ref(ref).load(std::memory_order_relaxed);
+  }
+
+  /// Forces the next cachedCurrent() call in this thread to re-probe the
+  /// current CPU.
+  static void invalidateCachedCurrent() {
+    if (kIsMobile) {
+      return;
+    }
+    cpuCache().invalidate();
+  }
+
+  /// Returns a canonical index in [0, maxLocalityIndexValue()) for each
+  /// stripe. This can be used to share global data structures accessed with
+  /// different stripings. For optimal spread, it is best for numStripes to be a
+  /// divisor of the number of L1 caches.
+  static size_t localityIndexForStripe(size_t numStripes, size_t stripe) {
+    assert(stripe < numStripes);
+    return stripe *
+        std::min(size_t(kMaxCpus), CacheLocality::system<Atom>().numCpus) /
+        numStripes;
   }
 
   /// Returns the maximum stripe value that can be returned under any
   /// dynamic configuration, based on the current compile-time platform
   static constexpr size_t maxStripeValue() { return kMaxCpus; }
 
+  /// Returns the maximum locality index value that can be returned under any
+  /// dynamic configuration, based on the current compile-time platform
+  static constexpr size_t maxLocalityIndexValue() { return kMaxCpus; }
+
  private:
   /// Caches the current CPU and refreshes the cache every so often.
   class CpuCache {
    public:
     unsigned cpu(GlobalState const& s) {
-      if (UNLIKELY(cachedCpuUses_-- == 0)) {
+      if (FOLLY_UNLIKELY(cachedCpuUses_-- == 0)) {
         unsigned cpu;
         s.getcpu.load(std::memory_order_relaxed)(&cpu, nullptr, nullptr);
         cachedCpu_ = cpu % kMaxCpus;
@@ -315,11 +335,13 @@ struct AccessSpreader : private detail::AccessSpreaderBase {
       return cachedCpu_;
     }
 
+    void invalidate() { cachedCpuUses_ = 0; }
+
    private:
     static constexpr unsigned kMaxCachedCpuUses = 32;
 
-    unsigned cachedCpu_;
-    unsigned cachedCpuUses_;
+    unsigned cachedCpu_ = 0;
+    unsigned cachedCpuUses_ = 0;
   };
 
   FOLLY_EXPORT FOLLY_ALWAYS_INLINE static CpuCache& cpuCache() {
@@ -353,144 +375,76 @@ struct AccessSpreader : private detail::AccessSpreaderBase {
 };
 
 /**
- * A simple freelist allocator.  Allocates things of size sz, from
- * slabs of size allocSize.  Takes a lock on each
- * allocation/deallocation.
+ * An allocator that can be used with AccessSpreader to allocate core-local
+ * memory.
+ *
+ * There is actually nothing special about the memory itself (it is not bound to
+ * NUMA nodes or anything), but the allocator guarantees that memory allocatd
+ * from the same stripe will only come from cache lines also allocated to the
+ * same stripe, for the given numStripes.  This means multiple things using
+ * AccessSpreader can allocate memory in smaller-than cacheline increments, and
+ * be assured that it won't cause more false sharing than it otherwise would.
+ *
+ * Note that allocation and deallocation takes a per-size-class lock.
+ *
+ * Memory allocated with coreMalloc() must be freed with coreFree().
  */
-class SimpleAllocator {
-  std::mutex m_;
-  uint8_t* mem_{nullptr};
-  uint8_t* end_{nullptr};
-  void* freelist_{nullptr};
-  size_t allocSize_;
-  size_t sz_;
-  std::vector<void*> blocks_;
+void* coreMalloc(size_t size, size_t numStripes, size_t stripe);
+void coreFree(void* ptr);
 
- public:
-  SimpleAllocator(size_t allocSize, size_t sz);
-  ~SimpleAllocator();
-  void* allocateHard();
-
-  // Inline fast-paths.
-  void* allocate() {
-    std::lock_guard<std::mutex> g(m_);
-    // Freelist allocation.
-    if (freelist_) {
-      auto mem = freelist_;
-      freelist_ = *static_cast<void**>(freelist_);
-      return mem;
-    }
-
-    // Bump-ptr allocation.
-    if (intptr_t(mem_) % 128 == 0) {
-      // Avoid allocating pointers that may look like malloc
-      // pointers.
-      mem_ += std::min(sz_, max_align_v);
-    }
-    if (mem_ && (mem_ + sz_ <= end_)) {
-      auto mem = mem_;
-      mem_ += sz_;
-
-      assert(intptr_t(mem) % 128 != 0);
-      return mem;
-    }
-
-    return allocateHard();
-  }
-  void deallocate(void* mem) {
-    std::lock_guard<std::mutex> g(m_);
-    *static_cast<void**>(mem) = freelist_;
-    freelist_ = mem;
-  }
-};
+namespace detail {
+void* coreMallocFromGuard(size_t size);
+}
 
 /**
- * An allocator that can be used with CacheLocality to allocate
- * core-local memory.
+ * An C++ allocator adapter for coreMalloc/Free. The allocator is stateless, to
+ * avoid increasing the footprint of the container that uses it, so the stripe
+ * needs to be passed out of band: allocate() can only be called while there is
+ * an active CoreAllocatorGuard. deallocate() can instead be called at any
+ * point.
  *
- * There is actually nothing special about the memory itself (it is
- * not bound to numa nodes or anything), but the allocator guarantees
- * that memory allocatd from the same stripe will only come from cache
- * lines also allocated to the same stripe.  This means multiple
- * things using CacheLocality can allocate memory in smaller-than
- * cacheline increments, and be assured that it won't cause more false
- * sharing than it otherwise would.
- *
- * Note that allocation and deallocation takes a per-sizeclass lock.
+ * This makes CoreAllocator unsuitable for containers that can grow, and it is
+ * meant for container where all allocations happen at construction time.
  */
-template <size_t Stripes>
-class CoreRawAllocator {
+template <typename T>
+class CoreAllocator : private std::allocator<T> {
  public:
-  class Allocator {
-    static constexpr size_t AllocSize{4096};
+  using value_type = T;
 
-    uint8_t sizeClass(size_t size) {
-      if (size <= 8) {
-        return 0;
-      } else if (size <= 16) {
-        return 1;
-      } else if (size <= 32) {
-        return 2;
-      } else if (size <= 64) {
-        return 3;
-      } else { // punt to malloc.
-        return 4;
-      }
-    }
+  CoreAllocator() = default;
 
-    std::array<SimpleAllocator, 4> allocators_{
-        {{AllocSize, 8}, {AllocSize, 16}, {AllocSize, 32}, {AllocSize, 64}}};
+  template <class U>
+  /* implicit */ CoreAllocator(const CoreAllocator<U>&) {}
 
-   public:
-    void* allocate(size_t size) {
-      auto cl = sizeClass(size);
-      if (cl == 4) {
-        // Align to a cacheline
-        size = size + (hardware_destructive_interference_size - 1);
-        size &= ~size_t(hardware_destructive_interference_size - 1);
-        void* mem =
-            aligned_malloc(size, hardware_destructive_interference_size);
-        if (!mem) {
-          throw_exception<std::bad_alloc>();
-        }
-        return mem;
-      }
-      return allocators_[cl].allocate();
-    }
-    void deallocate(void* mem, size_t = 0) {
-      if (!mem) {
-        return;
-      }
-
-      // See if it came from this allocator or malloc.
-      if (intptr_t(mem) % 128 != 0) {
-        auto addr =
-            reinterpret_cast<void*>(intptr_t(mem) & ~intptr_t(AllocSize - 1));
-        auto allocator = *static_cast<SimpleAllocator**>(addr);
-        allocator->deallocate(mem);
-      } else {
-        aligned_free(mem);
-      }
-    }
-  };
-
-  Allocator* get(size_t stripe) {
-    assert(stripe < Stripes);
-    return &allocators_[stripe];
+  T* allocate(std::size_t n) {
+    return reinterpret_cast<T*>(detail::coreMallocFromGuard(n * sizeof(T)));
   }
 
- private:
-  Allocator allocators_[Stripes];
+  void deallocate(T* p, std::size_t) { coreFree(p); }
+
+  friend bool operator==(const CoreAllocator&, const CoreAllocator&) noexcept {
+    return true;
+  }
+  friend bool operator!=(const CoreAllocator&, const CoreAllocator&) noexcept {
+    return false;
+  }
+
+  template <typename U>
+  struct rebind {
+    using other = CoreAllocator<U>;
+  };
 };
 
-template <typename T, size_t Stripes>
-CxxAllocatorAdaptor<T, typename CoreRawAllocator<Stripes>::Allocator>
-getCoreAllocator(size_t stripe) {
-  // We cannot make sure that the allocator will be destroyed after
-  // all the objects allocated with it, so we leak it.
-  static Indestructible<CoreRawAllocator<Stripes>> allocator;
-  return CxxAllocatorAdaptor<T, typename CoreRawAllocator<Stripes>::Allocator>(
-      *allocator->get(stripe));
-}
+class FOLLY_NODISCARD CoreAllocatorGuard {
+ public:
+  CoreAllocatorGuard(size_t numStripes, size_t stripe);
+  ~CoreAllocatorGuard();
+
+ private:
+  friend void* detail::coreMallocFromGuard(size_t size);
+
+  size_t numStripes_;
+  size_t stripe_;
+};
 
 } // namespace folly

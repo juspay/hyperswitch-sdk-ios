@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,46 @@
 namespace folly {
 
 namespace detail {
+
+using lsan_ignore_object_t = void(void const*);
+using lsan_register_root_region_t = void(void const*, std::size_t);
+using lsan_unregister_root_region_t = void(void const*, std::size_t);
+
+extern lsan_ignore_object_t* const lsan_ignore_object_v;
+extern lsan_register_root_region_t* const lsan_register_root_region_v;
+extern lsan_unregister_root_region_t* const lsan_unregister_root_region_v;
+
 void annotate_object_leaked_impl(void const* ptr);
 void annotate_object_collected_impl(void const* ptr);
+
 } // namespace detail
+
+//  lsan_ignore_object
+//
+//  Marks an allocation to be treated as a root when Leak Sanitizer scans for
+//  leaked allocations.
+FOLLY_ALWAYS_INLINE static void lsan_ignore_object(void const* const ptr) {
+  auto fun = detail::lsan_ignore_object_v;
+  return kIsSanitizeAddress && fun ? fun(ptr) : void();
+}
+
+//  lsan_register_root_region
+//
+//  Marks a region as a root for Leak Sanitizer scans.
+FOLLY_ALWAYS_INLINE static void lsan_register_root_region(
+    void const* const ptr, std::size_t const size) {
+  auto fun = detail::lsan_register_root_region_v;
+  return kIsSanitizeAddress && fun ? fun(ptr, size) : void();
+}
+
+//  lsan_unregister_root_region
+//
+//  Marks a region as a root for Leak Sanitizer scans.
+FOLLY_ALWAYS_INLINE static void lsan_unregister_root_region(
+    void const* const ptr, std::size_t const size) {
+  auto fun = detail::lsan_unregister_root_region_v;
+  return kIsSanitizeAddress && fun ? fun(ptr, size) : void();
+}
 
 /**
  * When the current compilation unit is being compiled with ASAN enabled this
@@ -36,7 +73,7 @@ void annotate_object_collected_impl(void const* ptr);
  */
 FOLLY_ALWAYS_INLINE static void annotate_object_leaked(void const* ptr) {
   if (kIsSanitizeAddress) {
-    detail::annotate_object_leaked_impl(static_cast<void const*>(ptr));
+    detail::annotate_object_leaked_impl(ptr);
   }
 }
 
@@ -48,7 +85,7 @@ FOLLY_ALWAYS_INLINE static void annotate_object_leaked(void const* ptr) {
  */
 FOLLY_ALWAYS_INLINE static void annotate_object_collected(void const* ptr) {
   if (kIsSanitizeAddress) {
-    detail::annotate_object_collected_impl(static_cast<void const*>(ptr));
+    detail::annotate_object_collected_impl(ptr);
   }
 }
 } // namespace folly

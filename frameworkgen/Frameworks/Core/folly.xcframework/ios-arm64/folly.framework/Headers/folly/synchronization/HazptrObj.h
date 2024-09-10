@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,6 @@ class hazptr_obj {
   template <typename, template <typename> class, typename>
   friend class hazptr_obj_base_linked;
   friend class hazptr_obj_list<Atom>;
-  friend class hazptr_priv<Atom>;
   friend class hazptr_detail::linked_list<Obj>;
   friend class hazptr_detail::shared_head_only_list<Obj, Atom>;
   friend class hazptr_detail::shared_head_tail_list<Obj, Atom>;
@@ -147,10 +146,7 @@ class hazptr_obj {
   friend class hazptr_domain<Atom>;
   template <typename, template <typename> class, typename>
   friend class hazptr_obj_base;
-  template <typename, template <typename> class, typename>
-  friend class hazptr_obj_base_refcounted;
   friend class hazptr_obj_cohort<Atom>;
-  friend class hazptr_priv<Atom>;
 
   Obj* next() const noexcept { return next_; }
 
@@ -178,14 +174,8 @@ class hazptr_obj {
   }
 
   void push_to_retired(hazptr_domain<Atom>& domain) {
-#if FOLLY_HAZPTR_THR_LOCAL
-    if (&domain == &default_hazptr_domain<Atom>() && !domain.shutdown_) {
-      hazptr_priv_tls<Atom>().push(this);
-      return;
-    }
-#endif
     hazptr_obj_list<Atom> l(this);
-    hazptr_domain_push_retired(l, true, domain);
+    hazptr_domain_push_retired(l, domain);
   }
 
   FOLLY_NOINLINE void pre_retire_check_fail() noexcept {
@@ -374,7 +364,13 @@ class hazptr_obj_cohort {
         (*(obj->reclaim()))(obj, children);
         obj = next;
       }
-      obj = children.head();
+      if (!children.empty()) {
+        if (active()) {
+          hazptr_domain_push_retired<Atom>(children);
+        } else {
+          obj = children.head();
+        }
+      }
     }
   }
 
@@ -395,7 +391,7 @@ class hazptr_obj_cohort {
           }
         }
         hazptr_obj_list<Atom> l(ll.head(), ll.tail(), c);
-        hazptr_domain_push_list<Atom>(l);
+        hazptr_domain_push_retired<Atom>(l);
         return;
       }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,7 +107,7 @@ template <
     typename KeyEqualOrVoid,
     typename AllocOrVoid,
     typename ItemType>
-struct BasePolicy
+struct FOLLY_MSVC_DECLSPEC(empty_bases) BasePolicy
     : private ObjectHolder<
           'H',
           Defaulted<HasherOrVoid, DefaultHasher<KeyType>>>,
@@ -154,6 +154,17 @@ struct BasePolicy
   struct AllocIsAlwaysEqual<A, typename A::is_always_equal>
       : A::is_always_equal {};
 
+  // Detection for folly_assume_32bit_hash
+
+  template <typename Hasher, typename Void = void>
+  struct ShouldAssume32BitHash : bool_constant<!sizeof(Hasher)> {};
+
+  template <typename Hasher>
+  struct ShouldAssume32BitHash<
+      Hasher,
+      void_t<typename Hasher::folly_assume_32bit_hash>>
+      : bool_constant<Hasher::folly_assume_32bit_hash::value> {};
+
  public:
   static constexpr bool kAllocIsAlwaysEqual = AllocIsAlwaysEqual<Alloc>::value;
 
@@ -167,6 +178,10 @@ struct BasePolicy
 
   static constexpr bool isAvalanchingHasher() {
     return IsAvalanchingHasher<Hasher, Key>::value;
+  }
+
+  static constexpr bool shouldAssume32BitHash() {
+    return ShouldAssume32BitHash<Hasher>::value;
   }
 
   //////// internal types and constants
@@ -517,6 +532,17 @@ class ValueContainerPolicy : public BasePolicy<
   using Item = typename Super::Item;
   using ItemIter = typename Super::ItemIter;
   using Value = typename Super::Value;
+  using KeyEqual = typename Super::KeyEqual;
+  using Hasher = typename Super::Hasher;
+  using Mapped = typename Super::Mapped;
+
+  static constexpr bool kDefaultConstructIsNoexcept =
+      Super::kDefaultConstructIsNoexcept;
+  static constexpr bool kAllocIsAlwaysEqual = Super::kAllocIsAlwaysEqual;
+  static constexpr bool kEnableItemIteration = Super::kEnableItemIteration;
+  static constexpr bool kContinuousCapacity = Super::kContinuousCapacity;
+  static constexpr auto isAvalanchingHasher = Super::isAvalanchingHasher;
+  static constexpr bool kSwapIsNoexcept = Super::kSwapIsNoexcept;
 
  private:
   using ByteAlloc = typename Super::ByteAlloc;
@@ -926,7 +952,7 @@ class VectorContainerIterator : public BaseIter<ValuePtr, uint32_t> {
   pointer operator->() const { return current_; }
 
   VectorContainerIterator& operator++() {
-    if (UNLIKELY(current_ == lowest_)) {
+    if (FOLLY_UNLIKELY(current_ == lowest_)) {
       current_ = nullptr;
     } else {
       --current_;
@@ -1425,7 +1451,8 @@ class VectorContainerPolicy : public BasePolicy<
   // Iterator stuff
 
   Iter linearBegin(std::size_t size) const {
-    return Iter{(size > 0 ? values_ + size - 1 : nullptr), values_};
+    return size > 0 ? Iter{values_ + size - 1, values_}
+                    : Iter{nullptr, nullptr};
   }
 
   Iter linearEnd() const { return Iter{nullptr, nullptr}; }

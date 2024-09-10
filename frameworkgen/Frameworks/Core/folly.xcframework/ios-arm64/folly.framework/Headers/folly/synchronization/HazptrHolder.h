@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #pragma once
 
 #include <folly/Traits.h>
-#include <folly/synchronization/AsymmetricMemoryBarrier.h>
+#include <folly/synchronization/AsymmetricThreadFence.h>
 #include <folly/synchronization/Hazptr-fwd.h>
 #include <folly/synchronization/HazptrDomain.h>
 #include <folly/synchronization/HazptrRec.h>
@@ -79,24 +79,24 @@ class hazptr_holder {
 
   /** Destructor */
   FOLLY_ALWAYS_INLINE ~hazptr_holder() {
-    if (LIKELY(hprec_ != nullptr)) {
+    if (FOLLY_LIKELY(hprec_ != nullptr)) {
       hprec_->reset_hazptr();
       auto domain = hprec_->domain();
 #if FOLLY_HAZPTR_THR_LOCAL
-      if (LIKELY(domain == &default_hazptr_domain<Atom>())) {
-        if (LIKELY(hazptr_tc_tls<Atom>().try_put(hprec_))) {
+      if (FOLLY_LIKELY(domain == &default_hazptr_domain<Atom>())) {
+        if (FOLLY_LIKELY(hazptr_tc_tls<Atom>().try_put(hprec_))) {
           return;
         }
       }
 #endif
-      domain->hprec_release(hprec_);
+      domain->release_hprec(hprec_);
     }
   }
 
   /** Move operator */
   FOLLY_ALWAYS_INLINE hazptr_holder& operator=(hazptr_holder&& rhs) noexcept {
     /* Self-move is a no-op.  */
-    if (LIKELY(this != &rhs)) {
+    if (FOLLY_LIKELY(this != &rhs)) {
       this->~hazptr_holder();
       new (this) hazptr_holder(rhs.hprec_);
       rhs.hprec_ = nullptr;
@@ -119,9 +119,10 @@ class hazptr_holder {
        for stealing bits of the pointer word */
     auto p = ptr;
     reset_protection(f(p));
-    /*** Full fence ***/ folly::asymmetricLightBarrier();
+    /*** Full fence ***/ folly::asymmetric_thread_fence_light(
+        std::memory_order_seq_cst);
     ptr = src.load(std::memory_order_acquire);
-    if (UNLIKELY(p != ptr)) {
+    if (FOLLY_UNLIKELY(p != ptr)) {
       reset_protection();
       return false;
     }
@@ -138,7 +139,7 @@ class hazptr_holder {
   FOLLY_ALWAYS_INLINE T* protect(const Atom<T*>& src, Func f) noexcept {
     T* ptr = src.load(std::memory_order_relaxed);
     while (!try_protect(ptr, src, f)) {
-      /* Keep trying */;
+      /* Keep trying */
     }
     return ptr;
   }
@@ -182,14 +183,16 @@ template <template <typename> class Atom>
 FOLLY_ALWAYS_INLINE hazptr_holder<Atom> make_hazard_pointer(
     hazptr_domain<Atom>& domain) {
 #if FOLLY_HAZPTR_THR_LOCAL
-  if (LIKELY(&domain == &default_hazptr_domain<Atom>())) {
+  if (FOLLY_LIKELY(&domain == &default_hazptr_domain<Atom>())) {
     auto hprec = hazptr_tc_tls<Atom>().try_get();
-    if (LIKELY(hprec != nullptr)) {
+    if (FOLLY_LIKELY(hprec != nullptr)) {
       return hazptr_holder<Atom>(hprec);
     }
   }
 #endif
-  auto hprec = domain.hprec_acquire();
+  auto hprec = domain.acquire_hprecs(1);
+  DCHECK(hprec);
+  DCHECK(hprec->next_avail() == nullptr);
   return hazptr_holder<Atom>(hprec);
 }
 
@@ -270,7 +273,7 @@ class hazptr_array {
     auto& tc = hazptr_tc_tls<Atom>();
     auto count = tc.count();
     auto cap = hazptr_tc<Atom>::capacity();
-    if (UNLIKELY((M + count) > cap)) {
+    if (FOLLY_UNLIKELY((M + count) > cap)) {
       tc.evict((M + count) - cap);
       count = cap - M;
     }
@@ -319,7 +322,7 @@ FOLLY_ALWAYS_INLINE hazptr_array<M, Atom> make_hazard_pointer_array() {
       "M must be within the thread cache capacity.");
   auto& tc = hazptr_tc_tls<Atom>();
   auto count = tc.count();
-  if (UNLIKELY(M > count)) {
+  if (FOLLY_UNLIKELY(M > count)) {
     tc.fill(M - count);
     count = M;
   }
@@ -331,9 +334,15 @@ FOLLY_ALWAYS_INLINE hazptr_array<M, Atom> make_hazard_pointer_array() {
   }
   tc.set_count(offset);
 #else
+  auto hprec = hazard_pointer_default_domain<Atom>().acquire_hprecs(M);
   for (uint8_t i = 0; i < M; ++i) {
-    new (&h[i]) hazptr_holder<Atom>(make_hazard_pointer<Atom>());
+    DCHECK(hprec);
+    auto next = hprec->next_avail();
+    hprec->set_next_avail(nullptr);
+    new (&h[i]) hazptr_holder<Atom>(hprec);
+    hprec = next;
   }
+  DCHECK(hprec == nullptr);
 #endif
   a.empty_ = false;
   return a;
@@ -368,7 +377,7 @@ class hazptr_local {
         "M must be <= hazptr_tc::capacity().");
     auto& tc = hazptr_tc_tls<Atom>();
     auto count = tc.count();
-    if (UNLIKELY(M > count)) {
+    if (FOLLY_UNLIKELY(M > count)) {
       tc.fill(M - count);
     }
     if (kIsDebug) {

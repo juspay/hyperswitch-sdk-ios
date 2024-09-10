@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -299,7 +299,7 @@ AtomicHashMap<
   typename SubMap::SimpleRetT ret =
       primaryMap
           ->template findInternal<LookupKeyT, LookupHashFcn, LookupEqualFcn>(k);
-  if (LIKELY(ret.idx != primaryMap->capacity_)) {
+  if (FOLLY_LIKELY(ret.idx != primaryMap->capacity_)) {
     return SimpleRetT(0, ret.idx, ret.success);
   }
   const unsigned int numMaps =
@@ -311,7 +311,7 @@ AtomicHashMap<
         thisMap
             ->template findInternal<LookupKeyT, LookupHashFcn, LookupEqualFcn>(
                 k);
-    if (LIKELY(ret.idx != thisMap->capacity_)) {
+    if (FOLLY_LIKELY(ret.idx != thisMap->capacity_)) {
       return SimpleRetT(i, ret.idx, ret.success);
     }
   }

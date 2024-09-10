@@ -10,9 +10,11 @@
 #endif
 #endif
 
-#import "ReactCommon/RCTBlockGuard.h"
+#import "ReactCommon/RCTInteropTurboModule.h"
+#import "ReactCommon/RCTRuntimeExecutor.h"
 #import "ReactCommon/RCTTurboModule.h"
 #import "ReactCommon/RCTTurboModuleManager.h"
+#import "ReactCommon/RCTTurboModuleWithJSIBindings.h"
 
 FOUNDATION_EXPORT double React_NativeModulesAppleVersionNumber;
 FOUNDATION_EXPORT const unsigned char React_NativeModulesAppleVersionString[];

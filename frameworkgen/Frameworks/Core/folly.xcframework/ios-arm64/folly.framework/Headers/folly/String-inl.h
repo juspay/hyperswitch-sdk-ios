@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,7 +179,7 @@ void uriEscape(StringPiece str, String& out, UriEscapeMode mode) {
     char c = *p;
     unsigned char v = static_cast<unsigned char>(c);
     unsigned char discriminator = detail::uriEscapeTable[v];
-    if (LIKELY(discriminator <= minEncode)) {
+    if (FOLLY_LIKELY(discriminator <= minEncode)) {
       ++p;
     } else if (mode == UriEscapeMode::QUERY && discriminator == 3) {
       out.append(&*last, size_t(p - last));
@@ -199,7 +199,7 @@ void uriEscape(StringPiece str, String& out, UriEscapeMode mode) {
 }
 
 template <class String>
-void uriUnescape(StringPiece str, String& out, UriEscapeMode mode) {
+bool tryUriUnescape(StringPiece str, String& out, UriEscapeMode mode) {
   out.reserve(out.size() + str.size());
   auto p = str.begin();
   auto last = p;
@@ -209,15 +209,13 @@ void uriUnescape(StringPiece str, String& out, UriEscapeMode mode) {
     char c = *p;
     switch (c) {
       case '%': {
-        if (UNLIKELY(std::distance(p, str.end()) < 3)) {
-          throw_exception<std::invalid_argument>(
-              "incomplete percent encode sequence");
+        if (FOLLY_UNLIKELY(std::distance(p, str.end()) < 3)) {
+          return false;
         }
         auto h1 = detail::hexTable[static_cast<unsigned char>(p[1])];
         auto h2 = detail::hexTable[static_cast<unsigned char>(p[2])];
-        if (UNLIKELY(h1 == 16 || h2 == 16)) {
-          throw_exception<std::invalid_argument>(
-              "invalid percent encode sequence");
+        if (FOLLY_UNLIKELY(h1 == 16 || h2 == 16)) {
+          return false;
         }
         out.append(&*last, size_t(p - last));
         out.push_back((h1 << 4) | h2);
@@ -241,6 +239,19 @@ void uriUnescape(StringPiece str, String& out, UriEscapeMode mode) {
     }
   }
   out.append(&*last, size_t(p - last));
+
+  return true;
+}
+
+template <class String>
+void uriUnescape(StringPiece str, String& out, UriEscapeMode mode) {
+  auto success = tryUriUnescape(str, out, mode);
+
+  if (!success) {
+    // tryUriEscape implementation only fails on invalid argument
+    throw_exception<std::invalid_argument>(
+        "imcomplete percent encode sequence");
+  }
 }
 
 namespace detail {
@@ -264,14 +275,40 @@ inline bool atDelim(const char* s, StringPiece sp) {
 
 // These are used to short-circuit internalSplit() in the case of
 // 1-character strings.
-inline char delimFront(char c) {
+inline char delimFront(char) {
   // This one exists only for compile-time; it should never be called.
   std::abort();
-  return c;
 }
 inline char delimFront(StringPiece s) {
   assert(!s.empty() && s.start() != nullptr);
   return *s.start();
+}
+
+template <class OutStringT, class DelimT, class OutputIterator>
+void internalSplit(
+    DelimT delim, StringPiece sp, OutputIterator out, bool ignoreEmpty);
+
+template <class OutStringT, class Container>
+std::enable_if_t<
+    IsSplitSupportedContainer<Container>::value &&
+    HasSimdSplitCompatibleValueType<Container>::value>
+internalSplitRecurseChar(
+    char delim,
+    folly::StringPiece sp,
+    std::back_insert_iterator<Container> it,
+    bool ignoreEmpty) {
+  using base = std::back_insert_iterator<Container>;
+  struct accessor : base {
+    accessor(base b) : base(b) {}
+    using base::container;
+  };
+  detail::simdSplitByChar(delim, sp, *accessor{it}.container, ignoreEmpty);
+}
+
+template <class OutStringT, class Iterator>
+void internalSplitRecurseChar(
+    char delim, folly::StringPiece sp, Iterator it, bool ignoreEmpty) {
+  internalSplit<OutStringT>(delim, sp, it, ignoreEmpty);
 }
 
 /*
@@ -281,7 +318,7 @@ inline char delimFront(StringPiece s) {
  * algorithm be more performant if the deliminator is a single
  * character instead of a whole string.
  *
- * @param ignoreEmpty iff true, don't copy empty segments to output
+ * @param ignoreEmpty if true, don't copy empty segments to output
  */
 template <class OutStringT, class DelimT, class OutputIterator>
 void internalSplit(
@@ -300,7 +337,8 @@ void internalSplit(
   }
   if (std::is_same<DelimT, StringPiece>::value && dSize == 1) {
     // Call the char version because it is significantly faster.
-    return internalSplit<OutStringT>(delimFront(delim), sp, out, ignoreEmpty);
+    return internalSplitRecurseChar<OutStringT>(
+        delimFront(delim), sp, out, ignoreEmpty);
   }
 
   size_t tokenStartPos = 0;
@@ -341,13 +379,7 @@ inline void toOrIgnore(StringPiece, decltype(std::ignore)&) {}
 
 template <bool exact, class Delim, class OutputType>
 bool splitFixed(const Delim& delimiter, StringPiece input, OutputType& output) {
-  static_assert(
-      exact || std::is_same<OutputType, StringPiece>::value ||
-          IsSomeString<OutputType>::value ||
-          std::is_same<OutputType, decltype(std::ignore)>::value,
-      "split<false>() requires that the last argument be a string type "
-      "or std::ignore");
-  if (exact && UNLIKELY(std::string::npos != input.find(delimiter))) {
+  if (exact && FOLLY_UNLIKELY(std::string::npos != input.find(delimiter))) {
     return false;
   }
   toOrIgnore(input, output);
@@ -361,13 +393,13 @@ bool splitFixed(
     OutputType& outHead,
     OutputTypes&... outTail) {
   size_t cut = input.find(delimiter);
-  if (UNLIKELY(cut == std::string::npos)) {
+  if (FOLLY_UNLIKELY(cut == std::string::npos)) {
     return false;
   }
   StringPiece head(input.begin(), input.begin() + cut);
   StringPiece tail(
       input.begin() + cut + detail::delimSize(delimiter), input.end());
-  if (LIKELY(splitFixed<exact>(delimiter, tail, outTail...))) {
+  if (FOLLY_LIKELY(splitFixed<exact>(delimiter, tail, outTail...))) {
     toOrIgnore(head, outHead);
     return true;
   }
@@ -379,25 +411,16 @@ bool splitFixed(
 //////////////////////////////////////////////////////////////////////
 
 template <class Delim, class String, class OutputType>
-void split(
+std::enable_if_t<
+    (!detail::IsSimdSupportedDelim<Delim>::value ||
+     !detail::HasSimdSplitCompatibleValueType<OutputType>::value) &&
+    detail::IsSplitSupportedContainer<OutputType>::value>
+split(
     const Delim& delimiter,
     const String& input,
-    std::vector<OutputType>& out,
+    OutputType& out,
     bool ignoreEmpty) {
-  detail::internalSplit<OutputType>(
-      detail::prepareDelim(delimiter),
-      StringPiece(input),
-      std::back_inserter(out),
-      ignoreEmpty);
-}
-
-template <class Delim, class String, class OutputType>
-void split(
-    const Delim& delimiter,
-    const String& input,
-    fbvector<OutputType, std::allocator<OutputType>>& out,
-    bool ignoreEmpty) {
-  detail::internalSplit<OutputType>(
+  detail::internalSplit<typename OutputType::value_type>(
       detail::prepareDelim(delimiter),
       StringPiece(input),
       std::back_inserter(out),
@@ -556,7 +579,7 @@ void humanify(const String1& input, String2& output) {
   // hexlify doubles a string's size; backslashify can potentially
   // explode it by 4x.  Now, the printable range of the ascii
   // "spectrum" is around 95 out of 256 values, so a "random" binary
-  // string should be around 60% unprintable.  We use a 50% hueristic
+  // string should be around 60% unprintable.  We use a 50% heuristic
   // here, so if a string is 60% unprintable, then we just use hex
   // output.  Otherwise we backslash.
   //

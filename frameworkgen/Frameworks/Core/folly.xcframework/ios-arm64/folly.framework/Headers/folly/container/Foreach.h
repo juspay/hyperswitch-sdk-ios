@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,8 +64,8 @@ namespace folly {
  *    }
  *    return folly::loop_continue;
  *  };
- *  folly_for_each(range_one, func);
- *  folly_for_each(range_two, func);
+ *  folly::for_each(range_one, func);
+ *  folly::for_each(range_two, func);
  *
  * A simple use case would be when using futures, if the user was doing calls to
  * n servers then they would accept the callback with the futures like this:

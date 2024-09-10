@@ -9,32 +9,25 @@
 
 #include <jsi/jsi.h>
 #include <react/renderer/runtimescheduler/Task.h>
+#include <react/utils/CoreFeatures.h>
 
-namespace facebook {
-namespace react {
-
-struct TaskWrapper : public jsi::HostObject {
-  TaskWrapper(std::shared_ptr<Task> const &task) : task(task) {}
-
-  std::shared_ptr<Task> task;
-};
+namespace facebook::react {
 
 inline static jsi::Value valueFromTask(
-    jsi::Runtime &runtime,
+    jsi::Runtime& runtime,
     std::shared_ptr<Task> task) {
-  return jsi::Object::createFromHostObject(
-      runtime, std::make_shared<TaskWrapper>(task));
+  jsi::Object obj(runtime);
+  obj.setNativeState(runtime, std::move(task));
+  return obj;
 }
 
 inline static std::shared_ptr<Task> taskFromValue(
-    jsi::Runtime &runtime,
-    jsi::Value const &value) {
+    jsi::Runtime& runtime,
+    const jsi::Value& value) {
   if (value.isNull()) {
     return nullptr;
   }
-
-  return value.getObject(runtime).getHostObject<TaskWrapper>(runtime)->task;
+  return value.getObject(runtime).getNativeState<Task>(runtime);
 }
 
-} // namespace react
-} // namespace facebook
+} // namespace facebook::react

@@ -1,0 +1,6 @@
+framework module React_defaultsnativemodule {
+  umbrella header "React-defaultsnativemodule-umbrella.h"
+
+  export *
+  module * { export * }
+}

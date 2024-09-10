@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@
 #include <atomic>
 #include <memory>
 
-#include <folly/portability/GFlags.h>
-
 ///
 /// Forward declatations and implicit documentation of all hazptr
 /// top-level classes, functions, macros, default values, and globals.
@@ -32,8 +30,6 @@
 #else
 #define FOLLY_HAZPTR_THR_LOCAL true
 #endif
-
-DECLARE_bool(folly_hazptr_use_executor);
 
 namespace folly {
 
@@ -123,13 +119,9 @@ class hazptr_tc;
 template <template <typename> class Atom = std::atomic>
 hazptr_tc<Atom>& hazptr_tc_tls();
 
-/** hazptr_priv */
+/** hazptr_tc_evict -- Used only for benchmarking */
 template <template <typename> class Atom = std::atomic>
-class hazptr_priv;
-
-/** hazptr_priv_tls */
-template <template <typename> class Atom = std::atomic>
-hazptr_priv<Atom>& hazptr_priv_tls();
+void hazptr_tc_evict();
 
 ///
 /// Hazard pointer domain
@@ -154,17 +146,10 @@ hazptr_domain<Atom>& default_hazptr_domain();
 template <template <typename> class Atom = std::atomic>
 hazard_pointer_domain<Atom>& hazard_pointer_default_domain();
 
-/** hazptr_domain_push_list */
-template <template <typename> class Atom = std::atomic>
-void hazptr_domain_push_list(
-    hazptr_obj_list<Atom>& l,
-    hazptr_domain<Atom>& domain = default_hazptr_domain<Atom>()) noexcept;
-
 /** hazptr_domain_push_retired */
 template <template <typename> class Atom = std::atomic>
 void hazptr_domain_push_retired(
     hazptr_obj_list<Atom>& l,
-    bool check = true,
     hazptr_domain<Atom>& domain = default_hazptr_domain<Atom>()) noexcept;
 
 /** hazptr_retire */
@@ -188,6 +173,9 @@ void hazard_pointer_clean_up(
 
 /** Global default domain defined in Hazptr.cpp */
 extern hazptr_domain<std::atomic> default_domain;
+
+/** Defined in Hazptr.cpp */
+bool hazptr_use_executor();
 
 ///
 /// Classes related to hazard pointer holders.

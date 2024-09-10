@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ class ThreadLocal {
   }
 
   // may return null
-  FOLLY_ERASE T* getIfExist() const { return tlp_.get(); }
+  FOLLY_ERASE T* get_existing() const { return tlp_.get(); }
 
   T* operator->() const { return get(); }
 
@@ -92,13 +92,13 @@ class ThreadLocal {
   ThreadLocal& operator=(const ThreadLocal&) = delete;
 
   FOLLY_NOINLINE T* makeTlp() const {
-    auto const ptr = constructor_();
+    auto const ptr = static_cast<T*>(constructor_());
     tlp_.reset(ptr);
     return ptr;
   }
 
   mutable ThreadLocalPtr<T, Tag, AccessMode> tlp_;
-  std::function<T*()> constructor_;
+  std::function<void*()> constructor_;
 };
 
 /*
@@ -442,19 +442,4 @@ class ThreadLocalPtr {
   mutable typename StaticMeta::EntryID id_;
 };
 
-namespace threadlocal_detail {
-template <typename>
-struct static_meta_of;
-
-template <typename T, typename Tag, typename AccessMode>
-struct static_meta_of<ThreadLocalPtr<T, Tag, AccessMode>> {
-  using type = StaticMeta<Tag, AccessMode>;
-};
-
-template <typename T, typename Tag, typename AccessMode>
-struct static_meta_of<ThreadLocal<T, Tag, AccessMode>> {
-  using type = StaticMeta<Tag, AccessMode>;
-};
-
-} // namespace threadlocal_detail
 } // namespace folly

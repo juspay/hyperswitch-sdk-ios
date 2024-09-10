@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,12 +33,12 @@
 #include <folly/ScopeGuard.h>
 #include <folly/SharedMutex.h>
 #include <folly/container/Foreach.h>
-#include <folly/detail/AtFork.h>
 #include <folly/detail/StaticSingletonManager.h>
 #include <folly/lang/Exception.h>
 #include <folly/memory/Malloc.h>
 #include <folly/portability/PThread.h>
 #include <folly/synchronization/MicroSpinLock.h>
+#include <folly/system/AtFork.h>
 #include <folly/system/ThreadId.h>
 
 namespace folly {
@@ -127,41 +127,39 @@ struct ElementWrapper {
 
   template <class Ptr>
   void set(Ptr p) {
-    auto guard = makeGuard([&] { delete p; });
     DCHECK(ptr == nullptr);
     DCHECK(deleter1 == nullptr);
 
-    if (p) {
-      node.initIfZero(true /*locked*/);
-      ptr = p;
-      deleter1 = [](void* pt, TLPDestructionMode) {
-        delete static_cast<Ptr>(pt);
-      };
-      ownsDeleter = false;
-      guard.dismiss();
+    if (!p) {
+      return;
     }
+
+    node.initIfZero(true /*locked*/);
+    deleter1 = [](void* pt, TLPDestructionMode) {
+      delete static_cast<Ptr>(pt);
+    };
+    ownsDeleter = false;
+    ptr = p;
   }
 
   template <class Ptr, class Deleter>
   void set(Ptr p, const Deleter& d) {
-    auto guard = makeGuard([&] {
-      if (p) {
-        d(p, TLPDestructionMode::THIS_THREAD);
-      }
-    });
     DCHECK(ptr == nullptr);
     DCHECK(deleter2 == nullptr);
-    if (p) {
-      node.initIfZero(true /*locked*/);
-      ptr = p;
-      auto d2 = d; // gcc-4.8 doesn't decay types correctly in lambda captures
-      deleter2 = new std::function<DeleterFunType>(
-          [d2](void* pt, TLPDestructionMode mode) {
-            d2(static_cast<Ptr>(pt), mode);
-          });
-      ownsDeleter = true;
-      guard.dismiss();
+
+    if (!p) {
+      return;
     }
+
+    node.initIfZero(true /*locked*/);
+    auto guard = makeGuard([&] { d(p, TLPDestructionMode::THIS_THREAD); });
+    deleter2 = new std::function<DeleterFunType>(
+        [d](void* pt, TLPDestructionMode mode) {
+          d(static_cast<Ptr>(pt), mode);
+        });
+    guard.dismiss();
+    ownsDeleter = true;
+    ptr = p;
   }
 
   void cleanup() {
@@ -221,8 +219,6 @@ struct ThreadEntryList {
   size_t count{0};
 };
 
-struct PthreadKeyUnregisterTester;
-
 FOLLY_ALWAYS_INLINE ThreadEntryNode* ThreadEntryNode::getPrev() {
   return &prev->elements[id].node;
 }
@@ -246,7 +242,7 @@ FOLLY_ALWAYS_INLINE ThreadEntryNode* ThreadEntryNode::getNext() {
  */
 class PthreadKeyUnregister {
  public:
-  static constexpr size_t kMaxKeys = 1UL << 16;
+  static constexpr size_t kMaxKeys = size_t(1) << 16;
 
   ~PthreadKeyUnregister() {
     // If static constructor priorities are not supported then
@@ -268,7 +264,6 @@ class PthreadKeyUnregister {
    * usage.
    */
   constexpr PthreadKeyUnregister() : lock_(), size_(0), keys_() {}
-  friend struct folly::threadlocal_detail::PthreadKeyUnregisterTester;
 
   void registerKeyImpl(pthread_key_t key) {
     MSLGuard lg(lock_);
@@ -361,8 +356,8 @@ struct StaticMetaBase {
 
   // push back an entry in the doubly linked list
   // that corresponds to idx id
-  void pushBackLocked(ThreadEntry* t, uint32_t id);
-  void pushBackUnlocked(ThreadEntry* t, uint32_t id);
+  void pushBackLocked(ThreadEntry* t, uint32_t id) noexcept;
+  void pushBackUnlocked(ThreadEntry* t, uint32_t id) noexcept;
 
   // static helper method to reallocate the ThreadEntry::elements
   // returns != nullptr if the ThreadEntry::elements was reallocated
@@ -394,7 +389,7 @@ struct FOLLY_EXPORT StaticMeta final : StaticMetaBase {
       : StaticMetaBase(
             &StaticMeta::getThreadEntrySlow,
             std::is_same<AccessMode, AccessModeStrict>::value) {
-    detail::AtFork::registerHandler(
+    AtFork::registerHandler(
         this,
         /*prepare*/ &StaticMeta::preFork,
         /*parent*/ &StaticMeta::onForkParent,
@@ -430,7 +425,7 @@ struct FOLLY_EXPORT StaticMeta final : StaticMetaBase {
       EntryID* ent, uint32_t& id, ThreadEntry*& threadEntry, size_t& capacity) {
     auto& inst = instance();
     threadEntry = inst.threadEntry_();
-    if (UNLIKELY(threadEntry->getElementsCapacity() <= id)) {
+    if (FOLLY_UNLIKELY(threadEntry->getElementsCapacity() <= id)) {
       inst.reserve(ent);
       id = ent->getOrInvalid();
     }

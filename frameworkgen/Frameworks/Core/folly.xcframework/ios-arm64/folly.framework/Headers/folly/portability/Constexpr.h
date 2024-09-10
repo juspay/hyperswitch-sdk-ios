@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,16 @@
 #pragma once
 
 #include <folly/CPortability.h>
+#include <folly/Portability.h>
 
 #include <cstdint>
 #include <cstring>
+#include <type_traits>
+
+// On MSVC an incorrect <version> header get's picked up
+#if !defined(_MSC_VER) && __has_include(<version>)
+#include <version>
+#endif
 
 namespace folly {
 
@@ -98,11 +105,46 @@ constexpr int constexpr_strcmp_fallback(
 
 template <typename Char>
 constexpr std::size_t constexpr_strlen(const Char* s) noexcept {
+#if __GNUC_PREREQ(11, 0)
+  return detail::constexpr_strlen_internal(s, 0u);
+#else
   return detail::constexpr_strlen_internal(s, 0);
+#endif
 }
 
 template <typename Char>
 constexpr int constexpr_strcmp(const Char* s1, const Char* s2) noexcept {
   return detail::constexpr_strcmp_internal(s1, s2, 0);
 }
+
+namespace detail {
+
+template <typename V>
+struct is_constant_evaluated_or_constinit_ {
+  V value;
+  FOLLY_ERASE FOLLY_CONSTEVAL /* implicit */
+  is_constant_evaluated_or_constinit_(V const v) noexcept(noexcept(V(v)))
+      : value{v} {}
+};
+
+} // namespace detail
+
+//  is_constant_evaluated_or
+//
+//  Similar in spirit to std::is_constant_evaluated (c++20), with differences:
+//  * Takes an argument to be used as the default return value, if the code is
+//    unable to tell whether it is in a constant context.
+constexpr bool is_constant_evaluated_or(
+    detail::is_constant_evaluated_or_constinit_<bool> const def) noexcept {
+#if defined(__cpp_lib_is_constant_evaluated)
+  return std::is_constant_evaluated();
+#endif
+
+#if FOLLY_HAS_BUILTIN(__builtin_is_constant_evaluated)
+  return __builtin_is_constant_evaluated();
+#endif
+
+  return def.value;
+}
+
 } // namespace folly

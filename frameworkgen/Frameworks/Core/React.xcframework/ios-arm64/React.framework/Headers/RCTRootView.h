@@ -40,7 +40,7 @@ extern
 
     NS_ASSUME_NONNULL_BEGIN
 
-        NSString *const RCTContentDidAppearNotification;
+    NSString *const RCTContentDidAppearNotification;
 
 /**
  * Native view used to host React-managed views within the app. Can be used just
@@ -76,19 +76,6 @@ extern
                        moduleName:(NSString *)moduleName
                 initialProperties:(nullable NSDictionary *)initialProperties
                     launchOptions:(nullable NSDictionary *)launchOptions;
-
-/**
- * This API allows RCTRootView users to know if the root view is backed by the bridge.
- */
-@property (nonatomic, readonly) BOOL hasBridge;
-
-/**
- * This API allows users of RCTRootView to access other NativeModules, without
- * directly accessing the bridge.
- */
-@property (nonatomic, strong, readonly) RCTModuleRegistry *moduleRegistry;
-
-@property (nonatomic, strong, readonly) id<RCTEventDispatcherProtocol> eventDispatcher;
 
 /**
  * The name of the JavaScript module to execute within the
@@ -132,6 +119,11 @@ extern
  * The backing view controller of the root view.
  */
 @property (nonatomic, weak, nullable) UIViewController *reactViewController;
+
+/**
+ * The root view casted as UIView. Used by splash screen libraries.
+ */
+@property (nonatomic, strong, readonly) UIView *view;
 
 /**
  * The React-managed contents view of the root view.

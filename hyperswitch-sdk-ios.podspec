@@ -1,4 +1,4 @@
-version = "0.1.6"
+version = "0.1.7"
 
 Pod::Spec.new do |s|
   s.name                      = 'hyperswitch-sdk-ios'
@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.author                    = 'Harshit S'
   s.license                   = { type: 'Apache-2.0', file: 'LICENSE' }
   s.platform                  = :ios
-  s.ios.deployment_target     = '13.0'
+  s.ios.deployment_target     = '13.4'
   s.source                    = { :git => 'https://github.com/juspay/hyperswitch-sdk-ios.git', :tag => "v#{s.version}"}
   s.module_name               = 'Hyperswitch'
 
@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
     core.resources = ['hyperswitchSDK/Core/Resources/CodePush.plist', 'hyperswitchSDK/Core/Resources/hyperswitch.bundle']
     core.vendored_frameworks = 'frameworkgen/Frameworks/Core/*.xcframework'
     core.dependency 'hyperswitch-sdk-ios/common'
-    core.dependency 'Hyperswitch-Hermes'
+    core.dependency 'hyperswitch-ios-hermes', '~> 0.75.2'
     core.dependency 'KlarnaMobileSDK'
   end
 
@@ -39,15 +39,16 @@ Pod::Spec.new do |s|
     netcetera3ds.dependency 'hyperswitch-sdk-ios/core'
   end
 
-  s.subspec 'appclip' do |appclip|
-    appclip.source_files = 'hyperswitchSDK/CoreLite/AppClip/**/*.{m,swift,h}'
-    appclip.dependency 'hyperswitch-sdk-ios/common'
-  end
+## Upcoming Release ##
+  # s.subspec 'appclip' do |appclip|
+  #   appclip.source_files = 'hyperswitchSDK/CoreLite/AppClip/**/*.{m,swift,h}'
+  #   appclip.dependency 'hyperswitch-sdk-ios/common'
+  # end
 
-  s.subspec 'appclip+scancard' do |appclip_scancard|
-    appclip_scancard.vendored_frameworks = 'frameworkgen/scanCard/Frameworks/HyperswitchScancard.xcframework'
-    appclip_scancard.dependency 'hyperswitch-sdk-ios/appclip'
-  end
+  # s.subspec 'appclip+scancard' do |appclip_scancard|
+  #   appclip_scancard.vendored_frameworks = 'frameworkgen/scanCard/Frameworks/HyperswitchScancard.xcframework'
+  #   appclip_scancard.dependency 'hyperswitch-sdk-ios/appclip'
+  # end
 
   s.subspec 'common' do |common|
     common.source_files = 'hyperswitchSDK/Shared/*.{m,swift,h}'

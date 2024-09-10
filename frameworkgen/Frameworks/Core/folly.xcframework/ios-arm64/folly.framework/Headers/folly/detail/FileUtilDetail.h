@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@
 
 #include <cerrno>
 #include <cstddef>
+#include <string>
 #include <type_traits>
 
-//  Private functions for wrapping file-io against interrupt and partial op
-//  completions.
-//
+#include <folly/portability/SysTypes.h>
+
 //  This header is intended to be extremely lightweight. In particular, the
 //  parallel private functions for wrapping vector file-io are in a separate
 //  header.
@@ -30,7 +30,8 @@
 namespace folly {
 namespace fileutil_detail {
 
-using ssize_t = std::make_signed_t<size_t>;
+//  The following wrapX() funcions are private functions for wrapping file-io
+//  against interrupt and partial op completions.
 
 // Wrap call to f(args) in loop to retry on EINTR
 template <class F, class... Args>
@@ -75,6 +76,10 @@ ssize_t wrapFull(F f, int fd, void* buf, size_t count, Offset... offset) {
 
   return totalBytes;
 }
+
+//  Returns a string compatible for mkstemp()
+std::string getTemporaryFilePathString(
+    const std::string& filePath, const std::string& temporaryDirectory);
 
 } // namespace fileutil_detail
 } // namespace folly

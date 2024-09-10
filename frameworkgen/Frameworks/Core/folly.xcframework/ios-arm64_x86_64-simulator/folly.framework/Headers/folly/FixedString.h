@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,8 +58,10 @@ struct FixedStringBase_ {
   static constexpr std::size_t npos = static_cast<std::size_t>(-1);
 };
 
+#if FOLLY_CPLUSPLUS < 201703L
 template <class Void>
 constexpr std::size_t FixedStringBase_<Void>::npos;
+#endif
 
 using FixedStringBase = FixedStringBase_<>;
 
@@ -68,7 +70,7 @@ using FixedStringBase = FixedStringBase_<>;
 // it's testing for fails. In this way, precondition violations are reported
 // at compile-time instead of at runtime.
 [[noreturn]] inline void assertOutOfBounds() {
-  assert(!"Array index out of bounds in BasicFixedString");
+  assert(false && "Array index out of bounds in BasicFixedString");
   throw_exception<std::out_of_range>(
       "Array index out of bounds in BasicFixedString");
 }
@@ -89,7 +91,9 @@ constexpr std::size_t checkOverflowIfDebug(std::size_t i, std::size_t size) {
 
 // Intentionally NOT constexpr. See note above for assertOutOfBounds
 [[noreturn]] inline void assertNotNullTerminated() noexcept {
-  assert(!"Non-null terminated string used to initialize a BasicFixedString");
+  assert(
+      false &&
+      "Non-null terminated string used to initialize a BasicFixedString");
   std::terminate(); // Fail hard, fail fast.
 }
 
@@ -391,10 +395,6 @@ struct ReverseIterator {
 
 } // namespace fixedstring
 } // namespace detail
-
-// Defined in folly/hash/Hash.h
-std::uint32_t hsieh_hash32_buf_constexpr(
-    const unsigned char* buf, std::size_t len);
 
 /** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** *
  * \class BasicFixedString
@@ -1041,10 +1041,6 @@ class BasicFixedString : private detail::fixedstring::FixedStringBase {
    * \return `N`.
    */
   static constexpr std::size_t max_size() noexcept { return N; }
-
-  constexpr std::uint32_t hash() const noexcept {
-    return folly::hsieh_hash32_buf_constexpr(data_, size_);
-  }
 
   /**
    * \note `at(size())` is allowed will return `Char(0)`.

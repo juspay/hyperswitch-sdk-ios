@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,7 @@ size_t qfind_first_byte_of_byteset(
 
 inline size_t qfind_first_byte_of_nosse(
     const StringPieceLite haystack, const StringPieceLite needles) {
-  if (UNLIKELY(needles.empty() || haystack.empty())) {
+  if (FOLLY_UNLIKELY(needles.empty() || haystack.empty())) {
     return std::string::npos;
   }
   // The thresholds below were empirically determined by benchmarking.

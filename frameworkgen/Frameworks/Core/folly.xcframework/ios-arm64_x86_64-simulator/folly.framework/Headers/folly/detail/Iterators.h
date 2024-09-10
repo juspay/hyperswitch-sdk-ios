@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@
 #include <cstddef>
 #include <iterator>
 #include <type_traits>
-
-#include <folly/portability/SysTypes.h>
 
 /*
  * This contains stripped-down workalikes of some Boost classes:
@@ -76,33 +74,12 @@ class IteratorFacade {
   using value_type = V;
   using reference = value_type&;
   using pointer = value_type*;
-  using difference_type = ssize_t;
+  using difference_type = std::ptrdiff_t;
   using iterator_category = Tag;
 
-  bool operator==(D const& rhs) const { return asDerivedConst().equal(rhs); }
+  friend bool operator==(D const& lhs, D const& rhs) { return equal(lhs, rhs); }
 
-  bool operator!=(D const& rhs) const { return !operator==(rhs); }
-
-  /*
-   * Allow for comparisons between this and an iterator of some other class.
-   * (e.g. a const_iterator version of this, the probable use case).
-   * Does a conversion of D (or D reference) to D2, if one exists (otherwise
-   * this is disabled).  Disabled if D and D2 are the same, to disambiguate
-   * this and the `operator==(D const&) const` method above.
-   */
-
-  template <
-      class D2,
-      std::enable_if_t<!std::is_same<D, D2>::value, int> = 0,
-      std::enable_if_t<std::is_convertible<D, D2>::value, int> = 0>
-  bool operator==(D2 const& rhs) const {
-    return D2(asDerivedConst()) == rhs;
-  }
-
-  template <class D2>
-  bool operator!=(D2 const& rhs) const {
-    return !operator==(rhs);
-  }
+  friend bool operator!=(D const& lhs, D const& rhs) { return !(lhs == rhs); }
 
   V& operator*() const { return asDerivedConst().dereference(); }
 
@@ -134,6 +111,8 @@ class IteratorFacade {
   D& asDerived() { return static_cast<D&>(*this); }
 
   D const& asDerivedConst() const { return static_cast<D const&>(*this); }
+
+  static bool equal(D const& lhs, D const& rhs) { return lhs.equal(rhs); }
 };
 
 /**

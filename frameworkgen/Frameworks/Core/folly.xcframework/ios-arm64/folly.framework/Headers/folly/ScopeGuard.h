@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,64 @@
  * limitations under the License.
  */
 
+//
+// Docs: https://fburl.com/fbcref_scopeguard
+//
+
+/**
+ * ScopeGuard is a general implementation of the "Initialization is
+ * Resource Acquisition" idiom.  It guarantees that a function
+ * is executed upon leaving the current scope.
+ *
+ * @file ScopeGuard.h
+ * @refcode folly/docs/examples/folly/ScopeGuard.cpp
+ */
+/*
+ * The makeGuard() function is used to create a new ScopeGuard object.
+ * It can be instantiated with a lambda function, a std::function<void()>,
+ * a functor, or a void(*)() function pointer.
+ *
+ *
+ * Usage example: Add a friend to memory if and only if it is also added
+ * to the db.
+ *
+ * void User::addFriend(User& newFriend) {
+ *   // add the friend to memory
+ *   friends_.push_back(&newFriend);
+ *
+ *   // If the db insertion that follows fails, we should
+ *   // remove it from memory.
+ *   auto guard = makeGuard([&] { friends_.pop_back(); });
+ *
+ *   // this will throw an exception upon error, which
+ *   // makes the ScopeGuard execute UserCont::pop_back()
+ *   // once the Guard's destructor is called.
+ *   db_->addFriend(GetName(), newFriend.GetName());
+ *
+ *   // an exception was not thrown, so don't execute
+ *   // the Guard.
+ *   guard.dismiss();
+ * }
+ *
+ * It is also possible to create a guard in dismissed state with
+ * makeDismissedGuard(), and later rehire it with the rehire()
+ * method.
+ *
+ * makeDismissedGuard() is not just syntactic sugar for creating a guard and
+ * immediately dismissing it, but it has a subtle behavior difference if
+ * move-construction of the passed function can throw: if it does, the function
+ * will be called by makeGuard(), but not by makeDismissedGuard().
+ *
+ * Examine ScopeGuardTest.cpp for some more sample usage.
+ *
+ * Stolen from:
+ *   Andrei's and Petru Marginean's CUJ article:
+ *     http://drdobbs.com/184403758
+ *   and the loki library:
+ *     http://loki-lib.sourceforge.net/index.php?n=Idioms.ScopeGuardPointer
+ *   and triendl.kj article:
+ *     http://www.codeproject.com/KB/cpp/scope_guard.aspx
+ */
 #pragma once
 
 #include <cstddef>
@@ -48,11 +106,6 @@ class ScopeGuardImplBase {
     return ScopeGuardImplBase{};
   }
 
-  template <typename T>
-  static const T& asConst(const T& t) noexcept {
-    return t;
-  }
-
   bool dismissed_;
 };
 
@@ -62,7 +115,7 @@ class ScopeGuardImpl : public ScopeGuardImplBase {
   explicit ScopeGuardImpl(FunctionType& fn) noexcept(
       std::is_nothrow_copy_constructible<FunctionType>::value)
       : ScopeGuardImpl(
-            asConst(fn),
+            folly::as_const(fn),
             makeFailsafe(
                 std::is_nothrow_copy_constructible<FunctionType>{}, &fn)) {}
 
@@ -142,54 +195,20 @@ using ScopeGuardImplDecay = ScopeGuardImpl<typename std::decay<F>::type, INE>;
 } // namespace detail
 
 /**
- * ScopeGuard is a general implementation of the "Initialization is
- * Resource Acquisition" idiom.  Basically, it guarantees that a function
- * is executed upon leaving the current scope unless otherwise told.
+ * Create a scope guard.
  *
- * The makeGuard() function is used to create a new ScopeGuard object.
- * It can be instantiated with a lambda function, a std::function<void()>,
- * a functor, or a void(*)() function pointer.
+ * The returned object has methods .dismiss() and .rehire(), which will
+ * deactivate/reactivate the calling of the function upon destruction.
  *
+ * The return value of this function must be captured. Otherwise, since it is a
+ * temporary, it will be destroyed immediately, thus calling the function.
  *
- * Usage example: Add a friend to memory if and only if it is also added
- * to the db.
+ *     auto guard = makeGuard(...); // good
  *
- * void User::addFriend(User& newFriend) {
- *   // add the friend to memory
- *   friends_.push_back(&newFriend);
+ *     makeGuard(...); // bad
  *
- *   // If the db insertion that follows fails, we should
- *   // remove it from memory.
- *   auto guard = makeGuard([&] { friends_.pop_back(); });
- *
- *   // this will throw an exception upon error, which
- *   // makes the ScopeGuard execute UserCont::pop_back()
- *   // once the Guard's destructor is called.
- *   db_->addFriend(GetName(), newFriend.GetName());
- *
- *   // an exception was not thrown, so don't execute
- *   // the Guard.
- *   guard.dismiss();
- * }
- *
- * It is also possible to create a guard in dismissed state with
- * makeDismissedGuard(), and later rehire it with the rehire()
- * method.
- *
- * makeDismissedGuard() is not just syntactic sugar for creating a guard and
- * immediately dismissing it, but it has a subtle behavior difference if
- * move-construction of the passed function can throw: if it does, the function
- * will be called by makeGuard(), but not by makeDismissedGuard().
- *
- * Examine ScopeGuardTest.cpp for some more sample usage.
- *
- * Stolen from:
- *   Andrei's and Petru Marginean's CUJ article:
- *     http://drdobbs.com/184403758
- *   and the loki library:
- *     http://loki-lib.sourceforge.net/index.php?n=Idioms.ScopeGuardPointer
- *   and triendl.kj article:
- *     http://www.codeproject.com/KB/cpp/scope_guard.aspx
+ * @param f  The function to execute upon the guard's destruction.
+ * @refcode folly/docs/examples/folly/ScopeGuard2.cpp
  */
 template <typename F>
 FOLLY_NODISCARD detail::ScopeGuardImplDecay<F, true> makeGuard(F&& f) noexcept(
@@ -197,6 +216,14 @@ FOLLY_NODISCARD detail::ScopeGuardImplDecay<F, true> makeGuard(F&& f) noexcept(
   return detail::ScopeGuardImplDecay<F, true>(static_cast<F&&>(f));
 }
 
+/**
+ * Create a scope guard in the dismissed state.
+ *
+ * The guard can be enabled using .rehire().
+ *
+ * @see makeGuard
+ * @refcode folly/docs/examples/folly/ScopeGuard2.cpp
+ */
 template <typename F>
 FOLLY_NODISCARD detail::ScopeGuardImplDecay<F, true>
 makeDismissedGuard(F&& f) noexcept(
@@ -207,10 +234,6 @@ makeDismissedGuard(F&& f) noexcept(
 }
 
 namespace detail {
-
-#if defined(FOLLY_EXCEPTION_COUNT_USE_CXA_GET_GLOBALS) || \
-    defined(FOLLY_EXCEPTION_COUNT_USE_GETPTD) ||          \
-    defined(FOLLY_EXCEPTION_COUNT_USE_STD)
 
 /**
  * ScopeGuard used for executing a function when leaving the current scope
@@ -273,8 +296,6 @@ operator+(ScopeGuardOnSuccess, FunctionType&& fn) {
       false>(std::forward<FunctionType>(fn));
 }
 
-#endif // native uncaught_exception() supported
-
 /**
  * Internal use for the macro SCOPE_EXIT below
  */
@@ -290,18 +311,112 @@ ScopeGuardImpl<typename std::decay<FunctionType>::type, true> operator+(
 
 } // namespace folly
 
+//  SCOPE_EXIT
+//
+//  Example:
+//
+//      /* open scope */ {
+//
+//        some_resource_t resource;
+//        some_resource_init(resource);
+//        SCOPE_EXIT { some_resource_fini(resource); };
+//
+//        if (!cond)
+//          throw 0; // the cleanup happens at end of the scope
+//        else
+//          return; // the cleanup happens at end of the scope
+//
+//        use_some_resource(resource); // may throw; cleanup will happen
+//
+//      } /* close scope */
+//
+//  The code in the braces passed to SCOPE_EXIT executes at the end of the
+//  containing scope as if the code is the content of the destructor of an
+//  object instantiated at the point of the SCOPE_EXIT, where the destructor
+//  reference-captures all local variables it uses.
+//
+//  The cleanup code - the code in the braces passed to SCOPE_EXIT - always
+//  executes at the end of the scope, regardless of whether the scope exits
+//  normally or erroneously as if via the throw statement.
+//
+//  Caution: Suitable for coroutine functions only when the cleanup code does
+//  not use captured references to thread-local objects. Recall that there is
+//  no assumption that coroutines resume from co-await, co-yield, or co-return
+//  in the same thread as the one in which they suspend.
+//
+//  Caution: May not execute if the scope exits erroneously but stack unwinding
+//  is skipped, or if the scope does not exit at all such as with std::abort or
+//  setcontext, which fibers use.
+
+/**
+ * Capture code that shall be run when the current scope exits.
+ *
+ * The code within SCOPE_EXIT's braces shall execute as if the code was in the
+ * destructor of an object instantiated at the point of SCOPE_EXIT.
+ *
+ * Variables used within SCOPE_EXIT are captured by reference.
+ *
+ * @def SCOPE_EXIT
+ */
 #define SCOPE_EXIT                               \
   auto FB_ANONYMOUS_VARIABLE(SCOPE_EXIT_STATE) = \
       ::folly::detail::ScopeGuardOnExit() + [&]() noexcept
 
-#if defined(FOLLY_EXCEPTION_COUNT_USE_CXA_GET_GLOBALS) || \
-    defined(FOLLY_EXCEPTION_COUNT_USE_GETPTD) ||          \
-    defined(FOLLY_EXCEPTION_COUNT_USE_STD)
+//  SCOPE_FAIL
+//
+//  May be useful in situations where the caller requests a resource where
+//  initializations of the resource is multi-step and may fail.
+//
+//  Example:
+//
+//      some_resource_t resource;
+//      some_resource_init(resource);
+//      SCOPE_FAIL { some_resource_fini(resource); };
+//
+//      if (do_throw)
+//        throw 0; // the cleanup happens at the end of the scope
+//      else
+//        return resource; // the cleanup does not happen
+//
+//  Warning: Not suitable for coroutine functions.
+
+/**
+ * Capture code to run if the scope exits with an exception.
+ *
+ * Like SCOPE_EXIT, but only executes the code if the scope exited due to an
+ * exception.
+ *
+ * @def SCOPE_FAIL
+ */
 #define SCOPE_FAIL                               \
   auto FB_ANONYMOUS_VARIABLE(SCOPE_FAIL_STATE) = \
       ::folly::detail::ScopeGuardOnFail() + [&]() noexcept
 
+//  SCOPE_SUCCESS
+//
+//  In a sense, the opposite of SCOPE_FAIL.
+//
+//  Example:
+//
+//      folly::stop_watch<> watch;
+//      SCOPE_FAIL { log_failure(watch.elapsed(); };
+//      SCOPE_SUCCESS { log_success(watch.elapsed(); };
+//
+//      if (do_throw)
+//        throw 0; // the cleanup does not happen; log failure
+//      else
+//        return; // the cleanup happens at the end of the scope; log success
+//
+//  Warning: Not suitable for coroutine functions.
+
+/**
+ * Capture code to run if the scope exits without an exception.
+ *
+ * Like SCOPE_EXIT, but does not execute the code if the scope exited due to an
+ * exception.
+ *
+ * @def SCOPE_SUCCESS
+ */
 #define SCOPE_SUCCESS                               \
   auto FB_ANONYMOUS_VARIABLE(SCOPE_SUCCESS_STATE) = \
       ::folly::detail::ScopeGuardOnSuccess() + [&]()
-#endif // native uncaught_exception() supported

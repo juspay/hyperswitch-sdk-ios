@@ -40,6 +40,7 @@
 #import "RCTSinglelineTextInputViewManager.h"
 #import "RCTUITextField.h"
 #import "RCTVirtualTextShadowView.h"
+#import "RCTVirtualTextView.h"
 #import "RCTVirtualTextViewManager.h"
 
 FOUNDATION_EXPORT double RCTTextVersionNumber;

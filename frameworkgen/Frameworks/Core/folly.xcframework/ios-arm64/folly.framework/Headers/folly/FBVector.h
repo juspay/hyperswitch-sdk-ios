@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@
 #include <folly/Likely.h>
 #include <folly/ScopeGuard.h>
 #include <folly/Traits.h>
+#include <folly/lang/CheckedMath.h>
 #include <folly/lang/Exception.h>
 #include <folly/memory/Malloc.h>
 
@@ -73,6 +74,12 @@ class fbvector;
 ///////////////////////////////////////////////////////////////////////////////
 
 namespace folly {
+
+namespace detail {
+inline void* thunk_return_nullptr() {
+  return nullptr;
+}
+} // namespace detail
 
 template <class T, class Allocator>
 class fbvector {
@@ -155,7 +162,7 @@ class fbvector {
     }
 
     void init(size_type n) {
-      if (UNLIKELY(n == 0)) {
+      if (FOLLY_UNLIKELY(n == 0)) {
         b_ = e_ = z_ = nullptr;
       } else {
         size_type sz = folly::goodMallocSize(n * sizeof(T)) / sizeof(T);
@@ -417,7 +424,10 @@ class fbvector {
   static void S_uninitialized_fill_n_a(
       Allocator& a, T* dest, size_type sz, Args&&... args) {
     auto b = dest;
-    auto e = dest + sz;
+    T* e;
+    if (!folly::checked_add(&e, dest, sz)) {
+      throw_exception<std::length_error>("FBVector exceeded max size.");
+    }
     auto rollback = makeGuard([&] { S_destroy_range_a(a, dest, b); });
     for (; b != e; ++b) {
       std::allocator_traits<Allocator>::construct(
@@ -429,12 +439,19 @@ class fbvector {
   // optimized
   static void S_uninitialized_fill_n(T* dest, size_type n) {
     if (folly::IsZeroInitializable<T>::value) {
-      if (LIKELY(n != 0)) {
+      if (FOLLY_LIKELY(n != 0)) {
+        T* sz;
+        if (!folly::checked_add(&sz, dest, n)) {
+          throw_exception<std::length_error>("FBVector exceeded max size.");
+        }
         std::memset((void*)dest, 0, sizeof(T) * n);
       }
     } else {
       auto b = dest;
-      auto e = dest + n;
+      T* e;
+      if (!folly::checked_add(&e, dest, n)) {
+        throw_exception<std::length_error>("FBVector exceeded max size.");
+      }
       auto rollback = makeGuard([&] {
         --b;
         for (; b >= dest; --b) {
@@ -450,7 +467,10 @@ class fbvector {
 
   static void S_uninitialized_fill_n(T* dest, size_type n, const T& value) {
     auto b = dest;
-    auto e = dest + n;
+    T* e;
+    if (!folly::checked_add(&e, dest, n)) {
+      throw_exception<std::length_error>("FBVector exceeded max size.");
+    }
     auto rollback = makeGuard([&] { S_destroy_range(dest, b); });
     for (; b != e; ++b) {
       S_construct(b, value);
@@ -462,7 +482,7 @@ class fbvector {
   // uninitialized_copy
 
   // it is possible to add an optimization for the case where
-  // It = move(T*) and IsRelocatable<T> and Is0Initiailizable<T>
+  // It = move(T*) and IsRelocatable<T> and Is0Initializeable<T>
 
   // wrappers
   template <typename It>
@@ -610,7 +630,7 @@ class fbvector {
   //  second exception being thrown. This is a known and unavoidable
   //  deficiency. In lieu of a strong exception guarantee, relocate_undo does
   //  the next best thing: it provides a weak exception guarantee by
-  //  destorying the new data, but leaving the old data in an indeterminate
+  //  destroying the new data, but leaving the old data in an indeterminate
   //  state. Note that that indeterminate state will be valid, since the
   //  old data has not been destroyed; it has merely been the source of a
   //  move, which is required to leave the source in a valid state.
@@ -730,7 +750,7 @@ class fbvector {
   ~fbvector() = default; // the cleanup occurs in impl_
 
   fbvector& operator=(const fbvector& other) {
-    if (UNLIKELY(this == &other)) {
+    if (FOLLY_UNLIKELY(this == &other)) {
       return *this;
     }
 
@@ -748,7 +768,7 @@ class fbvector {
   }
 
   fbvector& operator=(fbvector&& other) {
-    if (UNLIKELY(this == &other)) {
+    if (FOLLY_UNLIKELY(this == &other)) {
       return *this;
     }
     moveFrom(std::move(other), moveIsSwap());
@@ -869,7 +889,7 @@ class fbvector {
     return dataIsInternal(t);
   }
   bool dataIsInternal(const T& t) {
-    return UNLIKELY(
+    return FOLLY_UNLIKELY(
         impl_.b_ <= std::addressof(t) && std::addressof(t) < impl_.e_);
   }
 
@@ -981,26 +1001,15 @@ class fbvector {
         xallocx(p, newCapacityBytes, 0, 0) == newCapacityBytes) {
       impl_.z_ += newCap - oldCap;
     } else {
-      T* newB; // intentionally uninitialized
-      if (!catch_exception(
-              [&] {
-                newB = M_allocate(newCap);
-                return true;
-              },
-              [&] { //
-                return false;
-              })) {
+      T* newB = static_cast<T*>(catch_exception(
+          [&] { return M_allocate(newCap); }, //
+          &detail::thunk_return_nullptr));
+      if (!newB) {
         return;
       }
       if (!catch_exception(
-              [&] {
-                M_relocate(newB);
-                return true;
-              },
-              [&] {
-                M_deallocate(newB, newCap);
-                return false;
-              })) {
+              [&] { return M_relocate(newB), true; },
+              [&] { return M_deallocate(newB, newCap), false; })) {
         return;
       }
       if (impl_.b_) {
@@ -1046,7 +1055,7 @@ class fbvector {
     return impl_.b_[n];
   }
   const_reference at(size_type n) const {
-    if (UNLIKELY(n >= size())) {
+    if (FOLLY_UNLIKELY(n >= size())) {
       throw_exception<std::out_of_range>(
           "fbvector: index is greater than size.");
     }
@@ -1696,6 +1705,6 @@ void erase(fbvector<T, A>& v, U value) {
 
 template <class T, class A, class Predicate>
 void erase_if(fbvector<T, A>& v, Predicate predicate) {
-  v.erase(std::remove_if(v.begin(), v.end(), predicate), v.end());
+  v.erase(std::remove_if(v.begin(), v.end(), std::ref(predicate)), v.end());
 }
 } // namespace folly

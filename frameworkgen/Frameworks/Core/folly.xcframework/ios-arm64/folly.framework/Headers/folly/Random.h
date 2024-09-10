@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+//
+// Docs: https://fburl.com/fbvref_random
+//
+
 #pragma once
 #define FOLLY_RANDOM_H_
 
@@ -25,6 +29,7 @@
 #include <folly/Portability.h>
 #include <folly/Traits.h>
 #include <folly/functional/Invoke.h>
+#include <folly/lang/Bits.h>
 
 #if FOLLY_HAVE_EXTRANDOM_SFMT19937
 #include <ext/random>
@@ -32,35 +37,31 @@
 
 namespace folly {
 
+namespace detail {
+
+#if FOLLY_HAVE_EXTRANDOM_SFMT19937
+using DefaultGenerator = __gnu_cxx::sfmt19937;
+#else
+using DefaultGenerator = std::mt19937;
+#endif
+
+} // namespace detail
+
 /**
  * A PRNG with one instance per thread. This PRNG uses a mersenne twister random
  * number generator and is seeded from /dev/urandom. It should not be used for
  * anything which requires security, only for statistical randomness.
- *
- * An instance of this class represents the current threads PRNG. This means
- * copying an instance of this class across threads will result in corruption
- *
- * Most users will use the Random class which implicitly creates this class.
- * However, if you are worried about performance, you can memoize the TLS
- * lookups that get the per thread state by manually using this class:
- *
- * ThreadLocalPRNG rng;
- * for (...) {
- *   Random::rand32(rng);
- * }
  */
 class ThreadLocalPRNG {
+  using Generator = detail::DefaultGenerator;
+
  public:
-  using result_type = uint32_t;
+  using result_type = Generator::result_type;
 
   result_type operator()();
 
-  static constexpr result_type min() {
-    return std::numeric_limits<result_type>::min();
-  }
-  static constexpr result_type max() {
-    return std::numeric_limits<result_type>::max();
-  }
+  static constexpr result_type min() { return Generator::min(); }
+  static constexpr result_type max() { return Generator::max(); }
 };
 
 class Random {
@@ -87,13 +88,19 @@ class Random {
     }
   };
 
+  // Whether RNG output is surjective and uniform when truncated to ResultType.
+  template <class RNG, class ResultType>
+  static constexpr bool UniformRNG =
+      (std::is_unsigned<ResultType>::value &&
+       std::is_unsigned<typename RNG::result_type>::value &&
+       // RNG range covers ResultType.
+       RNG::min() == 0 &&
+       RNG::max() >= std::numeric_limits<ResultType>::max() &&
+       // Truncating the output maintains uniformness.
+       (~RNG::max() == 0 || isPowTwo(RNG::max() + 1)));
+
  public:
-  // Default generator type.
-#if FOLLY_HAVE_EXTRANDOM_SFMT19937
-  typedef __gnu_cxx::sfmt19937 DefaultGenerator;
-#else
-  typedef std::mt19937 DefaultGenerator;
-#endif
+  using DefaultGenerator = detail::DefaultGenerator;
 
   /**
    * Get secure random bytes. (On Linux and OSX, this means /dev/urandom).
@@ -127,7 +134,7 @@ class Random {
   }
 
   /**
-   * Returns a secure random uint32_t in [min, max). If min == max, returns 0.
+   * Returns a secure random uint32_t in [min, max). If min == max, returns min.
    */
   static uint32_t secureRand32(uint32_t min, uint32_t max) {
     SecureRNG<uint32_t> srng;
@@ -148,7 +155,7 @@ class Random {
   }
 
   /**
-   * Returns a secure random uint64_t in [min, max). If min == max, returns 0.
+   * Returns a secure random uint64_t in [min, max). If min == max, returns min.
    */
   static uint64_t secureRand64(uint64_t min, uint64_t max) {
     SecureRNG<uint64_t> srng;
@@ -167,6 +174,17 @@ class Random {
   }
 
   /**
+   * Returns true 1/n of the time. If n == 0, always returns false
+   */
+  static bool secureOneIn64(uint64_t n) {
+    if (n < 2) {
+      return n;
+    }
+    SecureRNG<uint64_t> srng;
+    return rand64(0, n, srng) == 0;
+  }
+
+  /**
    * Returns a secure double in [0, 1)
    */
   static double secureRandDouble01() {
@@ -175,7 +193,7 @@ class Random {
   }
 
   /**
-   * Returns a secure double in [min, max), if min == max, returns 0.
+   * Returns a secure double in [min, max), if min == max, returns min.
    */
   static double secureRandDouble(double min, double max) {
     SecureRNG<uint64_t> srng;
@@ -205,6 +223,15 @@ class Random {
   static RNG create();
 
   /**
+   * Create a new RNG, which can be used for applications that require secure
+   * randomness.
+   *
+   * The resulting RNG will have worse performance than one created with
+   * create(), so use it if you need the security.
+   */
+  static SecureRNG<uint32_t> createSecure() { return SecureRNG<uint32_t>(); }
+
+  /**
    * Returns a random uint32_t
    */
   static uint32_t rand32() { return rand32(ThreadLocalPRNG()); }
@@ -214,7 +241,12 @@ class Random {
    */
   template <class RNG, class /* EnableIf */ = ValidRNG<RNG>>
   static uint32_t rand32(RNG&& rng) {
-    return rng();
+    if FOLLY_CXX17_CONSTEXPR (UniformRNG<std::decay_t<RNG>, uint32_t>) {
+      return static_cast<uint32_t>(rng());
+    } else {
+      return std::uniform_int_distribution<uint32_t>(
+          0, std::numeric_limits<uint32_t>::max())(rng);
+    }
   }
 
   /**
@@ -234,7 +266,7 @@ class Random {
   }
 
   /**
-   * Returns a random uint32_t in [min, max). If min == max, returns 0.
+   * Returns a random uint32_t in [min, max). If min == max, returns min.
    */
   static uint32_t rand32(uint32_t min, uint32_t max) {
     return rand32(min, max, ThreadLocalPRNG());
@@ -242,12 +274,12 @@ class Random {
 
   /**
    * Returns a random uint32_t in [min, max) given a specific RNG.
-   * If min == max, returns 0.
+   * If min == max, returns min.
    */
   template <class RNG = ThreadLocalPRNG, class /* EnableIf */ = ValidRNG<RNG>>
   static uint32_t rand32(uint32_t min, uint32_t max, RNG&& rng) {
     if (min == max) {
-      return 0;
+      return min;
     }
     return std::uniform_int_distribution<uint32_t>(min, max - 1)(rng);
   }
@@ -262,7 +294,15 @@ class Random {
    */
   template <class RNG = ThreadLocalPRNG, class /* EnableIf */ = ValidRNG<RNG>>
   static uint64_t rand64(RNG&& rng) {
-    return ((uint64_t)rng() << 32) | rng();
+    if FOLLY_CXX17_CONSTEXPR (UniformRNG<std::decay_t<RNG>, uint64_t>) {
+      return rng();
+    } else if FOLLY_CXX17_CONSTEXPR (UniformRNG<std::decay_t<RNG>, uint32_t>) {
+      return (static_cast<uint64_t>(rng()) << 32) |
+          static_cast<uint32_t>(rng());
+    } else {
+      return std::uniform_int_distribution<uint64_t>(
+          0, std::numeric_limits<uint64_t>::max())(rng);
+    }
   }
 
   /**
@@ -281,19 +321,19 @@ class Random {
   }
 
   /**
-   * Returns a random uint64_t in [min, max). If min == max, returns 0.
+   * Returns a random uint64_t in [min, max). If min == max, returns min.
    */
   static uint64_t rand64(uint64_t min, uint64_t max) {
     return rand64(min, max, ThreadLocalPRNG());
   }
 
   /**
-   * Returns a random uint64_t in [min, max). If min == max, returns 0.
+   * Returns a random uint64_t in [min, max). If min == max, returns min.
    */
   template <class RNG = ThreadLocalPRNG, class /* EnableIf */ = ValidRNG<RNG>>
   static uint64_t rand64(uint64_t min, uint64_t max, RNG&& rng) {
     if (min == max) {
-      return 0;
+      return min;
     }
     return std::uniform_int_distribution<uint64_t>(min, max - 1)(rng);
   }
@@ -306,12 +346,38 @@ class Random {
   /**
    * Returns true 1/n of the time. If n == 0, always returns false
    */
+  static bool oneIn64(uint64_t n) { return oneIn64(n, ThreadLocalPRNG()); }
+
+  /**
+   * Returns true 1/n of the time. If n == 0, always returns false
+   */
   template <class RNG = ThreadLocalPRNG, class /* EnableIf */ = ValidRNG<RNG>>
   static bool oneIn(uint32_t n, RNG&& rng) {
     if (n < 2) {
       return n;
     }
-    return rand32(0, n, rng) == 0;
+    return rand32(0, n, std::forward<RNG>(rng)) == 0;
+  }
+
+  template <class RNG = ThreadLocalPRNG, class /* EnableIf */ = ValidRNG<RNG>>
+  static bool oneIn64(uint64_t n, RNG&& rng) {
+    if (n < 2) {
+      return n;
+    }
+    return rand64(0, n, std::forward<RNG>(rng)) == 0;
+  }
+
+  /**
+   * Returns true with the probability of p, false otherwise
+   */
+  static bool randBool(double p) { return randBool(p, ThreadLocalPRNG()); }
+
+  /**
+   * Returns true with the probability of p, false otherwise
+   */
+  template <class RNG = ThreadLocalPRNG, class /* EnableIf */ = ValidRNG<RNG>>
+  static bool randBool(double p, RNG&& rng) {
+    return randDouble01(std::forward<RNG>(rng)) < p;
   }
 
   /**
@@ -324,24 +390,30 @@ class Random {
    */
   template <class RNG = ThreadLocalPRNG, class /* EnableIf */ = ValidRNG<RNG>>
   static double randDouble01(RNG&& rng) {
-    return std::generate_canonical<double, std::numeric_limits<double>::digits>(
-        rng);
+    // Assuming 64-bit IEEE754 doubles, numbers in the form k/2^53 can be
+    // represented exactly, so we can sample uniformly in [0, 1) by sampling an
+    // integer in [0, 2^53) and scaling accordingly. This is the highest
+    // precision we can obtain if we want a symmetric output distribution.
+    // See https://prng.di.unimi.it/#remarks for more details.
+    static_assert(
+        std::numeric_limits<double>::digits == 53, "Unsupported double type");
+    return (rand64(std::forward<RNG>(rng)) >> 11) * 0x1.0p-53;
   }
 
   /**
-   * Returns a double in [min, max), if min == max, returns 0.
+   * Returns a double in [min, max), if min == max, returns min.
    */
   static double randDouble(double min, double max) {
     return randDouble(min, max, ThreadLocalPRNG());
   }
 
   /**
-   * Returns a double in [min, max), if min == max, returns 0.
+   * Returns a double in [min, max), if min == max, returns min.
    */
   template <class RNG = ThreadLocalPRNG, class /* EnableIf */ = ValidRNG<RNG>>
   static double randDouble(double min, double max, RNG&& rng) {
     if (std::fabs(max - min) < std::numeric_limits<double>::epsilon()) {
-      return 0;
+      return min;
     }
     return std::uniform_real_distribution<double>(min, max)(rng);
   }

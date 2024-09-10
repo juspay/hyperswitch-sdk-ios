@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,33 +19,37 @@
 
 #pragma once
 
+#include <algorithm>
 #include <atomic>
+#include <cassert>
 #include <cstddef>
+#include <cstring>
 #include <iosfwd>
 #include <limits>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
+#include <utility>
+
+#include <fmt/format.h>
+#include <folly/CPortability.h>
+#include <folly/CppAttributes.h>
+#include <folly/Likely.h>
+#include <folly/Portability.h>
+#include <folly/Traits.h>
+#include <folly/hash/Hash.h>
+#include <folly/lang/Assume.h>
+#include <folly/lang/CheckedMath.h>
+#include <folly/lang/Exception.h>
+#include <folly/memory/Malloc.h>
 
 #if FOLLY_HAS_STRING_VIEW
 #include <string_view>
 #endif
 
-#include <folly/CPortability.h>
-#include <folly/CppAttributes.h>
-#include <folly/Likely.h>
-#include <folly/Portability.h>
-
-#include <algorithm>
-#include <cassert>
-#include <cstring>
-#include <string>
-#include <utility>
-
-#include <folly/Traits.h>
-#include <folly/hash/Hash.h>
-#include <folly/lang/Assume.h>
-#include <folly/lang/Exception.h>
-#include <folly/memory/Malloc.h>
+#if FOLLY_CPLUSPLUS >= 202002L
+#include <compare>
+#endif
 
 FOLLY_PUSH_WARNING
 // Ignore shadowing warnings within this file, so includers can use -Wshadow.
@@ -368,6 +372,8 @@ class fbstring_core {
 
   FOLLY_NOINLINE
   void reserve(size_t minCapacity, bool disableSSO = FBSTRING_DISABLE_SSO) {
+    FOLLY_PUSH_WARNING
+    FOLLY_CLANG_DISABLE_WARNING("-Wcovered-switch-default")
     switch (category()) {
       case Category::isSmall:
         reserveSmall(minCapacity, disableSSO);
@@ -381,6 +387,7 @@ class fbstring_core {
       default:
         folly::assume_unreachable();
     }
+    FOLLY_POP_WARNING
     assert(capacity() >= minCapacity);
   }
 
@@ -400,7 +407,8 @@ class fbstring_core {
       auto maybeSmallSize = size_t(maxSmallSize) -
           size_t(static_cast<UChar>(small_[maxSmallSize]));
       // With this syntax, GCC and Clang generate a CMOV instead of a branch.
-      ret = (static_cast<ssize_t>(maybeSmallSize) >= 0) ? maybeSmallSize : ret;
+      ret =
+          (static_cast<ptrdiff_t>(maybeSmallSize) >= 0) ? maybeSmallSize : ret;
     } else {
       ret = (category() == Category::isSmall) ? smallSize() : ret;
     }
@@ -408,6 +416,8 @@ class fbstring_core {
   }
 
   size_t capacity() const {
+    FOLLY_PUSH_WARNING
+    FOLLY_CLANG_DISABLE_WARNING("-Wcovered-switch-default")
     switch (category()) {
       case Category::isSmall:
         return maxSmallSize;
@@ -423,6 +433,7 @@ class fbstring_core {
       default:
         break;
     }
+    FOLLY_POP_WARNING
     return ml_.capacity();
   }
 
@@ -477,13 +488,20 @@ class fbstring_core {
       size_t oldcnt = dis->refCount_.fetch_sub(1, std::memory_order_acq_rel);
       assert(oldcnt > 0);
       if (oldcnt == 1) {
-        free(dis);
+        ::free(dis);
       }
     }
 
     static RefCounted* create(size_t* size) {
-      const size_t allocSize =
-          goodMallocSize(getDataOffset() + (*size + 1) * sizeof(Char));
+      size_t capacityBytes;
+      if (!folly::checked_add(&capacityBytes, *size, size_t(1))) {
+        throw_exception(std::length_error(""));
+      }
+      if (!folly::checked_muladd(
+              &capacityBytes, capacityBytes, sizeof(Char), getDataOffset())) {
+        throw_exception(std::length_error(""));
+      }
+      const size_t allocSize = goodMallocSize(capacityBytes);
       auto result = static_cast<RefCounted*>(checkedMalloc(allocSize));
       result->refCount_.store(1, std::memory_order_release);
       *size = (allocSize - getDataOffset()) / sizeof(Char) - 1;
@@ -505,8 +523,15 @@ class fbstring_core {
         const size_t currentCapacity,
         size_t* newCapacity) {
       assert(*newCapacity > 0 && *newCapacity > currentSize);
-      const size_t allocNewCapacity =
-          goodMallocSize(getDataOffset() + (*newCapacity + 1) * sizeof(Char));
+      size_t capacityBytes;
+      if (!folly::checked_add(&capacityBytes, *newCapacity, size_t(1))) {
+        throw_exception(std::length_error(""));
+      }
+      if (!folly::checked_muladd(
+              &capacityBytes, capacityBytes, sizeof(Char), getDataOffset())) {
+        throw_exception(std::length_error(""));
+      }
+      const size_t allocNewCapacity = goodMallocSize(capacityBytes);
       auto const dis = fromData(data);
       assert(dis->refCount_.load(std::memory_order_acquire) == 1);
       auto result = static_cast<RefCounted*>(smartRealloc(
@@ -626,8 +651,7 @@ inline void fbstring_core<Char>::copySmall(const fbstring_core& rhs) {
 }
 
 template <class Char>
-FOLLY_NOINLINE inline void fbstring_core<Char>::copyMedium(
-    const fbstring_core& rhs) {
+FOLLY_NOINLINE void fbstring_core<Char>::copyMedium(const fbstring_core& rhs) {
   // Medium strings are copied eagerly. Don't forget to allocate
   // one extra Char for the null terminator.
   auto const allocSize = goodMallocSize((1 + rhs.ml_.size_) * sizeof(Char));
@@ -641,8 +665,7 @@ FOLLY_NOINLINE inline void fbstring_core<Char>::copyMedium(
 }
 
 template <class Char>
-FOLLY_NOINLINE inline void fbstring_core<Char>::copyLarge(
-    const fbstring_core& rhs) {
+FOLLY_NOINLINE void fbstring_core<Char>::copyLarge(const fbstring_core& rhs) {
   // Large strings are just refcounted
   ml_ = rhs.ml_;
   RefCounted::incrementRefs(ml_.data_);
@@ -697,7 +720,7 @@ inline void fbstring_core<Char>::initSmall(
 }
 
 template <class Char>
-FOLLY_NOINLINE inline void fbstring_core<Char>::initMedium(
+FOLLY_NOINLINE void fbstring_core<Char>::initMedium(
     const Char* const data, const size_t size) {
   // Medium strings are allocated normally. Don't forget to
   // allocate one extra Char for the terminating null.
@@ -712,7 +735,7 @@ FOLLY_NOINLINE inline void fbstring_core<Char>::initMedium(
 }
 
 template <class Char>
-FOLLY_NOINLINE inline void fbstring_core<Char>::initLarge(
+FOLLY_NOINLINE void fbstring_core<Char>::initLarge(
     const Char* const data, const size_t size) {
   // Large strings are allocated differently
   size_t effectiveCapacity = size;
@@ -724,7 +747,7 @@ FOLLY_NOINLINE inline void fbstring_core<Char>::initLarge(
 }
 
 template <class Char>
-FOLLY_NOINLINE inline void fbstring_core<Char>::unshare(size_t minCapacity) {
+FOLLY_NOINLINE void fbstring_core<Char>::unshare(size_t minCapacity) {
   assert(category() == Category::isLarge);
   size_t effectiveCapacity = std::max(minCapacity, ml_.capacity());
   auto const newRC = RefCounted::create(&effectiveCapacity);
@@ -749,8 +772,7 @@ inline Char* fbstring_core<Char>::mutableDataLarge() {
 }
 
 template <class Char>
-FOLLY_NOINLINE inline void fbstring_core<Char>::reserveLarge(
-    size_t minCapacity) {
+FOLLY_NOINLINE void fbstring_core<Char>::reserveLarge(size_t minCapacity) {
   assert(category() == Category::isLarge);
   if (RefCounted::refs(ml_.data_) > 1) { // Ensure unique
     // We must make it unique regardless; in-place reallocation is
@@ -773,7 +795,7 @@ FOLLY_NOINLINE inline void fbstring_core<Char>::reserveLarge(
 }
 
 template <class Char>
-FOLLY_NOINLINE inline void fbstring_core<Char>::reserveMedium(
+FOLLY_NOINLINE void fbstring_core<Char>::reserveMedium(
     const size_t minCapacity) {
   assert(category() == Category::isMedium);
   // String is not shared
@@ -806,7 +828,7 @@ FOLLY_NOINLINE inline void fbstring_core<Char>::reserveMedium(
 }
 
 template <class Char>
-FOLLY_NOINLINE inline void fbstring_core<Char>::reserveSmall(
+FOLLY_NOINLINE void fbstring_core<Char>::reserveSmall(
     size_t minCapacity, const bool disableSSO) {
   assert(category() == Category::isSmall);
   if (!disableSSO && minCapacity <= maxSmallSize) {
@@ -1680,13 +1702,41 @@ class basic_fbstring {
     return r != 0 ? r : n1 > n2 ? 1 : n1 < n2 ? -1 : 0;
   }
 
+#if FOLLY_CPLUSPLUS >= 202002L
+  friend auto operator<=>(
+      const basic_fbstring& lhs, const basic_fbstring& rhs) {
+    return lhs.spaceship(rhs.data(), rhs.size());
+  }
+  friend auto operator<=>(const basic_fbstring& lhs, const char* rhs) {
+    return lhs.spaceship(rhs, traitsLength(rhs));
+  }
+  template <typename A2>
+  friend auto operator<=>(
+      const basic_fbstring& lhs, const std::basic_string<E, T, A2>& rhs) {
+    return lhs.spaceship(rhs.data(), rhs.size());
+  }
+#endif // FOLLY_CPLUSPLUS >= 202002L
+
  private:
+#if FOLLY_CPLUSPLUS >= 202002L
+  auto spaceship(const value_type* rhsData, size_type rhsSize) const {
+    auto c = compare(0, size(), rhsData, rhsSize);
+    if (c == 0) {
+      return std::strong_ordering::equal;
+    } else if (c < 0) {
+      return std::strong_ordering::less;
+    } else {
+      return std::strong_ordering::greater;
+    }
+  }
+#endif // FOLLY_CPLUSPLUS >= 202002L
+
   // Data
   Storage store_;
 };
 
 template <typename E, class T, class A, class S>
-FOLLY_NOINLINE inline typename basic_fbstring<E, T, A, S>::size_type
+FOLLY_NOINLINE typename basic_fbstring<E, T, A, S>::size_type
 basic_fbstring<E, T, A, S>::traitsLength(const value_type* s) {
   return s ? traits_type::length(s)
            : (throw_exception<std::logic_error>(
@@ -1776,8 +1826,8 @@ inline basic_fbstring<E, T, A, S>& basic_fbstring<E, T, A, S>::append(
 }
 
 template <typename E, class T, class A, class S>
-FOLLY_NOINLINE inline basic_fbstring<E, T, A, S>&
-basic_fbstring<E, T, A, S>::append(const value_type* s, size_type n) {
+FOLLY_NOINLINE basic_fbstring<E, T, A, S>& basic_fbstring<E, T, A, S>::append(
+    const value_type* s, size_type n) {
   Invariant checker(*this);
 
   if (FOLLY_UNLIKELY(!n)) {
@@ -1827,8 +1877,8 @@ inline basic_fbstring<E, T, A, S>& basic_fbstring<E, T, A, S>::assign(
 }
 
 template <typename E, class T, class A, class S>
-FOLLY_NOINLINE inline basic_fbstring<E, T, A, S>&
-basic_fbstring<E, T, A, S>::assign(const value_type* s, const size_type n) {
+FOLLY_NOINLINE basic_fbstring<E, T, A, S>& basic_fbstring<E, T, A, S>::assign(
+    const value_type* s, const size_type n) {
   Invariant checker(*this);
 
   if (n == 0) {
@@ -2542,7 +2592,7 @@ operator<<(
         typename basic_fbstring<E, T, A, S>::value_type,
         typename basic_fbstring<E, T, A, S>::traits_type>& os,
     const basic_fbstring<E, T, A, S>& str) {
-#if _LIBCPP_VERSION
+#ifdef _LIBCPP_VERSION
   typedef std::basic_ostream<
       typename basic_fbstring<E, T, A, S>::value_type,
       typename basic_fbstring<E, T, A, S>::traits_type>
@@ -2577,9 +2627,11 @@ operator<<(
   return os;
 }
 
+#if FOLLY_CPLUSPLUS < 201703L
 template <typename E1, class T, class A, class S>
 constexpr typename basic_fbstring<E1, T, A, S>::size_type
     basic_fbstring<E1, T, A, S>::npos;
+#endif
 
 // basic_string compatibility routines
 
@@ -2729,3 +2781,14 @@ struct IsSomeString;
 template <>
 struct IsSomeString<fbstring> : std::true_type {};
 } // namespace folly
+
+template <>
+struct fmt::formatter<folly::fbstring> : private formatter<fmt::string_view> {
+  using formatter<fmt::string_view>::parse;
+
+  template <typename Context>
+  typename Context::iterator format(
+      const folly::fbstring& s, Context& ctx) const {
+    return formatter<fmt::string_view>::format({s.data(), s.size()}, ctx);
+  }
+};

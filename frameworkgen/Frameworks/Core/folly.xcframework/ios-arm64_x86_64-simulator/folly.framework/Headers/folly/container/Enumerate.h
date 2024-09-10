@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,30 +25,32 @@
 /**
  * Similar to Python's enumerate(), folly::enumerate() can be used to
  * iterate a range with a for-range loop, and it also allows to
- * retrieve the count of iterations so far.
+ * retrieve the count of iterations so far. Can be used in constexpr
+ * context.
  *
  * For example:
  *
- * for (const auto& [index, element] : folly::enumerate(vec)) {
- *   // index is a reference to a size_t
- *   // element is a reference to the type contained within vec
+ * for (auto&& [index, element] : folly::enumerate(vec)) {
+ *   // index is a const reference to a size_t containing the iteration count.
+ *   // element is a reference to the type contained within vec, mutable
+ *   // unless vec is const.
+ * }
+ *
+ * If the binding is const, the element reference is too.
+ *
+ * for (const auto&& [index, element] : folly::enumerate(vec)) {
+ *   // element is always a const reference.
  * }
  *
  * It can also be used as follows:
  *
  * for (auto&& it : folly::enumerate(vec)) {
- *   // *it is a reference to the current element. Const if vec is const.
+ *   // *it is a reference to the current element. Mutable unless vec is const.
  *   // it->member can be used as well.
  *   // it.index contains the iteration count.
  * }
  *
- * If the iteration variable is const, the reference is too.
- *
- * for (const auto&& it : folly::enumerate(vec)) {
- *   // *it is always a const reference.
- * }
- *
- * @author Giuseppe Ottaviano <ott@fb.com>
+ * As before, const auto&& it can also be used.
  */
 
 namespace folly {
@@ -71,7 +73,7 @@ struct MakeConst<T*> {
 template <class Iterator>
 class Enumerator {
  public:
-  explicit Enumerator(Iterator it) : it_(std::move(it)) {}
+  constexpr explicit Enumerator(Iterator it) : it_(std::move(it)) {}
 
   class Proxy {
    public:
@@ -81,18 +83,22 @@ class Enumerator {
     using pointer = typename std::iterator_traits<Iterator>::pointer;
     using iterator_category = std::input_iterator_tag;
 
-    FOLLY_ALWAYS_INLINE explicit Proxy(const Enumerator& e)
+    FOLLY_ALWAYS_INLINE constexpr explicit Proxy(const Enumerator& e)
         : index(e.idx_), element(*e.it_) {}
 
     // Non-const Proxy: Forward constness from Iterator.
-    FOLLY_ALWAYS_INLINE reference operator*() { return element; }
-    FOLLY_ALWAYS_INLINE pointer operator->() { return std::addressof(element); }
+    FOLLY_ALWAYS_INLINE constexpr reference operator*() { return element; }
+    FOLLY_ALWAYS_INLINE constexpr pointer operator->() {
+      return std::addressof(element);
+    }
 
     // Const Proxy: Force const references.
-    FOLLY_ALWAYS_INLINE typename MakeConst<reference>::type operator*() const {
+    FOLLY_ALWAYS_INLINE constexpr typename MakeConst<reference>::type
+    operator*() const {
       return element;
     }
-    FOLLY_ALWAYS_INLINE typename MakeConst<pointer>::type operator->() const {
+    FOLLY_ALWAYS_INLINE constexpr typename MakeConst<pointer>::type operator->()
+        const {
       return std::addressof(element);
     }
 
@@ -101,22 +107,22 @@ class Enumerator {
     reference element;
   };
 
-  FOLLY_ALWAYS_INLINE Proxy operator*() const { return Proxy(*this); }
+  FOLLY_ALWAYS_INLINE constexpr Proxy operator*() const { return Proxy(*this); }
 
-  FOLLY_ALWAYS_INLINE Enumerator& operator++() {
+  FOLLY_ALWAYS_INLINE constexpr Enumerator& operator++() {
     ++it_;
     ++idx_;
     return *this;
   }
 
   template <typename OtherIterator>
-  FOLLY_ALWAYS_INLINE bool operator==(
+  FOLLY_ALWAYS_INLINE constexpr bool operator==(
       const Enumerator<OtherIterator>& rhs) const {
     return it_ == rhs.it_;
   }
 
   template <typename OtherIterator>
-  FOLLY_ALWAYS_INLINE bool operator!=(
+  FOLLY_ALWAYS_INLINE constexpr bool operator!=(
       const Enumerator<OtherIterator>& rhs) const {
     return !(it_ == rhs.it_);
   }
@@ -136,12 +142,12 @@ class RangeEnumerator {
   using EndIteratorType = decltype(std::declval<Range>().end());
 
  public:
-  explicit RangeEnumerator(Range&& r) : r_(std::forward<Range>(r)) {}
+  constexpr explicit RangeEnumerator(Range&& r) : r_(std::forward<Range>(r)) {}
 
-  Enumerator<BeginIteratorType> begin() {
+  constexpr Enumerator<BeginIteratorType> begin() {
     return Enumerator<BeginIteratorType>(r_.begin());
   }
-  Enumerator<EndIteratorType> end() {
+  constexpr Enumerator<EndIteratorType> end() {
     return Enumerator<EndIteratorType>(r_.end());
   }
 };
@@ -149,7 +155,7 @@ class RangeEnumerator {
 } // namespace detail
 
 template <class Range>
-detail::RangeEnumerator<Range> enumerate(Range&& r) {
+constexpr detail::RangeEnumerator<Range> enumerate(Range&& r) {
   return detail::RangeEnumerator<Range>(std::forward<Range>(r));
 }
 

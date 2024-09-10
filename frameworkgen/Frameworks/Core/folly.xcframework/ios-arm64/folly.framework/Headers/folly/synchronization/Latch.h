@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,7 +101,7 @@ class Latch {
   FOLLY_ALWAYS_INLINE void count_down(ptrdiff_t n = 1) noexcept {
     terminate_if(n < 0 || n > max());
     if (FOLLY_LIKELY(n)) {
-      const auto count = count_.fetch_sub(n, std::memory_order_relaxed);
+      const auto count = count_.fetch_sub(n, std::memory_order_acq_rel);
       terminate_if(count < n);
       if (FOLLY_UNLIKELY(count == n)) {
         semaphore_.post();
@@ -146,7 +146,7 @@ class Latch {
   }
 
  private:
-  FOLLY_ALWAYS_INLINE void terminate_if(bool cond) noexcept {
+  FOLLY_ALWAYS_INLINE constexpr void terminate_if(bool cond) noexcept {
     if (cond) {
       folly::terminate_with<std::invalid_argument>(
           "argument outside expected range");
@@ -154,7 +154,7 @@ class Latch {
   }
 
   std::atomic<int32_t> count_;
-  SaturatingSemaphore</* MayBlock = */ true> semaphore_;
+  SaturatingSemaphore<> semaphore_;
 };
 
 } // namespace folly

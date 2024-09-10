@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ namespace sockets {
 bool is_fh_socket(int fh);
 SOCKET fd_to_socket(int fd);
 int socket_to_fd(SOCKET s);
-int translate_wsa_error(int wsaErr);
 
 // These aren't additional overloads, but rather other functions that
 // are referenced that we need to wrap, or, in the case of inet_aton,
@@ -116,7 +115,7 @@ ssize_t sendto(
 int setsockopt(
     int s, int level, int optname, const char* optval, socklen_t optlen);
 
-#elif defined(__XROS__) || defined(__EMSCRIPTEN__)
+#elif defined(__EMSCRIPTEN__)
 
 // None of these are implemented or referenced right now.
 

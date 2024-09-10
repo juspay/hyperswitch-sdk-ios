@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@
 ///   protected by hazard pointers.
 /// - The essential components of the hazptr API are:
 ///   o hazptr_holder: Class that owns and manages a hazard pointer.
-///   o protect: Mmember function of hazptr_holder. Protects
+///   o protect: Member function of hazptr_holder. Protects
 ///     an object pointed to by an atomic source (if not null).
 ///       T* protect(const atomic<T*>& src);
 ///   o hazptr_obj_base<T>: Base class for protected objects.

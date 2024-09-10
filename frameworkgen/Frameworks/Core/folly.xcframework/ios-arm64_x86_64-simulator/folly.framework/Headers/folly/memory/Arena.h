@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ class Arena {
     bytesUsed_ += size;
 
     assert(ptr_ <= end_);
-    if (LIKELY((size_t)(end_ - ptr_) >= size)) {
+    if (FOLLY_LIKELY((size_t)(end_ - ptr_) >= size)) {
       // Fast path: there's enough room in the current block
       char* r = ptr_;
       ptr_ += size;

@@ -1,0 +1,6 @@
+framework module React_microtasksnativemodule {
+  umbrella header "React-microtasksnativemodule-umbrella.h"
+
+  export *
+  module * { export * }
+}

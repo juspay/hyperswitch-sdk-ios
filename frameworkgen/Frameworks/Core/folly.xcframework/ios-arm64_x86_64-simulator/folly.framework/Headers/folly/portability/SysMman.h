@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@
 
 #include <sys/types.h>
 
+using off64_t = int64_t;
+
 #define MAP_ANONYMOUS 1
 #define MAP_ANON MAP_ANONYMOUS
 #define MAP_SHARED 2
@@ -56,6 +58,8 @@ extern "C" {
 int madvise(const void* addr, size_t len, int advise);
 int mlock(const void* addr, size_t len);
 void* mmap(void* addr, size_t length, int prot, int flags, int fd, off_t off);
+void* mmap64(
+    void* addr, size_t length, int prot, int flags, int fd, off64_t off);
 int mprotect(void* addr, size_t size, int prot);
 int munlock(const void* addr, size_t length);
 int munmap(void* addr, size_t length);

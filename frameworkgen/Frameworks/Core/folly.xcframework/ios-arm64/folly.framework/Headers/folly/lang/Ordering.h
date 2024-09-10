@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,14 @@
 
 #pragma once
 
+#include <cstdint>
+#include <stdexcept>
+
+#include <folly/lang/Exception.h>
+
 namespace folly {
 
-enum class ordering : int { lt = -1, eq = 0, gt = 1 };
+enum class ordering : std::int8_t { lt = -1, eq = 0, gt = 1 };
 
 template <typename T>
 constexpr ordering to_ordering(T c) {
@@ -67,6 +72,69 @@ struct compare_greater : detail::cmp_pred<C, ordering::gt, 0> {
 template <typename C>
 struct compare_greater_equal : detail::cmp_pred<C, ordering::lt, 1> {
   using detail::cmp_pred<C, ordering::lt, 1>::cmp_pred;
+};
+
+namespace detail {
+
+// extracted to a template so initialization can be inline and visible in c++14
+template <typename D>
+struct partial_ordering_ {
+  static D const less;
+  static D const greater;
+  static D const equivalent;
+  static D const unordered;
+};
+
+template <typename D>
+FOLLY_STORAGE_CONSTEXPR D const partial_ordering_<D>::less{ordering::lt};
+template <typename D>
+FOLLY_STORAGE_CONSTEXPR D const partial_ordering_<D>::greater{ordering::gt};
+template <typename D>
+FOLLY_STORAGE_CONSTEXPR D const partial_ordering_<D>::equivalent{ordering::eq};
+template <typename D>
+FOLLY_STORAGE_CONSTEXPR D const //
+    partial_ordering_<D>::unordered{typename D::unordered_tag{}};
+
+} // namespace detail
+
+/// @def partial_ordering
+///
+/// mimic: std::partial_ordering, c++20 (partial)
+class partial_ordering : private detail::partial_ordering_<partial_ordering> {
+ private:
+  using constants = detail::partial_ordering_<partial_ordering>;
+  friend constants;
+  class unordered_tag {};
+
+ public:
+  using constants::equivalent;
+  using constants::greater;
+  using constants::less;
+  using constants::unordered;
+
+  explicit constexpr partial_ordering(unordered_tag) noexcept : value_{undef} {}
+  /* implicit */ constexpr partial_ordering(ordering o) noexcept
+      : value_{int8_t(o)} {}
+
+  explicit operator ordering() const noexcept(false) {
+    switch (value_) {
+      case undef:
+        throw_exception<std::out_of_range>("unordered");
+      default:
+        return ordering(value_);
+    }
+  }
+
+  friend bool operator==(partial_ordering a, partial_ordering b) noexcept {
+    return a.value_ == b.value_;
+  }
+  friend bool operator!=(partial_ordering a, partial_ordering b) noexcept {
+    return a.value_ != b.value_;
+  }
+
+ private:
+  static constexpr int8_t undef = 2;
+  int8_t value_ = undef;
 };
 
 } // namespace folly
