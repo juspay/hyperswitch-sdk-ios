@@ -7,7 +7,9 @@
 
 import UIKit
 import WebKit
+#if canImport(HyperswitchScancard)
 import HyperswitchScancard
+#endif
 
 internal class WebViewController: UIViewController {
     
@@ -164,6 +166,7 @@ internal class WebViewController: UIViewController {
         }
     }
     func launchScanCard(vc: UIViewController) {
+    #if canImport(HyperswitchScancard)
         DispatchQueue.main.async {
             var message: [String:Any] = [:]
             var callback: [String:Any] = [:]
@@ -184,6 +187,7 @@ internal class WebViewController: UIViewController {
                 self.sendScanCardData(scanProps: callback)
             }
         }
+    #endif
     }
 }
 extension WebViewController: WKUIDelegate {
