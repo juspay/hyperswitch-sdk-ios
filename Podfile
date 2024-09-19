@@ -32,3 +32,8 @@ target 'hyperswitch' do
     )
   end
 end
+
+target 'hyperswitchAppClip' do  ## for testing attach local pods ##
+  use_frameworks!
+  pod 'HyperswitchScanCard', :path =>  "frameworkgen/scanCard" 
+end

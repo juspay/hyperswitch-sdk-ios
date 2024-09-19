@@ -25,7 +25,7 @@ internal class WebViewController: UIViewController {
     
     private let baseUrl = URL(string: "https://rnweb.netlify.app/")
     private var webView: WKWebView = WKWebView()
-    var popupWebView: WKWebView?
+    private var popupWebView: WKWebView?
     private var props: [String: Any]?
     private var completion: ((PaymentSheetResult) -> ())?
     
@@ -85,77 +85,24 @@ internal class WebViewController: UIViewController {
         webView.load(request)
     }
     
-    private func sendProps() {
-        
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: props as Any, options: []),
-              let jsonString = String(data: jsonData, encoding: .utf8) else {
-            let error = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
-            callback(.failed(error: error))
-            return
-        }
-        
-        let jsCode = "window.postMessage('\(jsonString)', '*');"
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-            self?.webView.evaluateJavaScript(jsCode) { (result, error) in
-                if let _ = error {
-                    let error = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
-                    self?.callback(.failed(error: error))
-                } else {
-                    // Message Sent
-                }
-            }
-        }
-    }
-    private func sendScanCardData(scanProps: [String: Any]?) {
-        
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: scanProps as Any, options: []),
-              let jsonString = String(data: jsonData, encoding: .utf8) else {
-            let error = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
-            callback(.failed(error: error))
-            return
-        }
-        
-        let jsCode = "window.postMessage('\(jsonString)', '*');"
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-            self?.webView.evaluateJavaScript(jsCode) { (result, error) in
-                if let _ = error {
-                    let error = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
-                    self?.callback(.failed(error: error))
-                } else {
-                    // Message Sent
-                }
-            }
-        }
-    }
-    
-    public func sendApplePayData(props: [[String: Any]]) {
-        
-        let applePayProps = [
-            "applePayData" : props[0]
-        ]
-        
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: applePayProps as Any, options: []),
-              let jsonString = String(data: jsonData, encoding: .utf8) else {
-            let error = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
-            callback(.failed(error: error))
-            return
-        }
-        
-        
-        let jsCode = "window.postMessage('\(jsonString)', '*');"
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-            self?.webView.evaluateJavaScript(jsCode) { (result, error) in
-                if let _ = error {
-                    let error = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
-                    self?.callback(.failed(error: error))
-                } else {
-                    // Message Sent
-                }
-            }
-        }
+    private func sendPropsToJS(props: [String: Any]?) {
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: props as Any)
+               if let jsonString = String(data: jsonData, encoding: .utf8) {
+                   let escapedJsonString = jsonString.replacingOccurrences(of: "\\", with: "\\\\")
+                                                     .replacingOccurrences(of: "\"", with: "\\\"")
+                                                     .replacingOccurrences(of: "\n", with: "\\n")
+                   
+                   let jsCode = "window.postMessage(\"\(escapedJsonString)\", '*');"
+                   webView.evaluateJavaScript(jsCode) { (result, error) in
+                       if let error = error {
+                           print("Error sending message: \(error)")
+                       }
+                   }
+               }
+           } catch {
+               print("Error creating JSON: \(error)")
+           }
     }
     
     private func callback(_ result: PaymentSheetResult) {
@@ -164,30 +111,6 @@ internal class WebViewController: UIViewController {
             self?.webView.stopLoading()
             self?.dismiss(animated: false)
         }
-    }
-    func launchScanCard(vc: UIViewController) {
-    #if canImport(HyperswitchScancard)
-        DispatchQueue.main.async {
-            var message: [String:Any] = [:]
-            var callback: [String:Any] = [:]
-            let cardScanSheet = CardScanSheet()
-            cardScanSheet.present(from: vc) { result in
-                switch result {
-                case .completed(var card as ScannedCard?):
-                    message["pan"] = card?.pan
-                    message["expiryMonth"] =  card?.expiryMonth
-                    message["expiryYear"] =  card?.expiryYear
-                    callback["status"] = "Succeeded"
-                    callback["scanCardData"] = message
-                case .canceled:
-                    callback["status"] = "Cancelled"
-                case .failed(let error):
-                    callback["status"] = "Failed"
-                }
-                self.sendScanCardData(scanProps: callback)
-            }
-        }
-    #endif
     }
 }
 extension WebViewController: WKUIDelegate {
@@ -211,16 +134,42 @@ extension WebViewController: WKUIDelegate {
 extension WebViewController: WKScriptMessageHandler {
     internal func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         if message.name == "sdkInitialised" {
-            self.sendProps()
-        }
-        if message.name == "launchScanCard" {
-            launchScanCard(vc: self)
+            self.sendPropsToJS(props: self.props)
         }
         if message.name == "launchApplePay" {
             guard let body = message.body as? String else {
                 return
             }
-            ApplePayHandler().startPayment(rnMessage: body, rnCallback: sendApplePayData)
+            ApplePayHandler().startPayment(rnMessage: body, rnCallback: { props in
+                let applePayProps = [
+                    "applePayData" : props[0]
+                ]
+                self.sendPropsToJS(props: applePayProps)
+            })
+        }
+        if message.name == "launchScanCard" {
+#if canImport(HyperswitchScancard)
+            DispatchQueue.main.async {
+                var message: [String:Any] = [:]
+                var callback: [String:Any] = [:]
+                let cardScanSheet = CardScanSheet()
+                cardScanSheet.present(from: self) { result in
+                    switch result {
+                    case .completed(var card as ScannedCard?):
+                        message["pan"] = card?.pan
+                        message["expiryMonth"] =  card?.expiryMonth
+                        message["expiryYear"] =  card?.expiryYear
+                        callback["status"] = "Succeeded"
+                        callback["scanCardData"] = message
+                    case .canceled:
+                        callback["status"] = "Cancelled"
+                    case .failed(let error):
+                        callback["status"] = "Failed"
+                    }
+                    self.sendPropsToJS(props: callback)
+                }
+            }
+#endif
         }
         if message.name == "exitPaymentSheet" {
             guard let body = message.body as? String,
@@ -283,7 +232,7 @@ extension WebViewController: WKNavigationDelegate {
                 webView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
             ])
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            DispatchQueue.main.asyncAfter(deadline: .now()+1) {
                 let js = """
                     var closeButtonContainer = document.createElement('div');
                     closeButtonContainer.style.position = 'fixed';
