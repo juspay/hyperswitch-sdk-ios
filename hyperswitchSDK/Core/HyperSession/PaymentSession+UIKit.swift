@@ -33,6 +33,11 @@ extension PaymentSession {
         paymentSheet.present(from: viewController, completion: completion)
     }
     
+    public func presentPaymentManagementSheet(viewController: UIViewController) {
+        let pmManagement = PaymentMethodMangement(ephemeralKey: PaymentSession.ephemeralKey ?? "")
+        pmManagement.presentPmManagent(from: viewController)
+    }
+    
     // for external frameworks
     public func presentPaymentSheetWithParams(viewController: UIViewController, params: [String: Any], completion: @escaping (PaymentSheetResult) -> ()){
         PaymentSession.isPresented = true

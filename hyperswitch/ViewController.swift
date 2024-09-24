@@ -16,6 +16,8 @@ class ViewController: UIViewController {
     private var reloadButtonConfiguration = UIButton.Configuration.plain()
     private var paymentSheetButton = UIButton()
     private var paymentSheetButtonConfiguration = UIButton.Configuration.plain()
+    private var paymentMethodManagementButton = UIButton()
+    private var paymentMethodManagementButtonConfig = UIButton.Configuration.plain()
     private var statusLabel = UILabel()
     private var cancellables = Set<AnyCancellable>()
     
@@ -23,6 +25,7 @@ class ViewController: UIViewController {
         self.view.backgroundColor = UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 0.2)
         super.viewDidLoad()
         hyperViewModel.preparePaymentSheet()
+        hyperViewModel.preparePaymentManagementSheet()
         asyncBind()
     }
     
@@ -78,6 +81,12 @@ class ViewController: UIViewController {
             }
         })
     }
+    
+    @objc
+    func openPaymentMethodManagement(_ sender: Any) {
+        hyperViewModel.paymentSession?.presentPaymentManagementSheet(viewController: self)
+    }
+    
     @objc
     func reload(_ sender: Any) {
         hyperViewModel.preparePaymentSheet()
@@ -119,7 +128,20 @@ extension ViewController {
         paymentSheetButton.translatesAutoresizingMaskIntoConstraints = false
         paymentSheetButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60).isActive = true
         paymentSheetButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
-        paymentSheetButton.topAnchor.constraint(equalTo: reloadButton.bottomAnchor, constant: 200).isActive = true
+        paymentSheetButton.topAnchor.constraint(equalTo: reloadButton.bottomAnchor, constant: 80).isActive = true
+        
+        paymentMethodManagementButton.setTitle("Payment Method Management", for: .normal)
+        paymentMethodManagementButton.setTitleColor(.white, for: .normal)
+        paymentMethodManagementButtonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 10)
+        paymentMethodManagementButton.configuration = paymentMethodManagementButtonConfig
+        paymentMethodManagementButton.backgroundColor = .systemBlue
+        paymentMethodManagementButton.layer.cornerRadius = 10
+        paymentMethodManagementButton.addTarget(self, action: #selector(openPaymentMethodManagement(_:)), for: .touchUpInside)
+        view.addSubview(paymentMethodManagementButton)
+        paymentMethodManagementButton.translatesAutoresizingMaskIntoConstraints = false
+        paymentMethodManagementButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60).isActive = true
+        paymentMethodManagementButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
+        paymentMethodManagementButton.topAnchor.constraint(equalTo: paymentSheetButton.bottomAnchor, constant: 80).isActive = true
         
         statusLabel.textAlignment = .center
         statusLabel.numberOfLines = 7
@@ -128,6 +150,6 @@ extension ViewController {
         statusLabel.translatesAutoresizingMaskIntoConstraints = false
         statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
         statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
-        statusLabel.topAnchor.constraint(equalTo: paymentSheetButton.bottomAnchor, constant: 50).isActive = true
+        statusLabel.topAnchor.constraint(equalTo: paymentMethodManagementButton.bottomAnchor, constant: 50).isActive = true
     }
 }
