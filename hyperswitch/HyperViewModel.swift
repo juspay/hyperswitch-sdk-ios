@@ -9,7 +9,7 @@ import SwiftUI
 
 class HyperViewModel: ObservableObject {
     
-    let backendUrl = URL(string: "http://localhost:5252/create-payment-intent")!
+    let backendUrl = URL(string: "http://localhost:5252")!
     
     @Published var paymentResult: PaymentSheetResult?
     @Published var paymentSession: PaymentSession?
@@ -21,46 +21,72 @@ class HyperViewModel: ObservableObject {
         case failure(String)
     }
     
+    private func fetchData(from endpoint: String) async throws -> [String: Any] {
+            guard let url = URL(string: endpoint, relativeTo: backendUrl) else {
+                throw NSError(domain: "Invalid URL", code: 400, userInfo: [NSLocalizedDescriptionKey: "Invalid URL"])
+            }
+            
+            var request = URLRequest(url: url)
+            request.httpMethod = "GET"
+            
+            let (data, response) = try await URLSession.shared.data(for: request)
+            
+            guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+                throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Invalid server response"])
+            }
+            
+            guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                throw NSError(domain: "Serialization Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Unable to decode response"])
+            }
+            
+            return json
+        }
+    
     func preparePaymentSheet() {
-        
-        var request = URLRequest(url: backendUrl)
-        request.httpMethod = "GET"
-        
-        let task = URLSession.shared.dataTask(with: request, completionHandler: { [weak self] (data, response, error) in
-            if let error = error {
-                DispatchQueue.main.async {
-                    self?.status = .failure(error.localizedDescription)
+        Task {
+            do {
+                let json = try await fetchData(from: "/create-payment-intent")
+                guard let paymentIntentClientSecret = json["clientSecret"] as? String,
+                      let publishableKey = json["publishableKey"] as? String
+                else {
+                    throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing required fields"])
                 }
-                return
-            }
-            
-            guard let httpResponse = response as? HTTPURLResponse,
-                  (200...299).contains(httpResponse.statusCode) else {
+                
                 DispatchQueue.main.async {
-                    self?.status = .failure("API Status Failed")
+                    self.status = .success
+                    self.paymentSession = PaymentSession(publishableKey: publishableKey)
+                    self.paymentSession?.initPaymentSession(paymentIntentClientSecret: paymentIntentClientSecret)
                 }
-                return
-            }
-            
-            guard let data = data,
-                  let json = try? JSONSerialization.jsonObject(with: data) as? [String : Any],
-                  let paymentIntentClientSecret = json["clientSecret"] as? String,
-                  let publishableKey = json["publishableKey"] as? String,
-                  let self = self else {
+            } catch {
                 DispatchQueue.main.async {
-                    self?.status = .failure("API Serialization/Decode failure")
+                    self.status = .failure(error.localizedDescription)
                 }
-                return
             }
-            
-            DispatchQueue.main.async {
-                self.status = .success
-                self.paymentSession = PaymentSession(publishableKey: publishableKey)
-                self.paymentSession?.initPaymentSession(paymentIntentClientSecret: paymentIntentClientSecret)
-            }
-        })
-        task.resume()
+        }
     }
+    
+    func preparePaymentManagementSheet() {
+        Task {
+            do {
+                let paymentIntentJson = try await fetchData(from: "/create-payment-intent")
+                guard let publishableKey = paymentIntentJson["publishableKey"] as? String
+                else {
+                    throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing required fields"])
+                }
+                
+                let ephemeralKeyJson = try await fetchData(from: "/create-ephemeral-key")
+                let ephemeralKey = ephemeralKeyJson["ephemeralKey"] as? String ?? ""
+                
+                self.paymentSession = PaymentSession(publishableKey: publishableKey)
+                self.paymentSession?.initPaymentManagementSession(ephemeralKey: ephemeralKey)
+            } catch {
+                DispatchQueue.main.async {
+                    self.status = .failure(error.localizedDescription)
+                }
+            }
+        }
+    }
+    
     func onPaymentCompletion(result: PaymentSheetResult) {
         DispatchQueue.main.async {
             self.paymentResult = result
