@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-internal class HyperUIViewController: UIViewController{
+internal class HyperUIViewController: UIViewController {
     internal override var shouldAutorotate: Bool {
         return false
     }

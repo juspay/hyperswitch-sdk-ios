@@ -34,8 +34,8 @@ extension PaymentSession {
     }
     
     public func presentPaymentManagementSheet(viewController: UIViewController) {
-        let pmManagement = PaymentMethodMangement(ephemeralKey: PaymentSession.ephemeralKey ?? "")
-        pmManagement.presentPmManagent(from: viewController)
+        let pmManagement = PaymentMethodManagement(ephemeralKey: PaymentSession.ephemeralKey ?? "")
+        pmManagement.presentPaymentMethodManagementView(from: viewController)
     }
     
     // for external frameworks

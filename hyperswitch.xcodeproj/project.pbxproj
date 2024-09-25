@@ -31,7 +31,7 @@
 		43F6051E2B45FA3300BAA90E /* PaymentSheetAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43F6051D2B45FA3300BAA90E /* PaymentSheetAppearance.swift */; };
 		4E0A93DE2CA2F29500E3A767 /* HyperUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A93DC2CA2F29500E3A767 /* HyperUIViewController.swift */; };
 		4E0A93DF2CA2F29500E3A767 /* HyperUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A93DC2CA2F29500E3A767 /* HyperUIViewController.swift */; };
-		4E0A93E62CA2F3E000E3A767 /* PaymentMethodMangement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A93E42CA2F3E000E3A767 /* PaymentMethodMangement.swift */; };
+		4E0A93E62CA2F3E000E3A767 /* PaymentMethodManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A93E42CA2F3E000E3A767 /* PaymentMethodManagement.swift */; };
 		663F68FC29CCC93C006E91BD /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663F68FB29CCC93C006E91BD /* APIClient.swift */; };
 		66486F92294355BD00150E4F /* hyperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66486F91294355BD00150E4F /* hyperApp.swift */; };
 		66486F94294355BD00150E4F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66486F93294355BD00150E4F /* ContentView.swift */; };
@@ -149,7 +149,7 @@
 		43E668672C084FB70094BD13 /* montserrat_blackitalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_blackitalic.ttf; sourceTree = "<group>"; };
 		43F6051D2B45FA3300BAA90E /* PaymentSheetAppearance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentSheetAppearance.swift; sourceTree = "<group>"; };
 		4E0A93DC2CA2F29500E3A767 /* HyperUIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperUIViewController.swift; sourceTree = "<group>"; };
-		4E0A93E42CA2F3E000E3A767 /* PaymentMethodMangement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodMangement.swift; sourceTree = "<group>"; };
+		4E0A93E42CA2F3E000E3A767 /* PaymentMethodManagement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodManagement.swift; sourceTree = "<group>"; };
 		663F68FB29CCC93C006E91BD /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		66486F8E294355BD00150E4F /* hyperswitch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hyperswitch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66486F91294355BD00150E4F /* hyperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = hyperApp.swift; sourceTree = "<group>"; };
@@ -264,20 +264,12 @@
 			path = fonts;
 			sourceTree = "<group>";
 		};
-		4E0A93DD2CA2F29500E3A767 /* HyperViewController */ = {
+		4E0A93E52CA2F3E000E3A767 /* HyperPaymentMethodManagement */ = {
 			isa = PBXGroup;
 			children = (
-				4E0A93DC2CA2F29500E3A767 /* HyperUIViewController.swift */,
+				4E0A93E42CA2F3E000E3A767 /* PaymentMethodManagement.swift */,
 			);
-			path = HyperViewController;
-			sourceTree = "<group>";
-		};
-		4E0A93E52CA2F3E000E3A767 /* PaymentMethodManagement */ = {
-			isa = PBXGroup;
-			children = (
-				4E0A93E42CA2F3E000E3A767 /* PaymentMethodMangement.swift */,
-			);
-			path = PaymentMethodManagement;
+			path = HyperPaymentMethodManagement;
 			sourceTree = "<group>";
 		};
 		66486F85294355BD00150E4F = {
@@ -391,6 +383,7 @@
 				DC5D0111294731480017C67A /* PaymentSheet.swift */,
 				DC5D0113294731480017C67A /* PaymentSheetConfiguration.swift */,
 				43F6051D2B45FA3300BAA90E /* PaymentSheetAppearance.swift */,
+				4E0A93DC2CA2F29500E3A767 /* HyperUIViewController.swift */,
 				DCF9778F29517BBB00596F78 /* DictionaryConverter.swift */,
 				663F68FB29CCC93C006E91BD /* APIClient.swift */,
 				79052A232C8922E90011804E /* Version.swift */,
@@ -413,14 +406,13 @@
 		79EAB09E2C81F0B9006B40AD /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				4E0A93E52CA2F3E000E3A767 /* PaymentMethodManagement */,
-				4E0A93DD2CA2F29500E3A767 /* HyperViewController */,
 				7954A4452C23A42200FEC02D /* ApplePay */,
 				DC5D0117294738870017C67A /* NativeModule */,
 				790BA8252B99DB37006678FD /* HyperSession */,
 				DC5D0110294731480017C67A /* HyperPaymentSheet */,
 				DC4AC9F3296D737300E0D2A6 /* HyperPaymentCardTextField */,
 				792D69F42B95E91D001598CD /* HyperExpressCheckout */,
+				4E0A93E52CA2F3E000E3A767 /* HyperPaymentMethodManagement */,
 				DC5D012C29486B560017C67A /* Resources */,
 			);
 			path = Core;
@@ -764,7 +756,7 @@
 				DC5D0127294853A90017C67A /* PaymentSheetView.swift in Sources */,
 				792D6A062B99C204001598CD /* HyperHeadless.m in Sources */,
 				66486F92294355BD00150E4F /* hyperApp.swift in Sources */,
-				4E0A93E62CA2F3E000E3A767 /* PaymentMethodMangement.swift in Sources */,
+				4E0A93E62CA2F3E000E3A767 /* PaymentMethodManagement.swift in Sources */,
 				793083EB2A0DA9E300E78310 /* PaymentHandler.swift in Sources */,
 				43F6051E2B45FA3300BAA90E /* PaymentSheetAppearance.swift in Sources */,
 				DC5D0116294731480017C67A /* PaymentSheetConfiguration.swift in Sources */,

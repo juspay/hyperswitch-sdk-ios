@@ -1,5 +1,5 @@
 //
-//  PaymentMethodMangement.swift
+//  PaymentMethodManagement.swift
 //  hyperswitch
 //
 //  Created by Shivam Nan on 15/09/24.
@@ -8,14 +8,14 @@
 import Foundation
 import WebKit
 
-public class PaymentMethodMangement {
+internal class PaymentMethodManagement {
     private var ephemeralKey: String?
     
-    init(ephemeralKey: String){
+    internal init(ephemeralKey: String){
         self.ephemeralKey = ephemeralKey
     }
     
-    public func presentPmManagent(from: UIViewController) {
+    internal func presentPaymentMethodManagementView(from presentingViewController: UIViewController) {
         /// Create a dictionary of hyperParams with app ID, sdkVersion, country, IP address, user agent, default view, and launch time.
         let hyperParams = [
             "appId" : Bundle.main.bundleIdentifier,
@@ -38,16 +38,16 @@ public class PaymentMethodMangement {
         /// Get the root view from the RNViewManager with the "hyperSwitch" module and the props dictionary.
         let rootView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": props])
         
-        /// Create a new UIViewController to present the payment sheet view.
+        /// Create a new UIViewController to present the payment method management view.
         let paymentMethodManagementViewController = HyperUIViewController()
         
         /// Set the modal presentation style to cover the entire screen.
         paymentMethodManagementViewController.modalPresentationStyle = .overFullScreen
         
-        /// Set the view of the payment sheet view controller to the provided root view.
+        /// Set the view of the payment management view controller to the provided root view.
         paymentMethodManagementViewController.view = rootView
         
-        /// Present the payment sheet view controller modally from the presenting view controller.
-        from.present(paymentMethodManagementViewController, animated: false)
+        /// Present the payment management view controller modally from the presenting view controller.
+        presentingViewController.present(paymentMethodManagementViewController, animated: false)
     }
 }
