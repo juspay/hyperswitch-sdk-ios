@@ -6,22 +6,14 @@
 //
 
 import UIKit
-import WebKit
+@preconcurrency import WebKit
 #if canImport(HyperswitchScancard)
 import HyperswitchScancard
 #endif
 
-internal class WebViewController: UIViewController {
+internal class WebViewController: HyperUIViewController {
     
-    internal override var shouldAutorotate: Bool {
-        return false
-    }
-    internal override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return UIInterfaceOrientationMask.portrait
-    }
-    internal override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
-        return UIInterfaceOrientation.portrait
-    }
+    private let applePayPaymentHandler = ApplePayHandler()
     
     private let baseUrl = URL(string: "https://rnweb.netlify.app/")
     private var webView: WKWebView = WKWebView()
@@ -140,7 +132,7 @@ extension WebViewController: WKScriptMessageHandler {
             guard let body = message.body as? String else {
                 return
             }
-            ApplePayHandler().startPayment(rnMessage: body, rnCallback: { props in
+            applePayPaymentHandler.startPayment(rnMessage: body, rnCallback: { props in
                 let applePayProps = [
                     "applePayData" : props[0]
                 ]
@@ -155,7 +147,7 @@ extension WebViewController: WKScriptMessageHandler {
                 let cardScanSheet = CardScanSheet()
                 cardScanSheet.present(from: self) { result in
                     switch result {
-                    case .completed(var card as ScannedCard?):
+                    case .completed(let card as ScannedCard?):
                         message["pan"] = card?.pan
                         message["expiryMonth"] =  card?.expiryMonth
                         message["expiryYear"] =  card?.expiryYear
@@ -163,7 +155,7 @@ extension WebViewController: WKScriptMessageHandler {
                         callback["scanCardData"] = message
                     case .canceled:
                         callback["status"] = "Cancelled"
-                    case .failed(let error):
+                    case .failed(_):
                         callback["status"] = "Failed"
                     }
                     self.sendPropsToJS(props: callback)

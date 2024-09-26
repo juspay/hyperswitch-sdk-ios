@@ -49,6 +49,7 @@
 		79052A272C89237A0011804E /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A262C89237A0011804E /* Extensions.swift */; };
 		79052A4A2C9057D60011804E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A492C9057D60011804E /* AppDelegate.swift */; };
 		790BA8272B99DB5E006678FD /* PaymentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790BA8262B99DB5E006678FD /* PaymentSession.swift */; };
+		79232DBF2CA571A900E044E0 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A262C89237A0011804E /* Extensions.swift */; };
 		792D69F62B95E942001598CD /* ExpressCheckoutLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792D69F52B95E942001598CD /* ExpressCheckoutLauncher.swift */; };
 		792D69F82B95E94C001598CD /* ExpressCheckoutWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792D69F72B95E94C001598CD /* ExpressCheckoutWidget.swift */; };
 		792D6A062B99C204001598CD /* HyperHeadless.m in Sources */ = {isa = PBXBuildFile; fileRef = 792D6A052B99C204001598CD /* HyperHeadless.m */; };
@@ -778,6 +779,7 @@
 				79EAB0292C81CDCE006B40AD /* HyperViewModel.swift in Sources */,
 				79EAB02C2C81CDEC006B40AD /* PaymentSheetAppearance.swift in Sources */,
 				4E0A93DF2CA2F29500E3A767 /* HyperUIViewController.swift in Sources */,
+				79232DBF2CA571A900E044E0 /* Extensions.swift in Sources */,
 				79EAB0412C81D330006B40AD /* PaymentSession.swift in Sources */,
 				79EAB03F2C81D292006B40AD /* PaymentSheetView+AppClip.swift in Sources */,
 				79EAB0132C81CCDA006B40AD /* AppDelegate.swift in Sources */,

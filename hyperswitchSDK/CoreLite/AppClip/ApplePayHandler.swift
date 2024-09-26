@@ -7,7 +7,6 @@
 
 import Foundation
 import PassKit
-import WebKit
 
 typealias ApplePayCallback = ([[String: Any]])->()
 
@@ -15,13 +14,10 @@ internal class ApplePayHandler: NSObject {
     
     var paymentStatus: PKPaymentAuthorizationStatus? = .failure
     var callback: ApplePayCallback?
-    
-    var test: (() -> ())?
-    func dummy() {}
+
 
     internal func startPayment(rnMessage: String, rnCallback: @escaping ApplePayCallback) {
         
-        test = dummy
         callback = rnCallback
         
         var requiredBillingContactFields:Set<PKContactField>?
@@ -242,12 +238,5 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         }
         
         return contactDict
-    }
-}
-
-private extension String {
-    func toJSON() -> Any? {
-        guard let data = self.data(using: .utf8, allowLossyConversion: false) else { return nil }
-        return try? JSONSerialization.jsonObject(with: data, options: .mutableContainers)
     }
 }
