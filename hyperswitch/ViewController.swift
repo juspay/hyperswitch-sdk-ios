@@ -74,7 +74,7 @@ class ViewController: UIViewController {
                 case .completed:
                     self.statusLabel.text = "Payment complete"
                 case .failed(let error):
-                    self.statusLabel.text =  "Payment failed: \(error)"
+                    self.statusLabel.text = "Payment failed: \(error)"
                 case .canceled:
                     self.statusLabel.text = "Payment canceled."
                 }
@@ -84,7 +84,25 @@ class ViewController: UIViewController {
     
     @objc
     func openPaymentMethodManagement(_ sender: Any) {
-        hyperViewModel.paymentSession?.presentPaymentManagementSheet(viewController: self)
+        var configuration = PMMConfiguration()
+        var appearance = PMMAppearance()
+        appearance.font.base = UIFont(name: "montserrat", size: UIFont.systemFontSize)
+        appearance.font.sizeScaleFactor = 1.0
+        appearance.shadow = .disabled
+        appearance.colors.primary = UIColor(red: 0.55, green: 0.74, blue: 0.00, alpha: 1.00)
+        appearance.theme = .light
+        configuration.appearance = appearance
+        
+        hyperViewModel.paymentSession?.presentPaymentManagementSheet(viewController: self, configuration: configuration, completion: { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .failed(let error):
+                    self.statusLabel.text =  "Payment Method Management failed: \(error)"
+                case .closed:
+                    self.statusLabel.text = "Payment Method Management closed."
+                }
+            }
+        })
     }
     
     @objc
