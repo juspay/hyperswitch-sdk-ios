@@ -96,6 +96,11 @@ internal class HyperModule: RCTEventEmitter {
     }
     
     @objc
+    private func exitPaymentMethodManagement(_ reactTag: NSNumber, _ rnMessage: String, _ reset: Bool) {
+        exitSheet(rnMessage)
+    }
+    
+    @objc
     private func exitCardForm(_ rnMessage: String) {
         var response: String?
         var error: NSError?
