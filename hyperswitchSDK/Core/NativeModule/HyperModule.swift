@@ -71,6 +71,11 @@ internal class HyperModule: RCTEventEmitter {
     }
     
     @objc
+    private func onAddPaymentMethod(_ rnMessage: String) -> Void {
+        PaymentMethodManagementWidget.onAddPaymentMethod?()
+    }
+    
+    @objc
     private func launchApplePay (_ rnMessage: String, _ rnCallback: @escaping RCTResponseSenderBlock) {
         applePayPaymentHandler.startPayment(rnMessage: rnMessage, rnCallback: rnCallback, presentCallback: self.presentCallback)
     }
