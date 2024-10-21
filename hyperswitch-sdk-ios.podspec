@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
     core.resources = ['hyperswitchSDK/Core/Resources/CodePush.plist', 'hyperswitchSDK/Core/Resources/hyperswitch.bundle']
     core.vendored_frameworks = 'frameworkgen/Frameworks/Core/*.xcframework'
     core.dependency 'hyperswitch-sdk-ios/common'
-    core.dependency 'hyperswitch-ios-hermes', '~> 0.75.2'
+    core.dependency 'hyperswitch-ios-hermes', '~> 0.75.4'
     core.dependency 'KlarnaMobileSDK'
   end
 
@@ -39,14 +39,14 @@ Pod::Spec.new do |s|
     netcetera3ds.dependency 'hyperswitch-sdk-ios/core'
   end
 
-  s.subspec 'lite' do |appclip|
-    appclip.source_files = 'hyperswitchSDK/CoreLite/AppClip/**/*.{m,swift,h}'
-    appclip.dependency 'hyperswitch-sdk-ios/common'
+  s.subspec 'lite' do |lite|
+    lite.source_files = 'hyperswitchSDK/CoreLite/AppClip/**/*.{m,swift,h}'
+    lite.dependency 'hyperswitch-sdk-ios/common'
   end
 
-  s.subspec 'lite+scancard' do |appclip_scancard|
-    appclip_scancard.vendored_frameworks = 'frameworkgen/scanCard/Frameworks/*.xcframework'
-    appclip_scancard.dependency 'hyperswitch-sdk-ios/appclip'
+  s.subspec 'lite+scancard' do |lite_scancard|
+    lite_scancard.vendored_frameworks = 'frameworkgen/scanCard/Frameworks/*.xcframework'
+    lite_scancard.dependency 'hyperswitch-sdk-ios/lite'
   end
 
   s.subspec 'common' do |common|
