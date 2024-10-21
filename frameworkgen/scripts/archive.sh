@@ -33,6 +33,7 @@ function archive() {
     CODE_SIGNING_ALLOWED=NO \
     CODE_SIGN_IDENTITY="" \
     CODE_SIGNING_REQUIRED=NO \
+    OTHER_SWIFT_FLAGS='-Xfrontend -empty-abi-descriptor' \
     SUPPORTS_MACCATALYST=NO | xcbeautify"
 
   eval $XCODEBUILD_COMMAND

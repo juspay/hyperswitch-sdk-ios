@@ -29,7 +29,7 @@ Pod::Spec.new do |s|
 
   s.subspec 'scancard' do |scancard|
     scancard.source_files = 'frameworkgen/scanCard/Source/**/*.{m,swift,h}'
-    scancard.vendored_frameworks = 'frameworkgen/scanCard/Frameworks/HyperswitchScancard.xcframework'
+    scancard.vendored_frameworks = 'frameworkgen/scanCard/Frameworks/*.xcframework'
     scancard.dependency 'hyperswitch-sdk-ios/core'
   end
 
@@ -46,7 +46,7 @@ Pod::Spec.new do |s|
   # end
 
   # s.subspec 'appclip+scancard' do |appclip_scancard|
-  #   appclip_scancard.vendored_frameworks = 'frameworkgen/scanCard/Frameworks/HyperswitchScancard.xcframework'
+  #   appclip_scancard.vendored_frameworks = 'frameworkgen/scanCard/Frameworks/HyperswitchScanCard.xcframework'
   #   appclip_scancard.dependency 'hyperswitch-sdk-ios/appclip'
   # end
 

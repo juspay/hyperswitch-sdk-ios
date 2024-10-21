@@ -11,6 +11,6 @@
 #endif
 
 
-FOUNDATION_EXPORT double HyperswitchScancardVersionNumber;
-FOUNDATION_EXPORT const unsigned char HyperswitchScancardVersionString[];
+FOUNDATION_EXPORT double HyperswitchScanCardVersionNumber;
+FOUNDATION_EXPORT const unsigned char HyperswitchScanCardVersionString[];
 

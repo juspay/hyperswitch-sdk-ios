@@ -7,8 +7,8 @@
 
 import UIKit
 @preconcurrency import WebKit
-#if canImport(HyperswitchScancard)
-import HyperswitchScancard
+#if canImport(HyperswitchScanCard)
+import HyperswitchScanCard
 #endif
 
 internal class WebViewController: HyperUIViewController {
@@ -140,7 +140,7 @@ extension WebViewController: WKScriptMessageHandler {
             })
         }
         if message.name == "launchScanCard" {
-#if canImport(HyperswitchScancard)
+#if canImport(HyperswitchScanCard)
             DispatchQueue.main.async {
                 var message: [String:Any] = [:]
                 var callback: [String:Any] = [:]

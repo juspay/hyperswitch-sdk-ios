@@ -1,11 +1,11 @@
-framework module HyperswitchScancard {
-  umbrella header "HyperswitchScancard-umbrella.h"
+framework module HyperswitchScanCard {
+  umbrella header "HyperswitchScanCard-umbrella.h"
 
   export *
   module * { export * }
 }
 
-module HyperswitchScancard.Swift {
-  header "HyperswitchScancard-Swift.h"
+module HyperswitchScanCard.Swift {
+  header "HyperswitchScanCard-Swift.h"
   requires objc
 }

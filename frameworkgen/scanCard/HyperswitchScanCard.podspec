@@ -11,5 +11,5 @@ Pod::Spec.new do |s|
   s.source                    = { :path => "." }
   s.module_name               = 'Hyperswitch'
 
-  s.vendored_frameworks = 'Frameworks/HyperswitchScancard.xcframework'
+  s.vendored_frameworks = 'Frameworks/HyperswitchScanCard.xcframework'
 end
