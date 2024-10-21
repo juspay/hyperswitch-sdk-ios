@@ -98,4 +98,9 @@ extension RNViewManager: RCTBridgeDelegate {
                                       subdirectory: "/Frameworks/Hyperswitch.framework")
         }
     }
+    func localSource(for bridge: RCTBridge!) -> URL! {
+        Bundle.main.url(forResource: "hyperswitch",
+                                  withExtension: "bundle",
+                                  subdirectory: "/Frameworks/Hyperswitch.framework")
+    }
 }
