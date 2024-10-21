@@ -74,12 +74,36 @@ public:
 #endif
 };
 
+class RNSVGFeBlendState {
+public:
+  RNSVGFeBlendState() = default;
+
+#ifdef ANDROID
+  RNSVGFeBlendState(RNSVGFeBlendState const &previousState, folly::dynamic data){};
+  folly::dynamic getDynamic() const {
+    return {};
+  };
+#endif
+};
+
 class RNSVGFeColorMatrixState {
 public:
   RNSVGFeColorMatrixState() = default;
 
 #ifdef ANDROID
   RNSVGFeColorMatrixState(RNSVGFeColorMatrixState const &previousState, folly::dynamic data){};
+  folly::dynamic getDynamic() const {
+    return {};
+  };
+#endif
+};
+
+class RNSVGFeFloodState {
+public:
+  RNSVGFeFloodState() = default;
+
+#ifdef ANDROID
+  RNSVGFeFloodState(RNSVGFeFloodState const &previousState, folly::dynamic data){};
   folly::dynamic getDynamic() const {
     return {};
   };

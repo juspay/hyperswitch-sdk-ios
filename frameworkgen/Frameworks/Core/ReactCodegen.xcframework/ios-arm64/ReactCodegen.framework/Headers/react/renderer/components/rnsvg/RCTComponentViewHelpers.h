@@ -29,7 +29,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@protocol RCTRNSVGFeBlendViewProtocol <NSObject>
+
+@end
+
 @protocol RCTRNSVGFeColorMatrixViewProtocol <NSObject>
+
+@end
+
+@protocol RCTRNSVGFeFloodViewProtocol <NSObject>
 
 @end
 

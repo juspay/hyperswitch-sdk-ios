@@ -73,6 +73,17 @@ using RNSVGEllipseShadowNode = ConcreteViewShadowNode<
     RNSVGEllipseEventEmitter,
     RNSVGEllipseState>;
 
+JSI_EXPORT extern const char RNSVGFeBlendComponentName[];
+
+/*
+ * `ShadowNode` for <RNSVGFeBlend> component.
+ */
+using RNSVGFeBlendShadowNode = ConcreteViewShadowNode<
+    RNSVGFeBlendComponentName,
+    RNSVGFeBlendProps,
+    RNSVGFeBlendEventEmitter,
+    RNSVGFeBlendState>;
+
 JSI_EXPORT extern const char RNSVGFeColorMatrixComponentName[];
 
 /*
@@ -83,6 +94,17 @@ using RNSVGFeColorMatrixShadowNode = ConcreteViewShadowNode<
     RNSVGFeColorMatrixProps,
     RNSVGFeColorMatrixEventEmitter,
     RNSVGFeColorMatrixState>;
+
+JSI_EXPORT extern const char RNSVGFeFloodComponentName[];
+
+/*
+ * `ShadowNode` for <RNSVGFeFlood> component.
+ */
+using RNSVGFeFloodShadowNode = ConcreteViewShadowNode<
+    RNSVGFeFloodComponentName,
+    RNSVGFeFloodProps,
+    RNSVGFeFloodEventEmitter,
+    RNSVGFeFloodState>;
 
 JSI_EXPORT extern const char RNSVGFeGaussianBlurComponentName[];
 

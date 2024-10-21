@@ -87,7 +87,7 @@ namespace JS {
               reject:(RCTPromiseRejectBlock)reject;
 - (void)fetchViewHierarchy:(RCTPromiseResolveBlock)resolve
                     reject:(RCTPromiseRejectBlock)reject;
-- (NSDictionary *)startProfiling;
+- (NSDictionary *)startProfiling:(BOOL)platformProfilers;
 - (NSDictionary *)stopProfiling;
 - (NSString * _Nullable)fetchNativePackageName;
 - (NSDictionary * _Nullable)fetchNativeStackFramesBy:(NSArray *)instructionsAddr;
