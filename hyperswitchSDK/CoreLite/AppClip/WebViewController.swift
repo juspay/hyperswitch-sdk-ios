@@ -13,9 +13,9 @@ import HyperswitchScanCard
 
 internal class WebViewController: HyperUIViewController {
     
-    private let applePayPaymentHandler = ApplePayHandler()
+    private let applePayPaymentHandler = ApplePayHandlerLite()
     
-    private let baseUrl = URL(string: "https://rnweb.netlify.app/")
+    private let baseUrl = URL(string: "https://dev.hyperswitch.io/mobile/v1/index.html")
     private var webView: WKWebView = WKWebView()
     private var popupWebView: WKWebView?
     private var props: [String: Any]?

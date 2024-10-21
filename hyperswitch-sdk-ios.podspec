@@ -1,4 +1,4 @@
-version = "0.1.8"
+version = "0.1.9"
 
 Pod::Spec.new do |s|
   s.name                      = 'hyperswitch-sdk-ios'
@@ -39,16 +39,15 @@ Pod::Spec.new do |s|
     netcetera3ds.dependency 'hyperswitch-sdk-ios/core'
   end
 
-## Upcoming Release ##
-  # s.subspec 'appclip' do |appclip|
-  #   appclip.source_files = 'hyperswitchSDK/CoreLite/AppClip/**/*.{m,swift,h}'
-  #   appclip.dependency 'hyperswitch-sdk-ios/common'
-  # end
+  s.subspec 'lite' do |appclip|
+    appclip.source_files = 'hyperswitchSDK/CoreLite/AppClip/**/*.{m,swift,h}'
+    appclip.dependency 'hyperswitch-sdk-ios/common'
+  end
 
-  # s.subspec 'appclip+scancard' do |appclip_scancard|
-  #   appclip_scancard.vendored_frameworks = 'frameworkgen/scanCard/Frameworks/HyperswitchScanCard.xcframework'
-  #   appclip_scancard.dependency 'hyperswitch-sdk-ios/appclip'
-  # end
+  s.subspec 'lite+scancard' do |appclip_scancard|
+    appclip_scancard.vendored_frameworks = 'frameworkgen/scanCard/Frameworks/*.xcframework'
+    appclip_scancard.dependency 'hyperswitch-sdk-ios/appclip'
+  end
 
   s.subspec 'common' do |common|
     common.source_files = 'hyperswitchSDK/Shared/*.{m,swift,h}'

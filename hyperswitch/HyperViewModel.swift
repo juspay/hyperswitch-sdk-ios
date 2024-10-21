@@ -9,7 +9,7 @@ import SwiftUI
 
 class HyperViewModel: ObservableObject {
     
-    let backendUrl = URL(string: "http://localhost:5252")!
+    let backendUrl = URL(string: "http://192.168.0.107:5252")!
     
     @Published var paymentResult: PaymentSheetResult?
     @Published var paymentSession: PaymentSession?
