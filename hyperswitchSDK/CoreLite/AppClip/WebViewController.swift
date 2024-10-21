@@ -149,16 +149,16 @@ extension WebViewController: WKScriptMessageHandler {
                     switch result {
                     case .completed(let card as ScannedCard?):
                         message["pan"] = card?.pan
-                        message["expiryMonth"] =  card?.expiryMonth
-                        message["expiryYear"] =  card?.expiryYear
+                        message["expiryMonth"] = card?.expiryMonth
+                        message["expiryYear"] = card?.expiryYear
                         callback["status"] = "Succeeded"
-                        callback["scanCardData"] = message
+                        callback["data"] = message
                     case .canceled:
                         callback["status"] = "Cancelled"
                     case .failed(_):
                         callback["status"] = "Failed"
                     }
-                    self.sendPropsToJS(props: callback)
+                    self.sendPropsToJS(props: ["scanCardData": callback])
                 }
             }
 #endif
