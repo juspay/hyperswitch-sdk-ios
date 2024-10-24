@@ -13,9 +13,9 @@ import HyperswitchScanCard
 
 internal class WebViewController: HyperUIViewController {
     
-    private let applePayPaymentHandler = ApplePayHandler()
+    private let applePayPaymentHandler = ApplePayHandlerLite()
     
-    private let baseUrl = URL(string: "https://rnweb.netlify.app/")
+    private let baseUrl = URL(string: "https://dev.hyperswitch.io/mobile/v1/index.html")
     private var webView: WKWebView = WKWebView()
     private var popupWebView: WKWebView?
     private var props: [String: Any]?
@@ -80,21 +80,21 @@ internal class WebViewController: HyperUIViewController {
     private func sendPropsToJS(props: [String: Any]?) {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: props as Any)
-               if let jsonString = String(data: jsonData, encoding: .utf8) {
-                   let escapedJsonString = jsonString.replacingOccurrences(of: "\\", with: "\\\\")
-                                                     .replacingOccurrences(of: "\"", with: "\\\"")
-                                                     .replacingOccurrences(of: "\n", with: "\\n")
-                   
-                   let jsCode = "window.postMessage(\"\(escapedJsonString)\", '*');"
-                   webView.evaluateJavaScript(jsCode) { (result, error) in
-                       if let error = error {
-                           print("Error sending message: \(error)")
-                       }
-                   }
-               }
-           } catch {
-               print("Error creating JSON: \(error)")
-           }
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                let escapedJsonString = jsonString.replacingOccurrences(of: "\\", with: "\\\\")
+                    .replacingOccurrences(of: "\"", with: "\\\"")
+                    .replacingOccurrences(of: "\n", with: "\\n")
+                
+                let jsCode = "window.postMessage(\"\(escapedJsonString)\", '*');"
+                webView.evaluateJavaScript(jsCode) { (result, error) in
+                    if let error = error {
+                        print("Error sending message: \(error)")
+                    }
+                }
+            }
+        } catch {
+            print("Error creating JSON: \(error)")
+        }
     }
     
     private func callback(_ result: PaymentSheetResult) {
@@ -164,28 +164,34 @@ extension WebViewController: WKScriptMessageHandler {
 #endif
         }
         if message.name == "exitPaymentSheet" {
-            guard let body = message.body as? String,
-                  let data = body.data(using: .utf8),
-                  let jsonDictionary = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: String],
-                  let status = jsonDictionary["status"] else {
-                let error = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
-                callback(.failed(error: error))
-                return
+            do {
+                guard let body = message.body as? String,
+                      let data = body.data(using: .utf8),
+                      let jsonDictionary = try JSONSerialization.jsonObject(with: data) as? [String: String] else {
+                    throw NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
+                }
+                
+                let result: PaymentSheetResult
+                
+                if let status = jsonDictionary["status"] {
+                    switch status {
+                    case "failed", "requires_payment_method":
+                        let errorDomain = jsonDictionary["code"] ?? "UNKNOWN_ERROR"
+                        let errorMessage = jsonDictionary["message"] ?? "An error has occurred."
+                        let error = NSError(domain: errorDomain, code: 0, userInfo: ["message": errorMessage])
+                        result = .failed(error: error)
+                    case "cancelled":
+                        result = .canceled(data: jsonDictionary["message"] ?? "Payment was canceled")
+                    default:
+                        result = .completed(data: status)
+                    }
+                } else {
+                    throw NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
+                }
+                callback(result)
+            } catch {
+                callback(.failed(error: NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])))
             }
-            
-            let result: PaymentSheetResult
-            switch status {
-            case "failed", "requires_payment_method":
-                let errorDomain = jsonDictionary["code"] ?? "UNKNOWN_ERROR"
-                let errorMessage = jsonDictionary["message"] ?? "An error has occurred."
-                let error = NSError(domain: errorDomain, code: 0, userInfo: ["message": errorMessage])
-                result = .failed(error: error)
-            case "cancelled":
-                result = .canceled(data: jsonDictionary["message"] ?? "Payment was canceled")
-            default:
-                result = .completed(data: status)
-            }
-            callback(result)
         }
         
         if message.name == "closePopupWebView" {

@@ -1,8 +1,8 @@
 //
-//  ApplePayHandler.swift
+//  ApplePayHandlerLite.swift
 //  Hyperswitch
 //
-//  Created by Shivam Shashank on 10/12/22.
+//  Created by Harshit Srivastava on 30/08/24.
 //
 
 import Foundation
@@ -10,12 +10,12 @@ import PassKit
 
 typealias ApplePayCallback = ([[String: Any]])->()
 
-internal class ApplePayHandler: NSObject {
+internal class ApplePayHandlerLite: NSObject {
     
     var paymentStatus: PKPaymentAuthorizationStatus? = .failure
     var callback: ApplePayCallback?
-
-
+    
+    
     internal func startPayment(rnMessage: String, rnCallback: @escaping ApplePayCallback) {
         
         callback = rnCallback
@@ -140,7 +140,7 @@ internal class ApplePayHandler: NSObject {
 }
 
 /// Extension to conform to PKPaymentAuthorizationControllerDelegate
-extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
+extension ApplePayHandlerLite: PKPaymentAuthorizationControllerDelegate {
     
     /// Handle successful payment authorization
     internal func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController, didAuthorizePayment payment: PKPayment, handler completion: @escaping (PKPaymentAuthorizationResult) -> Void) {

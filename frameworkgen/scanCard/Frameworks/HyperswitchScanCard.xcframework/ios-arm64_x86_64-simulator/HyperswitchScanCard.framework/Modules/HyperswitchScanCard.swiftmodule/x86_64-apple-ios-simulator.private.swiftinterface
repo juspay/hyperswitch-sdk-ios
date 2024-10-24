@@ -1,0 +1,70 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.0 effective-5.10 (swiftlang-6.0.0.9.10 clang-1600.0.26.2)
+// swift-module-flags: -target x86_64-apple-ios13.0-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name HyperswitchScanCard
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface
+import AVFoundation
+import AVKit
+import Accelerate
+import CoreGraphics
+import CoreML
+import Foundation
+@_exported import HyperswitchScanCard
+import Swift
+import UIKit
+import VideoToolbox
+import Vision
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+import os.log
+import os
+public protocol BundleLocatorProtocol {
+  static var internalClass: Swift.AnyClass { get }
+  static var bundleName: Swift.String { get }
+  static var resourcesBundle: Foundation.Bundle { get }
+}
+extension HyperswitchScanCard.BundleLocatorProtocol {
+  public static func computeResourcesBundle() -> Foundation.Bundle
+}
+@frozen public enum CardScanSheetResult {
+  case completed(card: HyperswitchScanCard.ScannedCard)
+  case canceled
+  case failed(error: any Swift.Error)
+}
+public class CardScanSheet {
+  public init()
+  public func present(from presentingViewController: UIKit.UIViewController, completion: @escaping (HyperswitchScanCard.CardScanSheetResult) -> Swift.Void, animated: Swift.Bool = true)
+  @objc deinit
+}
+public enum CardScanSheetError : Swift.Error {
+  case invalidClientSecret
+  case unknown(debugDescription: Swift.String)
+}
+extension HyperswitchScanCard.CardScanSheetError : Foundation.LocalizedError {
+  public var localizedDescription: Swift.String {
+    get
+  }
+}
+extension HyperswitchScanCard.CardScanSheetError : Swift.CustomDebugStringConvertible {
+  public var debugDescription: Swift.String {
+    get
+  }
+}
+@_hasMissingDesignatedInitializers public class CreditCardOcrImplementation {
+  @objc deinit
+}
+public struct ScannedCard : Swift.Equatable {
+  public let pan: Swift.String
+  public let expiryMonth: Swift.String?
+  public let expiryYear: Swift.String?
+  public let name: Swift.String?
+  public static func == (a: HyperswitchScanCard.ScannedCard, b: HyperswitchScanCard.ScannedCard) -> Swift.Bool
+}
+@_hasMissingDesignatedInitializers @available(macOS 10.13.2, iOS 11.2, tvOS 11.2, watchOS 4.2, *)
+public class SSDOcr {
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers public class SSDOcrDetect {
+  public static func loadModelFromBundle() -> HyperswitchScanCard.SSDOcr?
+  @objc deinit
+}

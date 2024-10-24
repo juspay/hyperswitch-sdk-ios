@@ -10,7 +10,7 @@ import WebKit
 
 extension PaymentSheet {
     
-    func presentAppClip(from presentingViewController: UIViewController, completion: @escaping (PaymentSheetResult) -> ()) {
+    func presentLite(from presentingViewController: UIViewController, completion: @escaping (PaymentSheetResult) -> ()) {
         
         let configuration = self.configuration?.toDictionary()
         

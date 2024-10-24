@@ -93,7 +93,7 @@ class ViewController: UIViewController {
         appearance.primaryButton.cornerRadius = 32
         configuration.appearance = appearance
         
-        hyperViewModel.paymentSession?.presentAppClip(viewController: self, configuration: configuration, completion: { result in
+        hyperViewModel.paymentSession?.presentPaymentSheetLite(viewController: self, configuration: configuration, completion: { result in
             DispatchQueue.main.async {
                 switch result {
                 case .completed:
