@@ -11,7 +11,6 @@ class HyperViewModel: ObservableObject {
     
     let backendUrl = URL(string: "http://localhost:5252")!
     
-    @Published var paymentResult: PaymentSheetResult?
     @Published var paymentSession: PaymentSession?
     @Published var status: APIStatus = .loading
     
@@ -84,12 +83,6 @@ class HyperViewModel: ObservableObject {
                     self.status = .failure(error.localizedDescription)
                 }
             }
-        }
-    }
-    
-    func onPaymentCompletion(result: PaymentSheetResult) {
-        DispatchQueue.main.async {
-            self.paymentResult = result
         }
     }
 }

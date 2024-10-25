@@ -19,17 +19,6 @@ struct ViewControllerKey: EnvironmentKey {
     }
 }
 
-extension UIViewController {
-    @available(iOS 13.0, *)
-    func present<Content: View>(style: UIModalPresentationStyle = .automatic, @ViewBuilder builder: () -> Content) {
-        
-        let toPresent = UIHostingController(rootView: builder())
-        toPresent.view.backgroundColor = UIColor.clear
-        toPresent.modalPresentationStyle = style
-        self.present(toPresent, animated: false, completion: nil)
-    }
-}
-
 @available(iOS 13.0, *)
 extension EnvironmentValues {
     var viewController: UIViewController? {

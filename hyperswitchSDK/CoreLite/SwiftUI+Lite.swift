@@ -1,20 +1,19 @@
 //
-//  PaymentSheetView+SwiftUI.swift
-//  Hyperswitch
+//  SwiftUI+Lite.swift
+//  hyperswitch
 //
-//  Created by Balaganesh on 09/12/22.
+//  Created by Harshit Srivastava on 25/10/24.
 //
 
 import Foundation
 import SwiftUI
-import React
 
 /// Extension on the PaymentSheet class to provide a SwiftUI integration for presenting the payment sheet.
 extension PaymentSheet {
     
     /// A SwiftUI View struct that represents a button for presenting the payment sheet.
     @available(iOS 13.0, *)
-    public struct PaymentButton<Content: View>: View {
+    public struct PaymentButtonLite<Content: View>: View {
         private let paymentSession: PaymentSession
         private let configuration: Configuration
         private let content: Content
@@ -39,7 +38,7 @@ extension PaymentSheet {
         public var body: some View {
             Button(action: {
                 if let vc = viewControllerHolder {
-                    paymentSession.presentPaymentSheet(viewController: vc, configuration: configuration, completion: completion)
+                    paymentSession.presentPaymentSheetLite(viewController: vc, configuration: configuration, completion: completion)
                 }
             }) {
                 content

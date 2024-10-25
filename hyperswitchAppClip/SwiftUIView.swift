@@ -1,8 +1,8 @@
 //
-//  SwiftUIView.swift
-//  Hyperswitch
+//  SwiftUIview.swift
+//  hyperswitch
 //
-//  Created by Harshit Srivastava on 25/04/23.
+//  Created by Harshit Srivastava on 25/10/24.
 //
 
 import SwiftUI
@@ -17,18 +17,18 @@ struct SwiftUIView: View {
                 .ignoresSafeArea()
             LazyVStack(spacing: 94) {
                 Button{hyperViewModel.preparePaymentSheet()}
-                label: {
-                    Text("Reload Client Secret")
-                }.padding(.vertical, 11)
+            label: {
+                Text("Reload Client Secret")
+            }.padding(.vertical, 11)
                     .padding(.horizontal, 58)
                     .background(Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(10.0)
                 Spacer()
                 if let paymentSession = hyperViewModel.paymentSession {
-                    PaymentSheet.PaymentButton(paymentSession: paymentSession,
-                                               configuration: setupConfiguration(),
-                                               onCompletion: onPaymentCompletion) {
+                    PaymentSheet.PaymentButtonLite(paymentSession: paymentSession,
+                                                   configuration: setupConfiguration(),
+                                                   onCompletion: onPaymentCompletion) {
                         Text("Launch Payment Sheet")
                             .padding(.vertical, 11)
                             .padding(.horizontal, 58)
