@@ -1,4 +1,4 @@
-version = "0.1.9"
+version = "0.2.0"
 
 Pod::Spec.new do |s|
   s.name                      = 'hyperswitch-sdk-ios'
@@ -41,7 +41,7 @@ Pod::Spec.new do |s|
   end
 
   s.subspec 'lite' do |lite|
-    lite.source_files = 'hyperswitchSDK/CoreLite/AppClip/**/*.{m,swift,h}'
+    lite.source_files = 'hyperswitchSDK/CoreLite/*.{m,swift,h}'
     lite.dependency 'hyperswitch-sdk-ios/common'
   end
 

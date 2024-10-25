@@ -1,5 +1,5 @@
 //
-//  PaymentSheetView+AppClip.swift
+//  PaymentSheetView+Lite.swift
 //  hyperswitch
 //
 //  Created by Harshit Srivastava on 30/08/24.
