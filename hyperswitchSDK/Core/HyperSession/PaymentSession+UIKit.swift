@@ -49,8 +49,8 @@ extension PaymentSession {
         PaymentSession.hasResponded = false
         PaymentSession.isPresented = false
         PaymentSession.headlessCompletion = func_
-        HeadlessRNManager.sharedInstance.reinvalidateBridge()
-        let _ = HeadlessRNManager.sharedInstance.viewForModule("dummy", initialProperties: [:])
+        RNViewManager.sharedInstance.reinvalidateBridge()
+        let _ = RNViewManager.sharedInstance.viewForModule("dummy", initialProperties: [:])
     }
     
     internal static func getPaymentSession(getPaymentMethodData: NSDictionary, getPaymentMethodData2: NSDictionary, getPaymentMethodDataArray: NSArray, callback: @escaping RCTResponseSenderBlock) {

@@ -64,7 +64,6 @@
 		7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7996A8322BA1FDD000394FAF /* hyperswitch.bundle */; };
 		799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */; };
 		79BF5A5B2C3EA2D6006546D6 /* CodePush.plist in Resources */ = {isa = PBXBuildFile; fileRef = 79BF5A5A2C3EA2D6006546D6 /* CodePush.plist */; };
-		79D474AF2CC6FA200022C47E /* HeadlessRNManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474AE2CC6FA190022C47E /* HeadlessRNManager.swift */; };
 		79D474B42CC6FDC30022C47E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B32CC6FDBF0022C47E /* Helper.swift */; };
 		79D474B52CC6FDC30022C47E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B32CC6FDBF0022C47E /* Helper.swift */; };
 		79D474B72CC6FDE80022C47E /* RNResponseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B62CC6FDE50022C47E /* RNResponseHandler.swift */; };
@@ -190,7 +189,6 @@
 		7996A8322BA1FDD000394FAF /* hyperswitch.bundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hyperswitch.bundle; sourceTree = "<group>"; };
 		799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		79BF5A5A2C3EA2D6006546D6 /* CodePush.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = CodePush.plist; sourceTree = "<group>"; };
-		79D474AE2CC6FA190022C47E /* HeadlessRNManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlessRNManager.swift; sourceTree = "<group>"; };
 		79D474B32CC6FDBF0022C47E /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		79D474B62CC6FDE50022C47E /* RNResponseHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNResponseHandler.swift; sourceTree = "<group>"; };
 		79D474B82CC6FE8D0022C47E /* CodePushAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodePushAPI.swift; sourceTree = "<group>"; };
@@ -475,7 +473,6 @@
 				792D6A072B99C215001598CD /* HyperHeadless.swift */,
 				79D474B62CC6FDE50022C47E /* RNResponseHandler.swift */,
 				66486FA32943580F00150E4F /* RNViewManager.swift */,
-				79D474AE2CC6FA190022C47E /* HeadlessRNManager.swift */,
 				79D474B82CC6FE8D0022C47E /* CodePushAPI.swift */,
 			);
 			path = NativeModule;
@@ -742,7 +739,6 @@
 				7954A4472C23A44B00FEC02D /* ApplePayViewManager.m in Sources */,
 				79728FB92C3412BB00CA8C10 /* HeadlessViewController.swift in Sources */,
 				790BA8272B99DB5E006678FD /* PaymentSession.swift in Sources */,
-				79D474AF2CC6FA200022C47E /* HeadlessRNManager.swift in Sources */,
 				7905257A2BDA73A600D49FE8 /* SwiftUIView.swift in Sources */,
 				DC5D0114294731480017C67A /* PaymentSheet.swift in Sources */,
 				4E87FA612CAAE8E300E74113 /* PaymentManagementConfiguration.swift in Sources */,
