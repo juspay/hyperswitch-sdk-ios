@@ -86,9 +86,21 @@ class PaymentMethodManagementViewController: UIViewController {
         
         let onAddPaymentMethod: () -> Void = {
             DispatchQueue.main.async {
-                let addPaymentVC = AddPaymentMethodViewController()
-                addPaymentVC.modalPresentationStyle = .fullScreen
-                self.present(addPaymentVC, animated: true, completion: nil)
+                var configuration = PaymentSheet.Configuration()
+                configuration.primaryButtonLabel = "Purchase ($0.00)"
+                configuration.paymentSheetHeaderLabel = "Add payment method"
+                configuration.displaySavedPaymentMethods = false
+                
+                var appearance = PaymentSheet.Appearance()
+                appearance.colors.background = UIColor(red: 0.96, green: 0.97, blue: 0.98, alpha: 1.00)
+                appearance.primaryButton.cornerRadius = 32
+                configuration.appearance = appearance
+
+                self.hyperViewModel.paymentSession?.presentPaymentSheet(viewController: self, configuration: configuration, completion: { result in
+                    DispatchQueue.main.async {
+                        print(result)
+                    }
+                })
             }
         }
         
