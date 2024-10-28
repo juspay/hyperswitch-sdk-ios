@@ -519,7 +519,7 @@ public:
   virtual void enableNativeFramesTracking(jsi::Runtime &rt) = 0;
   virtual jsi::Value fetchModules(jsi::Runtime &rt) = 0;
   virtual jsi::Value fetchViewHierarchy(jsi::Runtime &rt) = 0;
-  virtual jsi::Object startProfiling(jsi::Runtime &rt) = 0;
+  virtual jsi::Object startProfiling(jsi::Runtime &rt, bool platformProfilers) = 0;
   virtual jsi::Object stopProfiling(jsi::Runtime &rt) = 0;
   virtual std::optional<jsi::String> fetchNativePackageName(jsi::Runtime &rt) = 0;
   virtual std::optional<jsi::Object> fetchNativeStackFramesBy(jsi::Runtime &rt, jsi::Array instructionsAddr) = 0;
@@ -729,13 +729,13 @@ private:
       return bridging::callFromJs<jsi::Value>(
           rt, &T::fetchViewHierarchy, jsInvoker_, instance_);
     }
-    jsi::Object startProfiling(jsi::Runtime &rt) override {
+    jsi::Object startProfiling(jsi::Runtime &rt, bool platformProfilers) override {
       static_assert(
-          bridging::getParameterCount(&T::startProfiling) == 1,
-          "Expected startProfiling(...) to have 1 parameters");
+          bridging::getParameterCount(&T::startProfiling) == 2,
+          "Expected startProfiling(...) to have 2 parameters");
 
       return bridging::callFromJs<jsi::Object>(
-          rt, &T::startProfiling, jsInvoker_, instance_);
+          rt, &T::startProfiling, jsInvoker_, instance_, std::move(platformProfilers));
     }
     jsi::Object stopProfiling(jsi::Runtime &rt) override {
       static_assert(

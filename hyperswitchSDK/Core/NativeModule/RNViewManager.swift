@@ -11,27 +11,24 @@ import React
 import CodePush
 #endif
 
-internal protocol RNResponseHandler {
-    func didReceiveResponse(response: String?, error: Error?) -> Void
-}
-
 internal class RNViewManager: NSObject {
     
     internal var responseHandler: RNResponseHandler?
     internal var rootView: RCTRootView?
     
-    private var userAgent: String?
+    internal lazy var bridge: RCTBridge = {
+        RCTBridge.init(delegate: self, launchOptions: nil)
+    }()
     
-    private lazy var bridge: RCTBridge = {
+    internal lazy var bridgeHeadless: RCTBridge = {
         RCTBridge.init(delegate: self, launchOptions: nil)
     }()
     
     internal static let sharedInstance = RNViewManager()
-    internal static let sharedInstance2 = RNViewManager()
     
     internal func viewForModule(_ moduleName: String, initialProperties: [String : Any]?) -> RCTRootView {
         let rootView: RCTRootView = RCTRootView(
-            bridge: bridge,
+            bridge: moduleName == "dummy" ? bridgeHeadless : bridge,
             moduleName: moduleName,
             initialProperties: initialProperties)
         self.rootView = rootView
@@ -39,44 +36,49 @@ internal class RNViewManager: NSObject {
     }
     
     internal func reinvalidateBridge(){
-        self.bridge.invalidate()
-        self.bridge = RCTBridge.init(delegate: self, launchOptions: nil)
+        self.bridgeHeadless.invalidate()
+        self.bridgeHeadless = RCTBridge.init(delegate: self, launchOptions: nil)
     }
 }
 
-private func getInfoPlist(_ key: String) -> String? {
-    guard let infoDictionary = Bundle.main.infoDictionary,
-          let value = infoDictionary[key] as? String, !value.isEmpty else {
-        return nil
-    }
-    return value
-}
+extension RCTBridge: RCTReloadListener {
+    
+    func triggerReload (bridge: RCTBridge!) {
+        NotificationCenter.default.post(name: NSNotification.Name.RCTBridgeWillReload, object: bridge, userInfo: nil)
 
-private func getCodePushPlist(_ key: String) -> String? {
-    guard let path = Bundle(for: RNViewManager.self).path(forResource: "CodePush", ofType: "plist"),
-          let dict = NSDictionary(contentsOfFile: path),
-          let value = dict[key] as? String, !value.isEmpty else {
-        return nil
-    }
-    return value
-}
-
-private func CodePushAPI() {
-    if let hyperVersion = getInfoPlist("HyperVersion"){
-        CodePush.overrideAppVersion(hyperVersion)
-    }
-    else {
-        if let hyperVersionInSDK = getCodePushPlist("HyperVersion"){
-            CodePush.overrideAppVersion(hyperVersionInSDK)
+        DispatchQueue.main.async {
+            bridge.invalidate()
+            bridge.setUp()
         }
     }
-    if let codePushDeploymentKey = getInfoPlist("HyperCodePushDeploymentKey"){
-        CodePush.setDeploymentKey(codePushDeploymentKey)
-    }
-    else {
-        if let codePushDeploymentKeyInSDK = getCodePushPlist("HyperCodePushDeploymentKey"){
-            CodePush.setDeploymentKey(codePushDeploymentKeyInSDK)
+    
+    public func didReceiveReloadCommand() {
+        
+        let preferences = UserDefaults.standard
+        let pendingUpdate = preferences.object(forKey: "CODE_PUSH_PENDING_UPDATE") as? [String: Any]
+        let updateIsLoading = pendingUpdate?["isLoading"] as? Bool
+                
+        if(!(updateIsLoading ?? true) && RNViewManager.sharedInstance.rootView != nil) {
+            if (self === RNViewManager.sharedInstance.bridge) {
+                triggerReload(bridge: self)
+            }
+        } else {
+            if(RNViewManager.sharedInstance.rootView != nil) {
+                if (self === RNViewManager.sharedInstance.bridge) {
+                    return
+                }
+            }
+            triggerReload(bridge: self)
         }
+    }
+}
+
+extension CodePush {
+    @objc private class func clearUpdates() {
+        let preferences = UserDefaults.standard
+        preferences.removeObject(forKey: "CODE_PUSH_PENDING_UPDATE")
+        preferences.removeObject(forKey: "CODE_PUSH_FAILED_UPDATES")
+        preferences.synchronize()
     }
 }
 

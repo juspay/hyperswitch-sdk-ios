@@ -9,6 +9,7 @@ import SwiftUI
 
 struct SwiftUIView: View {
     @ObservedObject var hyperViewModel = HyperViewModel()
+    @State var paymentResult: PaymentSheetResult?
     
     var body: some View {
         ZStack(alignment: .top){
@@ -16,17 +17,18 @@ struct SwiftUIView: View {
                 .ignoresSafeArea()
             LazyVStack(spacing: 94) {
                 Button{hyperViewModel.preparePaymentSheet()}
-            label: {
-                Text("Reload Client Secret")
-            }.padding(.vertical, 11)
+                label: {
+                    Text("Reload Client Secret")
+                }.padding(.vertical, 11)
                     .padding(.horizontal, 58)
                     .background(Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(10.0)
                 Spacer()
                 if let paymentSession = hyperViewModel.paymentSession {
-                    PaymentSheet.PaymentButton(paymentSession: paymentSession, configuration: SwiftUIView.setupConfiguration()
-                                               , onCompletion: hyperViewModel.onPaymentCompletion) {
+                    PaymentSheet.PaymentButton(paymentSession: paymentSession,
+                                               configuration: setupConfiguration(),
+                                               onCompletion: onPaymentCompletion) {
                         Text("Launch Payment Sheet")
                             .padding(.vertical, 11)
                             .padding(.horizontal, 58)
@@ -35,7 +37,7 @@ struct SwiftUIView: View {
                             .cornerRadius(10.0)
                     }
                     
-                    if let result = hyperViewModel.paymentResult {
+                    if let result = paymentResult {
                         switch result {
                         case .completed:
                             Text("Payment complete")
@@ -53,7 +55,7 @@ struct SwiftUIView: View {
                 .padding(.top, 80)
         }
     }
-    static func setupConfiguration() -> PaymentSheet.Configuration {
+    func setupConfiguration() -> PaymentSheet.Configuration {
         var configuration = PaymentSheet.Configuration()
         configuration.primaryButtonLabel = "Purchase ($2.00)"
         configuration.savedPaymentSheetHeaderLabel = "Payment methods"
@@ -70,5 +72,10 @@ struct SwiftUIView: View {
         configuration.appearance = appearance
         
         return configuration
+    }
+    func onPaymentCompletion(result: PaymentSheetResult) {
+        DispatchQueue.main.async {
+            paymentResult = result
+        }
     }
 }

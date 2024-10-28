@@ -32,7 +32,9 @@ Class<RCTComponentViewProtocol> RNSVGCircleCls(void) __attribute__((used)); // 2
 Class<RCTComponentViewProtocol> RNSVGClipPathCls(void) __attribute__((used)); // 2
 Class<RCTComponentViewProtocol> RNSVGDefsCls(void) __attribute__((used)); // 2
 Class<RCTComponentViewProtocol> RNSVGEllipseCls(void) __attribute__((used)); // 2
+Class<RCTComponentViewProtocol> RNSVGFeBlendCls(void) __attribute__((used)); // 2
 Class<RCTComponentViewProtocol> RNSVGFeColorMatrixCls(void) __attribute__((used)); // 2
+Class<RCTComponentViewProtocol> RNSVGFeFloodCls(void) __attribute__((used)); // 2
 Class<RCTComponentViewProtocol> RNSVGFeGaussianBlurCls(void) __attribute__((used)); // 2
 Class<RCTComponentViewProtocol> RNSVGFeMergeCls(void) __attribute__((used)); // 2
 Class<RCTComponentViewProtocol> RNSVGFeOffsetCls(void) __attribute__((used)); // 2

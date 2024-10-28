@@ -39,34 +39,11 @@ extension PaymentSheet {
         public var body: some View {
             Button(action: {
                 if let vc = viewControllerHolder {
-                    let paymentSheet = PaymentSheet(paymentIntentClientSecret: PaymentSession.paymentIntentClientSecret ?? "", configuration: configuration)
-                    paymentSheet.present(from: vc, completion: completion)
+                    paymentSession.presentPaymentSheet(viewController: vc, configuration: configuration, completion: completion)
                 }
             }) {
                 content
             }
-        }
-    }
-    
-    /// A UIViewRepresentable struct that handles presenting the payment sheet view.
-    @available(iOS 13.0, *)
-    struct PaymentSheetPresenter: UIViewRepresentable {
-        
-        private let paymentSheet: PaymentSheet
-        
-        init(paymentSheet: PaymentSheet) {
-            self.paymentSheet = paymentSheet
-        }
-        
-        typealias UIViewType = RCTRootView
-        
-        func makeUIView(context: Context) -> RCTRootView {
-            
-            return self.paymentSheet.getRootView()
-        }
-        
-        func updateUIView(_ uiView: RCTRootView, context: Context) {
-            
         }
     }
 }

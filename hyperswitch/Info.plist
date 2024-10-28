@@ -19,7 +19,6 @@
 	</dict>
 	<key>UIAppFonts</key>
 	<array>
-		<string>montserrat.xml</string>
 		<string>montserrat_thin.ttf</string>
 		<string>montserrat_thinitalic.ttf</string>
 		<string>montserrat_extralight.ttf</string>
