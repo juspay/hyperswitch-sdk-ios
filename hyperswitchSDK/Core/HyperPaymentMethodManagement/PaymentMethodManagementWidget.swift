@@ -20,10 +20,10 @@ internal class PaymentMethodManagementWidget: UIControl {
     private var completion: ((PaymentMethodManagementResult) -> ())?
     
     // Initialize the widget with the ephemeral key and configuration.
-    public init(frame: CGRect, onAddPaymentMethod: (() -> Void)?, completion: @escaping (PaymentMethodManagementResult) -> ()) {
+    public init(onAddPaymentMethod: (() -> Void)?, completion: @escaping (PaymentMethodManagementResult) -> ()) {
         PaymentMethodManagementWidget.onAddPaymentMethod = onAddPaymentMethod
         self.completion = completion
-        super.init(frame: frame)
+        super.init(frame: .zero)
         commonInit()
     }
     
@@ -70,6 +70,14 @@ internal class PaymentMethodManagementWidget: UIControl {
         
         // Add the React Native view to the current view.
         addSubview(rootView)
+        
+        rootView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            rootView.topAnchor.constraint(equalTo: self.topAnchor),
+            rootView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
+            rootView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+            rootView.trailingAnchor.constraint(equalTo: self.trailingAnchor)
+        ])
     }
     
     internal static func exitWidget() {
