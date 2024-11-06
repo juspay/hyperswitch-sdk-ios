@@ -25,7 +25,6 @@ class ViewController: UIViewController {
         self.view.backgroundColor = UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 0.2)
         super.viewDidLoad()
         hyperViewModel.preparePaymentSheet()
-        hyperViewModel.preparePaymentManagementSheet()
         asyncBind()
     }
     
@@ -84,25 +83,13 @@ class ViewController: UIViewController {
     
     @objc
     func openPaymentMethodManagement(_ sender: Any) {
-        var configuration = PMMConfiguration()
-        var appearance = PMMAppearance()
-        appearance.font.base = UIFont(name: "montserrat", size: UIFont.systemFontSize)
-        appearance.font.sizeScaleFactor = 1.0
-        appearance.shadow = .disabled
-        appearance.colors.primary = UIColor(red: 0.55, green: 0.74, blue: 0.00, alpha: 1.00)
-        appearance.theme = .light
-        configuration.appearance = appearance
         
-        hyperViewModel.paymentSession?.presentPaymentManagementSheet(viewController: self, configuration: configuration, completion: { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .failed(let error):
-                    self.statusLabel.text =  "Payment Method Management failed: \(error)"
-                case .closed:
-                    self.statusLabel.text = "Payment Method Management closed."
-                }
-            }
-        })
+        // Create an instance of PaymentMethodManagementViewController
+        let paymentMethodVC = PaymentMethodManagementViewController()
+        
+        // Present the PaymentMethodManagementViewController
+        paymentMethodVC.modalPresentationStyle = .fullScreen
+        present(paymentMethodVC, animated: true)
     }
     
     @objc
