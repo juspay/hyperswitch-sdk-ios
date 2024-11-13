@@ -82,7 +82,6 @@ class PaymentMethodManagementViewController: UIViewController {
         })
     }
     @objc func backButtonTapped() {
-        PaymentMethodManagementWidget.exitWidget()
         self.dismiss(animated: true, completion: nil)
     }
 }

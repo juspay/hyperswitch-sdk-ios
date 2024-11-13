@@ -79,14 +79,6 @@ internal class PaymentMethodManagementWidget: UIControl {
             rootView.trailingAnchor.constraint(equalTo: self.trailingAnchor)
         ])
     }
-    
-    internal static func exitWidget() {
-        DispatchQueue.main.async {
-            if let view = RNViewManager.sharedInstance.rootView {
-                view.reactViewController()?.dismiss(animated: false, completion: nil)
-            }
-        }
-    }
 }
 
 /// An extension that conforms to the RNResponseHandler protocol, which handles the response from the payment sheet operation.
