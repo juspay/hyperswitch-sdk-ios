@@ -30,7 +30,7 @@ public class PaymentSession {
         PaymentSession.paymentIntentClientSecret = paymentIntentClientSecret
     }
     
-    public func initPaymentManagementSession(ephemeralKey: String, paymentIntentClientSecret: String){
+    public func initPaymentManagementSession(ephemeralKey: String, paymentIntentClientSecret: String? = nil){
         PaymentSession.ephemeralKey = ephemeralKey
         PaymentSession.paymentIntentClientSecret = paymentIntentClientSecret
     }

@@ -67,21 +67,24 @@ class HyperViewModel: ObservableObject {
     func preparePaymentMethodManagement() {
         Task {
             do {
-                let paymentMethodsJson = try await fetchData(from: "/payment_methods")
-                guard let publishableKey = paymentMethodsJson["publishableKey"] as? String,
-                      let paymentManagementClientSecret = paymentMethodsJson["clientSecret"] as? String else {
-                    throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing required fields"])
-                }
-                
                 let ephemeralKeyJson = try await fetchData(from: "/create-ephemeral-key")
                 guard let ephemeralKey = ephemeralKeyJson["ephemeralKey"] as? String else {
                     throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing ephemeral key"])
                 }
                 
+                let json = try await fetchData(from: "/create-payment-intent")
+                guard let paymentIntentClientSecret = json["clientSecret"] as? String,
+                      let publishableKey = json["publishableKey"] as? String
+                else {
+                    throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing required fields"])
+                }
+                
                 DispatchQueue.main.async {
                     self.status = .success
                     self.paymentSession = PaymentSession(publishableKey: publishableKey)
-                    self.paymentSession?.initPaymentManagementSession(ephemeralKey: ephemeralKey, paymentIntentClientSecret: paymentManagementClientSecret)
+
+                    self.paymentSession?.initPaymentManagementSession(ephemeralKey: ephemeralKey, paymentIntentClientSecret: nil)
+                    self.paymentSession?.initPaymentSession(paymentIntentClientSecret: paymentIntentClientSecret)
                 }
             } catch {
                 DispatchQueue.main.async {
