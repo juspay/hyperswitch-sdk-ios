@@ -75,12 +75,18 @@ class PaymentMethodManagementViewController: UIViewController {
             DispatchQueue.main.async {
                 switch result {
                 case .completed:
+                    self.showAlert(title: "Success", message: "Successfully saved the payment method")
                     self.hyperViewModel.preparePaymentMethodManagement()
-                default: break
+                case .failed(let error):
+                    self.showAlert(title: "Error", message: "Failure: \(error.localizedDescription)")
+                    self.hyperViewModel.preparePaymentMethodManagement()
+                case .canceled:
+                    break
                 }
             }
         })
     }
+    
     @objc func backButtonTapped() {
         self.dismiss(animated: true, completion: nil)
     }
@@ -112,5 +118,16 @@ extension PaymentMethodManagementViewController {
         textLabel.leadingAnchor.constraint(equalTo: backButton.trailingAnchor, constant: 4).isActive = true
         textLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
+    }
+}
+
+extension PaymentMethodManagementViewController {
+    func showAlert(title: String, message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alertController.addAction(okAction)
+        DispatchQueue.main.async {
+            self.present(alertController, animated: true, completion: nil)
+        }
     }
 }
