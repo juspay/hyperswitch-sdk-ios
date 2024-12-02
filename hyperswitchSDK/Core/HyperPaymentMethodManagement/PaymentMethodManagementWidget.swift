@@ -55,10 +55,11 @@ internal class PaymentMethodManagementWidget: UIControl {
         let props: [String : Any] = [
             "type": "paymentMethodsManagement",
             "hyperParams": hyperParams,
-            "customBackendUrl": APIClient.shared.customBackendUrl as Any,
-            "customParamas": APIClient.shared.customParams as Any,
             "ephemeralKey": PaymentSession.ephemeralKey ?? "",
             "publishableKey": APIClient.shared.publishableKey as Any,
+            "customBackendUrl": APIClient.shared.customBackendUrl as Any,
+            "customLogUrl": APIClient.shared.customLogUrl as Any,
+            "customParams": APIClient.shared.customParams as Any,
         ]
         
         RNViewManager.sharedInstance.responseHandler = self

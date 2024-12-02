@@ -49,6 +49,7 @@ internal class HyperHeadless: RCTEventEmitter {
                 let hyperParams = [
                     "appId": Bundle.main.bundleIdentifier,
                     "sdkVersion" : SDKVersion.current,
+                    "country" : NSLocale.current.regionCode,
                     "ip": nil,
                     "user-agent": WKWebView().value(forKey: "userAgent"),
                     "launchTime": Int(Date().timeIntervalSince1970 * 1000)
@@ -59,6 +60,8 @@ internal class HyperHeadless: RCTEventEmitter {
                     "publishableKey": APIClient.shared.publishableKey as Any,
                     "hyperParams": hyperParams,
                     "customBackendUrl": APIClient.shared.customBackendUrl as Any,
+                    "customLogUrl": APIClient.shared.customLogUrl as Any,
+                    "customParams": APIClient.shared.customParams as Any
                 ]
                 rnCallback([props])
             }

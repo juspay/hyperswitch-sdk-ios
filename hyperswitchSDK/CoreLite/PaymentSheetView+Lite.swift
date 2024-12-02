@@ -32,7 +32,8 @@ extension PaymentSheet {
             "publishableKey": APIClient.shared.publishableKey as Any,
             "hyperParams": hyperParams,
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
-            "customParamas": APIClient.shared.customParams as Any
+            "customLogUrl": APIClient.shared.customLogUrl as Any,
+            "customParams": APIClient.shared.customParams as Any
         ]
         
         let initialProps: [String : Any] = [
