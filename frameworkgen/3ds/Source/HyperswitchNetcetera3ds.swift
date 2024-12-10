@@ -78,7 +78,7 @@ class HyperswitchNetcetera3ds: NSObject {
                     initStatus["message"] = "netcetera sdk initialization successful"
                     callback([initStatus])
                 },
-                                                failure: { error in
+                failure: { error in
                     if (error.localizedDescription == "The SDK is already initialized") {
                         initStatus["status"] = "success";
                         initStatus["message"] = "netcetera sdk initialization successful";
