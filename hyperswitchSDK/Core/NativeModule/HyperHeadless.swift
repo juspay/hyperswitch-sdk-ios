@@ -52,6 +52,9 @@ internal class HyperHeadless: RCTEventEmitter {
                     "country" : NSLocale.current.regionCode,
                     "ip": nil,
                     "user-agent": WKWebView().value(forKey: "userAgent"),
+                    "device_model": UIDevice.current.model,
+                    "os_type": "ios",
+                    "os_version": UIDevice.current.systemVersion,
                     "launchTime": Int(Date().timeIntervalSince1970 * 1000)
                 ]
                 

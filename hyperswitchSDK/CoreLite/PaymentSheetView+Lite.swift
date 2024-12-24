@@ -21,7 +21,10 @@ extension PaymentSheet {
             "ip": nil,
             "user-agent": WKWebView().value(forKey: "userAgent"),
             "defaultView": self.defaultView,
-            "launchTime": Int(Date().timeIntervalSince1970 * 1000)
+            "launchTime": Int(Date().timeIntervalSince1970 * 1000),
+            "device_model": UIDevice.current.model,
+            "os_type": "ios",
+            "os_version": UIDevice.current.systemVersion
         ]
         
         /// Create a dictionary of props to be sent to React Native with configuration, type, client secret, publishable key, hyperParams, custom backend URL, themes, and custom parameters
