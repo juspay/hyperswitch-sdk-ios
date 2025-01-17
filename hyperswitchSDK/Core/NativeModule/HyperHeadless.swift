@@ -29,12 +29,12 @@ internal class HyperHeadless: RCTEventEmitter {
         return true
     }
     
-    @objc 
+    @objc
     internal override func supportedEvents() -> [String] {
         return ["test"]
     }
     
-    @objc 
+    @objc
     private func confirm(data: [String: Any]) {
         self.sendEvent(withName: "test", body: data)
     }
@@ -46,17 +46,7 @@ internal class HyperHeadless: RCTEventEmitter {
     private func initialisePaymentSession (_ rnCallback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
             if PaymentSession.headlessCompletion != nil, !PaymentSession.isPresented {
-                let hyperParams = [
-                    "appId": Bundle.main.bundleIdentifier,
-                    "sdkVersion" : SDKVersion.current,
-                    "country" : NSLocale.current.regionCode,
-                    "ip": nil,
-                    "user-agent": WKWebView().value(forKey: "userAgent"),
-                    "device_model": UIDevice.current.model,
-                    "os_type": "ios",
-                    "os_version": UIDevice.current.systemVersion,
-                    "launchTime": Int(Date().timeIntervalSince1970 * 1000)
-                ]
+                let hyperParams = getHyperParams()
                 
                 let props: [String: Any] = [
                     "clientSecret": PaymentSession.paymentIntentClientSecret as Any,
