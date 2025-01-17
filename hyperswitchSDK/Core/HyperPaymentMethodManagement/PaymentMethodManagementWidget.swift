@@ -48,7 +48,10 @@ internal class PaymentMethodManagementWidget: UIControl {
             "country" : NSLocale.current.regionCode,
             "ip": nil,
             "user-agent": WKWebView().value(forKey: "userAgent"),
-            "launchTime": Int(Date().timeIntervalSince1970 * 1000)
+            "launchTime": Int(Date().timeIntervalSince1970 * 1000),
+            "device_model": UIDevice.current.model,
+            "os_type": "ios",
+            "os_version": UIDevice.current.systemVersion
         ]
         
         // Prepare the props to send to the React Native module.
