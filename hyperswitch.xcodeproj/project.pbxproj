@@ -43,6 +43,7 @@
 		66486FAB2943580F00150E4F /* HyperModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66486FA42943580F00150E4F /* HyperModule.swift */; };
 		66486FAD2943580F00150E4F /* HyperModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 66486FA62943580F00150E4F /* HyperModule.m */; };
 		66C2F89B29444E6700ACD32D /* ApplePayHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C2F89A29444E6700ACD32D /* ApplePayHandler.swift */; };
+		75A685E22D40EABF00122778 /* HyperOTA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75A685E12D40EAB700122778 /* HyperOTA.swift */; };
 		790525712BDA66EF00D49FE8 /* HyperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790525702BDA66EF00D49FE8 /* HyperViewModel.swift */; };
 		7905257A2BDA73A600D49FE8 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790525792BDA73A600D49FE8 /* SwiftUIView.swift */; };
 		79052A242C8922E90011804E /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A232C8922E90011804E /* Version.swift */; };
@@ -176,6 +177,7 @@
 		66486FA42943580F00150E4F /* HyperModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HyperModule.swift; sourceTree = "<group>"; };
 		66486FA62943580F00150E4F /* HyperModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HyperModule.m; sourceTree = "<group>"; };
 		66C2F89A29444E6700ACD32D /* ApplePayHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayHandler.swift; sourceTree = "<group>"; };
+		75A685E12D40EAB700122778 /* HyperOTA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperOTA.swift; sourceTree = "<group>"; };
 		790525702BDA66EF00D49FE8 /* HyperViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperViewModel.swift; sourceTree = "<group>"; };
 		790525792BDA73A600D49FE8 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
 		79052A232C8922E90011804E /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
@@ -474,6 +476,7 @@
 		DC5D0117294738870017C67A /* NativeModule */ = {
 			isa = PBXGroup;
 			children = (
+				75A685E12D40EAB700122778 /* HyperOTA.swift */,
 				66486F9F2943580E00150E4F /* hyper-Bridging-Header.h */,
 				66486FA62943580F00150E4F /* HyperModule.m */,
 				66486FA42943580F00150E4F /* HyperModule.swift */,
@@ -769,6 +772,7 @@
 				4E69679B2CB7CF71000DBE0A /* PMMViewController.swift in Sources */,
 				DC5D011E294844900017C67A /* ViewController.swift in Sources */,
 				79D474B72CC6FDE80022C47E /* RNResponseHandler.swift in Sources */,
+				75A685E22D40EABF00122778 /* HyperOTA.swift in Sources */,
 				79EAB03A2C81D152006B40AD /* PaymentSession+UIKit.swift in Sources */,
 				79052A272C89237A0011804E /* Extensions.swift in Sources */,
 				DC4AC9F2296D6D6C00E0D2A6 /* PaymentCardTextField.swift in Sources */,
