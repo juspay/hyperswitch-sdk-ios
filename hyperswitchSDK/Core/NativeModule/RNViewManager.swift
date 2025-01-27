@@ -45,7 +45,7 @@ extension RCTBridge: RCTReloadListener {
     
     func triggerReload (bridge: RCTBridge!) {
         NotificationCenter.default.post(name: NSNotification.Name.RCTBridgeWillReload, object: bridge, userInfo: nil)
-
+        
         DispatchQueue.main.async {
             bridge.invalidate()
             bridge.setUp()
@@ -57,7 +57,7 @@ extension RCTBridge: RCTReloadListener {
         let preferences = UserDefaults.standard
         let pendingUpdate = preferences.object(forKey: "CODE_PUSH_PENDING_UPDATE") as? [String: Any]
         let updateIsLoading = pendingUpdate?["isLoading"] as? Bool
-                
+        
         if(!(updateIsLoading ?? true) && RNViewManager.sharedInstance.rootView != nil) {
             if (self === RNViewManager.sharedInstance.bridge) {
                 triggerReload(bridge: self)
@@ -84,21 +84,17 @@ extension RCTBridge: RCTReloadListener {
 
 extension RNViewManager: RCTBridgeDelegate {
     func sourceURL(for bridge: RCTBridge!) -> URL! {
-//        switch getInfoPlist("HyperswitchSource") {
-//        case "LocalHosted":
-//            if let ip = getInfoPlist("HyperswitchSourceIP") {
-//                return URL(string: "http://"+ip+":8081/index.bundle?platform=ios")
-//            } else {
-//                return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
-//            }
-//        case "LocalBundle":
-//            return Bundle.main.url(forResource: "hyperswitch.bundle", withExtension: "bundle")
-//        default:
-            return bundleURL
-//            CodePushAPI()
-//            return CodePush.bundleURL(forResource: "hyperswitch",
-//                                      withExtension: "bundle",
-//                                      subdirectory: "/Frameworks/Hyperswitch.framework")
-//        }
+        switch getInfoPlist("HyperswitchSource") {
+       case "LocalHosted":
+           if let ip = getInfoPlist("HyperswitchSourceIP") {
+               return URL(string: "http://"+ip+":8081/index.bundle?platform=ios")
+           } else {
+               return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+           }
+        case "LocalBundle":
+            return Bundle.main.url(forResource: "hyperswitch.bundle", withExtension: "bundle")
+        default:
+            return OTAServices.getBundleURL()
+        }
     }
 }
