@@ -36,7 +36,7 @@ public final class OTAServices {
             let bundleURL = try HyperOTAServices.bundleURL(payload, loggerDelegate: logger)
             return bundleURL
         } catch {
-            return Bundle.main.url(forResource: "hyperswitch.bundle", withExtension: "bundle")
+            return Bundle.main.url(forResource: "hyperswitch", withExtension: "bundle")
         }
     }
 }

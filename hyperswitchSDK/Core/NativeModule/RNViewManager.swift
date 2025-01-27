@@ -92,7 +92,7 @@ extension RNViewManager: RCTBridgeDelegate {
                return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
            }
         case "LocalBundle":
-            return Bundle.main.url(forResource: "hyperswitch.bundle", withExtension: "bundle")
+            return Bundle.main.url(forResource: "hyperswitch", withExtension: "bundle")
         default:
             return OTAServices.getBundleURL()
         }
