@@ -14,12 +14,13 @@ import Foundation
 }
 
 public class PaymentSession {
-    
+  
     internal static var isPresented: Bool = false
     internal static var paymentIntentClientSecret: String?
     internal static var ephemeralKey: String?
     
     public init(publishableKey: String, customBackendUrl: String? = nil, customParams: [String : Any]? = nil, customLogUrl: String? = nil){
+        HyperLogManager.initialise(publishableKey: publishableKey)
         APIClient.shared.publishableKey = publishableKey
         APIClient.shared.customBackendUrl = customBackendUrl
         APIClient.shared.customLogUrl = customLogUrl

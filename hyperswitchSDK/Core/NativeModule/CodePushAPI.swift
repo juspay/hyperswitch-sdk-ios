@@ -6,9 +6,9 @@
 //
 
 import Foundation
-#if canImport(CodePush)
-import CodePush
-#endif
+//#if canImport(CodePush)
+//import CodePush
+//#endif
 
 private func getCodePushPlist(_ key: String) -> String? {
     guard let path = Bundle(for: RNViewManager.self).path(forResource: "CodePush", ofType: "plist"),
@@ -21,19 +21,19 @@ private func getCodePushPlist(_ key: String) -> String? {
 
 internal func CodePushAPI() {
     if let hyperVersion = getInfoPlist("HyperVersion"){
-        CodePush.overrideAppVersion(hyperVersion)
+//        CodePush.overrideAppVersion(hyperVersion)
     }
     else {
         if let hyperVersionInSDK = getCodePushPlist("HyperVersion"){
-            CodePush.overrideAppVersion(hyperVersionInSDK)
+//            CodePush.overrideAppVersion(hyperVersionInSDK)
         }
     }
     if let codePushDeploymentKey = getInfoPlist("HyperCodePushDeploymentKey"){
-        CodePush.setDeploymentKey(codePushDeploymentKey)
+//        CodePush.setDeploymentKey(codePushDeploymentKey)
     }
     else {
         if let codePushDeploymentKeyInSDK = getCodePushPlist("HyperCodePushDeploymentKey"){
-            CodePush.setDeploymentKey(codePushDeploymentKeyInSDK)
+//            CodePush.setDeploymentKey(codePushDeploymentKeyInSDK)
         }
     }
 }
