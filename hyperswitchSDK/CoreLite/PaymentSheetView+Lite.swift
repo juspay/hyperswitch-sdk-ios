@@ -14,18 +14,7 @@ extension PaymentSheet {
         
         let configuration = self.configuration?.toDictionary()
         
-        let hyperParams = [
-            "appId" : Bundle.main.bundleIdentifier,
-            "sdkVersion" : SDKVersion.current,
-            "country" : NSLocale.current.regionCode,
-            "ip": nil,
-            "user-agent": WKWebView().value(forKey: "userAgent"),
-            "defaultView": self.defaultView,
-            "launchTime": Int(Date().timeIntervalSince1970 * 1000),
-            "device_model": UIDevice.current.model,
-            "os_type": "ios",
-            "os_version": UIDevice.current.systemVersion
-        ]
+        let hyperParams = HyperParams.getHyperParams()
         
         /// Create a dictionary of props to be sent to React Native with configuration, type, client secret, publishable key, hyperParams, custom backend URL, themes, and custom parameters
         let props: [String : Any] = [

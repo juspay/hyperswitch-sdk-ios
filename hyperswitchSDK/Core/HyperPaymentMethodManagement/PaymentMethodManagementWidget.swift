@@ -42,17 +42,7 @@ internal class PaymentMethodManagementWidget: UIControl {
     }
     
     private func commonInit() {
-        let hyperParams = [
-            "appId" : Bundle.main.bundleIdentifier,
-            "sdkVersion" : SDKVersion.current,
-            "country" : NSLocale.current.regionCode,
-            "ip": nil,
-            "user-agent": WKWebView().value(forKey: "userAgent"),
-            "launchTime": Int(Date().timeIntervalSince1970 * 1000),
-            "device_model": UIDevice.current.model,
-            "os_type": "ios",
-            "os_version": UIDevice.current.systemVersion
-        ]
+        let hyperParams = HyperParams.getHyperParams()
         
         // Prepare the props to send to the React Native module.
         let props: [String : Any] = [
