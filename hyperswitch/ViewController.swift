@@ -20,10 +20,19 @@ class ViewController: UIViewController {
     private var paymentMethodManagementButtonConfig = UIButton.Configuration.plain()
     private var statusLabel = UILabel()
     private var cancellables = Set<AnyCancellable>()
-    
+    private var netceteraApiKey: String?
+
     override func viewDidLoad() {
         self.view.backgroundColor = UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 0.2)
         super.viewDidLoad()
+        Task {
+            do {
+                let apiKey = try await hyperViewModel.getNetceteraApiKey()
+                self.netceteraApiKey = apiKey
+            } catch {
+                print("Failed to fetch API key: \(error.localizedDescription)")
+            }
+        }
         hyperViewModel.preparePaymentSheet()
         asyncBind()
     }
@@ -57,7 +66,9 @@ class ViewController: UIViewController {
         configuration.savedPaymentSheetHeaderLabel = "Payment methods"
         configuration.paymentSheetHeaderLabel = "Select payment method"
         configuration.displaySavedPaymentMethods = true
-        
+        if ((netceteraApiKey) != nil){
+            configuration.netceteraSDKApiKey = netceteraApiKey
+        }
         var appearance = PaymentSheet.Appearance()
         appearance.font.base = UIFont(name: "montserrat", size: UIFont.systemFontSize)
         appearance.font.sizeScaleFactor = 1.0
