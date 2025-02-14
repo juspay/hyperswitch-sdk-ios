@@ -11,24 +11,24 @@ import UIKit
 
 // MARK: - Configuration
 extension PaymentSheet {
-    
+
     /// Style options for colors in PaymentSheet
     public enum UserInterfaceStyle: Int, DictionaryConverter {
-        
+
         /// (default) PaymentSheet will automatically switch between standard and dark mode compatible colors based on device settings
         case automatic = 0
-        
+
         /// PaymentSheet will always use colors appropriate for standard, i.e. non-dark mode UI
         case alwaysLight
-        
+
         /// PaymentSheet will always use colors appropriate for dark mode UI
         case alwaysDark
-        
+
         func configure(_ viewController: UIViewController) {
             switch self {
             case .automatic:
                 break  // no-op
-                
+
             case .alwaysLight:
                 if #available(iOS 13.0, *) {
                     viewController.overrideUserInterfaceStyle = .light
@@ -40,23 +40,118 @@ extension PaymentSheet {
             }
         }
     }
+
+    /**
+     * style options for label customization
+     */
+    public struct LabelCustomization: DictionaryConverter {
+        public var textFontName: String?
+        public var textColor: String?
+        public var textFontSize: Float?
+        public var headingTextFontName: String?
+        public var headingTextColor: String?
+        public var headingTextFontSize: Float?
+    }
+    /**
+     * style options for toolbar customization
+     */
+    public struct ToolbarCustomization: DictionaryConverter {
+        public var textFontName : String?
+        public var textColor: String?
+        public var textFontSize : Float?
+        public var backgroundColor: String?
+        public var headerText: String?
+        public var buttonText: String?
+    }
+    /**
+     * style options for text box customization
+     */
+    public struct TextBoxCustomization: DictionaryConverter {
+        public var textFontName: String?
+        public var textColor: String?
+        public var textFontSize: Float?
+        public var borderWidth: Float?
+        public var borderColor: String?
+        public var cornerRadius: Float?
+    }
+    /**
+     * style options for submit button customization
+     */
+    public enum NetceteraButtonType: String {
+        case SUBMIT
+        case CONTINUE
+        case NEXT
+        case RESEND
+        case OPEN_OOB_APP
+        case ADD_CH
+        case CANCEL
+    }
     
+    public struct ButtonCustomization: DictionaryConverter {
+        public var backgroundColor: String?
+        public var cornerRadius: Float?
+        public var textFontSize: Float?
+        public var textFontName: String?
+        public var textColor: String?
+        public var buttonType : NetceteraButtonType
+        init(buttonType: NetceteraButtonType) {
+            self.buttonType = buttonType
+        }
+    }
+    /**
+     * style options for view customization
+     */
+    public struct ViewCustomization: DictionaryConverter {
+        public var challengeViewBackgroundColor: String?
+        public var progressViewBackgroundColor: String?
+    }
+
+    public struct NetceteraChallengeUICustomization: DictionaryConverter {
+        /**
+         * style options for label customization
+         */
+        public var labelCustomization: LabelCustomization = LabelCustomization()
+        /**
+         * style options for text box customization
+         */
+        public var textBoxCustomization: TextBoxCustomization = TextBoxCustomization()
+
+        /**
+         * style options for toolbar customization
+         */
+        public var toolbarCustomization: ToolbarCustomization = ToolbarCustomization()
+
+        /**
+         * style options for submit button customization
+         */
+        public var buttonCustomization : [ButtonCustomization] = []
+        /**
+         * style options for view customization
+         */
+        public var viewCustomization: ViewCustomization = ViewCustomization()
+    }
+
+    public struct NetceteraChallengeUI: DictionaryConverter {
+        public var lightModeCustomization: NetceteraChallengeUICustomization = NetceteraChallengeUICustomization()
+        public var darkModeCustomization: NetceteraChallengeUICustomization = NetceteraChallengeUICustomization()
+    }
+
     /// Options for the default state of save payment method controls
     /// @note Some jurisdictions may have rules governing the ability to default to opt-out behaviors
     public enum SavePaymentMethodOptInBehavior: DictionaryConverter {
-        
+
         /// (Default) The SDK will apply opt-out behavior for supported countries.
         /// Currently, this behavior is supported in the US.
         case automatic
-        
+
         /// The control will always default to unselected and users
         /// will have to explicitly interact to save their payment method
         case requiresOptIn
-        
+
         /// The control will always default to selected and users
         /// will have to explicitly interact to not save their payment method
         case requiresOptOut
-        
+
         var isSelectedByDefault: Bool {
             switch self {
             case .automatic:
@@ -69,45 +164,45 @@ extension PaymentSheet {
             }
         }
     }
-    
+
     public struct PlaceHolder: Equatable, DictionaryConverter {
         public init() {}
         public var cardNumber: String?
         public var expiryDate: String? //  MM/YY
         public var cvv: String?
     }
-    
+
     /// Configuration for PaymentSheet
     public struct Configuration: DictionaryConverter {
-        
+
         /// If true, allows payment methods that do not move money at the end of the checkout. Defaults to false.
         /// - Description: Some payment methods can't guarantee you will receive funds from your customer at the end of the checkout because they take time to settle (eg. most bank debits, like SEPA or ACH) or require customer action to complete (e.g. OXXO, Konbini, Boleto). If this is set to true, make sure your integration listens to webhooks for notifications on whether a payment has succeeded or not.
         /// - Seealso: https://docs.hyperswitch.io/payments/payment-methods#payment-notification
         public var allowsDelayedPaymentMethods: Bool = false
-        
+
         /// If `true`, allows payment methods that require a shipping address, like Afterpay and Affirm. Defaults to `false`.
         /// Set this to `true` if you collect shipping addresses and set `Configuration.shippingDetails` or set `shipping` details directly on the PaymentIntent.
         /// - Note: PaymentSheet considers this property `true` and allows payment methods that require a shipping address if `shipping` details are present on the PaymentIntent when PaymentSheet loads.
         public var allowsPaymentMethodsRequiringShippingAddress: Bool = false
-        
+
         /// The APIClient instance used to make requests to Hyperswitch
-//        internal var apiClient: APIClient = APIClient.shared
-        
+        //        internal var apiClient: APIClient = APIClient.shared
+
         /// Configuration related to Apple Pay
         /// If set, PaymentSheet displays Apple Pay as a payment option
         public var applePay: ApplePayConfiguration?
-        
+
         /// The color of the Buy or Add button. Defaults to `.systemBlue` when `nil`.
         public var primaryButtonColor: UIColor? {
             get {
                 return appearance.primaryButton.backgroundColor
             }
-            
+
             set {
                 appearance.primaryButton.backgroundColor = newValue
             }
         }
-        
+
         /// The label to use for the primary button.
         ///
         /// If not set, Payment Sheet will display suitable default labels
@@ -115,7 +210,7 @@ extension PaymentSheet {
         public var primaryButtonLabel: String?
         public var paymentSheetHeaderLabel: String?
         public var savedPaymentSheetHeaderLabel: String?
-        
+
         private var styleRawValue: Int = 0  // SheetStyle.automatic.rawValue
         /// The color styling to use for PaymentSheet UI
         /// Default value is SheetStyle.automatic
@@ -128,58 +223,58 @@ extension PaymentSheet {
                 styleRawValue = newValue.rawValue
             }
         }
-        
+
         /// Configuration related to the Hyperswitch Customer
         /// If set, the customer can select a previously saved payment method within PaymentSheet
         public var customer: CustomerConfiguration?
-        
+
         /// Your customer-facing business name.
         /// The default value is the name of your app, using CFBundleDisplayName or CFBundleName
         public var merchantDisplayName: String = Bundle.displayName ?? ""
-        
+
         ///
         /// toggle to disable SaveCard CheckBox
         public var displaySavedPaymentMethodsCheckbox: Bool? = true
-        
+
         ///
         /// toggle to disable SavedCard Screen
         public var displaySavedPaymentMethods: Bool? = true
-        
+
         ///
         /// toggle to disable Branding
         public var disableBranding: Bool? = false
-        
+
         ///
         /// add custom placeholder text
         public var placeholder: PlaceHolder = PlaceHolder()
-        
+
         ///
         /// toggle to  disable Default Saved Payment Icon
         public var displayDefaultSavedPaymentIcon: Bool? = true
-        
+
         /// A URL that redirects back to your app that PaymentSheet can use to auto-dismiss
         /// web views used for additional authentication, e.g. 3DS2
         public var returnURL: String?
-        
+
         /// PaymentSheet pre-populates fields with the values provided.
         /// If `billingDetailsCollectionConfiguration.attachDefaultsToPaymentMethod` is `true`, these values will
         /// be attached to the payment method even if they are not collected by the PaymentSheet UI.
         public var defaultBillingDetails: BillingDetails = BillingDetails()
-        
+
         /// PaymentSheet offers users an option to save some payment methods for later use.
         /// Default value is .automatic
         /// @see SavePaymentMethodOptInBehavior
         public var savePaymentMethodOptInBehavior: SavePaymentMethodOptInBehavior = .automatic
-        
+
         /// Describes the appearance of PaymentSheet
         public var appearance = PaymentSheet.Appearance.default
-        
+
         /// A closure that returns the customer's shipping details.
         /// This is used to display a "Billing address is same as shipping" checkbox if `defaultBillingDetails` is not provided
         /// If `name` and `line1` are populated, it's also [attached to the PaymentIntent](https://docs.hyperswitch.io/api/payment_intents/object#payment_intent_object-shipping) during payment.
         //        public var shippingDetails: () -> AddressViewController.AddressDetails? = { return nil }
         public var shippingDetails: BillingDetails = BillingDetails()
-        
+
         /// The list of preferred networks that should be used to process payments made with a co-branded card.
         /// This value will only be used if your user hasn't selected a network themselves.
         //        public var preferredNetworks: [CardBrand]? {
@@ -189,76 +284,78 @@ extension PaymentSheet {
         //                       "preferredNetworks must not contain any duplicate card brands")
         //            }
         //        }
-        
+
         /// Initializes a Configuration with default values
         public init() {}
-        
+
         // MARK: Internal
         internal var linkPaymentMethodsOnly: Bool = false
-        
+
         /// Describes how billing details should be collected.
         /// All values default to `automatic`.
         /// If `never` is used for a required field for the Payment Method used during checkout,
         /// you **must** provide an appropriate value as part of `defaultBillingDetails`.
         public var billingDetailsCollectionConfiguration = BillingDetailsCollectionConfiguration()
-        
+
         /// Optional configuration to display a custom message when a saved payment method is removed.
         public var removeSavedPaymentMethodMessage: String?
-        
+
         /// Configuration for external payment methods.
         public var externalPaymentMethodConfiguration: ExternalPaymentMethodConfiguration?
-        
+
         /// By default, PaymentSheet will use a dynamic ordering that optimizes payment method display for the customer.
         /// You can override the default order in which payment methods are displayed in PaymentSheet with a list of payment method types.
         /// See https://docs.hyperswitch.io/api/payment_methods/object#payment_method_object-type for the list of valid types.  You may also pass external payment methods.
         /// - Example: ["card", "external_paypal", "klarna"]
         /// - Note: If you omit payment methods from this list, they’ll be automatically ordered by Hyperswitch after the ones you provide. Invalid payment methods are ignored.
         public var paymentMethodOrder: [String]?
-        
+
         /// Api key used to invoke netcetera sdk for redirection-less 3DS authentication.
         public var netceteraSDKApiKey: String?
+        ///  Netcetera ui customizations
+        public var netceteraChallengeUICustomization: NetceteraChallengeUI?
     }
-    
+
     /// Configuration related to the Hyperswitch Customer
     public struct CustomerConfiguration: DictionaryConverter {
         /// The identifier of the Hyperswitch Customer object.
         /// See https://docs.hyperswitch.io/api/customers/object#customer_object-id
         public let id: String
-        
+
         /// A short-lived token that allows the SDK to access a Customer's payment methods
         public let ephemeralKeySecret: String
-        
+
         /// Initializes a CustomerConfiguration
         public init(id: String, ephemeralKeySecret: String) {
             self.id = id
             self.ephemeralKeySecret = ephemeralKeySecret
         }
     }
-    
+
     /// Configuration related to Apple Pay
     public struct ApplePayConfiguration {
         /// The Apple Merchant Identifier to use during Apple Pay transactions.
         /// To obtain one, see https://docs.hyperswitch.io/apple-pay#native
         public let merchantId: String
-        
+
         /// The two-letter ISO 3166 code of the country of your business, e.g. "US"
         /// See your account's country value here https://app.hyperswitch.io/settings/account
         public let merchantCountryCode: String
-        
+
         /// Defines the label that will be displayed in the Apple Pay button.
         /// See <https://developer.apple.com/design/human-interface-guidelines/technologies/apple-pay/buttons-and-marks/>
         /// for all available options.
         public let buttonType: PKPaymentButtonType
-        
+
         /// An array of payment summary item objects that summarize the amount of the payment. This property is identical to `PKPaymentRequest.paymentSummaryItems`.
         /// If `nil`, we display a single line item with the amount on the PaymentIntent or "Amount pending" for SetupIntents.
         /// If you're using a SetupIntent for a recurring payment, you should set this to display the amount you intend to charge, in accordance with https://developer.apple.com/design/human-interface-guidelines/technologies/apple-pay/subscriptions-and-donations
         /// Follow Apple's documentation to set this property: https://developer.apple.com/documentation/passkit/pkpaymentrequest/1619231-paymentsummaryitems
         public let paymentSummaryItems: [PKPaymentSummaryItem]?
-        
+
         /// Optional handler blocks for Apple Pay
         public let customHandlers: Handlers?
-        
+
         /// Custom handler blocks for Apple Pay
         public struct Handlers {
             /// Optionally configure additional information on your PKPaymentRequest.
@@ -268,7 +365,7 @@ extension PaymentSheet {
             /// - Parameter: The PKPaymentRequest created by PaymentSheet.
             /// - Return: The PKPaymentRequest after your modifications.
             public let paymentRequestHandler: ((PKPaymentRequest) -> PKPaymentRequest)?
-            
+
             /// Optionally configure additional information on your PKPaymentAuthorizationResult.
             /// This closure will be called after the PaymentIntent or SetupIntent is confirmed, but before
             /// the Apple Pay sheet has been closed.
@@ -287,7 +384,7 @@ extension PaymentSheet {
             /// WARNING: If you do not call the completion handler, your app will hang until the Apple Pay sheet times out.
             public let authorizationResultHandler:
             ((PKPaymentAuthorizationResult, @escaping ((PKPaymentAuthorizationResult) -> Void)) -> Void)?
-            
+
             /// Initializes the ApplePayConfiguration Handlers.
             public init(
                 paymentRequestHandler: ((PKPaymentRequest) -> PKPaymentRequest)? = nil,
@@ -299,7 +396,7 @@ extension PaymentSheet {
                 self.authorizationResultHandler = authorizationResultHandler
             }
         }
-        
+
         /// Initializes a ApplePayConfiguration
         public init(
             merchantId: String,
@@ -315,32 +412,32 @@ extension PaymentSheet {
             self.customHandlers = customHandlers
         }
     }
-    
+
     /// An address.
     public struct Address: Equatable, DictionaryConverter {
         /// City, district, suburb, town, or village.
         /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
         public var city: String?
-        
+
         /// Two-letter country code (ISO 3166-1 alpha-2).
         public var country: String?
-        
+
         /// Address line 1 (e.g., street, PO Box, or company name).
         /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
         public var line1: String?
-        
+
         /// Address line 2 (e.g., apartment, suite, unit, or building).
         /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
         public var line2: String?
-        
+
         /// ZIP or postal code.
         /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
         public var postalCode: String?
-        
+
         /// State, county, province, or region.
         /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
         public var state: String?
-        
+
         /// Initializes an Address
         public init(
             city: String? = nil,
@@ -358,23 +455,23 @@ extension PaymentSheet {
             self.state = state
         }
     }
-    
+
     /// Billing details of a customer
     public struct BillingDetails: Equatable, DictionaryConverter {
         /// The customer's billing address
         public var address: Address = Address()
-        
+
         /// The customer's email
         /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
         public var email: String?
-        
+
         /// The customer's full name
         /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
         public var name: String?
-        
+
         /// The customer's phone number without formatting (e.g. 5551234567)
         public var phone: String?
-        
+
         /// Initializes billing details
         public init(address: PaymentSheet.Address = Address(), email: String? = nil, name: String? = nil, phone: String? = nil) {
             self.address = address
@@ -383,7 +480,7 @@ extension PaymentSheet {
             self.phone = phone
         }
     }
-    
+
     /// Configuration for how billing details are collected during checkout.
     public struct BillingDetailsCollectionConfiguration: Equatable {
         /// Billing details fields collection options.
@@ -396,7 +493,7 @@ extension PaymentSheet {
             /// The field will always be collected, even if it isn't required for the Payment Method.
             case always
         }
-        
+
         /// Billing address collection options.
         public enum AddressCollectionMode: String, CaseIterable {
             /// Only the fields required by the Payment Method will be collected, this may be none.
@@ -408,34 +505,34 @@ extension PaymentSheet {
             /// Collect the full billing address, regardless of the Payment Method requirements.
             case full
         }
-        
+
         /// How to collect the name field.
         /// Defaults to `automatic`.
         public var name: CollectionMode = .automatic
-        
+
         /// How to collect the phone field.
         /// Defaults to `automatic`.
         public var phone: CollectionMode = .automatic
-        
+
         /// How to collect the email field.
         /// Defaults to `automatic`.
         public var email: CollectionMode = .automatic
-        
+
         /// How to collect the billing address.
         /// Defaults to `automatic`.
         public var address: AddressCollectionMode = .automatic
-        
+
         /// Whether the values included in `Configuration.defaultBillingDetails` should be attached to the payment
         /// method, this includes fields that aren't displayed in the form.
         ///
         /// If `false` (the default), those values will only be used to prefill the corresponding fields in the form.
         public var attachDefaultsToPaymentMethod = false
     }
-    
+
     /// Configuration for external payment methods
     /// - Seealso: See the [integration guide](https://docs.hyperswitch.io/payments/external-payment-methods?platform=ios).
     public struct ExternalPaymentMethodConfiguration {
-        
+
         /// Initializes an `ExternalPaymentMethodConfiguration`
         /// - Parameter externalPaymentMethods: A list of external payment methods to display in PaymentSheet e.g., ["external_paypal"].
         /// - Parameter externalPaymentMethodConfirmHandler: A handler called when the customer confirms the payment using an external payment method.
@@ -444,11 +541,11 @@ extension PaymentSheet {
             self.externalPaymentMethods = externalPaymentMethods
             self.externalPaymentMethodConfirmHandler = externalPaymentMethodConfirmHandler
         }
-        
+
         /// A list of external payment methods to display in PaymentSheet.
         /// e.g. ["external_paypal"].
         public var externalPaymentMethods: [String] = []
-        
+
         /// - Parameter externalPaymentMethodType: The external payment method to confirm payment with e.g., "external_paypal"
         /// - Parameter billingDetails: An object containing any billing details you've configured PaymentSheet to collect.
         /// - Parameter completion: Call this after payment has completed, passing the result of the payment.
@@ -458,7 +555,7 @@ extension PaymentSheet {
             _ billingDetails: BillingDetails,
             _ completion: @escaping ((PaymentSheetResult) -> Void)
         ) -> Void
-        
+
         /// This handler is called when the customer confirms the payment using an external payment method.
         /// Your implementation should complete the payment and call the `completion` parameter with the result.
         /// - Note: This is always called on the main thread.
@@ -470,19 +567,19 @@ extension Bundle {
     public class func applicationName() -> String? {
         return self.main.infoDictionary?[kCFBundleNameKey as String] as? String
     }
-    
+
     public class func applicationVersion() -> String? {
         return self.main.infoDictionary?["CFBundleShortVersionString"] as? String
     }
-    
+
     public class func applicationBundleId() -> String? {
         return self.main.bundleIdentifier
     }
-    
+
     public class func buildVersion() -> String? {
         return self.main.infoDictionary?["CFBundleVersion"] as? String
     }
-    
+
     public class var displayName: String? {
         return self.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? self.main
             .object(forInfoDictionaryKey: "CFBundleName") as? String
