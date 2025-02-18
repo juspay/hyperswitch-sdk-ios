@@ -171,6 +171,10 @@ extension PaymentSheet {
         /// @see SavePaymentMethodOptInBehavior
         public var savePaymentMethodOptInBehavior: SavePaymentMethodOptInBehavior = .automatic
         
+        /// DefaultView = `true` launches PaymentSheet with cardForm, never shows the loading state.
+        /// Default value is `false`
+        public var defaultView: Bool? = false
+        
         /// Describes the appearance of PaymentSheet
         public var appearance = PaymentSheet.Appearance.default
         

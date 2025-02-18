@@ -18,15 +18,13 @@ import Foundation
 public class PaymentSheet {
     
     /// The initializer method that sets up the payment sheet with the required parameters.
-    internal required init(paymentIntentClientSecret: String, configuration: Configuration, defaultView: Bool? = nil) {
+    internal required init(paymentIntentClientSecret: String, configuration: Configuration) {
         self.intentClientSecret = paymentIntentClientSecret
         self.configuration = configuration
-        self.defaultView = defaultView
     }
     
     /// The configuration object that holds the settings for the payment sheet.
     internal let configuration: Configuration?
     internal let intentClientSecret: String
     internal var completion: ((PaymentSheetResult) -> ())?
-    internal let defaultView: Bool?
 }

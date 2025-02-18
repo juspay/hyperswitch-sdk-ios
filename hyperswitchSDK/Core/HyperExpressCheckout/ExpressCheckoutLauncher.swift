@@ -21,17 +21,15 @@ public class ExpressCheckoutLauncher {
     static var intentClientSecret: String?
     static var completion: ((ExpressCheckoutResult) -> ())?
     static var themes: String?
-    static var defaultView: Bool?
     
     
-    public convenience init(paymentIntentClientSecret: String, configuration: PaymentSheet.Configuration, themes: String? = nil, defaultView: Bool? = nil, completion: @escaping ((ExpressCheckoutResult) -> ())) {
+    public convenience init(paymentIntentClientSecret: String, configuration: PaymentSheet.Configuration, themes: String? = nil, completion: @escaping ((ExpressCheckoutResult) -> ())) {
         
         self.init()
         
         ExpressCheckoutLauncher.configuration = configuration
         ExpressCheckoutLauncher.intentClientSecret = paymentIntentClientSecret
         ExpressCheckoutLauncher.themes = themes
-        ExpressCheckoutLauncher.defaultView = defaultView
         ExpressCheckoutLauncher.completion = completion
         
         let props: [String : Any] = [
@@ -51,17 +49,7 @@ public class ExpressCheckoutLauncher {
             
             RNViewManager.sharedInstance.responseHandler = self
             
-            let hyperParams = [
-                "appId" : Bundle.main.bundleIdentifier,
-                "sdkVersion" : SDKVersion.current,
-                "country" : NSLocale.current.regionCode,
-                "ip": nil,
-                "user-agent": WKWebView().value(forKey: "userAgent"),
-                "launchTime": Int(Date().timeIntervalSince1970 * 1000),
-                "device_model": UIDevice.current.model,
-                "os_type": "ios",
-                "os_version": UIDevice.current.systemVersion
-            ]
+            let hyperParams = HyperParams.getHyperParams()
             
             let props: [String : Any] = [
                 "type":"widgetPayment",
