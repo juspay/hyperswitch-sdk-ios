@@ -45,6 +45,20 @@
 		66486FAB2943580F00150E4F /* HyperModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66486FA42943580F00150E4F /* HyperModule.swift */; };
 		66486FAD2943580F00150E4F /* HyperModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 66486FA62943580F00150E4F /* HyperModule.m */; };
 		66C2F89B29444E6700ACD32D /* ApplePayHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C2F89A29444E6700ACD32D /* ApplePayHandler.swift */; };
+		75AA28DE2D477F9D00CD88A6 /* Debouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28DD2D477F9D00CD88A6 /* Debouncer.swift */; };
+		75AA28E02D477FB100CD88A6 /* HyperLogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28DF2D477FB100CD88A6 /* HyperLogManager.swift */; };
+		75AA28E22D477FC700CD88A6 /* LogType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28E12D477FC700CD88A6 /* LogType.swift */; };
+		75AA28E42D477FDA00CD88A6 /* LogFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28E32D477FDA00CD88A6 /* LogFileManager.swift */; };
+		75AA28E62D477FF200CD88A6 /* HyperNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28E52D477FF200CD88A6 /* HyperNetworking.swift */; };
+		75AA28E92D47805800CD88A6 /* SDKEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28E82D47805800CD88A6 /* SDKEnvironment.swift */; };
+		75AA28EA2D48F61800CD88A6 /* SDKEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28E82D47805800CD88A6 /* SDKEnvironment.swift */; };
+		75AA28EB2D48F61800CD88A6 /* HyperNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28E52D477FF200CD88A6 /* HyperNetworking.swift */; };
+		75AA28EC2D48F61800CD88A6 /* LogFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28E32D477FDA00CD88A6 /* LogFileManager.swift */; };
+		75AA28ED2D48F61800CD88A6 /* LogType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28E12D477FC700CD88A6 /* LogType.swift */; };
+		75AA28EE2D48F61800CD88A6 /* HyperLogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28DF2D477FB100CD88A6 /* HyperLogManager.swift */; };
+		75AA28EF2D48F61800CD88A6 /* Debouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28DD2D477F9D00CD88A6 /* Debouncer.swift */; };
+		75E692FA2D5B28D70077C0F3 /* OTAServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75E692F92D5B28D70077C0F3 /* OTAServices.swift */; };
+		75E692FC2D5B2AB90077C0F3 /* HyperOTA.plist in Resources */ = {isa = PBXBuildFile; fileRef = 75E692FB2D5B2AB90077C0F3 /* HyperOTA.plist */; };
 		790525712BDA66EF00D49FE8 /* HyperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790525702BDA66EF00D49FE8 /* HyperViewModel.swift */; };
 		7905257A2BDA73A600D49FE8 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790525792BDA73A600D49FE8 /* SwiftUIView.swift */; };
 		79052A242C8922E90011804E /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A232C8922E90011804E /* Version.swift */; };
@@ -92,7 +106,7 @@
 		79EAB0412C81D330006B40AD /* PaymentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790BA8262B99DB5E006678FD /* PaymentSession.swift */; };
 		79EAB0432C81D4AA006B40AD /* PaymentSessionTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EAB0422C81D4AA006B40AD /* PaymentSessionTypes.swift */; };
 		79EAB0462C81D5C9006B40AD /* PaymentSession+Lite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EAB0442C81D5AC006B40AD /* PaymentSession+Lite.swift */; };
-		A735661F8FD20531737221D5 /* libPods-hyperswitch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E0124B34D0882C5EE8E3C471 /* libPods-hyperswitch.a */; };
+		933FCA59836949913309D5F7 /* libPods-hyperswitch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B9FCA4FCC4F90DF3A85737F2 /* libPods-hyperswitch.a */; };
 		DC4AC9F2296D6D6C00E0D2A6 /* PaymentCardTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4AC9F1296D6D6C00E0D2A6 /* PaymentCardTextField.swift */; };
 		DC4AC9F5296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4AC9F4296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift */; };
 		DC5D0114294731480017C67A /* PaymentSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D0111294731480017C67A /* PaymentSheet.swift */; };
@@ -179,6 +193,14 @@
 		66486FA42943580F00150E4F /* HyperModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HyperModule.swift; sourceTree = "<group>"; };
 		66486FA62943580F00150E4F /* HyperModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HyperModule.m; sourceTree = "<group>"; };
 		66C2F89A29444E6700ACD32D /* ApplePayHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayHandler.swift; sourceTree = "<group>"; };
+		75AA28DD2D477F9D00CD88A6 /* Debouncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debouncer.swift; sourceTree = "<group>"; };
+		75AA28DF2D477FB100CD88A6 /* HyperLogManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperLogManager.swift; sourceTree = "<group>"; };
+		75AA28E12D477FC700CD88A6 /* LogType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogType.swift; sourceTree = "<group>"; };
+		75AA28E32D477FDA00CD88A6 /* LogFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFileManager.swift; sourceTree = "<group>"; };
+		75AA28E52D477FF200CD88A6 /* HyperNetworking.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperNetworking.swift; sourceTree = "<group>"; };
+		75AA28E82D47805800CD88A6 /* SDKEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKEnvironment.swift; sourceTree = "<group>"; };
+		75E692F92D5B28D70077C0F3 /* OTAServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTAServices.swift; sourceTree = "<group>"; };
+		75E692FB2D5B2AB90077C0F3 /* HyperOTA.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = HyperOTA.plist; sourceTree = "<group>"; };
 		790525702BDA66EF00D49FE8 /* HyperViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperViewModel.swift; sourceTree = "<group>"; };
 		790525792BDA73A600D49FE8 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
 		79052A232C8922E90011804E /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
@@ -216,6 +238,7 @@
 		79EAB03D2C81D283006B40AD /* PaymentSheetView+Lite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSheetView+Lite.swift"; sourceTree = "<group>"; };
 		79EAB0422C81D4AA006B40AD /* PaymentSessionTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSessionTypes.swift; sourceTree = "<group>"; };
 		79EAB0442C81D5AC006B40AD /* PaymentSession+Lite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSession+Lite.swift"; sourceTree = "<group>"; };
+		B9FCA4FCC4F90DF3A85737F2 /* libPods-hyperswitch.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-hyperswitch.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1EC79B4F3AE880184DBA3AB /* Pods-hyperswitch.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitch.release.xcconfig"; path = "Target Support Files/Pods-hyperswitch/Pods-hyperswitch.release.xcconfig"; sourceTree = "<group>"; };
 		C81F63A695B68ECC0E84E916 /* Pods-hyperswitchAppClip.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitchAppClip.release.xcconfig"; path = "Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip.release.xcconfig"; sourceTree = "<group>"; };
 		DC4AC9F1296D6D6C00E0D2A6 /* PaymentCardTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCardTextField.swift; sourceTree = "<group>"; };
@@ -227,7 +250,6 @@
 		DC5D0124294847E90017C67A /* PaymentSheetView+UIKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSheetView+UIKit.swift"; sourceTree = "<group>"; };
 		DC5D0126294853A90017C67A /* PaymentSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSheetView.swift; sourceTree = "<group>"; };
 		DCF9778F29517BBB00596F78 /* DictionaryConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryConverter.swift; sourceTree = "<group>"; };
-		E0124B34D0882C5EE8E3C471 /* libPods-hyperswitch.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-hyperswitch.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E46E9CFF14E3027745661800 /* Pods-hyperswitch.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitch.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitch/Pods-hyperswitch.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -236,7 +258,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A735661F8FD20531737221D5 /* libPods-hyperswitch.a in Frameworks */,
+				933FCA59836949913309D5F7 /* libPods-hyperswitch.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -300,8 +322,8 @@
 		5C7ECC79FDCE9EFB3DB59509 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				E0124B34D0882C5EE8E3C471 /* libPods-hyperswitch.a */,
 				5011A1F9BD7E9F2F9984CC1C /* Pods_hyperswitchAppClip.framework */,
+				B9FCA4FCC4F90DF3A85737F2 /* libPods-hyperswitch.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -352,6 +374,26 @@
 				66486F98294355BE00150E4F /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		75AA28DA2D477F6500CD88A6 /* NativeLogger */ = {
+			isa = PBXGroup;
+			children = (
+				75AA28E32D477FDA00CD88A6 /* LogFileManager.swift */,
+				75AA28E12D477FC700CD88A6 /* LogType.swift */,
+				75AA28DF2D477FB100CD88A6 /* HyperLogManager.swift */,
+				75AA28DD2D477F9D00CD88A6 /* Debouncer.swift */,
+			);
+			path = NativeLogger;
+			sourceTree = "<group>";
+		};
+		75AA28E72D47800300CD88A6 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				75AA28E82D47805800CD88A6 /* SDKEnvironment.swift */,
+				75AA28E52D477FF200CD88A6 /* HyperNetworking.swift */,
+			);
+			path = Networking;
 			sourceTree = "<group>";
 		};
 		790575ED2C85CF5E0097C6F4 /* CoreLite */ = {
@@ -431,6 +473,8 @@
 		79EAB09E2C81F0B9006B40AD /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				75AA28E72D47800300CD88A6 /* Networking */,
+				75AA28DA2D477F6500CD88A6 /* NativeLogger */,
 				7954A4452C23A42200FEC02D /* ApplePay */,
 				DC5D0117294738870017C67A /* NativeModule */,
 				790BA8252B99DB37006678FD /* HyperSession */,
@@ -478,6 +522,7 @@
 		DC5D0117294738870017C67A /* NativeModule */ = {
 			isa = PBXGroup;
 			children = (
+				75E692F92D5B28D70077C0F3 /* OTAServices.swift */,
 				66486F9F2943580E00150E4F /* hyper-Bridging-Header.h */,
 				66486FA62943580F00150E4F /* HyperModule.m */,
 				66486FA42943580F00150E4F /* HyperModule.swift */,
@@ -493,6 +538,7 @@
 		DC5D012C29486B560017C67A /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				75E692FB2D5B2AB90077C0F3 /* HyperOTA.plist */,
 				7996A8322BA1FDD000394FAF /* hyperswitch.bundle */,
 				79BF5A5A2C3EA2D6006546D6 /* CodePush.plist */,
 			);
@@ -612,6 +658,7 @@
 				43E6686D2C084FB70094BD13 /* montserrat_medium.ttf in Resources */,
 				43E6686C2C084FB70094BD13 /* montserrat_italic.ttf in Resources */,
 				43E6686A2C084FB70094BD13 /* montserrat_bold.ttf in Resources */,
+				75E692FC2D5B2AB90077C0F3 /* HyperOTA.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -757,11 +804,13 @@
 				4E87FA612CAAE8E300E74113 /* PaymentManagementConfiguration.swift in Sources */,
 				DC5D0115294731480017C67A /* PaymentSheetView+SwiftUI.swift in Sources */,
 				7954A44A2C23A49A00FEC02D /* ApplePayViewManager.swift in Sources */,
+				75AA28E92D47805800CD88A6 /* SDKEnvironment.swift in Sources */,
 				792D6A082B99C215001598CD /* HyperHeadless.swift in Sources */,
 				79052A242C8922E90011804E /* Version.swift in Sources */,
 				4E0A93DE2CA2F29500E3A767 /* HyperUIViewController.swift in Sources */,
 				66486FAB2943580F00150E4F /* HyperModule.swift in Sources */,
 				66486FAD2943580F00150E4F /* HyperModule.m in Sources */,
+				75AA28E02D477FB100CD88A6 /* HyperLogManager.swift in Sources */,
 				790525712BDA66EF00D49FE8 /* HyperViewModel.swift in Sources */,
 				79052A4A2C9057D60011804E /* AppDelegate.swift in Sources */,
 				4E971A722CC2764F0040EFEB /* PaymentMethodManagementWidget.swift in Sources */,
@@ -769,6 +818,8 @@
 				79EAB0432C81D4AA006B40AD /* PaymentSessionTypes.swift in Sources */,
 				793083ED2A0DA9F100E78310 /* PaymentIntentParams.swift in Sources */,
 				66C2F89B29444E6700ACD32D /* ApplePayHandler.swift in Sources */,
+				75E692FA2D5B28D70077C0F3 /* OTAServices.swift in Sources */,
+				75AA28E62D477FF200CD88A6 /* HyperNetworking.swift in Sources */,
 				66486F94294355BD00150E4F /* ContentView.swift in Sources */,
 				792D69F62B95E942001598CD /* ExpressCheckoutLauncher.swift in Sources */,
 				4E69679B2CB7CF71000DBE0A /* PMMViewController.swift in Sources */,
@@ -781,14 +832,17 @@
 				7938D81B2A4EF45000286CEE /* PaymentMethodParams.swift in Sources */,
 				DC5D0125294847E90017C67A /* PaymentSheetView+UIKit.swift in Sources */,
 				66486FA72943580F00150E4F /* SwiftUIManager.swift in Sources */,
+				75AA28E42D477FDA00CD88A6 /* LogFileManager.swift in Sources */,
 				DCF9779029517BBB00596F78 /* DictionaryConverter.swift in Sources */,
 				792D69F82B95E94C001598CD /* ExpressCheckoutWidget.swift in Sources */,
 				66486FAA2943580F00150E4F /* RNViewManager.swift in Sources */,
+				75AA28DE2D477F9D00CD88A6 /* Debouncer.swift in Sources */,
 				DC4AC9F5296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift in Sources */,
 				79D474B92CC6FE920022C47E /* CodePushAPI.swift in Sources */,
 				DC5D0127294853A90017C67A /* PaymentSheetView.swift in Sources */,
 				792D6A062B99C204001598CD /* HyperHeadless.m in Sources */,
 				66486F92294355BD00150E4F /* hyperApp.swift in Sources */,
+				75AA28E22D477FC700CD88A6 /* LogType.swift in Sources */,
 				793083EB2A0DA9E300E78310 /* PaymentHandler.swift in Sources */,
 				43F6051E2B45FA3300BAA90E /* PaymentSheetAppearance.swift in Sources */,
 				DC5D0116294731480017C67A /* PaymentSheetConfiguration.swift in Sources */,
@@ -799,6 +853,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				75AA28EA2D48F61800CD88A6 /* SDKEnvironment.swift in Sources */,
+				75AA28EB2D48F61800CD88A6 /* HyperNetworking.swift in Sources */,
+				75AA28EC2D48F61800CD88A6 /* LogFileManager.swift in Sources */,
+				75AA28ED2D48F61800CD88A6 /* LogType.swift in Sources */,
+				75AA28EE2D48F61800CD88A6 /* HyperLogManager.swift in Sources */,
+				75AA28EF2D48F61800CD88A6 /* Debouncer.swift in Sources */,
 				79EAB0172C81CCDA006B40AD /* ViewController.swift in Sources */,
 				79EAB0462C81D5C9006B40AD /* PaymentSession+Lite.swift in Sources */,
 				79EAB0402C81D2FA006B40AD /* WebViewController.swift in Sources */,
@@ -890,6 +950,17 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon/ReactCommon.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon/ReactCommon.framework/Headers/react/nativemodule/core",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon-Samples/ReactCommon_Samples.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon-Samples/ReactCommon_Samples.framework/Headers/platform/ios",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-Fabric/React_Fabric.framework/Headers/react/renderer/components/view/platform/cxx",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-NativeModulesApple/React_NativeModulesApple.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers/react/renderer/graphics/platform/ios",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD = "";
 				LDPLUSPLUS = "";
@@ -958,6 +1029,17 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon/ReactCommon.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon/ReactCommon.framework/Headers/react/nativemodule/core",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon-Samples/ReactCommon_Samples.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon-Samples/ReactCommon_Samples.framework/Headers/platform/ios",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-Fabric/React_Fabric.framework/Headers/react/renderer/components/view/platform/cxx",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-NativeModulesApple/React_NativeModulesApple.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers",
+					"${PODS_CONFIGURATION_BUILD_DIR}/React-graphics/React_graphics.framework/Headers/react/renderer/graphics/platform/ios",
+				);
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD = "";
 				LDPLUSPLUS = "";
