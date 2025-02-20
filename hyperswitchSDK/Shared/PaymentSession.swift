@@ -20,6 +20,7 @@ public class PaymentSession {
     internal static var ephemeralKey: String?
     
     public init(publishableKey: String, customBackendUrl: String? = nil, customParams: [String : Any]? = nil, customLogUrl: String? = nil){
+        HyperLogManager.initialize(publishableKey: publishableKey)
         APIClient.shared.publishableKey = publishableKey
         APIClient.shared.customBackendUrl = customBackendUrl
         APIClient.shared.customLogUrl = customLogUrl
