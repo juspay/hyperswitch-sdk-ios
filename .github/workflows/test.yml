@@ -3,7 +3,7 @@ on:
     workflow_dispatch:
 jobs:
   test-tag:
-    runs-on: ubuntu-latest
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
         with:
