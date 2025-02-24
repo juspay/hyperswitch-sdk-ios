@@ -1,0 +1,37 @@
+name: Test Tag Operations
+on:
+    workflow_dispatch:
+jobs:
+  test-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}  # Use PAT for authentication
+          
+      # Make some test changes
+      - name: Create test changes
+        run: |
+          echo "Test content $(date)" > test.txt
+          
+      # Commit changes and create/push tag
+      - name: Git operations
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          
+          # Commit changes
+          git add test.txt
+          git commit -m "Test commit for tagging"
+          
+          # Create new tag with timestamp to make it unique
+          TAG_NAME="test-tag-$(date +%Y%m%d-%H%M%S)"
+          
+          # Create annotated tag
+          git tag -a "$TAG_NAME" -m "Test tag created by GitHub Actions"
+          
+          # Push both the commit and the tag
+          git push origin main
+          git push origin "$TAG_NAME"
+          
+          echo "Created and pushed tag: $TAG_NAME"
