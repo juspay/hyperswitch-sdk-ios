@@ -1,4 +1,4 @@
-version = "0.2.3"
+version = "0.2.3-beta.1"
 
 Pod::Spec.new do |s|
   s.name                      = 'hyperswitch-sdk-ios'
@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.platform                  = :ios
   s.ios.deployment_target     = '13.4'
   s.swift_version             = '5.0'
-  s.source                    = { :git => 'https://github.com/juspay/hyperswitch-sdk-ios.git', :tag => "v#{s.version}"}
+  s.source                    = { :path => '.' }
   s.module_name               = 'Hyperswitch'
 
   s.subspec 'core' do |core|
@@ -38,6 +38,12 @@ Pod::Spec.new do |s|
     netcetera3ds.source_files = 'frameworkgen/3ds/Source/**/*.{m,swift,h}'
     netcetera3ds.vendored_frameworks = 'frameworkgen/3ds/Frameworks/*.xcframework'
     netcetera3ds.dependency 'hyperswitch-sdk-ios/core'
+  end
+
+  s.subspec 'juspay3ds' do |juspay3ds|
+    juspay3ds.source_files = 'hyperswitchSDK/Authentication/*.{m,swift,h}'
+    juspay3ds.vendored_frameworks = 'frameworkgen/auth/Frameworks/*.xcframework'
+    juspay3ds.dependency 'hyperswitch-sdk-ios/common'
   end
 
   s.subspec 'lite' do |lite|

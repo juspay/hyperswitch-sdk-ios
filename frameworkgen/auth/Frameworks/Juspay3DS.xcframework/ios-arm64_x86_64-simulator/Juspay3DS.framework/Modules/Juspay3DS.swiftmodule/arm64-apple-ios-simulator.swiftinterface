@@ -1,0 +1,316 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.0.3 effective-5.10 (swiftlang-6.0.3.1.10 clang-1600.0.30.1)
+// swift-module-flags: -target arm64-apple-ios13.4-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name Juspay3DS
+import Combine
+import CommonCrypto
+import CoreLocation
+import CryptoKit
+import DeveloperToolsSupport
+import Foundation
+@_exported import Juspay3DS
+import Swift
+import SwiftUI
+import UIKit
+import WebKit
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+@_inheritsConvenienceInitializers @objc public class ChallengeParameters : ObjectiveC.NSObject {
+  @objc public var threeDSServerTransactionID: Swift.String
+  @objc public var acsTransactionID: Swift.String
+  @objc public var acsRefNumber: Swift.String
+  @objc public var acsSignedContent: Swift.String
+  @objc public var threeDSRequestorAppURL: Swift.String
+  @objc public func get3DSServerTransactionID() -> Swift.String
+  @objc public func getAcsTransactionID() -> Swift.String
+  @objc public func getAcsRefNumber() -> Swift.String
+  @objc public func getAcsSignedContent() -> Swift.String
+  @objc public func getThreeDSRequestorAppURL() -> Swift.String
+  @objc override dynamic public init()
+  @objc deinit
+}
+public class AuthenticationChallengeParameters {
+  public var threeDSServerTransactionID: Swift.String
+  public var acsTransactionID: Swift.String
+  public var acsRefNumber: Swift.String
+  public var acsSignedContent: Swift.String
+  public var threeDSRequestorAppURL: Swift.String
+  public init()
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @available(iOS 13.0, *)
+@objc public class AuthenticationRequestParameters : ObjectiveC.NSObject {
+  @objc final public let sdkTransactionID: Swift.String
+  @objc final public let deviceData: Swift.String
+  @objc final public let sdkEphemeralPublicKey: Swift.String
+  @objc final public let sdkAppID: Swift.String
+  @objc final public let sdkReferenceNumber: Swift.String
+  @objc final public let messageVersion: Swift.String
+  @objc deinit
+}
+@objc public protocol CertificateDelegate {
+  @objc func didFinishDownloadingCertificate(downloaded: Swift.Bool)
+}
+@objc public class TextCustomization : ObjectiveC.NSObject {
+  @objc public init(textColor: Swift.String? = nil, fontSize: Foundation.NSNumber? = nil, fontStyle: Swift.String? = nil)
+  @objc deinit
+}
+@objc public class LabelCustomization : ObjectiveC.NSObject {
+  @objc public init(challengeHeader: Juspay3DS.TextCustomization? = nil, challengeContent: Juspay3DS.TextCustomization? = nil, challengeLabel: Juspay3DS.TextCustomization? = nil)
+  @objc deinit
+}
+public enum AuthenticationChallengeResult {
+  case completed(sdkTransactionID: Swift.String, transactionStatus: Swift.String)
+  case cancelled
+  case timedout
+  case protocolError(sdkTransactionID: Swift.String, errorMessage: Juspay3DS.AuthenticationErrorMessage)
+  case runtimeError(errorCode: Swift.String, errorMessage: Swift.String)
+}
+@available(iOS 13.0, *)
+@objc public protocol Transaction {
+  @objc func getAuthenticationRequestParameters() throws -> Juspay3DS.AuthenticationRequestParameters
+  @objc func doChallenge(viewController: UIKit.UIViewController, challengeParameters: Juspay3DS.ChallengeParameters, challengeStatusReceiver: any Juspay3DS.ChallengeStatusReceiver, timeOut: Swift.Int) throws
+  @objc func getProgressView() throws -> Juspay3DS.ProgressDialog
+  @objc func close()
+  @objc func registerForLoaderEvents(loaderEventHandler: @escaping (Swift.Bool) -> Swift.Void)
+}
+@objc public class CancelPopupCustomization : ObjectiveC.NSObject {
+  @objc public init(continueButtonCustomization: Juspay3DS.ButtonCustomization? = nil, exitButtonCustomization: Juspay3DS.ButtonCustomization? = nil, headerTextCustomization: Juspay3DS.TextCustomization? = nil, contentTextCustomization: Juspay3DS.TextCustomization? = nil, headerText: Swift.String? = nil, labelText: Swift.String? = nil, exitButtonText: Swift.String? = nil, continueButtonText: Swift.String? = nil)
+  @objc deinit
+}
+@objc public class TextBoxCustomization : ObjectiveC.NSObject {
+  @objc public init(textColor: Swift.String? = nil, textSpacing: Foundation.NSNumber? = nil, fontName: Swift.String? = nil, borderColor: Swift.String? = nil, borderWidth: Foundation.NSNumber? = nil, cornerRadius: Foundation.NSNumber? = nil, useBoxedLayout: Foundation.NSNumber? = nil, focusedColor: Swift.String? = nil, fontSize: Foundation.NSNumber? = nil, hintTextColor: Swift.String? = nil, useNumericInputField: Foundation.NSNumber? = nil, fontStyle: Swift.String? = nil)
+  @objc deinit
+}
+public class AuthenticationUICustomization {
+  public init()
+  @discardableResult
+  public func toolbar(backgroundColor: Swift.String? = nil, headerText: Swift.String? = nil, headerColor: Swift.String? = nil, buttonText: Swift.String? = nil, textFontSize: Swift.Int? = nil, useCloseIcon: Swift.Bool? = nil, closeIconColor: Swift.String? = nil, fontStyle: Swift.String? = nil) -> Juspay3DS.AuthenticationUICustomization
+  @discardableResult
+  public func submitButton(backgroundColor: Swift.String? = nil, textColor: Swift.String? = nil, cornerRadius: Swift.Double? = nil, fontSize: Swift.Int? = nil, fontName: Swift.String? = nil, capitalizeText: Swift.Bool? = nil, fontStyle: Swift.String? = nil) -> Juspay3DS.AuthenticationUICustomization
+  @discardableResult
+  public func resendButton(backgroundColor: Swift.String? = nil, textColor: Swift.String? = nil, cornerRadius: Swift.Double? = nil, fontSize: Swift.Int? = nil, fontName: Swift.String? = nil, capitalizeText: Swift.Bool? = nil, fontStyle: Swift.String? = nil) -> Juspay3DS.AuthenticationUICustomization
+  @discardableResult
+  public func challengeHeader(textColor: Swift.String? = nil, fontSize: Swift.Int? = nil, fontStyle: Swift.String? = nil) -> Juspay3DS.AuthenticationUICustomization
+  @discardableResult
+  public func challengeContent(textColor: Swift.String? = nil, fontSize: Swift.Int? = nil, fontStyle: Swift.String? = nil) -> Juspay3DS.AuthenticationUICustomization
+  @discardableResult
+  public func challengeLabel(textColor: Swift.String? = nil, fontSize: Swift.Int? = nil, fontStyle: Swift.String? = nil) -> Juspay3DS.AuthenticationUICustomization
+  @discardableResult
+  public func fonts(regular: Swift.String? = nil, semibold: Swift.String? = nil, bold: Swift.String? = nil) -> Juspay3DS.AuthenticationUICustomization
+  @discardableResult
+  public func textBox(textColor: Swift.String? = nil, textSpacing: Swift.Float? = nil, fontName: Swift.String? = nil, borderColor: Swift.String? = nil, borderWidth: Swift.Double? = nil, cornerRadius: Swift.Double? = nil, useBoxedLayout: Swift.Bool? = nil, focusedColor: Swift.String? = nil, fontSize: Swift.Int? = nil, hintTextColor: Swift.String? = nil, useNumericInputField: Swift.Bool? = nil, fontStyle: Swift.String? = nil) -> Juspay3DS.AuthenticationUICustomization
+  @discardableResult
+  public func cancelPopup(headerText: Swift.String? = nil, contentText: Swift.String? = nil, exitButtonText: Swift.String? = nil, continueButtonText: Swift.String? = nil, headerTextColor: Swift.String? = nil, headerFontSize: Swift.Int? = nil, contentTextColor: Swift.String? = nil, contentFontSize: Swift.Int? = nil, exitButtonBackgroundColor: Swift.String? = nil, exitButtonTextColor: Swift.String? = nil, continueButtonBackgroundColor: Swift.String? = nil, continueButtonTextColor: Swift.String? = nil) -> Juspay3DS.AuthenticationUICustomization
+  @discardableResult
+  public func applyLightTheme() -> Juspay3DS.AuthenticationUICustomization
+  @discardableResult
+  public func applyDarkTheme() -> Juspay3DS.AuthenticationUICustomization
+  @discardableResult
+  public func applyBrandColors(primary: Swift.String, secondary: Swift.String? = nil) -> Juspay3DS.AuthenticationUICustomization
+  @objc deinit
+}
+public struct AuthenticationSessionRequestParameters {
+  public let sdkTransactionID: Swift.String
+  public let deviceData: Swift.String
+  public let sdkEphemeralPublicKey: Swift.String
+  public let sdkAppID: Swift.String
+  public let sdkReferenceNumber: Swift.String
+  public let messageVersion: Swift.String
+}
+@available(iOS 13.0, *)
+@objc public class UICustomization : ObjectiveC.NSObject {
+  @objc public init(toolbarCustomization: Juspay3DS.ToolbarCustomization? = nil, submitButtonCustomization: Juspay3DS.ButtonCustomization? = nil, resendButtonCustomization: Juspay3DS.ButtonCustomization? = nil, labelCustomization: Juspay3DS.LabelCustomization? = nil, fontCustomization: Juspay3DS.FontCustomization? = nil, textBoxCustomization: Juspay3DS.TextBoxCustomization? = nil, cancelPopupCustomization: Juspay3DS.CancelPopupCustomization? = nil)
+  @objc deinit
+}
+@_inheritsConvenienceInitializers @objc public class CustomFontStyle : ObjectiveC.NSObject {
+  public static let BOLD: Swift.String
+  public static let SEMIBOLD: Swift.String
+  public static let REGULAR: Swift.String
+  @objc override dynamic public init()
+  @objc deinit
+}
+@_inheritsConvenienceInitializers @available(iOS 13.0, *)
+@objc public class FontCustomization : ObjectiveC.NSObject {
+  public init(regular: Swift.String?, semibold: Swift.String?, bold: Swift.String?)
+  @objc override dynamic public init()
+  @objc deinit
+}
+public protocol AuthenticationLoggerDelegate {
+  func trackEvent(withLevel level: Swift.String, label: Swift.String, value: [Swift.String : Any], category: Swift.String, subcategory: Swift.String)
+}
+@_hasMissingDesignatedInitializers public class AuthenticationErrorMessage {
+  public var transactionID: Swift.String
+  public var errorCode: Swift.String
+  public var errorDescription: Swift.String
+  public var errorDetail: Swift.String
+  @objc deinit
+}
+@objc public enum ButtonType : Swift.Int {
+  case submit
+  case `continue`
+  case next
+  case cancel
+  case resend
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@objc public class ButtonCustomization : ObjectiveC.NSObject {
+  @objc public init(backgroundColor: Swift.String? = nil, textColor: Swift.String? = nil, cornerRadius: Foundation.NSNumber? = nil, fontSize: Foundation.NSNumber? = nil, fontName: Swift.String? = nil, showCapitalizedText: Foundation.NSNumber? = nil, fontStyle: Swift.String? = nil)
+  @objc deinit
+}
+@objc public enum Severity : Swift.Int {
+  case low
+  case medium
+  case high
+  public init?(rawValue: Swift.Int)
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+@_inheritsConvenienceInitializers @objc public class Warning : ObjectiveC.NSObject {
+  @objc public var severity: Juspay3DS.Severity
+  @objc override dynamic public init()
+  @objc public func getID() -> Swift.String
+  @objc public func getMessage() -> Swift.String
+  @objc public func getSeverity() -> Juspay3DS.Severity
+  @objc public func setID(_ id: Swift.String)
+  @objc public func setMessage(_ message: Swift.String)
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers public class AuthenticationSessionTransaction {
+  public func getAuthenticationRequestParameters() throws -> Juspay3DS.AuthenticationSessionRequestParameters
+  public func doChallenge(viewController: UIKit.UIViewController, challengeParameters: Juspay3DS.AuthenticationChallengeParameters, timeOut: Swift.Int = 5, completion: @escaping (Juspay3DS.AuthenticationChallengeResult) -> Swift.Void) throws
+  public func close()
+  public func registerForLoaderEvents(loaderEventHandler: @escaping (Swift.Bool) -> Swift.Void)
+  @objc deinit
+}
+@objc public protocol ChallengeStatusReceiver {
+  @objc func completed(_ completionEvent: Juspay3DS.CompletionEvent)
+  @objc func cancelled()
+  @objc func timedout()
+  @objc func protocolError(_ protocolErrorEvent: Juspay3DS.ProtocolErrorEvent)
+  @objc func runtimeError(_ runtimeErrorEvent: Juspay3DS.RuntimeErrorEvent)
+}
+public enum Exception : Swift.Error {
+  case invalidInput
+  case sdkAlreadyInitialized
+  case sdkNotInitialized
+  case sdkRuntime
+  public static func == (a: Juspay3DS.Exception, b: Juspay3DS.Exception) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@objc public class ErrorMessage : ObjectiveC.NSObject {
+  @objc public var transactionID: Swift.String
+  @objc public var errorCode: Swift.String
+  @objc public var errorDescription: Swift.String
+  @objc public var errorDetail: Swift.String
+  @objc public init(_ transactionID: Swift.String, _ errorCode: Swift.String, _ errorDescription: Swift.String, _ errorDetail: Swift.String)
+  @objc public func getTransactionID() -> Swift.String
+  @objc public func getErrorCode() -> Swift.String
+  @objc public func getErrorDescription() -> Swift.String
+  @objc public func getErrorDetails() -> Swift.String
+  @objc deinit
+}
+@_inheritsConvenienceInitializers @available(iOS 13.0, *)
+@objc public class ProgressDialog : ObjectiveC.NSObject {
+  @objc public func start()
+  @objc public func stop()
+  @objc override dynamic public init()
+  @objc deinit
+}
+public protocol AuthenticationCertificateDelegate {
+  func didFinishDownloadingCertificate(downloaded: Swift.Bool)
+}
+@_inheritsConvenienceInitializers @objc public class ConfigParameters : ObjectiveC.NSObject {
+  @objc public func addParam(_ group: Swift.String?, _ paramName: Swift.String, _ paramValue: Swift.String?) throws
+  @objc public func getParamValue(_ group: Swift.String?, _ paramName: Swift.String) throws -> Swift.String
+  @objc public func removeParam(_ group: Swift.String?, _ paramName: Swift.String) throws -> Swift.String
+  @objc public var fixOrIgnoreInvalidCRes: Swift.Bool
+  @objc public var fixTextMasqueradingAsOobIssue: Swift.Bool
+  @objc public var certificateAPITimeout: Swift.Int
+  @objc override dynamic public init()
+  @objc deinit
+}
+@_hasMissingDesignatedInitializers @available(iOS 13.0, *)
+@objc public class TransactionImpl : ObjectiveC.NSObject, Juspay3DS.Transaction {
+  @objc public func getAuthenticationRequestParameters() throws -> Juspay3DS.AuthenticationRequestParameters
+  @objc public func doChallenge(viewController: UIKit.UIViewController, challengeParameters: Juspay3DS.ChallengeParameters, challengeStatusReceiver: any Juspay3DS.ChallengeStatusReceiver, timeOut: Swift.Int) throws
+  @objc public func getProgressView() throws -> Juspay3DS.ProgressDialog
+  @objc public func close()
+  @objc public func registerForLoaderEvents(loaderEventHandler: @escaping (Swift.Bool) -> Swift.Void)
+  @objc deinit
+}
+@objc public class ToolbarCustomization : ObjectiveC.NSObject {
+  @objc public init(headerColor: Swift.String? = nil, headerText: Swift.String? = nil, backgroundColor: Swift.String? = nil, buttonText: Swift.String? = nil, textFontSize: Foundation.NSNumber? = nil, useCloseIcon: Foundation.NSNumber? = nil, closeIconColor: Swift.String? = nil, fontStyle: Swift.String? = nil)
+  @objc deinit
+}
+@available(iOS 13.0, *)
+@objc public protocol ThreeDS2Service {
+  @objc func initialize(configParameters: Juspay3DS.ConfigParameters, locale: Swift.String?, uiCustomization: Juspay3DS.UICustomization?, certificateDelegate: (any Juspay3DS.CertificateDelegate)?) throws
+  @objc func createTransaction(directoryServerId: Swift.String, messageVersion: Swift.String?) throws -> any Juspay3DS.Transaction
+  @objc func cleanup() throws
+  @objc func getSDKVersion() throws -> Swift.String
+  @objc func getWarnings() throws -> Swift.Array<Juspay3DS.Warning>
+}
+@available(iOS 13.0, *)
+@objc public protocol TridentLoggerDelegate {
+  @objc func trackEvent(withLevel level: Swift.String, label: Swift.String, value: Swift.Dictionary<Swift.String, Any>, category: Swift.String, subcategory: Swift.String)
+}
+@_hasMissingDesignatedInitializers public class AuthenticationSession {
+  public static func initAuthenticationSession(publishableKey: Swift.String, paymentIntentClientSecret: Swift.String, logger: (any Juspay3DS.AuthenticationLoggerDelegate)? = nil, uiCustomization: Juspay3DS.AuthenticationUICustomization? = nil, configParameters: Juspay3DS.AuthenticationConfigParameters = AuthenticationConfigParameters(), completion: @escaping (Juspay3DS.AuthenticationSession?) -> Swift.Void)
+  public static func initAuthenticationSession(publishableKey: Swift.String, paymentIntentClientSecret: Swift.String, merchantId: Swift.String, cardNetwork: Swift.String, directoryServerId: Swift.String? = nil, messageVersion: Swift.String, logger: (any Juspay3DS.AuthenticationLoggerDelegate)? = nil, uiCustomization: Juspay3DS.AuthenticationUICustomization? = nil, configParameters: Juspay3DS.AuthenticationConfigParameters = AuthenticationConfigParameters(), completion: @escaping (Juspay3DS.AuthenticationSession?) -> Swift.Void)
+  public func startAuthentication(viewController: UIKit.UIViewController, completion: @escaping (Juspay3DS.AuthenticationChallengeResult) -> Swift.Void)
+  public func getDirectoryServerId(cardNetwork: Swift.String) throws -> Swift.String
+  public func createTransaction(directoryServerId: Swift.String, messageVersion: Swift.String) throws -> Juspay3DS.AuthenticationSessionTransaction
+  public func getSDKVersion() throws -> Swift.String
+  public func getWarnings() throws -> Swift.Array<Juspay3DS.Warning>
+  public func cleanup() throws
+  @objc deinit
+}
+public class AuthenticationConfigParameters {
+  public var fixOrIgnoreInvalidCRes: Swift.Bool
+  public var fixTextMasqueradingAsOobIssue: Swift.Bool
+  public var certificateAPITimeout: Swift.Int
+  public init()
+  @objc deinit
+}
+@objc public class RuntimeErrorEvent : ObjectiveC.NSObject {
+  @objc public var errorCode: Swift.String
+  @objc public var errorMessage: Swift.String
+  @objc public init(_ errorCode: Swift.String?, _ errorMessage: Swift.String)
+  @objc public func getErrorCode() -> Swift.String?
+  @objc public func getErrorMessage() -> Swift.String
+  @objc deinit
+}
+@objc public class ProtocolErrorEvent : ObjectiveC.NSObject {
+  @objc public var sdkTransactionID: Swift.String
+  @objc public var errorMessage: Juspay3DS.ErrorMessage
+  @objc public init(_ sdkTransactionID: Swift.String, _ errorMessage: Juspay3DS.ErrorMessage)
+  @objc public func getErrorMessage() -> Juspay3DS.ErrorMessage
+  @objc public func getSDKTransactionID() -> Swift.String
+  @objc deinit
+}
+@objc public class CompletionEvent : ObjectiveC.NSObject {
+  @objc public var sdkTransactionID: Swift.String
+  @objc public var transactionStatus: Swift.String
+  @objc public init(_ sdkTransactionID: Swift.String, _ transactionStatus: Swift.String)
+  @objc public func getSDKTransactionID() -> Swift.String
+  @objc public func getTransactionStatus() -> Swift.String
+  @objc deinit
+}
+extension Juspay3DS.ButtonType : Swift.Equatable {}
+extension Juspay3DS.ButtonType : Swift.Hashable {}
+extension Juspay3DS.ButtonType : Swift.RawRepresentable {}
+extension Juspay3DS.Severity : Swift.Equatable {}
+extension Juspay3DS.Severity : Swift.Hashable {}
+extension Juspay3DS.Severity : Swift.RawRepresentable {}
+extension Juspay3DS.Exception : Swift.Equatable {}
+extension Juspay3DS.Exception : Swift.Hashable {}

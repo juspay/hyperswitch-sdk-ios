@@ -1,0 +1,6 @@
+framework module Juspay3DS {
+  umbrella header "Juspay3DS.h"
+  export *
+
+  module * { export * }
+}

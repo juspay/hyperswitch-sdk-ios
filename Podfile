@@ -15,7 +15,7 @@ end
 
 target 'hyperswitch' do
   config = use_native_modules!
-  
+  pod 'Juspay3DS', :path =>  "frameworkgen/auth" 
   use_react_native!(
     :path => config[:reactNativePath],
     :hermes_enabled => true,
