@@ -32,9 +32,9 @@ extension PaymentSession {
     
     public func initAuthenticationSession(
         paymentIntentClientSecret: String,
-        merchantId: String,
         cardNetwork: String,
         messageVersion: String,
+        postAuthUrl: String,
         logger: AuthenticationLoggerDelegate? = nil,
         uiCustomization: AuthenticationUICustomization? = nil,
         configParameters: AuthenticationConfigParameters = AuthenticationConfigParameters(),
@@ -48,11 +48,12 @@ extension PaymentSession {
         AuthenticationSession.initAuthenticationSession(
             publishableKey: publishableKey,
             paymentIntentClientSecret: paymentIntentClientSecret,
-            merchantId: merchantId,
             cardNetwork: cardNetwork,
             messageVersion: messageVersion,
+            postAuthUrl: postAuthUrl,
             logger: logger,
             uiCustomization: uiCustomization,
+            configParameters: configParameters,
             completion: completion)
     }
 }
