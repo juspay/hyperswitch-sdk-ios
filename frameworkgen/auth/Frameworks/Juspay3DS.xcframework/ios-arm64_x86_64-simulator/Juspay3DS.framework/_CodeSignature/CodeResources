@@ -22,19 +22,19 @@
 		</data>
 		<key>Modules/Juspay3DS.swiftmodule/arm64-apple-ios-simulator.private.swiftinterface</key>
 		<data>
-		N2O+d0TPEh33pQNkSu/bE/wusVU=
+		BtpvvCZpidfOH3jsTe3oDcWnSWk=
 		</data>
 		<key>Modules/Juspay3DS.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		/nvA4f6w5OfGEWm869rPPpoTY4U=
+		lRrNGnqwqYhvOuK8xl0A4TF/anM=
 		</data>
 		<key>Modules/Juspay3DS.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		N2O+d0TPEh33pQNkSu/bE/wusVU=
+		BtpvvCZpidfOH3jsTe3oDcWnSWk=
 		</data>
 		<key>Modules/Juspay3DS.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		20Inrz6DrhFJyOXkH21+g2X18zQ=
+		CR/vI/B9i8zhfqPNFvMcxxs33qk=
 		</data>
 		<key>Modules/Juspay3DS.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<data>
@@ -42,19 +42,19 @@
 		</data>
 		<key>Modules/Juspay3DS.swiftmodule/x86_64-apple-ios-simulator.private.swiftinterface</key>
 		<data>
-		EZJnI/9AEiE4XrCXpNL0MTWLUnw=
+		wkhSrKwT6owlMn5ePt4+tYFNTGM=
 		</data>
 		<key>Modules/Juspay3DS.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		tUPdtlzoYZfry6KuL/LpzGt7b8Y=
+		Vvi+16XcIiRJi3+qMWzYUW8mrc0=
 		</data>
 		<key>Modules/Juspay3DS.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		EZJnI/9AEiE4XrCXpNL0MTWLUnw=
+		wkhSrKwT6owlMn5ePt4+tYFNTGM=
 		</data>
 		<key>Modules/Juspay3DS.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<data>
-		UTGMK4Z27jpxevzKWJTXblUo4cM=
+		DTLFXJbIOeNGs2UsIOe9hvhgOqY=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -88,28 +88,28 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			W0gJGHkmz9flkJRIIanUZ0irAjatPp1Af5RbfZ6eUnY=
+			JWENmXcscgz8bKymgSVZzfgy8R0AQPMuUTT5F+1C/P8=
 			</data>
 		</dict>
 		<key>Modules/Juspay3DS.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			wHjFW5JSfKQuoPkus/A6Kbsf05o/E/RoKLu1iXEEIiw=
+			N4ji72vkGMM//GOjdagsLL/FRqI/5TZWwKhKwnRv/To=
 			</data>
 		</dict>
 		<key>Modules/Juspay3DS.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			W0gJGHkmz9flkJRIIanUZ0irAjatPp1Af5RbfZ6eUnY=
+			JWENmXcscgz8bKymgSVZzfgy8R0AQPMuUTT5F+1C/P8=
 			</data>
 		</dict>
 		<key>Modules/Juspay3DS.swiftmodule/arm64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			dW6/IFP00Q+LgviYBSQr/npNVJcXjv1RrfvmspDBaU8=
+			7DRCc+p9XnxSoADrWYFF23ClZjtCgnQuNgKiVohKv58=
 			</data>
 		</dict>
 		<key>Modules/Juspay3DS.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
@@ -123,28 +123,28 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			1NSbCaP63GBAA+gb4qw+N29kBLhv0Yn21ziIC8uMffc=
+			YWH4hfIzFFd+9JPYvUFt1inWDuJI2n6Pzz7C5LOywZY=
 			</data>
 		</dict>
 		<key>Modules/Juspay3DS.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			d296fuUlkF7CJ6gBVxyaGYp7L/DTzWcQQghwC6ZANkg=
+			2CuB6x+U9Lu+YxVdgyG19KzBMVASqciNtceCGmJljHo=
 			</data>
 		</dict>
 		<key>Modules/Juspay3DS.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			1NSbCaP63GBAA+gb4qw+N29kBLhv0Yn21ziIC8uMffc=
+			YWH4hfIzFFd+9JPYvUFt1inWDuJI2n6Pzz7C5LOywZY=
 			</data>
 		</dict>
 		<key>Modules/Juspay3DS.swiftmodule/x86_64-apple-ios-simulator.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			+FMWuQE1A/RPZWzO9bbE1Gydu4oRkUWwywbIDyRar1I=
+			d21H+938WtVQZHINGE8M4uebfViwRnRGMPDTVTiODY0=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>

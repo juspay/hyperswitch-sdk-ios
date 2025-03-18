@@ -22,19 +22,19 @@
 		</data>
 		<key>Modules/Juspay3DS.swiftmodule/arm64-apple-ios.private.swiftinterface</key>
 		<data>
-		+M2ffjL/4yaCE066ARoQrT2+O+A=
+		+q8yW2wbJbDBSXV9xWd0ZpT7J3w=
 		</data>
 		<key>Modules/Juspay3DS.swiftmodule/arm64-apple-ios.swiftdoc</key>
 		<data>
-		tWayzuRHXyxN3pvCH69d7pEEfKg=
+		B/8YM1NwhqgbEkS7g3ZthdYkccs=
 		</data>
 		<key>Modules/Juspay3DS.swiftmodule/arm64-apple-ios.swiftinterface</key>
 		<data>
-		+M2ffjL/4yaCE066ARoQrT2+O+A=
+		+q8yW2wbJbDBSXV9xWd0ZpT7J3w=
 		</data>
 		<key>Modules/Juspay3DS.swiftmodule/arm64-apple-ios.swiftmodule</key>
 		<data>
-		K9J12waASadzp1AfS0U5FDbWJRo=
+		uDsKv5YCoB9ocJfb8Mv3LQrNHSQ=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -68,28 +68,28 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			l32Uav4DpfNPaOJf51ebKDHmPN8trqhXmIrz/uMgWFo=
+			dVeeufb+3N4+ro2HoJ5LcXqx23WnWSnle1+QtFfO2PI=
 			</data>
 		</dict>
 		<key>Modules/Juspay3DS.swiftmodule/arm64-apple-ios.swiftdoc</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			Ys+6ELr1Wkc4MqOoV5K4NTX/OoDXLDAXBqK5Zw08Drw=
+			fAYJifsW7jRuhvHN7vgHGvPNyieruU8P6DBXz7qmiT4=
 			</data>
 		</dict>
 		<key>Modules/Juspay3DS.swiftmodule/arm64-apple-ios.swiftinterface</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			l32Uav4DpfNPaOJf51ebKDHmPN8trqhXmIrz/uMgWFo=
+			dVeeufb+3N4+ro2HoJ5LcXqx23WnWSnle1+QtFfO2PI=
 			</data>
 		</dict>
 		<key>Modules/Juspay3DS.swiftmodule/arm64-apple-ios.swiftmodule</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			BSSf8mMG1bObMIAz77jhO/C8wNGIwISsJdt2AI0nUs0=
+			IyQmLHy+eNNOmehrmVUaBeD0miiZWAGB3Gj0PG3TqzE=
 			</data>
 		</dict>
 		<key>Modules/module.modulemap</key>
