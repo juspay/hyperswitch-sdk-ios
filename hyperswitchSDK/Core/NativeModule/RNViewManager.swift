@@ -94,10 +94,9 @@ extension RNViewManager: RCTBridgeDelegate {
         case "LocalBundle":
             return Bundle.main.url(forResource: "hyperswitch", withExtension: "bundle")
         default:
-            CodePushAPI()
-            return CodePush.bundleURL(forResource: "hyperswitch",
-                                      withExtension: "bundle",
-                                      subdirectory: "/Frameworks/Hyperswitch.framework")
+//            CodePushAPI()
+//            return CodePush.bundleURL(forResource: "hyperswitch",
+            return OTAServices.getBundleURL()
         }
     }
 }
