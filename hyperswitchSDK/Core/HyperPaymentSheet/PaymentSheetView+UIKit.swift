@@ -36,12 +36,18 @@ internal extension PaymentSheet {
     /// Method to present the payment sheet view with the default configuration.
     func present(from presentingViewController: UIViewController, completion: @escaping (PaymentSheetResult) -> ()) {
         
+        // Set publishable key to logManager
+        LogManager.initialize(publishableKey: APIClient.shared.publishableKey ?? "")
+        
         // Present the payment sheet view with the root view obtained from the getRootView() method.
         self.presentWithRootView(from: presentingViewController, rootView: self.getRootView(), completion: completion)
     }
     
     /// Method to present the payment sheet view with custom parameters.
     func presentWithParams(from presentingViewController: UIViewController, props: [String: Any], completion: @escaping ((PaymentSheetResult) -> ())) {
+        
+        // Set publishable key to logManager
+        LogManager.initialize(publishableKey: APIClient.shared.publishableKey ?? "")
         
         // Present the payment sheet view with the root view obtained from the getRootViewWithParams() method.
         self.presentWithRootView(from: presentingViewController, rootView: self.getRootViewWithParams(props: props), completion: completion)

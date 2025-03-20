@@ -52,15 +52,13 @@ internal class EventLogger: NSObject, HPJPLoggerDelegate {
             default:
                 log = log.setEventName(.HYPER_OTA_EVENT)
             }
-            HyperLogManager.addLog(log.build())
+            LogManager.addLog(log.build())
             
         } catch {
             print("Error serializing event data: \(error.localizedDescription)")
         }
     }
 }
-
-
 
 public final class OTAServices {
     public static func getBundleURL() -> URL {

@@ -1,10 +1,11 @@
 //
-//  SDKEnvironment.swift
+//  Environment.swift
 //  hyperswitch
 //
 //  Created by Kuntimaddi Manideep on 24/01/25.
 //
 
+import Foundation
 
 enum SDKEnvironment {
     case PROD, SANDBOX

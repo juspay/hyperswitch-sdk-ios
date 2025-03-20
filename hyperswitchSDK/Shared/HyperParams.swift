@@ -18,7 +18,7 @@ class HyperParams {
     static let osVersion: String = UIDevice.current.systemVersion
     
     static func getHyperParams() -> [String: Any?] {
-        var params: [String: Any?] = [
+        let params: [String: Any?] = [
             "appId": appId,
             "sdkVersion": sdkVersion,
             "country": country,

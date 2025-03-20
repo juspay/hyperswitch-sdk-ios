@@ -7,8 +7,8 @@
 
 import Foundation
 
-final class HyperLogManager {
-    private static var logsBatch: [Log] = []
+final class LogManager {
+    private static var logsBatch: [LogPayload] = []
     private static var publishableKey: String = ""
     private static var loggingEndPoint: String?
     private static let fileManager = LogFileManager()
@@ -21,10 +21,10 @@ final class HyperLogManager {
             .replacingOccurrences(of: "\n", with: "") + "]"
     }
     
-    private static func getStringifiedLogs(_ logBatch: [Log]) -> [String] {
+    private static func getStringifiedLogs(_ logBatch: [LogPayload]) -> [String] {
         return logBatch.compactMap { $0.toJson() }
     }
-
+    
     static func initialize(publishableKey: String) {
         queue.async {
             self.publishableKey = publishableKey
@@ -40,18 +40,19 @@ final class HyperLogManager {
             guard let endpoint = loggingEndPoint else { return }
             let logs = fileManager.getStoredLogsInArray()
             let payload = formatPayload(logs: logs)
-            Task {
-                do {
-                    let response = try await HyperNetworking.makeHttpRequest(
-                        urlString: endpoint,
-                        method: "POST",
-                        headers: ["Content-Type": "application/json"],
-                        body: payload)
-                        if !response.isEmpty {
-                            fileManager.clearFile()
-                    }
-                } catch {
-                    print("Network error")
+            
+            let data = payload.data(using: .utf8)
+            
+            let logRequest = HTTPRequestService(host: endpoint, path: "", endpoint: "", method: .post)
+            logRequest.headers = ["Content-Type": "application/json"]
+            logRequest.bodyData = data
+            
+            logRequest.request(type: Data.self) { (result, statusCode) in
+                switch (result, statusCode) {
+                case (.success(_), 200..<300):
+                    fileManager.clearFile()
+                default:
+                    break;
                 }
             }
         }
@@ -64,14 +65,14 @@ final class HyperLogManager {
         }
     }
     
-    static func saveLogsToFile(_ logsBatch: [Log]) {
+    static func saveLogsToFile(_ logsBatch: [LogPayload]) {
         queue.async {
             let logs = getStringifiedLogs(logsBatch)
             fileManager.addLogs(logs: logs)
         }
     }
     
-    static func addLog(_ log: Log) {
+    static func addLog(_ log: LogPayload) {
         queue.async {
             logsBatch.append(log)
             debouncer.debounce {
@@ -85,32 +86,28 @@ final class HyperLogManager {
             guard !logsBatch.isEmpty, let endpoint = loggingEndPoint else { return }
             var copiedLogs = logsBatch
             logsBatch.removeAll()
-        
+            
             for index in copiedLogs.indices {
-                copiedLogs[index].merchant_id = HyperLogManager.publishableKey
+                copiedLogs[index].merchant_id = LogManager.publishableKey
             }
             
             let logsToSend = getStringifiedLogs(copiedLogs)
-        
             guard !logsToSend.isEmpty else { return }
             
             let payload = formatPayload(logs: logsToSend)
+            let data = payload.data(using: .utf8)
+            let logRequest = HTTPRequestService(host: endpoint, path: "", endpoint: "", method: .post)
             
-            Task {
-                do {
-                    let response = try await HyperNetworking.makeHttpRequest(
-                        urlString: endpoint,
-                        method: "POST",
-                        headers: ["Content-Type": "application/json"],
-                        body: payload)
-                    
-                    if response.isEmpty {
-                        saveLogsToFile(copiedLogs)
-                    }
-                } catch {
+            logRequest.headers = ["Content-Type": "application/json"]
+            logRequest.bodyData = data
+            logRequest.request(type: Data.self) { (result, statusCode) in
+                switch (result, statusCode) {
+                case (.success(_), 200..<300):
+                    break;
+                default:
                     saveLogsToFile(copiedLogs)
                 }
             }
-        } 
+        }
     }
 }
