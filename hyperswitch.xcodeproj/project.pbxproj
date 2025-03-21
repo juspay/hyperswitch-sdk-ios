@@ -52,9 +52,6 @@
 		75AA28E92D47805800CD88A6 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28E82D47805800CD88A6 /* Environment.swift */; };
 		75AA28EA2D48F61800CD88A6 /* Environment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28E82D47805800CD88A6 /* Environment.swift */; };
 		75AA28EB2D48F61800CD88A6 /* HyperNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28E52D477FF200CD88A6 /* HyperNetworking.swift */; };
-		75AA28EC2D48F61800CD88A6 /* LogFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28E32D477FDA00CD88A6 /* LogFileManager.swift */; };
-		75AA28EE2D48F61800CD88A6 /* LogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28DF2D477FB100CD88A6 /* LogManager.swift */; };
-		75AA28EF2D48F61800CD88A6 /* Debouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28DD2D477F9D00CD88A6 /* Debouncer.swift */; };
 		75E692FA2D5B28D70077C0F3 /* OTAServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75E692F92D5B28D70077C0F3 /* OTAServices.swift */; };
 		75E692FC2D5B2AB90077C0F3 /* HyperOTA.plist in Resources */ = {isa = PBXBuildFile; fileRef = 75E692FB2D5B2AB90077C0F3 /* HyperOTA.plist */; };
 		790525712BDA66EF00D49FE8 /* HyperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790525702BDA66EF00D49FE8 /* HyperViewModel.swift */; };
@@ -64,10 +61,8 @@
 		79052A272C89237A0011804E /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A262C89237A0011804E /* Extensions.swift */; };
 		79052A4A2C9057D60011804E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A492C9057D60011804E /* AppDelegate.swift */; };
 		790BA8272B99DB5E006678FD /* PaymentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790BA8262B99DB5E006678FD /* PaymentSession.swift */; };
-		790F847E2D8C311900178A09 /* LogBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790F847D2D8C311900178A09 /* LogBuilder.swift */; };
 		790F847F2D8C311900178A09 /* LogBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790F847D2D8C311900178A09 /* LogBuilder.swift */; };
 		790F84822D8C31E800178A09 /* LogPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790F84812D8C31E500178A09 /* LogPayload.swift */; };
-		790F84832D8C31FA00178A09 /* LogPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790F84812D8C31E500178A09 /* LogPayload.swift */; };
 		79232DBF2CA571A900E044E0 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A262C89237A0011804E /* Extensions.swift */; };
 		792D69F62B95E942001598CD /* ExpressCheckoutLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792D69F52B95E942001598CD /* ExpressCheckoutLauncher.swift */; };
 		792D69F82B95E94C001598CD /* ExpressCheckoutWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792D69F72B95E94C001598CD /* ExpressCheckoutWidget.swift */; };
@@ -82,11 +77,9 @@
 		79728FB92C3412BB00CA8C10 /* HeadlessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */; };
 		7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7996A8322BA1FDD000394FAF /* hyperswitch.bundle */; };
 		799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */; };
-		79BF5A5B2C3EA2D6006546D6 /* CodePush.plist in Resources */ = {isa = PBXBuildFile; fileRef = 79BF5A5A2C3EA2D6006546D6 /* CodePush.plist */; };
 		79D474B42CC6FDC30022C47E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B32CC6FDBF0022C47E /* Helper.swift */; };
 		79D474B52CC6FDC30022C47E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B32CC6FDBF0022C47E /* Helper.swift */; };
 		79D474B72CC6FDE80022C47E /* RNResponseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B62CC6FDE50022C47E /* RNResponseHandler.swift */; };
-		79D474B92CC6FE920022C47E /* CodePushAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B82CC6FE8D0022C47E /* CodePushAPI.swift */; };
 		79E528922CCBB55F00070AD9 /* hyperClip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E528912CCBB55800070AD9 /* hyperClip.swift */; };
 		79E528942CCBB56700070AD9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E528932CCBB56200070AD9 /* ContentView.swift */; };
 		79E528972CCBB57300070AD9 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E528962CCBB56E00070AD9 /* SwiftUIView.swift */; };
@@ -222,10 +215,8 @@
 		79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlessViewController.swift; sourceTree = "<group>"; };
 		7996A8322BA1FDD000394FAF /* hyperswitch.bundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hyperswitch.bundle; sourceTree = "<group>"; };
 		799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		79BF5A5A2C3EA2D6006546D6 /* CodePush.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = CodePush.plist; sourceTree = "<group>"; };
 		79D474B32CC6FDBF0022C47E /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		79D474B62CC6FDE50022C47E /* RNResponseHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNResponseHandler.swift; sourceTree = "<group>"; };
-		79D474B82CC6FE8D0022C47E /* CodePushAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodePushAPI.swift; sourceTree = "<group>"; };
 		79E528912CCBB55800070AD9 /* hyperClip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = hyperClip.swift; sourceTree = "<group>"; };
 		79E528932CCBB56200070AD9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		79E528962CCBB56E00070AD9 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
@@ -534,7 +525,6 @@
 				79D474B62CC6FDE50022C47E /* RNResponseHandler.swift */,
 				66486FA32943580F00150E4F /* RNViewManager.swift */,
 				75E692F92D5B28D70077C0F3 /* OTAServices.swift */,
-				79D474B82CC6FE8D0022C47E /* CodePushAPI.swift */,
 			);
 			path = NativeModule;
 			sourceTree = "<group>";
@@ -544,7 +534,6 @@
 			children = (
 				75E692FB2D5B2AB90077C0F3 /* HyperOTA.plist */,
 				7996A8322BA1FDD000394FAF /* hyperswitch.bundle */,
-				79BF5A5A2C3EA2D6006546D6 /* CodePush.plist */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -644,7 +633,6 @@
 				43E668752C084FB70094BD13 /* montserrat_extrabolditalic.ttf in Resources */,
 				43E668692C084FB70094BD13 /* montserrat_bolditalic.ttf in Resources */,
 				43E668732C084FB70094BD13 /* montserrat_mediumitalic.ttf in Resources */,
-				79BF5A5B2C3EA2D6006546D6 /* CodePush.plist in Resources */,
 				43E668702C084FB70094BD13 /* montserrat_light.ttf in Resources */,
 				43E668722C084FB70094BD13 /* montserrat_extralightitalic.ttf in Resources */,
 				799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */,
@@ -844,7 +832,6 @@
 				66486FAA2943580F00150E4F /* RNViewManager.swift in Sources */,
 				75AA28DE2D477F9D00CD88A6 /* Debouncer.swift in Sources */,
 				DC4AC9F5296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift in Sources */,
-				79D474B92CC6FE920022C47E /* CodePushAPI.swift in Sources */,
 				DC5D0127294853A90017C67A /* PaymentSheetView.swift in Sources */,
 				792D6A062B99C204001598CD /* HyperHeadless.m in Sources */,
 				66486F92294355BD00150E4F /* hyperApp.swift in Sources */,
@@ -860,9 +847,6 @@
 			files = (
 				75AA28EA2D48F61800CD88A6 /* Environment.swift in Sources */,
 				75AA28EB2D48F61800CD88A6 /* HyperNetworking.swift in Sources */,
-				75AA28EC2D48F61800CD88A6 /* LogFileManager.swift in Sources */,
-				75AA28EE2D48F61800CD88A6 /* LogManager.swift in Sources */,
-				75AA28EF2D48F61800CD88A6 /* Debouncer.swift in Sources */,
 				79EAB0172C81CCDA006B40AD /* ViewController.swift in Sources */,
 				79EAB0462C81D5C9006B40AD /* PaymentSession+Lite.swift in Sources */,
 				79EAB0402C81D2FA006B40AD /* WebViewController.swift in Sources */,
@@ -872,11 +856,9 @@
 				79EAB0332C81CF50006B40AD /* DictionaryConverter.swift in Sources */,
 				79E5289A2CCBB71E00070AD9 /* SwiftUIManager.swift in Sources */,
 				79EAB0322C81CF2E006B40AD /* PaymentSheet.swift in Sources */,
-				790F84832D8C31FA00178A09 /* LogPayload.swift in Sources */,
 				79E528942CCBB56700070AD9 /* ContentView.swift in Sources */,
 				79D474B52CC6FDC30022C47E /* Helper.swift in Sources */,
 				79EAB0292C81CDCE006B40AD /* HyperViewModel.swift in Sources */,
-				790F847E2D8C311900178A09 /* LogBuilder.swift in Sources */,
 				79EAB02C2C81CDEC006B40AD /* PaymentSheetAppearance.swift in Sources */,
 				79232DBF2CA571A900E044E0 /* Extensions.swift in Sources */,
 				7932B80F2CB4182100A40E1A /* HyperUIViewController.swift in Sources */,

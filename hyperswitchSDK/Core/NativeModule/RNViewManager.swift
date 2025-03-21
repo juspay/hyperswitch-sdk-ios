@@ -7,9 +7,6 @@
 
 import Foundation
 import React
-#if canImport(CodePush)
-import CodePush
-#endif
 
 internal class RNViewManager: NSObject {
     
@@ -41,47 +38,6 @@ internal class RNViewManager: NSObject {
     }
 }
 
-extension RCTBridge: RCTReloadListener {
-    
-    func triggerReload (bridge: RCTBridge!) {
-        NotificationCenter.default.post(name: NSNotification.Name.RCTBridgeWillReload, object: bridge, userInfo: nil)
-
-        DispatchQueue.main.async {
-            bridge.invalidate()
-            bridge.setUp()
-        }
-    }
-    
-    public func didReceiveReloadCommand() {
-        
-        let preferences = UserDefaults.standard
-        let pendingUpdate = preferences.object(forKey: "CODE_PUSH_PENDING_UPDATE") as? [String: Any]
-        let updateIsLoading = pendingUpdate?["isLoading"] as? Bool
-                
-        if(!(updateIsLoading ?? true) && RNViewManager.sharedInstance.rootView != nil) {
-            if (self === RNViewManager.sharedInstance.bridge) {
-                triggerReload(bridge: self)
-            }
-        } else {
-            if(RNViewManager.sharedInstance.rootView != nil) {
-                if (self === RNViewManager.sharedInstance.bridge) {
-                    return
-                }
-            }
-            triggerReload(bridge: self)
-        }
-    }
-}
-
-extension CodePush {
-    @objc private class func clearUpdates() {
-        let preferences = UserDefaults.standard
-        preferences.removeObject(forKey: "CODE_PUSH_PENDING_UPDATE")
-        preferences.removeObject(forKey: "CODE_PUSH_FAILED_UPDATES")
-        preferences.synchronize()
-    }
-}
-
 extension RNViewManager: RCTBridgeDelegate {
     func sourceURL(for bridge: RCTBridge!) -> URL! {
         switch getInfoPlist("HyperswitchSource") {
@@ -94,8 +50,6 @@ extension RNViewManager: RCTBridgeDelegate {
         case "LocalBundle":
             return Bundle.main.url(forResource: "hyperswitch", withExtension: "bundle")
         default:
-//            CodePushAPI()
-//            return CodePush.bundleURL(forResource: "hyperswitch",
             return OTAServices.getBundleURL()
         }
     }
