@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>releaseConfigURL</key>
-	<string>releaseConfigURL</string>
+	<string>https://checkout.hyperswitch.io/assets/v1</string>
 	<key>fileName</key>
 	<string>hyperswitch.bundle</string>
 	<key>localAssets</key>
