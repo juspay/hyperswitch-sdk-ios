@@ -64,6 +64,14 @@ class HyperViewModel: ObservableObject {
         }
     }
     
+    func getNetceteraApiKey() async throws -> String {
+        let json = try await fetchData(from: "/netcetera-sdk-api-key")
+        guard let apiKey = json["netceteraApiKey"] as? String else {
+            throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing required fields"])
+        }
+        return apiKey
+    }
+    
     func preparePaymentMethodManagement() {
         Task {
             do {
