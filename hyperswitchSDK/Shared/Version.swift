@@ -8,5 +8,5 @@
 import Foundation
 
 public struct SDKVersion {
-    public static let current = "0.2.4"
+    public static let current = "0.2.5"
 }

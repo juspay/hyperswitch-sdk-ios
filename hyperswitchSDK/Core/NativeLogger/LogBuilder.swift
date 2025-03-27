@@ -13,7 +13,7 @@ internal class LogBuilder {
     private var component: String = "MOBILE"
     private var category: LogCategory = .OTA_LIFE_CYCLE
     private var version: String = SDKVersion.current
-    private var codePushVersion: String = "0.0.2" // MARK: replace with hyperOTAVersion
+    private var codePushVersion: String = "" // MARK: replace with hyperOTAVersion
     private var clientCoreVersion: String = ""
     private var value: String = ""
     private var internalMetadata: String = ""

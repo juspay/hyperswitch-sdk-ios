@@ -65,7 +65,7 @@ public final class OTAServices {
         let payload = [
             "clientId": getHyperOTAPlist("clientId") ?? "" ,
             "namespace": getHyperOTAPlist("namespace") ?? "",
-            "forceUpdate": true,
+            "forceUpdate": false,
             "localAssets": (getHyperOTAPlist("releaseConfigURL") ?? "releaseConfigURL") == "releaseConfigURL",
             "fileName": getHyperOTAPlist("fileName") ?? "" ,
             "releaseConfigURL": (getHyperOTAPlist("releaseConfigURL") ?? "" ) +  "/mobile-ota/ios/" + SDKVersion.current + "/config.json",
