@@ -59,6 +59,7 @@
 #import "SentryAppStartMeasurement.h"
 #import "SentryBinaryImageCache.h"
 #import "SentryBreadcrumb+Private.h"
+#import "SentryDebugImageProvider+HybridSDKs.h"
 #import "SentryDependencyContainer.h"
 #import "SentryEnvelope.h"
 #import "SentryEnvelopeItemType.h"

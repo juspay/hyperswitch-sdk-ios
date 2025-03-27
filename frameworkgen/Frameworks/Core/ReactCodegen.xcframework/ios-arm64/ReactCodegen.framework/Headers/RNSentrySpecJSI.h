@@ -499,6 +499,7 @@ protected:
 public:
   virtual void addListener(jsi::Runtime &rt, jsi::String eventType) = 0;
   virtual void removeListeners(jsi::Runtime &rt, double id) = 0;
+  virtual jsi::Value getNewScreenTimeToDisplay(jsi::Runtime &rt) = 0;
   virtual void addBreadcrumb(jsi::Runtime &rt, jsi::Object breadcrumb) = 0;
   virtual jsi::Value captureEnvelope(jsi::Runtime &rt, jsi::String bytes, jsi::Object options) = 0;
   virtual jsi::Value captureScreenshot(jsi::Runtime &rt) = 0;
@@ -568,6 +569,14 @@ private:
 
       return bridging::callFromJs<void>(
           rt, &T::removeListeners, jsInvoker_, instance_, std::move(id));
+    }
+    jsi::Value getNewScreenTimeToDisplay(jsi::Runtime &rt) override {
+      static_assert(
+          bridging::getParameterCount(&T::getNewScreenTimeToDisplay) == 1,
+          "Expected getNewScreenTimeToDisplay(...) to have 1 parameters");
+
+      return bridging::callFromJs<jsi::Value>(
+          rt, &T::getNewScreenTimeToDisplay, jsInvoker_, instance_);
     }
     void addBreadcrumb(jsi::Runtime &rt, jsi::Object breadcrumb) override {
       static_assert(
