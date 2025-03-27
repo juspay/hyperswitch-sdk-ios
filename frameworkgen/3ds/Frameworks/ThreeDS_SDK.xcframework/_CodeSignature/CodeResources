@@ -26,7 +26,7 @@
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/Assets.car</key>
 		<data>
-		aH4BlEbtXmF+Te3kBQeQbOlEJrw=
+		kTMbOUKowDryM10tvAXwtIPZkFk=
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/BrandingZoneView.nib</key>
 		<data>
@@ -54,7 +54,7 @@
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/ExpandableInformationView.nib</key>
 		<data>
-		W2g8AEckYzWRE1yysdv484mfKLU=
+		UgF9aTRlFg7EqN9Uwhpchi8C0+w=
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/FooterStackView.nib</key>
 		<data>
@@ -94,7 +94,7 @@
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/Headers/ThreeDS_SDK-Swift.h</key>
 		<data>
-		Uh1aYzJ8zXCTOtBYcn1h9tAkFv8=
+		w6SBFyRncWzakRW6ZyU0nYD5Sjw=
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/Headers/ThreeDS_SDK.h</key>
 		<data>
@@ -102,23 +102,27 @@
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/Info.plist</key>
 		<data>
-		EiXD1CxWAYtiph2GI8p13WBedSs=
+		6/A9SzugTnmwd/XqeUJg3Zf2JaI=
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/InformationView.nib</key>
 		<data>
 		9mnoW5j37AnqKMXWFQBVDWIudf4=
 		</data>
+		<key>ios-arm64/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.abi.json</key>
+		<data>
+		s6eXmvZ/wXREHAoEOeQRzDBPZ+A=
+		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.private.swiftinterface</key>
 		<data>
-		X4xn/xVmFKP34QrJVVByduhBfMA=
+		WyohM0v1zpW1Iu1gWkZUouxWw64=
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.swiftdoc</key>
 		<data>
-		ynzrv3gCjJloa4p4l/cUwhjjS/o=
+		wP+jd5Bvud10daEDCOq0BA8SoHg=
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.swiftinterface</key>
 		<data>
-		X4xn/xVmFKP34QrJVVByduhBfMA=
+		WyohM0v1zpW1Iu1gWkZUouxWw64=
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/Modules/module.modulemap</key>
 		<data>
@@ -146,15 +150,15 @@
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/SelectView.nib</key>
 		<data>
-		Kg1WylBqKw/wd9d/lNVgD3Dyi6Y=
+		4jVoeY65wv/wa8Lx4yCZ8DdYSmU=
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/SelectionView.nib</key>
 		<data>
-		rsvk7B3stNoOQgPk+Kn8sht0iV0=
+		N/EV4BU1wmHEfMirApVV+Prio6E=
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/ThreeDS_SDK</key>
 		<data>
-		MMiVbj0KTMXyDXclnt6rxkFYBZE=
+		EREKCPdC+TjFCxs9OTE/g7QDa/U=
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/WhitelistingZone.nib</key>
 		<data>
@@ -162,7 +166,7 @@
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/_CodeSignature/CodeResources</key>
 		<data>
-		0tgSUyNk3LyyYGB+2suPgDos2JY=
+		014FZ8dfCSXa4zd4gSv61GFgQsQ=
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/challengeVC.storyboardc/C4Y-y0-tcs-view-MrG-17-JGv.nib</key>
 		<data>
@@ -182,11 +186,11 @@
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/challengeVC.storyboardc/WUm-ax-p1H-view-Hja-72-DgH.nib</key>
 		<data>
-		f5RqQGe+Q8fURLF1QbTJeXP4kE4=
+		Xcedb/ipgbNTr9ezo5iqps320Gw=
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/challengeVC.storyboardc/challengeVC.nib</key>
 		<data>
-		enAtECYhh76j/K5IoZnFseTgjrM=
+		kSvCIDzonpYFUx/+jBqBBrBLJbk=
 		</data>
 		<key>ios-arm64/ThreeDS_SDK.framework/checkbox@3x.png</key>
 		<data>
@@ -246,7 +250,7 @@
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Assets.car</key>
 		<data>
-		+OYBEJmzaQGtMLcCrpP/isNQTqk=
+		kTMbOUKowDryM10tvAXwtIPZkFk=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/BrandingZoneView.nib</key>
 		<data>
@@ -274,7 +278,7 @@
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/ExpandableInformationView.nib</key>
 		<data>
-		a90PIecHjqqWOQ4evxIKaXe+5Qg=
+		ihUi6zDq5wxD13FduahoLzXjklU=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/FooterStackView.nib</key>
 		<data>
@@ -314,7 +318,7 @@
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Headers/ThreeDS_SDK-Swift.h</key>
 		<data>
-		58cjd7FgO02Lo5x5lQmKMWx4Es8=
+		HThsxi7eA2Y1Pk4Dycm5LzRnKcM=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Headers/ThreeDS_SDK.h</key>
 		<data>
@@ -322,7 +326,7 @@
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Info.plist</key>
 		<data>
-		zQ2db8GB1o7uraHvThvmQbCx4kk=
+		uziE3bIQkefoNwdGHWQAnyiip2A=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/InformationView.nib</key>
 		<data>
@@ -330,35 +334,35 @@
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.abi.json</key>
 		<data>
-		z9W3k6e01fbIhHsLg8KWrFEnsgM=
+		i9khyNs9dfsb0BqLLB+nVBo2gbY=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.private.swiftinterface</key>
 		<data>
-		z75lw5IobmVQkFpuzD3+dOCdX0A=
+		d4VMkNDwFxxDR3Z7C9CcFZGRpEk=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		6l2VbB+XfHkSznlo9JdGpSA1tps=
+		1dXxsWl3bZb1oi4Y6Ydok0Zv/4Y=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		z75lw5IobmVQkFpuzD3+dOCdX0A=
+		d4VMkNDwFxxDR3Z7C9CcFZGRpEk=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<data>
-		z9W3k6e01fbIhHsLg8KWrFEnsgM=
+		i9khyNs9dfsb0BqLLB+nVBo2gbY=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.private.swiftinterface</key>
 		<data>
-		oYJSkaLhAGJk+p7cXMrviroEEVo=
+		wfrT6i2RdkUeukrRPaEJdwWweEA=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<data>
-		lvRcZFneKAOZC0KHLP23LHEVIoE=
+		zJSUCj9s/B3Vu9XYZJVmdaTH750=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<data>
-		oYJSkaLhAGJk+p7cXMrviroEEVo=
+		wfrT6i2RdkUeukrRPaEJdwWweEA=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/module.modulemap</key>
 		<data>
@@ -386,15 +390,15 @@
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/SelectView.nib</key>
 		<data>
-		18z0LsDYcWlREUbNRUVdCcEtNmM=
+		Jsn3r7fEQqiPnw8B6xT5AIoHbug=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/SelectionView.nib</key>
 		<data>
-		SWrg4IzIPihySf2L+wJnQWCuCoM=
+		+S9SisYIP1tIRieSKiHNGUc8JMs=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/ThreeDS_SDK</key>
 		<data>
-		IHOTHi4FCjQX3V+NXYpnHcqOG5Q=
+		z17+f+x2UhnqOcmemkk6nwgnYiA=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/WhitelistingZone.nib</key>
 		<data>
@@ -402,7 +406,7 @@
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/_CodeSignature/CodeResources</key>
 		<data>
-		7R45QU203pbtV5pvnC0SGdcbEmw=
+		HdzXiRf9fBsse+Ne8nNmCQhFdjM=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/challengeVC.storyboardc/C4Y-y0-tcs-view-MrG-17-JGv.nib</key>
 		<data>
@@ -422,11 +426,11 @@
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/challengeVC.storyboardc/WUm-ax-p1H-view-Hja-72-DgH.nib</key>
 		<data>
-		OOhwP+p+FIyEnoWEz9hXyNUMXB8=
+		ZDzPyzoeOmYIqbFc01+DiwkhPIY=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/challengeVC.storyboardc/challengeVC.nib</key>
 		<data>
-		1N/hvT3kvYr/qDQnzD8jB/dmMYc=
+		k6bkRtjCiAps8QkhiVR3evSBL3o=
 		</data>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/checkbox@3x.png</key>
 		<data>
@@ -526,11 +530,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			aH4BlEbtXmF+Te3kBQeQbOlEJrw=
+			kTMbOUKowDryM10tvAXwtIPZkFk=
 			</data>
 			<key>hash2</key>
 			<data>
-			2RmG7oZlczvjaBwmc6/2xCEu63Iuo8x2PK7WWWrl8Lc=
+			ny8ty1N4GKUMjV9E6BDzoj942qphto75YgsmePgpcq4=
 			</data>
 		</dict>
 		<key>ios-arm64/ThreeDS_SDK.framework/BrandingZoneView.nib</key>
@@ -603,11 +607,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			W2g8AEckYzWRE1yysdv484mfKLU=
+			UgF9aTRlFg7EqN9Uwhpchi8C0+w=
 			</data>
 			<key>hash2</key>
 			<data>
-			ir/ajQrWIbq/bw42nOHMNRGv4pp5wjUPnObwl1ze5Zo=
+			C1UAZ11yZLFQHpqZds0keVwHuof8u9sz31Tf7U1pY40=
 			</data>
 		</dict>
 		<key>ios-arm64/ThreeDS_SDK.framework/FooterStackView.nib</key>
@@ -713,11 +717,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			Uh1aYzJ8zXCTOtBYcn1h9tAkFv8=
+			w6SBFyRncWzakRW6ZyU0nYD5Sjw=
 			</data>
 			<key>hash2</key>
 			<data>
-			u2lbyDtPM3xS0WMP4shb0ByzHkP68nHyjshUA5MVGeA=
+			g2VqnJudD1OzhgakrRJKD4rqGp/jOsYCKpzmSbC9JMs=
 			</data>
 		</dict>
 		<key>ios-arm64/ThreeDS_SDK.framework/Headers/ThreeDS_SDK.h</key>
@@ -735,11 +739,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			EiXD1CxWAYtiph2GI8p13WBedSs=
+			6/A9SzugTnmwd/XqeUJg3Zf2JaI=
 			</data>
 			<key>hash2</key>
 			<data>
-			ZkZBEC4Sj1WGlP2bh01nfkd4iDiGNmegZeqR01v8624=
+			pG/tR9BZRmRvOdJrqwtCbV5i1WIMWtPXqOTPH+wAk8M=
 			</data>
 		</dict>
 		<key>ios-arm64/ThreeDS_SDK.framework/InformationView.nib</key>
@@ -753,37 +757,48 @@
 			Lx4WaYpTG+Fio6ThKfaXLIsij0Ip+42OrKQHDfOql08=
 			</data>
 		</dict>
+		<key>ios-arm64/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.abi.json</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			s6eXmvZ/wXREHAoEOeQRzDBPZ+A=
+			</data>
+			<key>hash2</key>
+			<data>
+			i1bHT4+Ms5buO2ZQDpKnmLvH7x0qleEzSJJjPtvcj7A=
+			</data>
+		</dict>
 		<key>ios-arm64/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.private.swiftinterface</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			X4xn/xVmFKP34QrJVVByduhBfMA=
+			WyohM0v1zpW1Iu1gWkZUouxWw64=
 			</data>
 			<key>hash2</key>
 			<data>
-			dwb8upZmQHiZD1rrnWhh6Fx4VlPzj5fdFeqvSZJHDZE=
+			cNWdCml0Uy4p/w2lrBRXOglf5cpxzpLADmgX/+Epxm4=
 			</data>
 		</dict>
 		<key>ios-arm64/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.swiftdoc</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			ynzrv3gCjJloa4p4l/cUwhjjS/o=
+			wP+jd5Bvud10daEDCOq0BA8SoHg=
 			</data>
 			<key>hash2</key>
 			<data>
-			TzifVX9hcBZnKzFWfxiZ9JXKp50xkaua3ENG7Z4rLpU=
+			Fut/IPuDS4/7ydWn8KCyzj0Pw2ozAQ+xltivdG7g/Mk=
 			</data>
 		</dict>
 		<key>ios-arm64/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios.swiftinterface</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			X4xn/xVmFKP34QrJVVByduhBfMA=
+			WyohM0v1zpW1Iu1gWkZUouxWw64=
 			</data>
 			<key>hash2</key>
 			<data>
-			dwb8upZmQHiZD1rrnWhh6Fx4VlPzj5fdFeqvSZJHDZE=
+			cNWdCml0Uy4p/w2lrBRXOglf5cpxzpLADmgX/+Epxm4=
 			</data>
 		</dict>
 		<key>ios-arm64/ThreeDS_SDK.framework/Modules/module.modulemap</key>
@@ -856,33 +871,33 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			Kg1WylBqKw/wd9d/lNVgD3Dyi6Y=
+			4jVoeY65wv/wa8Lx4yCZ8DdYSmU=
 			</data>
 			<key>hash2</key>
 			<data>
-			dP2ncOe/HQWlmlu8jDO3QdXVeggnqg7jASACySbokOM=
+			m8sXQz9SKbpbU52r/w2JmMl/j2ijzWmtXgnsYp/stVs=
 			</data>
 		</dict>
 		<key>ios-arm64/ThreeDS_SDK.framework/SelectionView.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			rsvk7B3stNoOQgPk+Kn8sht0iV0=
+			N/EV4BU1wmHEfMirApVV+Prio6E=
 			</data>
 			<key>hash2</key>
 			<data>
-			ULgRulBU2F4aDdl8Fsy0hWTv3z8oR6yixR3ai7zK3UM=
+			+Mtvrh5rZzYX2il4sQxzBdZihAKkELqgnUHPUHd7xqg=
 			</data>
 		</dict>
 		<key>ios-arm64/ThreeDS_SDK.framework/ThreeDS_SDK</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			MMiVbj0KTMXyDXclnt6rxkFYBZE=
+			EREKCPdC+TjFCxs9OTE/g7QDa/U=
 			</data>
 			<key>hash2</key>
 			<data>
-			OW65kojib4vNDvioNdlC0Bd1bI4U/dd5zd7kwlv0OfA=
+			5SrjfYw6EfV2yI1A/kNXVv70LfhSmLTD4p7E2mpNUJ0=
 			</data>
 		</dict>
 		<key>ios-arm64/ThreeDS_SDK.framework/WhitelistingZone.nib</key>
@@ -900,11 +915,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			0tgSUyNk3LyyYGB+2suPgDos2JY=
+			014FZ8dfCSXa4zd4gSv61GFgQsQ=
 			</data>
 			<key>hash2</key>
 			<data>
-			mgNF0p9rPDfX91D5bJES3CkWRJdO8sYiqC4Yxe7OEx4=
+			B8hMj5GZQ3mpIdCOLM8rhW4R9Xnu+pVSVp3/trUZHdc=
 			</data>
 		</dict>
 		<key>ios-arm64/ThreeDS_SDK.framework/challengeVC.storyboardc/C4Y-y0-tcs-view-MrG-17-JGv.nib</key>
@@ -955,22 +970,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			f5RqQGe+Q8fURLF1QbTJeXP4kE4=
+			Xcedb/ipgbNTr9ezo5iqps320Gw=
 			</data>
 			<key>hash2</key>
 			<data>
-			U1NeL5b6qjQHmGVFcvsQ/93GFm6GeF0Xax/sXKe08SY=
+			YBqKwehHWEIsDSFpkuIVKePzvRCYYxndyJ/do+jy97E=
 			</data>
 		</dict>
 		<key>ios-arm64/ThreeDS_SDK.framework/challengeVC.storyboardc/challengeVC.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			enAtECYhh76j/K5IoZnFseTgjrM=
+			kSvCIDzonpYFUx/+jBqBBrBLJbk=
 			</data>
 			<key>hash2</key>
 			<data>
-			71EASyGsnY82PFGTiQWGr2QA3kg+JabLdqU2/ekO2Lg=
+			1+vkvv4YFfwwUoR/nrBpejUuSOTlDZAKZ98X6S2Ylng=
 			</data>
 		</dict>
 		<key>ios-arm64/ThreeDS_SDK.framework/checkbox@3x.png</key>
@@ -1131,11 +1146,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			+OYBEJmzaQGtMLcCrpP/isNQTqk=
+			kTMbOUKowDryM10tvAXwtIPZkFk=
 			</data>
 			<key>hash2</key>
 			<data>
-			M36RSvqmYSfltkxn741BRI8Ht17ArV4jSFmuNVK7T6w=
+			ny8ty1N4GKUMjV9E6BDzoj942qphto75YgsmePgpcq4=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/BrandingZoneView.nib</key>
@@ -1208,11 +1223,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			a90PIecHjqqWOQ4evxIKaXe+5Qg=
+			ihUi6zDq5wxD13FduahoLzXjklU=
 			</data>
 			<key>hash2</key>
 			<data>
-			QPyKOSZA0WyOYTHKUrO70pZLlFKFoR3bJ1fe/yBTAtY=
+			67Wo008lWTKiAmpEfsJtoU8ucq5EYLcg86GnoCLt00g=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/FooterStackView.nib</key>
@@ -1318,11 +1333,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			58cjd7FgO02Lo5x5lQmKMWx4Es8=
+			HThsxi7eA2Y1Pk4Dycm5LzRnKcM=
 			</data>
 			<key>hash2</key>
 			<data>
-			ZdSZ/hhszSqP3ja1jkdyh6wpV+J/1+JN3B80917/6CY=
+			F3+17jWSSGeSUoiZJZUAO2r5ksxowV8eTcOidqFmlvo=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Headers/ThreeDS_SDK.h</key>
@@ -1340,11 +1355,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			zQ2db8GB1o7uraHvThvmQbCx4kk=
+			uziE3bIQkefoNwdGHWQAnyiip2A=
 			</data>
 			<key>hash2</key>
 			<data>
-			D7n3iaZBKJgOWCy+AOLMwRY0gz0/yG2OrZLvhz+4lOw=
+			MncV3NrINkARgykAOBrED6LkShqPgDmizpp1BBzfA3g=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/InformationView.nib</key>
@@ -1362,88 +1377,88 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			z9W3k6e01fbIhHsLg8KWrFEnsgM=
+			i9khyNs9dfsb0BqLLB+nVBo2gbY=
 			</data>
 			<key>hash2</key>
 			<data>
-			eUr3BxES6gtlZtStx1bgj26aE4gWVHFRQVkrb5QAa5o=
+			oZvddhL0tvA5i8tuyHlzPkZRvf7JvJyWQUISCFR/ofk=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.private.swiftinterface</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			z75lw5IobmVQkFpuzD3+dOCdX0A=
+			d4VMkNDwFxxDR3Z7C9CcFZGRpEk=
 			</data>
 			<key>hash2</key>
 			<data>
-			X5+UiQzjyJ+yhVhPHGHpZ0fDSPn5tHRUsrD5ELi9Oz0=
+			NrL6HZNu68Jxqf1nKeoVjKzt/ICHASjZ+sLj6kfaodU=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.swiftdoc</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			6l2VbB+XfHkSznlo9JdGpSA1tps=
+			1dXxsWl3bZb1oi4Y6Ydok0Zv/4Y=
 			</data>
 			<key>hash2</key>
 			<data>
-			OS20pSita+vv6tyWR14xz39vDVVAa+wlQSyw+ZOqpbQ=
+			pEEVNPMpZXdifdsuZdt337pDKnlYl9euxxwFxE7GExI=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/arm64-apple-ios-simulator.swiftinterface</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			z75lw5IobmVQkFpuzD3+dOCdX0A=
+			d4VMkNDwFxxDR3Z7C9CcFZGRpEk=
 			</data>
 			<key>hash2</key>
 			<data>
-			X5+UiQzjyJ+yhVhPHGHpZ0fDSPn5tHRUsrD5ELi9Oz0=
+			NrL6HZNu68Jxqf1nKeoVjKzt/ICHASjZ+sLj6kfaodU=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.abi.json</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			z9W3k6e01fbIhHsLg8KWrFEnsgM=
+			i9khyNs9dfsb0BqLLB+nVBo2gbY=
 			</data>
 			<key>hash2</key>
 			<data>
-			eUr3BxES6gtlZtStx1bgj26aE4gWVHFRQVkrb5QAa5o=
+			oZvddhL0tvA5i8tuyHlzPkZRvf7JvJyWQUISCFR/ofk=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.private.swiftinterface</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			oYJSkaLhAGJk+p7cXMrviroEEVo=
+			wfrT6i2RdkUeukrRPaEJdwWweEA=
 			</data>
 			<key>hash2</key>
 			<data>
-			/kXHQ3FH6P3da1SpcCs0cl4zqOja5acVWpcRIQS06DI=
+			nkR6M7BqASjzjCOedNHF2W+Y5luAc5H1qDnJZov6Oiw=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.swiftdoc</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			lvRcZFneKAOZC0KHLP23LHEVIoE=
+			zJSUCj9s/B3Vu9XYZJVmdaTH750=
 			</data>
 			<key>hash2</key>
 			<data>
-			Xm0Fz6YZYhN/5IrseRw0YdSGtu10lwLt84xDylvlmik=
+			ypAOFKvHjLaJrJcl8YlgR4Z8e4WeSeZ78UP6op1AWcw=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/ThreeDS_SDK.swiftmodule/x86_64-apple-ios-simulator.swiftinterface</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			oYJSkaLhAGJk+p7cXMrviroEEVo=
+			wfrT6i2RdkUeukrRPaEJdwWweEA=
 			</data>
 			<key>hash2</key>
 			<data>
-			/kXHQ3FH6P3da1SpcCs0cl4zqOja5acVWpcRIQS06DI=
+			nkR6M7BqASjzjCOedNHF2W+Y5luAc5H1qDnJZov6Oiw=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/Modules/module.modulemap</key>
@@ -1516,33 +1531,33 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			18z0LsDYcWlREUbNRUVdCcEtNmM=
+			Jsn3r7fEQqiPnw8B6xT5AIoHbug=
 			</data>
 			<key>hash2</key>
 			<data>
-			hOalQFqdeeGI5ssd5MLQahN93oWWRr/KOieefr+4uhg=
+			ORX8gtrDqqVqqfgXEWMED9kzAKjFkD1u0dV62cMBoKk=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/SelectionView.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			SWrg4IzIPihySf2L+wJnQWCuCoM=
+			+S9SisYIP1tIRieSKiHNGUc8JMs=
 			</data>
 			<key>hash2</key>
 			<data>
-			Fx0Fhm04QrcxkF1vCqsmmfLF3lFQcDkTnXygzDf6Hfg=
+			gPKLXnI7tmUAVyUu0SfLXtaoZTHhJvR+fBEpckXZZLM=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/ThreeDS_SDK</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			IHOTHi4FCjQX3V+NXYpnHcqOG5Q=
+			z17+f+x2UhnqOcmemkk6nwgnYiA=
 			</data>
 			<key>hash2</key>
 			<data>
-			wayNxE2ENryxgMMJIE9CS+dQXudmCkpVOLHm2Cv4LSc=
+			9ZxcFVgbO778vym9YUV9B5Uv2Ci7sUbtIOzEou5f+ek=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/WhitelistingZone.nib</key>
@@ -1560,11 +1575,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			7R45QU203pbtV5pvnC0SGdcbEmw=
+			HdzXiRf9fBsse+Ne8nNmCQhFdjM=
 			</data>
 			<key>hash2</key>
 			<data>
-			2gPmZpsecgJtL8ptOZMX6Z7kGlrdu11K9FF1/nzKh+A=
+			3SABB8Dhdfyg7b0q569+d28UR9b3W3nU6kErokHaqa4=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/challengeVC.storyboardc/C4Y-y0-tcs-view-MrG-17-JGv.nib</key>
@@ -1615,22 +1630,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			OOhwP+p+FIyEnoWEz9hXyNUMXB8=
+			ZDzPyzoeOmYIqbFc01+DiwkhPIY=
 			</data>
 			<key>hash2</key>
 			<data>
-			6VDvPBTx5dZT393EkRhwpmil9bnLviJgcZ2vd2/I+xs=
+			Zwl5mpFPJMKigrXCiUb/QkxRHXhVlC7+5wG7ypoRMag=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/challengeVC.storyboardc/challengeVC.nib</key>
 		<dict>
 			<key>hash</key>
 			<data>
-			1N/hvT3kvYr/qDQnzD8jB/dmMYc=
+			k6bkRtjCiAps8QkhiVR3evSBL3o=
 			</data>
 			<key>hash2</key>
 			<data>
-			Oq6qaXDjSncBSOT/ObR1PWmvf+PpPR22v+MdlE9onwY=
+			hUw1BKjYYZSEBoTdRp5O5PFzRrQsTaJ6BH01d4MWkQk=
 			</data>
 		</dict>
 		<key>ios-arm64_x86_64-simulator/ThreeDS_SDK.framework/checkbox@3x.png</key>

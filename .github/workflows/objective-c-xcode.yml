@@ -31,7 +31,7 @@ jobs:
           mv package.json.tmp package.json
           npm install
           cd frameworkgen
-          brew bundle install --no-lock --file Brewfile
+          brew bundle install --file Brewfile
           bundle install
           xcodegen && RCT_NEW_ARCH_ENABLED=0 USE_FRAMEWORKS=dynamic bundle exec pod install --verbose && scripts/xcode_env.sh
       - name: Framework Generation

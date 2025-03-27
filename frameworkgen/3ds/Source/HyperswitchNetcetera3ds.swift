@@ -140,7 +140,7 @@ class HyperswitchNetcetera3ds: NSObject {
     func recieveChallengeParamsFromRN(_ acsSignedContent: String,
                                       _ acsRefNumber: String,
                                       _ acsTransactionId: String,
-                                      _ threeDSRequestorURL: String,
+                                      _ threeDSRequestorAppURL: String?,
                                       _ threeDSServerTransId: String,
                                       _ callback: @escaping RCTResponseSenderBlock) {
         let challengeParameters = ChallengeParameters(
@@ -148,7 +148,10 @@ class HyperswitchNetcetera3ds: NSObject {
             acsTransactionID: acsTransactionId,
             acsRefNumber: acsRefNumber,
             acsSignedContent: acsSignedContent);
-        challengeParameters.setThreeDSRequestorAppURL(threeDSRequestorAppURL: threeDSRequestorURL);
+
+        if let url = threeDSRequestorAppURL {
+            challengeParameters.setThreeDSRequestorAppURL(threeDSRequestorAppURL: url)
+        }
         
         self.challengeParams = challengeParameters
         var statusMap: [String:Any] = [:]

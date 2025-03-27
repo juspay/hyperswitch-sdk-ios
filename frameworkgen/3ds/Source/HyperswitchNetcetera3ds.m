@@ -17,7 +17,7 @@ RCT_EXTERN_METHOD(recieveChallengeParamsFromRN:
                   (NSString *)acsSignedContent:
                   (NSString *)acsRefNumber:
                   (NSString *)acsTransactionId:
-                  (NSString *)threeDSRequestorURL:
+                  (nullable NSString *)threeDSRequestorAppURL:
                   (NSString *)threeDSServerTransId:
                   (RCTResponseSenderBlock)callback)
 

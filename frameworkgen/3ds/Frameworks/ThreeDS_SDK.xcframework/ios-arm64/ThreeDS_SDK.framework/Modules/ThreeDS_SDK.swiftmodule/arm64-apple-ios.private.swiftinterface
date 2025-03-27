@@ -1,7 +1,7 @@
 // swift-interface-format-version: 1.0
-// swift-compiler-version: Apple Swift version 5.9 (swiftlang-5.9.0.128.108 clang-1500.0.40.1)
-// swift-module-flags: -target arm64-apple-ios11.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -module-name ThreeDS_SDK
-// swift-module-flags-ignorable: -enable-bare-slash-regex
+// swift-compiler-version: Apple Swift version 6.0.3 effective-5.10 (swiftlang-6.0.3.1.10 clang-1600.0.30.1)
+// swift-module-flags: -target arm64-apple-ios11.0 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name ThreeDS_SDK
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface
 import AdSupport
 import CommonCrypto
 import CoreLocation
@@ -42,6 +42,7 @@ extension ThreeDS_SDK.CompletionEvent : Foundation.NSCopying {
 @_hasMissingDesignatedInitializers @objc(NCASDKInfo) @objcMembers public class SDKInfo : ObjectiveC.NSObject {
   @objc final public let schemes: [ThreeDS_SDK.SchemeInfo]
   @objc final public let licenseExpiryDate: Foundation.Date
+  @objc final public let supportedProtocolVersions: [Swift.String]
   @objc deinit
 }
 @_hasMissingDesignatedInitializers public class ASN1DERDecoder {
@@ -220,6 +221,15 @@ extension ThreeDS_SDK.Scheme {
 extension ThreeDS_SDK.RuntimeErrorEvent : Foundation.NSCopying {
   @objc dynamic public func copy(with zone: ObjectiveC.NSZone? = nil) -> Any
 }
+@_inheritsConvenienceInitializers @objc(NCAViewCustomization) @objcMembers public class ViewCustomization : ObjectiveC.NSObject, Foundation.NSCopying {
+  @objc required override dynamic public init()
+  @objc public func setChallengeViewBackgroundColor(hexColorCode: Swift.String) throws
+  @objc public func setProgressViewBackgroundColor(hexColorCode: Swift.String) throws
+  @objc public func getChallengeViewBackgroundColor() -> Swift.String
+  @objc public func getProgressViewBackgroundColor() -> Swift.String
+  @objc public func copy(with zone: ObjectiveC.NSZone? = nil) -> Any
+  @objc deinit
+}
 @objc(NCAThreeDS2Service) public protocol ThreeDS2Service {
   @objc @available(*, deprecated, message: "Starting with protocol version 2.3.1, integrators should pass the UICustomization as a map.")
   func initialize(_ configParameters: ThreeDS_SDK.ConfigParameters, locale: Swift.String?, uiCustomization: ThreeDS_SDK.UiCustomization?) throws
@@ -251,7 +261,7 @@ extension ThreeDS_SDK.ChallengeParameters : Foundation.NSCopying {
 }
 extension UIKit.UIControl {
   public typealias UIControlTargetClosure = (UIKit.UIControl) -> ()
-  @_Concurrency.MainActor(unsafe) public func addAction(for event: UIKit.UIControl.Event, closure: @escaping UIKit.UIControl.UIControlTargetClosure)
+  @_Concurrency.MainActor @preconcurrency public func addAction(for event: UIKit.UIControl.Event, closure: @escaping UIKit.UIControl.UIControlTargetClosure)
 }
 @objc(NCATransaction) public protocol Transaction {
   @objc func getAuthenticationRequestParameters() throws -> ThreeDS_SDK.AuthenticationRequestParameters
@@ -323,9 +333,11 @@ extension ThreeDS_SDK.ProtocolErrorEvent : Foundation.NSCopying {
   @objc @available(*, deprecated, message: "Starting with protocol version 2.3.1, for dark mode UI customization,\nthe integrators shall use setTextColor(...) and insert\nthe UiCustomization object into the uiCustomizationMap with key \"DARK\".")
   public func setDarkTextColor(hexColorCode: Swift.String) throws
   @objc public func setTextFontSize(fontSize: Swift.Int) throws
+  @objc public func setTextFont(font: UIKit.UIFont)
   @objc public func getTextFontName() -> Swift.String
   @objc public func getTextColor() -> Swift.String
   @objc public func getTextFontSize() -> Swift.Int
+  @objc public func getTextFont() -> UIKit.UIFont?
   @objc public func copy(with zone: ObjectiveC.NSZone? = nil) -> Any
   @objc deinit
 }
@@ -351,9 +363,11 @@ extension ThreeDS_SDK.ProtocolErrorEvent : Foundation.NSCopying {
   public func setHeadingDarkTextColor(hexColorCode: Swift.String) throws
   @objc public func setHeadingTextFontName(fontName: Swift.String) throws
   @objc public func setHeadingTextFontSize(fontSize: Swift.Int) throws
+  @objc public func setHeadingTextFont(font: UIKit.UIFont)
   @objc public func getHeadingTextColor() -> Swift.String
   @objc public func getHeadingTextFontName() -> Swift.String
   @objc public func getHeadingTextFontSize() -> Swift.Int
+  @objc public func getHeadingTextFont() -> UIKit.UIFont?
   @objc override public func copy(with zone: ObjectiveC.NSZone? = nil) -> Any
   @objc required dynamic public init()
   @objc deinit
@@ -459,11 +473,13 @@ extension ThreeDS_SDK.ThreeDS2ServiceSDK : Foundation.NSCopying {
   @objc public func setToolbarCustomization(toolbarCustomization: ThreeDS_SDK.ToolbarCustomization)
   @objc public func setLabelCustomization(labelCustomization: ThreeDS_SDK.LabelCustomization)
   @objc public func setTextBoxCustomization(textBoxCustomization: ThreeDS_SDK.TextBoxCustomization)
+  @objc public func setViewCustomization(viewCustomization: ThreeDS_SDK.ViewCustomization)
   @objc public func getButtonCustomization(buttonType: ThreeDS_SDK.UiCustomization.ButtonType) -> ThreeDS_SDK.ButtonCustomization?
   @objc public func getButtonCustomization(btnType: Swift.String) -> ThreeDS_SDK.ButtonCustomization?
   @objc public func getToolbarCustomization() -> ThreeDS_SDK.ToolbarCustomization?
   @objc public func getLabelCustomization() -> ThreeDS_SDK.LabelCustomization?
   @objc public func getTextboxCustomization() -> ThreeDS_SDK.TextBoxCustomization?
+  @objc public func getViewCustomization() -> ThreeDS_SDK.ViewCustomization?
   @objc public func copy(with zone: ObjectiveC.NSZone? = nil) -> Any
   @objc deinit
 }
