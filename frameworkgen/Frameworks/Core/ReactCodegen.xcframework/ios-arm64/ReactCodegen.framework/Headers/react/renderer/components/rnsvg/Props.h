@@ -355,6 +355,51 @@ class RNSVGFeColorMatrixProps final : public ViewProps {
   std::vector<Float> values{};
 };
 
+enum class RNSVGFeCompositeOperator1 { Over, In, Out, Atop, Xor, Arithmetic };
+
+static inline void fromRawValue(const PropsParserContext& context, const RawValue &value, RNSVGFeCompositeOperator1 &result) {
+  auto string = (std::string)value;
+  if (string == "over") { result = RNSVGFeCompositeOperator1::Over; return; }
+  if (string == "in") { result = RNSVGFeCompositeOperator1::In; return; }
+  if (string == "out") { result = RNSVGFeCompositeOperator1::Out; return; }
+  if (string == "atop") { result = RNSVGFeCompositeOperator1::Atop; return; }
+  if (string == "xor") { result = RNSVGFeCompositeOperator1::Xor; return; }
+  if (string == "arithmetic") { result = RNSVGFeCompositeOperator1::Arithmetic; return; }
+  abort();
+}
+
+static inline std::string toString(const RNSVGFeCompositeOperator1 &value) {
+  switch (value) {
+    case RNSVGFeCompositeOperator1::Over: return "over";
+    case RNSVGFeCompositeOperator1::In: return "in";
+    case RNSVGFeCompositeOperator1::Out: return "out";
+    case RNSVGFeCompositeOperator1::Atop: return "atop";
+    case RNSVGFeCompositeOperator1::Xor: return "xor";
+    case RNSVGFeCompositeOperator1::Arithmetic: return "arithmetic";
+  }
+}
+
+class RNSVGFeCompositeProps final : public ViewProps {
+ public:
+  RNSVGFeCompositeProps() = default;
+  RNSVGFeCompositeProps(const PropsParserContext& context, const RNSVGFeCompositeProps &sourceProps, const RawProps &rawProps);
+
+#pragma mark - Props
+
+  folly::dynamic x{};
+  folly::dynamic y{};
+  folly::dynamic width{};
+  folly::dynamic height{};
+  std::string result{};
+  std::string in1{};
+  std::string in2{};
+  RNSVGFeCompositeOperator1 operator1{RNSVGFeCompositeOperator1::Over};
+  Float k1{0.0};
+  Float k2{0.0};
+  Float k3{0.0};
+  Float k4{0.0};
+};
+
 class RNSVGFeFloodProps final : public ViewProps {
  public:
   RNSVGFeFloodProps() = default;

@@ -49,6 +49,8 @@ namespace JS {
 
 - (void)addListener:(NSString *)eventType;
 - (void)removeListeners:(double)id;
+- (void)getNewScreenTimeToDisplay:(RCTPromiseResolveBlock)resolve
+                           reject:(RCTPromiseRejectBlock)reject;
 - (void)addBreadcrumb:(NSDictionary *)breadcrumb;
 - (void)captureEnvelope:(NSString *)bytes
                 options:(JS::NativeRNSentry::SpecCaptureEnvelopeOptions &)options

@@ -37,6 +37,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@protocol RCTRNSVGFeCompositeViewProtocol <NSObject>
+
+@end
+
 @protocol RCTRNSVGFeFloodViewProtocol <NSObject>
 
 @end

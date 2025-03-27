@@ -80,6 +80,27 @@ NS_SWIFT_NAME(Options)
  */
 @property (nonatomic, assign) BOOL enableCrashHandler;
 
+#if TARGET_OS_OSX
+
+/**
+ * When enabled, the SDK captures uncaught NSExceptions. As this feature uses swizzling, disabling
+ * @c enableSwizzling also disables this feature.
+ *
+ * @discussion This option registers the `NSApplicationCrashOnExceptions` UserDefault,
+ * so your macOS application crashes when an uncaught exception occurs. As the Cocoa Frameworks are
+ * generally not exception-safe on macOS, we recommend this approach because the application could
+ * otherwise end up in a corrupted state.
+ *
+ * @warning Don't use this in combination with `SentryCrashExceptionApplication`. Either enable this
+ * feature or use the `SentryCrashExceptionApplication`. Having both enabled can lead to duplicated
+ * reports.
+ *
+ * @note Default value is @c NO .
+ */
+@property (nonatomic, assign) BOOL enableUncaughtNSExceptionReporting;
+
+#endif // TARGET_OS_OSX
+
 #if !TARGET_OS_WATCH
 
 /**
@@ -121,25 +142,27 @@ NS_SWIFT_NAME(Options)
 /**
  * This block can be used to modify the event before it will be serialized and sent.
  */
-@property (nullable, nonatomic, copy) SentryBeforeSendEventCallback beforeSend;
+@property (nullable, nonatomic, copy) SentryBeforeSendEventCallback beforeSend NS_SWIFT_SENDABLE;
 
 /**
  * Use this callback to drop or modify a span before the SDK sends it to Sentry. Return @c nil to
  * drop the span.
  */
-@property (nullable, nonatomic, copy) SentryBeforeSendSpanCallback beforeSendSpan;
+@property (nullable, nonatomic, copy) SentryBeforeSendSpanCallback beforeSendSpan NS_SWIFT_SENDABLE;
 
 /**
  * This block can be used to modify the event before it will be serialized and sent.
  */
-@property (nullable, nonatomic, copy) SentryBeforeBreadcrumbCallback beforeBreadcrumb;
+@property (nullable, nonatomic, copy)
+    SentryBeforeBreadcrumbCallback beforeBreadcrumb NS_SWIFT_SENDABLE;
 
 /**
  * You can use this callback to decide if the SDK should capture a screenshot or not. Return @c true
  * if the SDK should capture a screenshot, return @c false if not. This callback doesn't work for
  * crashes.
  */
-@property (nullable, nonatomic, copy) SentryBeforeCaptureScreenshotCallback beforeCaptureScreenshot;
+@property (nullable, nonatomic, copy)
+    SentryBeforeCaptureScreenshotCallback beforeCaptureScreenshot NS_SWIFT_SENDABLE;
 
 /**
  * You can use this callback to decide if the SDK should capture a view hierarchy or not. Return @c
@@ -147,7 +170,7 @@ NS_SWIFT_NAME(Options)
  * work for crashes.
  */
 @property (nullable, nonatomic, copy)
-    SentryBeforeCaptureScreenshotCallback beforeCaptureViewHierarchy;
+    SentryBeforeCaptureScreenshotCallback beforeCaptureViewHierarchy NS_SWIFT_SENDABLE;
 
 /**
  * A block called shortly after the initialization of the SDK when the last program execution
@@ -159,7 +182,8 @@ NS_SWIFT_NAME(Options)
  * @warning It is not guaranteed that this is called on the main thread.
  * @note Crash reporting is automatically disabled if a debugger is attached.
  */
-@property (nullable, nonatomic, copy) SentryOnCrashedLastRunCallback onCrashedLastRun;
+@property (nullable, nonatomic, copy)
+    SentryOnCrashedLastRunCallback onCrashedLastRun NS_SWIFT_SENDABLE;
 
 /**
  * Array of integrations to install.
@@ -255,6 +279,17 @@ NS_SWIFT_NAME(Options)
  * include most features in the next major by default.
  */
 @property (nonatomic, assign) BOOL enablePerformanceV2;
+
+/**
+ * @warning This is an experimental feature and may still have bugs.
+ *
+ * When enabled, the SDK finishes the ongoing transaction bound to the scope and links them to the
+ * crash event when your app crashes. The SDK skips adding profiles to increase the chance of
+ * keeping the transaction.
+ *
+ * @note The default is @c NO .
+ */
+@property (nonatomic, assign) BOOL enablePersistingTracesWhenCrashing;
 
 /**
  * A block that configures the initial scope when starting the SDK.
@@ -379,7 +414,7 @@ NS_SWIFT_NAME(Options)
  * with @c SentrySamplingContext.forNextAppLaunch set to @c YES, and the result will be persisted to
  * disk for use on the next app launch.
  */
-@property (nullable, nonatomic) SentryTracesSamplerCallback tracesSampler;
+@property (nullable, nonatomic) SentryTracesSamplerCallback tracesSampler NS_SWIFT_SENDABLE;
 
 /**
  * If tracing is enabled or not.
@@ -446,17 +481,17 @@ NS_SWIFT_NAME(Options)
 @property (nonatomic, assign) BOOL enableSwizzling;
 
 /**
- * An array of class names to ignore for swizzling.
+ * A set of class names to ignore for swizzling.
  *
  * @discussion The SDK checks if a class name of a class to swizzle contains a class name of this
  * array. For example, if you add MyUIViewController to this list, the SDK excludes the following
  * classes from swizzling: YourApp.MyUIViewController, YourApp.MyUIViewControllerA,
  * MyApp.MyUIViewController.
- * We can't use an @c NSArray<Class>  here because we use this as a workaround for which users have
+ * We can't use an @c NSSet<Class>  here because we use this as a workaround for which users have
  * to pass in class names that aren't available on specific iOS versions. By using @c
- * NSArray<NSString *>, users can specify unavailable class names.
+ * NSSet<NSString *>, users can specify unavailable class names.
  *
- * @note Default is an empty array.
+ * @note Default is an empty set.
  */
 @property (nonatomic, strong) NSSet<NSString *> *swizzleClassNameExcludes;
 
@@ -516,7 +551,7 @@ NS_SWIFT_NAME(Options)
  * disk for use on the next app launch.
  * @note Profiling is automatically disabled if a thread sanitizer is attached.
  */
-@property (nullable, nonatomic) SentryTracesSamplerCallback profilesSampler;
+@property (nullable, nonatomic) SentryTracesSamplerCallback profilesSampler NS_SWIFT_SENDABLE;
 
 /**
  * If profiling should be enabled or not.
@@ -558,6 +593,40 @@ NS_SWIFT_NAME(Options)
  * @note ANR tracking is automatically disabled if a debugger is attached.
  */
 @property (nonatomic, assign) BOOL enableAppHangTracking;
+
+#if SENTRY_UIKIT_AVAILABLE
+
+/**
+ * AppHangTrackingV2 can differentiate between fully-blocking and non-fully blocking app hangs.
+ * fully-blocking app hang is when the main thread is stuck completely, and the app can't render a
+ * single frame. A non-fully-blocking app hang is when the app appears stuck to the user but can
+ still
+ * render a few frames. Fully-blocking app hangs are more actionable because the stacktrace shows
+ the
+ * exact blocking location on the main thread. As the main thread isn't completely blocked,
+ * non-fully-blocking app hangs can have a stacktrace that doesn't highlight the exact blocking
+ * location.
+ *
+ * You can use @c enableReportNonFullyBlockingAppHangs to ignore non-fully-blocking app hangs.
+ *
+ * @note This flag wins over enableAppHangTracking. When enabling both enableAppHangTracking and
+ enableAppHangTrackingV2, the SDK only enables enableAppHangTrackingV2 and disables
+ enableAppHangTracking.
+ *
+ * @warning This is an experimental feature and may still have bugs.
+ */
+@property (nonatomic, assign) BOOL enableAppHangTrackingV2;
+
+/**
+ * When enabled the SDK reports non-fully-blocking app hangs. A non-fully-blocking app hang is when
+ * the app appears stuck to the user but can still render a few frames. For more information see @c
+ * enableAppHangTrackingV2.
+ *
+ * @note The default is @c YES. This feature only works when @c enableAppHangTrackingV2 is enabled.
+ */
+@property (nonatomic, assign) BOOL enableReportNonFullyBlockingAppHangs;
+
+#endif // SENTRY_UIKIT_AVAILABLE
 
 /**
  * The minimum amount of time an app should be unresponsive to be classified as an App Hanging.
@@ -679,38 +748,6 @@ NS_SWIFT_NAME(Options)
  * https://spotlightjs.com/
  */
 @property (nonatomic, copy) NSString *spotlightUrl;
-
-/**
- * Wether to enable DDM (delightful developer metrics) or not. For more information see
- * https://docs.sentry.io/product/metrics/.
- *
- * @warning This is an experimental feature and may still have bugs.
- * @note Default value is @c NO .
- */
-@property (nonatomic, assign) BOOL enableMetrics;
-
-/**
- * Wether to enable adding some default tags to every metrics or not. You need to enable @c
- * enableMetrics for this flag to work.
- *
- * @warning This is an experimental feature and may still have bugs.
- * @note Default value is @c YES .
- */
-@property (nonatomic, assign) BOOL enableDefaultTagsForMetrics;
-
-/**
- * Wether to enable connecting metrics to spans and transactions or not. You need to enable @c
- * enableMetrics for this flag to work.
- *
- * @warning This is an experimental feature and may still have bugs.
- * @note Default value is @c YES .
- */
-@property (nonatomic, assign) BOOL enableSpanLocalMetricAggregation;
-
-/**
- * This block can be used to modify the event before it will be serialized and sent.
- */
-@property (nullable, nonatomic, copy) SentryBeforeEmitMetricCallback beforeEmitMetric;
 
 /**
  * This aggregates options for experimental features.
