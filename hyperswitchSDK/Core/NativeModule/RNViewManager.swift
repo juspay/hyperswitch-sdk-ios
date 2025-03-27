@@ -42,11 +42,7 @@ extension RNViewManager: RCTBridgeDelegate {
     func sourceURL(for bridge: RCTBridge!) -> URL! {
         switch getInfoPlist("HyperswitchSource") {
         case "LocalHosted":
-            if let ip = getInfoPlist("HyperswitchSourceIP") {
-                return URL(string: "http://"+ip+":8081/index.bundle?platform=ios")
-            } else {
                 return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
-            }
         case "LocalBundle":
             return Bundle.main.url(forResource: "hyperswitch", withExtension: "bundle")
         default:
