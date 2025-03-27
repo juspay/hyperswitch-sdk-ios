@@ -16,11 +16,12 @@ Pod::Spec.new do |s|
 
   s.subspec 'core' do |core|
     core.source_files = 'hyperswitchSDK/Core/**/*.{m,swift,h}'
-    core.resources = ['hyperswitchSDK/Core/Resources/CodePush.plist', 'hyperswitchSDK/Core/Resources/hyperswitch.bundle']
+    core.resources = ['hyperswitchSDK/Core/Resources/HyperOTA.plist', 'hyperswitchSDK/Core/Resources/hyperswitch.bundle']
     core.vendored_frameworks = 'frameworkgen/Frameworks/Core/*.xcframework'
     core.dependency 'hyperswitch-sdk-ios/common'
-    core.dependency 'hyperswitch-ios-hermes', '~> 0.75.4'
+    core.dependency 'hyperswitch-ios-hermes', '~> 0.75.5'
     core.dependency 'KlarnaMobileSDK'
+    core.dependency 'HyperOTA', '~> 0.0.3'
   end
 
   s.subspec 'sentry' do |sentry|

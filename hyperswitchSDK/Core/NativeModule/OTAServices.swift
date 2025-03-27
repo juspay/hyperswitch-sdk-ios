@@ -71,6 +71,6 @@ public final class OTAServices {
             "releaseConfigURL": (getHyperOTAPlist("releaseConfigURL") ?? "" ) +  "/mobile-ota/ios/" + SDKVersion.current + "/config.json",
         ] as [String: Any]
         let logger = EventLogger()
-        return HyperOTAServices.bundleURL(payload, loggerDelegate: logger)
+        return HyperOTAServices.bundleURL(payload, baseBundle: Bundle(for:OTAServices.self), loggerDelegate: logger)
     }
 }
