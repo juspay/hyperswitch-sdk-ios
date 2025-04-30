@@ -37,6 +37,7 @@ internal extension PaymentSheet {
     func present(from presentingViewController: UIViewController, completion: @escaping (PaymentSheetResult) -> ()) {
         
         // Set publishable key to logManager
+        OTAServices.shared.initialize(publishableKey: APIClient.shared.publishableKey ?? "")
         LogManager.initialize(publishableKey: APIClient.shared.publishableKey ?? "")
         
         // Present the payment sheet view with the root view obtained from the getRootView() method.
@@ -47,6 +48,7 @@ internal extension PaymentSheet {
     func presentWithParams(from presentingViewController: UIViewController, props: [String: Any], completion: @escaping ((PaymentSheetResult) -> ())) {
         
         // Set publishable key to logManager
+        OTAServices.shared.initialize(publishableKey: APIClient.shared.publishableKey ?? "")
         LogManager.initialize(publishableKey: APIClient.shared.publishableKey ?? "")
         
         // Present the payment sheet view with the root view obtained from the getRootViewWithParams() method.
