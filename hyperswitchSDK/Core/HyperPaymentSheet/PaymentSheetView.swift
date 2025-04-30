@@ -18,7 +18,7 @@ internal extension PaymentSheet {
         /// Get the configuration dictionary from the configuration object.
         let configuration = self.configuration?.toDictionary()
         
-        /// Create a dictionary of hyperParams with app ID, sdkVersion, country, IP address, user agent, default view, and launch time.
+        /// Create a dictionary of hyperParams with app ID, sdkVersion, country, user agent, default view, and launch time.
         let hyperParams = HyperParams.getHyperParams()
         
         /// Create a dictionary of props to be sent to React Native with configuration, type, client secret, publishable key, hyperParams, custom backend URL, themes, and custom parameters.

@@ -19,9 +19,9 @@ Pod::Spec.new do |s|
     core.resources = ['hyperswitchSDK/Core/Resources/HyperOTA.plist', 'hyperswitchSDK/Core/Resources/hyperswitch.bundle']
     core.vendored_frameworks = 'frameworkgen/Frameworks/Core/*.xcframework'
     core.dependency 'hyperswitch-sdk-ios/common'
-    core.dependency 'hyperswitch-ios-hermes', '~> 0.75.5'
+    core.dependency 'hyperswitch-ios-hermes', '0.75.5'
     core.dependency 'KlarnaMobileSDK'
-    core.dependency 'HyperOTA', '~> 0.0.3'
+    core.dependency 'HyperOTA', '0.0.4'
   end
 
   s.subspec 'sentry' do |sentry|

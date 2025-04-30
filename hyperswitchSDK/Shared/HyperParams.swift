@@ -12,7 +12,6 @@ class HyperParams {
     static let appId: String? = Bundle.main.bundleIdentifier
     static let sdkVersion: String = SDKVersion.current
     static let country: String? = NSLocale.current.regionCode
-    static let ip: String? = nil
     static let userAgent: String? = WKWebView().value(forKey: "userAgent") as? String
     static let deviceModel: String = UIDevice.current.model
     static let osVersion: String = UIDevice.current.systemVersion
@@ -22,7 +21,6 @@ class HyperParams {
             "appId": appId,
             "sdkVersion": sdkVersion,
             "country": country,
-            "ip": ip,
             "user-agent": userAgent,
             "device_model": deviceModel,
             "os_version": osVersion,
