@@ -29,7 +29,7 @@ jobs:
           del(.dependencies["react-native-hyperswitch-netcetera-3ds"]) | 
           del(.dependencies["react-native-hyperswitch-scancard"])' package.json > package.json.tmp && 
           mv package.json.tmp package.json
-          npm install
+          npm i --legacy-peer-deps
           cd frameworkgen
           brew bundle install --file Brewfile
           bundle install
