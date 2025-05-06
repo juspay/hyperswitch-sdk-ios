@@ -62,7 +62,7 @@ internal class EventLogger: NSObject, HPJPLoggerDelegate {
             "subcategory": eventSubcategory
         ]
         addLog(eventData: eventData, logLevel: logLevel, eventLabel:eventLabel)
-       
+        
     }
     func trackEvent(
         withLevel logLevel: String,
@@ -78,15 +78,15 @@ internal class EventLogger: NSObject, HPJPLoggerDelegate {
             "subcategory": eventSubcategory
         ]
         addLog(eventData: eventData, logLevel: logLevel, eventLabel:eventLabel)
-
+        
     }
 }
 
 public final class OTAServices {
     public static var shared = OTAServices()
     public var otaServices : HyperOTAServices? = nil
-    public func initialize(publishableKey : String){
-        if((self.otaServices == nil)){
+    public func initialize(publishableKey : String) {
+        if(self.otaServices == nil) {
             let environment = SDKEnvironment.getEnvironment(publishableKey)
             let configKey = (environment == .PROD) ? "releaseConfigURL" : "sandBoxReleaseConfigURL"
             let payload = [
@@ -101,7 +101,7 @@ public final class OTAServices {
             self.otaServices = HyperOTAServices(payload: payload, loggerDelegate: logger, baseBundle: Bundle(for: OTAServices.self))
         }
     }
-    public  func getBundleURL() -> URL {
-        return otaServices?.bundleURL() ?? Bundle.main.url(forResource: "hyperswitch", withExtension: "bundle")!
+    public  func getBundleURL() -> URL? {
+        return otaServices?.bundleURL() ?? Bundle(for: OTAServices.self).url(forResource: "hyperswitch", withExtension: "bundle")
     }
 }

@@ -11,7 +11,7 @@
 	<key>localAssets</key>
 	<false/>
 	<key>forceUpdate</key>
-	<true/>
+	<false/>
 	<key>clientId</key>
 	<string>hyperswitch</string>
 	<key>namespace</key>

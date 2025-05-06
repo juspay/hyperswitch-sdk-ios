@@ -39,7 +39,7 @@ internal class RNViewManager: NSObject {
 }
 
 extension RNViewManager: RCTBridgeDelegate {
-    func sourceURL(for bridge: RCTBridge!) -> URL! {
+    func sourceURL(for bridge: RCTBridge) -> URL? {
         switch getInfoPlist("HyperswitchSource") {
         case "LocalHosted":
             return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
