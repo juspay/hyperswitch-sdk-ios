@@ -48,7 +48,6 @@
  *    Endian::little(x)   little <-> native
  *    Endian::swap(x)     big <-> little
  *
- * @author Tudor Bosman (tudorb@fb.com)
  */
 
 #pragma once
@@ -65,7 +64,12 @@
 #include <folly/Traits.h>
 #include <folly/Utility.h>
 #include <folly/lang/Assume.h>
+#include <folly/lang/CString.h>
 #include <folly/portability/Builtins.h>
+
+#ifdef __BMI2__
+#include <immintrin.h>
+#endif
 
 #if __has_include(<bit>) && (__cplusplus >= 202002L || (defined(__cpp_lib_bit_cast) && __cpp_lib_bit_cast >= 201806L))
 #include <bit>
@@ -84,8 +88,8 @@ template <
     typename To,
     typename From,
     std::enable_if_t<
-        sizeof(From) == sizeof(To) && is_trivially_copyable<To>::value &&
-            is_trivially_copyable<From>::value,
+        sizeof(From) == sizeof(To) && std::is_trivially_copyable<To>::value &&
+            std::is_trivially_copyable<From>::value,
         int> = 0>
 To bit_cast(const From& src) noexcept {
   aligned_storage_for_t<To> storage;
@@ -106,6 +110,11 @@ constexpr std::make_unsigned_t<Dst> bits_to_unsigned(Src const s) {
   static_assert(std::is_unsigned<Dst>::value, "signed type");
   return static_cast<Dst>(to_unsigned(s));
 }
+
+template <typename T>
+inline constexpr bool supported_in_bits_operations_v =
+    std::is_unsigned_v<T> && sizeof(T) <= 8;
+
 } // namespace detail
 
 /// findFirstSet
@@ -223,6 +232,148 @@ inline constexpr T strictPrevPowTwo(T const v) {
   return v > 1 ? prevPowTwo(T(v - 1)) : T(0);
 }
 
+/// n_least_significant_bits
+/// n_least_significant_bits_fn
+///
+/// Returns an unsigned integer of type T, where n
+/// least significant (right) bits are set and others are not.
+template <class T>
+struct n_least_significant_bits_fn {
+  static_assert(detail::supported_in_bits_operations_v<T>, "");
+
+  FOLLY_NODISCARD constexpr T operator()(std::uint32_t n) const {
+    if (!folly::is_constant_evaluated_or(true)) {
+      compiler_may_unsafely_assume(n <= sizeof(T) * 8);
+
+#ifdef __BMI2__
+      if constexpr (sizeof(T) <= 4) {
+        return static_cast<T>(_bzhi_u32(static_cast<std::uint32_t>(-1), n));
+      }
+      return static_cast<T>(_bzhi_u64(static_cast<std::uint64_t>(-1), n));
+#endif
+    }
+
+    if (sizeof(T) == 8 && n == 64) {
+      return static_cast<T>(-1);
+    }
+    return static_cast<T>((std::uint64_t{1} << n) - 1);
+  }
+};
+
+template <class T>
+inline constexpr n_least_significant_bits_fn<T> n_least_significant_bits;
+
+/// n_most_significant_bits
+/// n_most_significant_bits_fn
+///
+/// Returns an unsigned integer of type T, where n
+/// most significant bits (left) are set and others are not.
+template <class T>
+struct n_most_significant_bits_fn {
+  static_assert(detail::supported_in_bits_operations_v<T>, "");
+
+  FOLLY_NODISCARD constexpr T operator()(std::uint32_t n) const {
+    if (!folly::is_constant_evaluated_or(true)) {
+      compiler_may_unsafely_assume(n <= sizeof(T) * 8);
+
+#ifdef __BMI2__
+      // assembler looks smaller here, if we use bzhi from `set_lowest_n_bits`
+      if constexpr (sizeof(T) == 8) {
+        return static_cast<T>(~n_least_significant_bits<T>(64 - n));
+      }
+#endif
+    }
+
+    if (sizeof(T) == 8 && n == 0) {
+      return 0;
+    }
+    n = sizeof(T) * 8 - n;
+
+    std::uint64_t ones = static_cast<T>(~0);
+    return static_cast<T>(ones << n);
+  }
+};
+
+template <class T>
+inline constexpr n_most_significant_bits_fn<T> n_most_significant_bits;
+
+/// clear_n_least_significant_bits
+/// clear_n_least_significant_bits_fn
+///
+/// Clears n least significant (right) bits. Other bits stay the same.
+struct clear_n_least_significant_bits_fn {
+  template <typename T>
+  FOLLY_NODISCARD constexpr T operator()(T x, std::uint32_t n) const {
+    static_assert(detail::supported_in_bits_operations_v<T>, "");
+
+    // alternative is to do two shifts but that has
+    // a dependency between them, so is likely worse
+    return x & n_most_significant_bits<T>(sizeof(T) * 8 - n);
+  }
+};
+
+inline constexpr clear_n_least_significant_bits_fn
+    clear_n_least_significant_bits;
+
+/// set_n_least_significant_bits
+/// set_n_least_significant_bits_fn
+///
+/// Sets n least significant (right) bits. Other bits stay the same.
+struct set_n_least_significant_bits_fn {
+  template <typename T>
+  FOLLY_NODISCARD constexpr T operator()(T x, std::uint32_t n) const {
+    static_assert(detail::supported_in_bits_operations_v<T>, "");
+
+    // alternative is to do two shifts but that has
+    // a dependency between them, so is likely worse
+    return x | n_least_significant_bits<T>(n);
+  }
+};
+
+inline constexpr set_n_least_significant_bits_fn set_n_least_significant_bits;
+
+/// clear_n_most_significant_bits
+/// clear_n_most_significant_bits_fn
+///
+/// Clears n most significant (left) bits. Other bits stay the same.
+struct clear_n_most_significant_bits_fn {
+  template <typename T>
+  FOLLY_NODISCARD constexpr T operator()(T x, std::uint32_t n) const {
+    static_assert(detail::supported_in_bits_operations_v<T>, "");
+
+    if (!folly::is_constant_evaluated_or(true)) {
+      compiler_may_unsafely_assume(n <= sizeof(T) * 8);
+
+#ifdef __BMI2__
+      if constexpr (sizeof(T) <= 4) {
+        return static_cast<T>(_bzhi_u32(x, sizeof(T) * 8 - n));
+      }
+      return static_cast<T>(_bzhi_u64(x, sizeof(T) * 8 - n));
+#endif
+    }
+
+    // alternative is to do two shifts but that has
+    // a dependency between them, so is likely worse
+    return x & n_least_significant_bits<T>(sizeof(T) * 8 - n);
+  }
+};
+
+inline constexpr clear_n_most_significant_bits_fn clear_n_most_significant_bits;
+
+/// set_n_most_significant_bits
+/// set_n_most_significant_bits_fn
+///
+/// Sets n most significant (left) bits. Other bits stay the same.
+struct set_n_most_significant_bits_fn {
+  template <typename T>
+  FOLLY_NODISCARD constexpr T operator()(T x, std::uint32_t n) const {
+    static_assert(detail::supported_in_bits_operations_v<T>, "");
+    return x | n_most_significant_bits<T>(n);
+  }
+};
+
+inline constexpr set_n_most_significant_bits_fn set_n_most_significant_bits;
+
 /**
  * Endianness detection and manipulation primitives.
  */
@@ -231,11 +382,13 @@ namespace detail {
 template <size_t Size>
 struct uint_types_by_size;
 
-#define FB_GEN(sz, fn)                                                      \
-  static inline uint##sz##_t byteswap_gen(uint##sz##_t v) { return fn(v); } \
-  template <>                                                               \
-  struct uint_types_by_size<sz / 8> {                                       \
-    using type = uint##sz##_t;                                              \
+#define FB_GEN(sz, fn)                                      \
+  static inline uint##sz##_t byteswap_gen(uint##sz##_t v) { \
+    return fn(v);                                           \
+  }                                                         \
+  template <>                                               \
+  struct uint_types_by_size<sz / 8> {                       \
+    using type = uint##sz##_t;                              \
   };
 
 FB_GEN(8, uint8_t)
@@ -277,7 +430,9 @@ struct EndianInt {
 // ntohs, htons == big16
 // ntohl, htonl == big32
 #define FB_GEN1(fn, t, sz) \
-  static t fn##sz(t x) { return fn<t>(x); }
+  static t fn##sz(t x) {   \
+    return fn<t>(x);       \
+  }
 
 #define FB_GEN2(t, sz) \
   FB_GEN1(swap, t, sz) \
@@ -322,9 +477,6 @@ class Endian {
 #undef FB_GEN2
 #undef FB_GEN1
 
-template <class T, class Enable = void>
-struct Unaligned;
-
 /**
  * Representation of an unaligned value of a POD type.
  */
@@ -332,13 +484,18 @@ FOLLY_PUSH_WARNING
 FOLLY_CLANG_DISABLE_WARNING("-Wpacked")
 FOLLY_PACK_PUSH
 template <class T>
-struct Unaligned<
-    T,
-    typename std::enable_if<
-        std::is_standard_layout<T>::value && std::is_trivial<T>::value>::type> {
+struct Unaligned {
+ public:
+  static_assert(std::is_standard_layout_v<T>);
+  static_assert(std::is_trivial_v<T>);
+
   Unaligned() = default; // uninitialized
-  /* implicit */ Unaligned(T v) : value(v) {}
-  T value;
+  /* implicit */ Unaligned(T v) noexcept : value_(v) {}
+
+  /* implicit */ operator T() const noexcept { return value_; }
+
+ private:
+  T value_; // it must be an error to get a reference to a packed member
 } FOLLY_PACK_ATTR;
 FOLLY_PACK_POP
 FOLLY_POP_WARNING
@@ -348,17 +505,10 @@ FOLLY_POP_WARNING
  */
 template <class T>
 inline constexpr T loadUnaligned(const void* p) {
-  static_assert(sizeof(Unaligned<T>) == sizeof(T), "Invalid unaligned size");
-  static_assert(alignof(Unaligned<T>) == 1, "Invalid alignment");
-  if FOLLY_CXX17_CONSTEXPR (kHasUnalignedAccess) {
-    return static_cast<const Unaligned<T>*>(p)->value;
-  } else if FOLLY_CXX17_CONSTEXPR (alignof(T) == 1) {
-    return *static_cast<const T*>(p);
-  } else {
-    T value{};
-    memcpy(&value, p, sizeof(T));
-    return value;
-  }
+  static_assert(std::is_trivial_v<T>);
+  T value{static_cast<T>(unsafe_default_initialized)};
+  FOLLY_BUILTIN_MEMCPY(&value, p, sizeof(T));
+  return value;
 }
 
 /**
@@ -378,7 +528,7 @@ inline T partialLoadUnaligned(const void* p, size_t l) {
 
   auto cp = static_cast<const char*>(p);
   T value = 0;
-  if FOLLY_CXX17_CONSTEXPR (!kHasUnalignedAccess || !kIsLittleEndian) {
+  if constexpr (!kHasUnalignedAccess || !kIsLittleEndian) {
     // Unsupported, use memcpy.
     memcpy(&value, cp, l);
     return value;
@@ -404,23 +554,8 @@ inline T partialLoadUnaligned(const void* p, size_t l) {
  */
 template <class T>
 inline void storeUnaligned(void* p, T value) {
-  static_assert(sizeof(Unaligned<T>) == sizeof(T), "Invalid unaligned size");
-  static_assert(alignof(Unaligned<T>) == 1, "Invalid alignment");
-  if FOLLY_CXX17_CONSTEXPR (kHasUnalignedAccess) {
-    // Prior to C++14, the spec says that a placement new like this
-    // is required to check that p is not nullptr, and to do nothing
-    // if p is a nullptr. By assuming it's not a nullptr, we get a
-    // nice loud segfault in optimized builds if p is nullptr, rather
-    // than just silently doing nothing.
-    assume(p != nullptr);
-    new (p) Unaligned<T>(value);
-  } else if FOLLY_CXX17_CONSTEXPR (alignof(T) == 1) {
-    // See above comment about assuming not a nullptr
-    assume(p != nullptr);
-    new (p) T(value);
-  } else {
-    memcpy(p, &value, sizeof(T));
-  }
+  static_assert(std::is_trivial_v<T>);
+  FOLLY_BUILTIN_MEMCPY(p, &value, sizeof(T));
 }
 
 template <typename T>

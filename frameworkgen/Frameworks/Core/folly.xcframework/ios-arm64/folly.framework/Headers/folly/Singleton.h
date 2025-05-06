@@ -132,9 +132,9 @@
 #include <folly/Memory.h>
 #include <folly/Synchronized.h>
 #include <folly/concurrency/CoreCachedSharedPtr.h>
+#include <folly/concurrency/memory/ReadMostlySharedPtr.h>
 #include <folly/detail/Singleton.h>
 #include <folly/detail/StaticSingletonManager.h>
-#include <folly/experimental/ReadMostlySharedPtr.h>
 #include <folly/hash/Hash.h>
 #include <folly/lang/Exception.h>
 #include <folly/memory/SanitizeLeak.h>
@@ -156,11 +156,6 @@
 #include <vector>
 
 #include <glog/logging.h>
-
-// use this guard to handleSingleton breaking change in 3rd party code
-#ifndef FOLLY_SINGLETON_TRY_GET
-#define FOLLY_SINGLETON_TRY_GET
-#endif
 
 namespace folly {
 
@@ -502,6 +497,7 @@ class SingletonVault {
   bool eagerInitComplete() const;
 
   size_t livingSingletonCount() const {
+    auto state = state_.rlock();
     auto singletons = singletons_.rlock();
 
     size_t ret = 0;

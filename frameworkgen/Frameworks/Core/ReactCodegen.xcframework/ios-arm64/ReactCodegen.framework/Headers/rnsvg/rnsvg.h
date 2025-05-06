@@ -31,6 +31,8 @@
 #import <vector>
 
 
+NS_ASSUME_NONNULL_BEGIN
+
 @protocol NativeSvgRenderableModuleSpec <RCTBridgeModule, RCTTurboModule>
 
 - (NSNumber *)isPointInFill:(NSNumber *)tag
@@ -49,6 +51,16 @@
                 reject:(RCTPromiseRejectBlock)reject;
 
 @end
+
+@interface NativeSvgRenderableModuleSpecBase : NSObject {
+@protected
+facebook::react::EventEmitterCallback _eventEmitterCallback;
+}
+- (void)setEventEmitterCallback:(EventEmitterCallbackWrapper *)eventEmitterCallbackWrapper;
+
+
+@end
+
 namespace facebook::react {
   /**
    * ObjC++ class for module 'NativeSvgRenderableModule'
@@ -66,6 +78,16 @@ namespace facebook::react {
          callback:(RCTResponseSenderBlock)callback;
 
 @end
+
+@interface NativeSvgViewModuleSpecBase : NSObject {
+@protected
+facebook::react::EventEmitterCallback _eventEmitterCallback;
+}
+- (void)setEventEmitterCallback:(EventEmitterCallbackWrapper *)eventEmitterCallbackWrapper;
+
+
+@end
+
 namespace facebook::react {
   /**
    * ObjC++ class for module 'NativeSvgViewModule'
@@ -77,4 +99,5 @@ namespace facebook::react {
 } // namespace facebook::react
 
 
+NS_ASSUME_NONNULL_END
 #endif // rnsvg_H

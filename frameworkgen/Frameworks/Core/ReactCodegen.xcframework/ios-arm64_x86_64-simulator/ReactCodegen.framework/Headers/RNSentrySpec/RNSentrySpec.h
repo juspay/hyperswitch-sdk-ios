@@ -30,6 +30,8 @@
 #import <optional>
 #import <vector>
 
+
+NS_ASSUME_NONNULL_BEGIN
 namespace JS {
   namespace NativeRNSentry {
     struct SpecCaptureEnvelopeOptions {
@@ -101,8 +103,25 @@ namespace JS {
 - (NSString * _Nullable)getCurrentReplayId;
 - (void)crashedLastRun:(RCTPromiseResolveBlock)resolve
                 reject:(RCTPromiseRejectBlock)reject;
+- (void)getDataFromUri:(NSString *)uri
+               resolve:(RCTPromiseResolveBlock)resolve
+                reject:(RCTPromiseRejectBlock)reject;
+- (void)popTimeToDisplayFor:(NSString *)key
+                    resolve:(RCTPromiseResolveBlock)resolve
+                     reject:(RCTPromiseRejectBlock)reject;
+- (NSNumber *)setActiveSpanId:(NSString *)spanId;
 
 @end
+
+@interface NativeRNSentrySpecBase : NSObject {
+@protected
+facebook::react::EventEmitterCallback _eventEmitterCallback;
+}
+- (void)setEventEmitterCallback:(EventEmitterCallbackWrapper *)eventEmitterCallbackWrapper;
+
+
+@end
+
 namespace facebook::react {
   /**
    * ObjC++ class for module 'NativeRNSentry'
@@ -117,4 +136,5 @@ inline bool JS::NativeRNSentry::SpecCaptureEnvelopeOptions::hardCrashed() const
   id const p = _v[@"hardCrashed"];
   return RCTBridgingToBool(p);
 }
+NS_ASSUME_NONNULL_END
 #endif // RNSentrySpec_H

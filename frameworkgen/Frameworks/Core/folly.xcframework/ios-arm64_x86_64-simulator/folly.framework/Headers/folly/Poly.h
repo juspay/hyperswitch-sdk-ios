@@ -37,12 +37,6 @@
 #include <folly/detail/TypeList.h>
 #include <folly/lang/Assume.h>
 
-#if !defined(__cpp_inline_variables)
-#define FOLLY_INLINE_CONSTEXPR constexpr
-#else
-#define FOLLY_INLINE_CONSTEXPR inline constexpr
-#endif
-
 #include <folly/PolyException.h>
 #include <folly/detail/PolyDetail.h>
 
@@ -117,64 +111,11 @@ using PolySelf = _t<PolySelf_<Node, Tfx, Access>>;
  */
 using PolyDecay = detail::MetaQuote<std::decay_t>;
 
-#if !FOLLY_POLY_NTTP_AUTO
-
-/**
- * Use `FOLLY_POLY_MEMBERS(MEMS...)` on pre-C++17 compilers to specify a
- * comma-separated list of member function bindings.
- *
- * For example:
- *
- *     struct IFooBar {
- *       template <class Base>
- *       struct Interface : Base {
- *         int foo() const { return folly::poly_call<0>(*this); }
- *         void bar() { folly::poly_call<1>(*this); }
- *       };
- *       template <class T>
- *       using Members = FOLLY_POLY_MEMBERS(&T::foo, &T::bar);
- *     };
- */
-#define FOLLY_POLY_MEMBERS(...)                     \
-  typename decltype(::folly::detail::deduceMembers( \
-      __VA_ARGS__))::template Members<__VA_ARGS__>
-
-/**
- * Use `FOLLY_POLY_MEMBER(SIG, MEM)` on pre-C++17 compilers to specify a member
- * function binding that needs to be disambiguated because of overloads. `SIG`
- * should the (possibly const-qualified) signature of the `MEM` member function
- * pointer.
- *
- * For example:
- *
- *     struct IFoo {
- *       template <class Base> struct Interface : Base {
- *         int foo() const { return folly::poly_call<0>(*this); }
- *       };
- *       template <class T> using Members = FOLLY_POLY_MEMBERS(
- *         // This works even if T::foo is overloaded:
- *         FOLLY_POLY_MEMBER(int()const, &T::foo)
- *       );
- *     };
- */
-#define FOLLY_POLY_MEMBER(SIG, MEM) \
-  ::folly::detail::MemberDef<       \
-      ::folly::detail::Member<decltype(::folly::sig<SIG>(MEM)), MEM>>::value
-
-/**
- * A list of member function bindings.
- */
-template <class... Ts>
-using PolyMembers = detail::TypeList<Ts...>;
-
-#else
 #define FOLLY_POLY_MEMBER(SIG, MEM) ::folly::sig<SIG>(MEM)
 #define FOLLY_POLY_MEMBERS(...) ::folly::PolyMembers<__VA_ARGS__>
 
 template <auto... Ps>
 struct PolyMembers {};
-
-#endif
 
 /**
  * Used in the definition of a `Poly` interface to say that the current
@@ -276,7 +217,8 @@ template <
     typename... As,
     std::enable_if_t<detail::IsPoly<Poly>::value, int> = 0>
 auto poly_call(Poly&& _this, As&&... as) -> decltype(poly_call<N, I>(
-    static_cast<Poly&&>(_this).get(), static_cast<As&&>(as)...)) {
+                                             static_cast<Poly&&>(_this).get(),
+                                             static_cast<As&&>(as)...)) {
   return poly_call<N, I>(
       static_cast<Poly&&>(_this).get(), static_cast<As&&>(as)...);
 }
@@ -1146,10 +1088,8 @@ void swap(Poly<I>& left, Poly<I>& right) noexcept {
  * The above is permitted
  */
 template <class Sig>
-FOLLY_INLINE_CONSTEXPR detail::Sig<Sig> const sig = {};
+inline constexpr detail::Sig<Sig> const sig = {};
 
 } // namespace folly
 
 #include <folly/Poly-inl.h>
-
-#undef FOLLY_INLINE_CONSTEXPR

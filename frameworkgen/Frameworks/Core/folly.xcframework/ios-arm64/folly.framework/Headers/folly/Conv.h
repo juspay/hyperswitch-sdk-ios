@@ -115,11 +115,17 @@
 #include <cmath>
 #include <cstddef>
 #include <limits>
+#include <optional>
 #include <stdexcept>
 #include <string>
+#include <system_error>
 #include <tuple>
 #include <type_traits>
 #include <utility>
+
+#if __has_include(<charconv>)
+#include <charconv>
+#endif
 
 #include <double-conversion/double-conversion.h> // V8 JavaScript implementation
 
@@ -138,6 +144,43 @@
 #include <folly/lang/Pretty.h>
 #include <folly/lang/ToAscii.h>
 #include <folly/portability/Math.h>
+
+// FOLLY_CONV_AVALIABILITY_TO_CHARS_FLOATING_POINT indicates that
+// std::to_chars for floating point is available
+#if (defined(__cpp_lib_to_chars) && __cpp_lib_to_chars >= 201611L)
+#define FOLLY_CONV_AVALIABILITY_TO_CHARS_FLOATING_POINT 1
+#elif defined(_LIBCPP_HAS_NO_VENDOR_AVAILABILITY_ANNOTATIONS) && \
+    defined(_LIBCPP_AVAILABILITY_TO_CHARS_FLOATING_POINT)
+#define FOLLY_CONV_AVALIABILITY_TO_CHARS_FLOATING_POINT 1
+#elif defined(__APPLE__) &&                                        \
+    ((defined(__ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__) &&    \
+      __ENVIRONMENT_MAC_OS_X_VERSION_MIN_REQUIRED__ >= 130300) ||  \
+     (defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) &&   \
+      __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ >= 160300) || \
+     (defined(__ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__) &&       \
+      __ENVIRONMENT_TV_OS_VERSION_MIN_REQUIRED__ >= 160300) ||     \
+     (defined(__ENVIRONMENT_WATCH_OS_VERSION_MIN_REQUIRED__) &&    \
+      __ENVIRONMENT_WATCH_OS_VERSION_MIN_REQUIRED__ >= 90300))
+// Apple introduces std::to_chars & std::from_chars support for floating
+// point types for: macOS 13.3, iOS 16.3, tvOS 16.3, watchOS 9.3.
+// https://developer.apple.com/xcode/cpp/#c++17
+// __builtin_available(macOS 13.3, iOS 16.3, tvOS 16.3, watchOS 9.3, *)) {
+// The avaliability attributes are marked as strict, so preprocessor
+// conditionals must be used to check if it's available.
+#define FOLLY_CONV_AVALIABILITY_TO_CHARS_FLOATING_POINT 1
+#else
+#define FOLLY_CONV_AVALIABILITY_TO_CHARS_FLOATING_POINT 0
+#endif
+
+// FOLLY_CONV_USE_TO_CHARS set to 1 indicates that std::to_chars will be used
+// because it's available and it was requested.
+#if defined(FOLLY_CONV_DTOA_TO_CHARS) && FOLLY_CONV_DTOA_TO_CHARS == 1 && \
+    defined(FOLLY_CONV_AVALIABILITY_TO_CHARS_FLOATING_POINT) &&           \
+    FOLLY_CONV_AVALIABILITY_TO_CHARS_FLOATING_POINT == 1
+#define FOLLY_CONV_USE_TO_CHARS 1
+#else
+#define FOLLY_CONV_USE_TO_CHARS 0
+#endif
 
 namespace folly {
 
@@ -235,7 +278,7 @@ template <class Tgt, class Src>
 typename std::enable_if<
     std::is_same<Tgt, typename std::decay<Src>::type>::value,
     Expected<Tgt, ConversionCode>>::type
-tryTo(Src&& value) {
+tryTo(Src&& value) noexcept {
   return static_cast<Src&&>(value);
 }
 
@@ -264,7 +307,7 @@ typename std::enable_if<
     is_arithmetic_v<Src> && !std::is_same<Tgt, Src>::value &&
         std::is_same<Tgt, bool>::value,
     Expected<Tgt, ConversionCode>>::type
-tryTo(const Src& value) {
+tryTo(const Src& value) noexcept {
   return value != Src();
 }
 
@@ -292,8 +335,8 @@ using LastElement = type_pack_element_t<sizeof...(T) - 1, T...>;
 // which result in significantly more templates being compiled,
 // though the runtime performance is the same.
 
-template <typename... Ts>
-const LastElement<Ts...>& getLastElement(const Ts&... ts) {
+template <typename... Ts, typename R = LastElement<Ts...>>
+const R& getLastElement(const Ts&... ts) {
   return std::get<sizeof...(Ts) - 1>(std::forward_as_tuple(ts...));
 }
 
@@ -313,8 +356,8 @@ struct LastElementImpl<Ign, Igns...> {
   }
 };
 
-template <typename... Ts>
-const LastElement<Ts...>& getLastElement(const Ts&... ts) {
+template <typename... Ts, typename R = LastElement<Ts...>>
+const R& getLastElement(const Ts&... ts) {
   return LastElementImpl<Ignored<Ts>...>::call(ts...);
 }
 #endif
@@ -638,25 +681,138 @@ estimateSpaceNeeded(Src value) {
  * Conversions from floating-point types to string types.
  */
 
+/// Operating mode for the floating point type version of
+/// `folly::ToAppend`. This is modeled after
+/// `double_conversion::DoubleToStringConverter::DtoaMode`.
+/// Dtoa is an acryonym for Double to ASCII.
+enum class DtoaMode {
+  /// Outputs the shortest representation of a `double`.
+  /// The output is either in decimal or exponential notation; which ever is
+  /// shortest.
+  SHORTEST,
+  /// Outputs the shortest representation of a `float`.
+  /// This outputs in either decimal or exponential notation, which ever is
+  /// shortest.
+  SHORTEST_SINGLE,
+  /// Outputs fixed precision after the decimal point. Similar to
+  /// `printf`'s %f.
+  /// The output is in decimal notation.
+  /// Use the `numDigits` parameter to specify the precision.
+  FIXED,
+  /// Outputs with a precision that is independent of the decimal point.
+  /// The outputs is either decimal or exponential notation, depending on the
+  /// value and the precision.
+  /// Similar to `printf`'s %g formating.
+  /// Use the `numDigits` parameter to specify the precision.
+  PRECISION,
+};
+
+/// Flags for the floating point type version of `folly::ToAppend`.
+/// This is modeled after `double_conversion::DoubleToStringConverter::Flags`.
+/// Dtoa is an acryonym for Double to ASCII.
+/// This enum is used to store bit wise flags, so a variable of this type may be
+/// a bitwise combination of these definitions.
+enum class DtoaFlags {
+  NO_FLAGS = 0,
+  /// Emits a plus sign for positive exponents. e.g., 1.2e+3
+  EMIT_POSITIVE_EXPONENT_SIGN = 1,
+  /// Emits a trailing decimal point. e.g., 123.
+  EMIT_TRAILING_DECIMAL_POINT = 2,
+  /// Emits a trailing decimal point. e.g., 123.0
+  /// Requires `EMIT_TRAILING_DECIMAL_POINT` to be set.
+  EMIT_TRAILING_ZERO_AFTER_POINT = 4,
+  /// -0.0 outputs as 0.0
+  UNIQUE_ZERO = 8,
+  /// Trailing zeros are removed from the fractional portion
+  /// of the result in precision mode. Matches `printf`'s %g.
+  /// When `EMIT_TRAILING_ZERO_AFTER_POINT` is also given, one trailing zero is
+  /// preserved.
+  NO_TRAILING_ZERO = 16,
+};
+
+constexpr DtoaFlags operator|(DtoaFlags a, DtoaFlags b) {
+  return static_cast<DtoaFlags>(to_underlying(a) | to_underlying(b));
+}
+
+constexpr DtoaFlags operator&(DtoaFlags a, DtoaFlags b) {
+  return static_cast<DtoaFlags>(to_underlying(a) & to_underlying(b));
+}
+
 namespace detail {
 constexpr int kConvMaxDecimalInShortestLow = -6;
+/// 10^kConvMaxDecimalInShortestLow. Replace with constexpr std::pow in C++26.
+constexpr double kConvMaxDecimalInShortestLowValue = 0.000001;
 constexpr int kConvMaxDecimalInShortestHigh = 21;
-} // namespace detail
+/// 10^kConvMaxDecimalInShortestHigh. Replace with constexpr std::pow in C++26.
+constexpr double kConvMaxDecimalInShortestHighValue =
+    1'000'000'000'000'000'000'000.0;
+constexpr int kBase10MaximalLength = 17;
 
-/** Wrapper around DoubleToStringConverter */
+enum class FloatToStringImpl {
+  LibDoubleConversion,
+  StdToChars,
+};
+
+#if defined(FOLLY_CONV_USE_TO_CHARS) && FOLLY_CONV_USE_TO_CHARS == 1
+constexpr FloatToStringImpl kConvFloatToStringImpl =
+    FloatToStringImpl::StdToChars;
+constexpr int kConvMaxFixedDigitsAfterPoint = 100;
+constexpr int kConvMaxPrecisionDigits = 120;
+#else
+constexpr FloatToStringImpl kConvFloatToStringImpl =
+    FloatToStringImpl::LibDoubleConversion;
+constexpr int kConvMaxFixedDigitsAfterPoint =
+    double_conversion::DoubleToStringConverter::kMaxFixedDigitsAfterPoint;
+constexpr int kConvMaxPrecisionDigits =
+    double_conversion::DoubleToStringConverter::kMaxPrecisionDigits;
+
+/// Converts `DtoaMode` to
+/// `double_conversion::DoubleToStringConverter::DtoaMode`.
+/// This is temporary until
+/// `double_conversion::DoubleToStringConverter::DtoaMode` is removed.
+constexpr double_conversion::DoubleToStringConverter::DtoaMode convert(
+    DtoaMode mode) {
+  switch (mode) {
+    case DtoaMode::SHORTEST:
+      return double_conversion::DoubleToStringConverter::SHORTEST;
+    case DtoaMode::SHORTEST_SINGLE:
+      return double_conversion::DoubleToStringConverter::SHORTEST_SINGLE;
+    case DtoaMode::FIXED:
+      return double_conversion::DoubleToStringConverter::FIXED;
+    case DtoaMode::PRECISION:
+      return double_conversion::DoubleToStringConverter::PRECISION;
+  }
+
+  assert(false);
+  // Default to PRECISION per exising behavior.
+  return double_conversion::DoubleToStringConverter::PRECISION;
+}
+
+/// Converts `DtoaFlags` to
+/// `double_conversion::DoubleToStringConverter::DtoaFlags`.
+/// This is temporary until
+/// `double_conversion::DoubleToStringConverter::DtoaFlags` is removed.
+constexpr double_conversion::DoubleToStringConverter::Flags convert(
+    DtoaFlags flags) {
+  return static_cast<double_conversion::DoubleToStringConverter::Flags>(flags);
+}
+
+/**
+ * Wrapper around `double_conversion::DoubleToStringConverter`.
+ */
 template <class Tgt, class Src>
 typename std::enable_if<
     std::is_floating_point<Src>::value && IsSomeString<Tgt>::value>::type
-toAppend(
+toAppendDoubleConversion(
     Src value,
     Tgt* result,
-    double_conversion::DoubleToStringConverter::DtoaMode mode,
+    DtoaMode mode,
     unsigned int numDigits,
-    double_conversion::DoubleToStringConverter::Flags flags =
-        double_conversion::DoubleToStringConverter::NO_FLAGS) {
+    DtoaFlags flags = DtoaFlags::NO_FLAGS) {
   using namespace double_conversion;
+  DoubleToStringConverter::Flags dcFlags = detail::convert(flags);
   DoubleToStringConverter conv(
-      flags,
+      dcFlags,
       "Infinity",
       "NaN",
       'E',
@@ -666,9 +822,10 @@ toAppend(
       1); // max trailing padding zeros
   char buffer[256];
   StringBuilder builder(buffer, sizeof(buffer));
+  DoubleToStringConverter::DtoaMode dcMode = detail::convert(mode);
   FOLLY_PUSH_WARNING
   FOLLY_CLANG_DISABLE_WARNING("-Wcovered-switch-default")
-  switch (mode) {
+  switch (dcMode) {
     case DoubleToStringConverter::SHORTEST:
       conv.ToShortest(value, &builder);
       break;
@@ -680,7 +837,7 @@ toAppend(
       break;
     case DoubleToStringConverter::PRECISION:
     default:
-      assert(mode == DoubleToStringConverter::PRECISION);
+      assert(dcMode == DoubleToStringConverter::PRECISION);
       conv.ToPrecision(value, int(numDigits), &builder);
       break;
   }
@@ -688,6 +845,232 @@ toAppend(
   const size_t length = size_t(builder.position());
   builder.Finalize();
   result->append(buffer, length);
+}
+#endif // FOLLY_CONV_USE_TO_CHARS
+
+#if defined(FOLLY_CONV_AVALIABILITY_TO_CHARS_FLOATING_POINT) && \
+    FOLLY_CONV_AVALIABILITY_TO_CHARS_FLOATING_POINT == 1
+/// Holds a set of `DtoaFlags` as a bitwise OR of the flags.
+/// It has convience member functions to check if a flag is set.
+struct DtoaFlagsSet {
+  explicit DtoaFlagsSet(DtoaFlags flags);
+
+  bool isSet(DtoaFlags flag) const;
+
+  bool emitPositiveExponentSign() const;
+  bool emitTrailingDecimalPoint() const;
+  bool emitTrailingZeroAfterPoint() const;
+  bool uniqueZero() const;
+  bool noTrailingZero() const;
+
+ private:
+  DtoaFlags flags_;
+};
+/// This parses a decimal string into a structured format.
+/// For example, given "123.456e+7", this will create pointers to the integer,
+/// fractional, exponentional parts.
+///
+/// The decimal string is passed in as a `char` buffer with begin and end
+/// pointers. The parsing will create pointers to parts of the decimal string.
+///
+/// e.g.,
+/// -123.456e+78
+/// ABCDEFGHIJK
+/// negativeSign points to address A
+/// integerBegin points to address B
+/// integerEnd points to address E
+/// and so on...
+///
+/// The is used to format the output of `std::to_chars` so that it is consistent
+/// with `double_conversion::DoubleToStringConverter`'s format.
+///
+/// This also has helper member functions to identify parts needed to apply
+/// `DtoaMode::PRECISION` formating.
+class ParsedDecimal {
+ public:
+  char* negativeSign{};
+  char* integerBegin{};
+  char* integerEnd{};
+  char* decimalPoint{};
+  char* fractionalBegin{};
+  char* fractionalEnd{};
+  char* exponentSymbol{};
+  char* exponentSign{};
+  char* exponentBegin{};
+  char* exponentEnd{};
+
+  ParsedDecimal(char* begin, char* end);
+
+  /// Returns the number of figures that count in PRECISION/general mode.
+  /// This is needed to know how many more figures to add when NO_TRAILING_ZERO
+  /// is unset.
+  int numPrecisionFigures() const;
+
+  /// first is the begin pointer of the fractional suffix.
+  /// second is the end pointer of the fractional suffix.
+  using FractionalSuffix = std::pair<char*, char*>;
+
+  /// Returns pointers to the suffix after the fraction.
+  /// e.g., for "12.34-56" this returns pointers to "e-56".
+  /// Returns nothing if there is no suffix (e.g., "7.89").
+  std::optional<FractionalSuffix> fractionalSuffix() const;
+
+  /// Shifts the pointers of the fractional suffix by the given amount.
+  /// This is used when inserting additional figures for `DtoaMode::PRECISION`.
+  /// The pointers need to be updated after the fractional suffix is `memmove`'d
+  /// to accommodate the additional figures.
+  void shiftFractionalSuffixPtrs(size_t amount);
+};
+
+/// Formats the output from `std::to_chars` as if it came from
+/// `double_conversion::DoubleToStringConverter`.
+///
+/// Specifically it adds support for:
+/// - EMIT_POSITIVE_EXPONENT_SIGN
+/// - EMIT_TRAILING_DECIMAL_POINT
+/// - EMIT_TRAILING_ZERO_AFTER_POINT
+/// - UNIQUE_ZERO
+/// - NO_TRAILING_ZERO
+/// - Captial E exponent sign (e.g., 1.23e4 -> 1.23E4)
+/// - Removes leading zeros in exponent (e.g., 1.23e04 -> 1.23e4)
+///
+/// This modifies the result buffer in place to match the output format of
+/// `double_conversion::DoubleToStringConverter`.
+/// `resultBegin` is the begin pointer of the result from `std::to_chars`.
+/// `resultEnd` is the end pointer of the result from `std::to_chars`.
+/// `bufferEnd` is the end pointer of the buffer space given to `std::to_chars`.
+/// The extra buffer space is used to expand the result.
+/// `resultBegin`, `resultEnd`, and `bufferEnd` must point to the same buffer.
+///
+/// The first char* of the return type is the begin pointer of the newly
+/// formatted output. The second char* of the return type is the begin pointer
+/// of the newly formatted output.
+std::pair<char*, char*> formatAsDoubleConversion(
+    bool valueIsZero,
+    DtoaMode mode,
+    unsigned int numDigits,
+    DtoaFlags flags,
+    char* resultBegin,
+    char* resultEnd,
+    char* bufferEnd);
+
+template <class Tgt, class Src>
+typename std::enable_if<
+    std::is_floating_point<Src>::value && IsSomeString<Tgt>::value>::type
+toAppendStdToChars(
+    Src value,
+    Tgt* result,
+    DtoaMode mode,
+    unsigned int numDigits,
+    DtoaFlags flags = DtoaFlags::NO_FLAGS) {
+  if (std::isnan(value)) {
+    // no signbit check because -nan outputs as NaN
+    result->append("NaN", 3);
+    return;
+  }
+
+  if (std::isinf(value)) {
+    if (std::signbit(value)) {
+      result->append("-", 1);
+    }
+    // std::to_chars returns "inf", this needs "Infinity"
+    result->append("Infinity", 8);
+    return;
+  }
+
+  if (mode == DtoaMode::PRECISION &&
+      (numDigits == 0 || numDigits > detail::kConvMaxPrecisionDigits)) {
+    // double_conversion outputs the empty string in this scenario
+    return;
+  }
+
+  if (mode == DtoaMode::FIXED &&
+      numDigits > detail::kConvMaxFixedDigitsAfterPoint) {
+    // double_conversion outputs the empty string in this scenario
+    return;
+  }
+
+  bool useShortestFixed{false};
+  if (mode == DtoaMode::SHORTEST || mode == DtoaMode::SHORTEST_SINGLE) {
+    Src absValue = std::abs(value);
+    // use fixed decimal notation (i.e., not exponential notation)
+    // for values in this range to match double-conversion formatting.
+    useShortestFixed = kConvMaxDecimalInShortestLowValue <= absValue &&
+        absValue < kConvMaxDecimalInShortestHighValue;
+  }
+
+  std::to_chars_result conv_result;
+  char buffer[256];
+  char* const bufferEnd = buffer + sizeof(buffer);
+  FOLLY_PUSH_WARNING
+  FOLLY_CLANG_DISABLE_WARNING("-Wcovered-switch-default")
+  switch (mode) {
+    case DtoaMode::SHORTEST: {
+      if (useShortestFixed) {
+        conv_result =
+            std::to_chars(buffer, bufferEnd, value, std::chars_format::fixed);
+      } else {
+        conv_result = std::to_chars(buffer, bufferEnd, value);
+      }
+      break;
+    }
+    case DtoaMode::SHORTEST_SINGLE:
+      if (useShortestFixed) {
+        conv_result = std::to_chars(
+            buffer,
+            bufferEnd,
+            static_cast<float>(value),
+            std::chars_format::fixed);
+      } else {
+        conv_result =
+            std::to_chars(buffer, bufferEnd, static_cast<float>(value));
+      }
+      break;
+    case DtoaMode::FIXED:
+      conv_result = std::to_chars(
+          buffer, bufferEnd, value, std::chars_format::fixed, numDigits);
+      break;
+    case DtoaMode::PRECISION:
+    default:
+      assert(mode == DtoaMode::PRECISION);
+      conv_result = std::to_chars(
+          buffer, bufferEnd, value, std::chars_format::general, numDigits);
+      break;
+  }
+  FOLLY_POP_WARNING
+
+  auto [resultEnd, ec] = conv_result;
+  if (ec != std::errc()) {
+    folly::throw_exception<std::system_error>(std::make_error_code(ec));
+  }
+
+  char* resultBegin = buffer;
+  bool valueIsZero = value == 0.0;
+  auto [formattedBegin, formattedEnd] = detail::formatAsDoubleConversion(
+      valueIsZero, mode, numDigits, flags, resultBegin, resultEnd, bufferEnd);
+
+  result->append(formattedBegin, formattedEnd - formattedBegin);
+}
+#endif // FOLLY_CONV_AVALIABILITY_TO_CHARS_FLOATING_POINT
+} // namespace detail
+
+/**
+ * `numDigits` is only used with `FIXED` && `PRECISION`.
+ */
+template <class Tgt, class Src>
+typename std::enable_if<
+    std::is_floating_point<Src>::value && IsSomeString<Tgt>::value>::type
+toAppend(
+    Src value,
+    Tgt* result,
+    DtoaMode mode,
+    unsigned int numDigits,
+    DtoaFlags flags = DtoaFlags::NO_FLAGS) {
+#if defined(FOLLY_CONV_USE_TO_CHARS) && FOLLY_CONV_USE_TO_CHARS == 1
+  detail::toAppendStdToChars(value, result, mode, numDigits, flags);
+#else
+  detail::toAppendDoubleConversion(value, result, mode, numDigits, flags);
+#endif
 }
 
 /**
@@ -697,8 +1080,7 @@ template <class Tgt, class Src>
 typename std::enable_if<
     std::is_floating_point<Src>::value && IsSomeString<Tgt>::value>::type
 toAppend(Src value, Tgt* result) {
-  toAppend(
-      value, result, double_conversion::DoubleToStringConverter::SHORTEST, 0);
+  toAppend(value, result, DtoaMode::SHORTEST, 0);
 }
 
 /**
@@ -711,8 +1093,7 @@ typename std::enable_if<std::is_floating_point<Src>::value, size_t>::type
 estimateSpaceNeeded(Src value) {
   // kBase10MaximalLength is 17. We add 1 for decimal point,
   // e.g. 10.0/9 is 17 digits and 18 characters, including the decimal point.
-  constexpr int kMaxMantissaSpace =
-      double_conversion::DoubleToStringConverter::kBase10MaximalLength + 1;
+  constexpr int kMaxMantissaSpace = detail::kBase10MaximalLength + 1;
   // strlen("E-") + digits10(numeric_limits<double>::max_exponent10)
   constexpr int kMaxExponentSpace = 2 + 3;
   static const int kMaxPositiveSpace = std::max({
@@ -764,7 +1145,7 @@ struct EstimateSpaceToReserveAll;
 template <size_t... I>
 struct EstimateSpaceToReserveAll<std::index_sequence<I...>> {
   template <size_t J, size_t N = sizeof...(I)>
-  using tag = bool_constant<J + 1 < N>;
+  using tag = std::bool_constant<J + 1 < N>;
   template <class... T>
   static size_t call(const T&... v) {
     const size_t sizes[] = {estimateSpaceToReserveOne(tag<I>{}, v)...};
@@ -818,7 +1199,8 @@ struct ToAppendStrImplAll<std::index_sequence<I...>> {
   static void call(const T&... v) {
     using _ = int[];
     auto r = getLastElement(v...);
-    void(_{toAppendStrImplOne(bool_constant<I + 1 < sizeof...(T)>{}, v, r)...});
+    void(_{toAppendStrImplOne(
+        std::bool_constant<I + 1 < sizeof...(T)>{}, v, r)...});
   }
 };
 
@@ -856,12 +1238,16 @@ struct ToAppendDelimStrImplAll<std::index_sequence<I...>> {
     void(_{toAppendDelimStrImplOne(tag<I>{}, d, v, r)...});
   }
 };
-template <class Delimiter, class T, class... Ts>
-typename std::enable_if<
-    sizeof...(Ts) >= 2 &&
-    IsSomeString<typename std::remove_pointer<
-        detail::LastElement<Ts...>>::type>::value>::type
-toAppendDelimStrImpl(const Delimiter& delim, const T& v, const Ts&... vs) {
+template <
+    class Delimiter,
+    class T,
+    class... Ts,
+    std::enable_if_t<
+        sizeof...(Ts) >= 2 &&
+            IsSomeString<typename std::remove_pointer<
+                detail::LastElement<Ts...>>::type>::value,
+        int> = 0>
+void toAppendDelimStrImpl(const Delimiter& delim, const T& v, const Ts&... vs) {
   using seq = std::index_sequence_for<T, Ts...>;
   ToAppendDelimStrImplAll<seq>::call(delim, v, vs...);
 }
@@ -889,12 +1275,14 @@ toAppendDelimStrImpl(const Delimiter& delim, const T& v, const Ts&... vs) {
  *
  * }
  */
-template <class... Ts>
-typename std::enable_if<
-    sizeof...(Ts) >= 3 &&
-    IsSomeString<typename std::remove_pointer<
-        detail::LastElement<Ts...>>::type>::value>::type
-toAppend(const Ts&... vs) {
+template <
+    class... Ts,
+    std::enable_if_t<
+        sizeof...(Ts) >= 3 &&
+            IsSomeString<typename std::remove_pointer<
+                detail::LastElement<Ts...>>::type>::value,
+        int> = 0>
+void toAppend(const Ts&... vs) {
   using seq = std::index_sequence_for<Ts...>;
   detail::ToAppendStrImplAll<seq>::call(vs...);
 }
@@ -910,10 +1298,13 @@ toAppend(const Ts&... vs) {
  * On the other hand if you are appending to a string once, this
  * will probably save a few calls to malloc.
  */
-template <class... Ts>
-typename std::enable_if<IsSomeString<typename std::remove_pointer<
-    detail::LastElement<Ts...>>::type>::value>::type
-toAppendFit(const Ts&... vs) {
+template <
+    class... Ts,
+    std::enable_if_t<
+        IsSomeString<typename std::remove_pointer<
+            detail::LastElement<Ts...>>::type>::value,
+        int> = 0>
+void toAppendFit(const Ts&... vs) {
   ::folly::detail::reserveInTarget(vs...);
   toAppend(vs...);
 }
@@ -950,12 +1341,15 @@ typename std::enable_if<IsSomeString<Tgt>::value>::type toAppendDelim(
  * Append to string with a delimiter in between elements. Check out
  * comments for toAppend for details about memory allocation.
  */
-template <class Delimiter, class... Ts>
-typename std::enable_if<
-    sizeof...(Ts) >= 3 &&
-    IsSomeString<typename std::remove_pointer<
-        detail::LastElement<Ts...>>::type>::value>::type
-toAppendDelim(const Delimiter& delim, const Ts&... vs) {
+template <
+    class Delimiter,
+    class... Ts,
+    std::enable_if_t<
+        sizeof...(Ts) >= 3 &&
+            IsSomeString<typename std::remove_pointer<
+                detail::LastElement<Ts...>>::type>::value,
+        int> = 0>
+void toAppendDelim(const Delimiter& delim, const Ts&... vs) {
   detail::toAppendDelimStrImpl(delim, vs...);
 }
 
@@ -964,10 +1358,14 @@ toAppendDelim(const Delimiter& delim, const Ts&... vs) {
  *
  * Detail in comment for toAppendFit
  */
-template <class Delimiter, class... Ts>
-typename std::enable_if<IsSomeString<typename std::remove_pointer<
-    detail::LastElement<Ts...>>::type>::value>::type
-toAppendDelimFit(const Delimiter& delim, const Ts&... vs) {
+template <
+    class Delimiter,
+    class... Ts,
+    std::enable_if_t<
+        IsSomeString<typename std::remove_pointer<
+            detail::LastElement<Ts...>>::type>::value,
+        int> = 0>
+void toAppendDelimFit(const Delimiter& delim, const Ts&... vs) {
   detail::reserveInTargetDelim(delim, vs...);
   toAppendDelim(delim, vs...);
 }
@@ -979,13 +1377,15 @@ void toAppendDelimFit(const De&, const Ts&) {}
  * to<SomeString>(v1, v2, ...) uses toAppend() (see below) as back-end
  * for all types.
  */
-template <class Tgt, class... Ts>
-typename std::enable_if<
-    IsSomeString<Tgt>::value &&
-        (sizeof...(Ts) != 1 ||
-         !std::is_same<Tgt, detail::LastElement<void, Ts...>>::value),
-    Tgt>::type
-to(const Ts&... vs) {
+template <
+    class Tgt,
+    class... Ts,
+    std::enable_if_t<
+        IsSomeString<Tgt>::value &&
+            (sizeof...(Ts) != 1 ||
+             !std::is_same<Tgt, detail::LastElement<void, Ts...>>::value),
+        int> = 0>
+Tgt to(const Ts&... vs) {
   Tgt result;
   toAppendFit(vs..., &result);
   return result;
@@ -1030,13 +1430,16 @@ toDelim(const Delim& /* delim */, Src&& value) {
  * toDelim<SomeString>(delim, v1, v2, ...) uses toAppendDelim() as
  * back-end for all types.
  */
-template <class Tgt, class Delim, class... Ts>
-typename std::enable_if<
-    IsSomeString<Tgt>::value &&
-        (sizeof...(Ts) != 1 ||
-         !std::is_same<Tgt, detail::LastElement<void, Ts...>>::value),
-    Tgt>::type
-toDelim(const Delim& delim, const Ts&... vs) {
+template <
+    class Tgt,
+    class Delim,
+    class... Ts,
+    std::enable_if_t<
+        IsSomeString<Tgt>::value &&
+            (sizeof...(Ts) != 1 ||
+             !std::is_same<Tgt, detail::LastElement<void, Ts...>>::value),
+        int> = 0>
+Tgt toDelim(const Delim& delim, const Ts&... vs) {
   Tgt result;
   toAppendDelimFit(delim, vs..., &result);
   return result;
@@ -1057,6 +1460,15 @@ extern template Expected<float, ConversionCode> str_to_floating<float>(
     StringPiece* src) noexcept;
 extern template Expected<double, ConversionCode> str_to_floating<double>(
     StringPiece* src) noexcept;
+
+template <typename T>
+Expected<T, ConversionCode> str_to_floating_fast_float_from_chars(
+    StringPiece* src) noexcept;
+
+extern template Expected<float, ConversionCode>
+str_to_floating_fast_float_from_chars<float>(StringPiece* src) noexcept;
+extern template Expected<double, ConversionCode>
+str_to_floating_fast_float_from_chars<double>(StringPiece* src) noexcept;
 
 template <class Tgt>
 Expected<Tgt, ConversionCode> digits_to(const char* b, const char* e) noexcept;
@@ -1165,7 +1577,7 @@ template <typename Tgt>
 typename std::enable_if<
     is_integral_v<Tgt> && !std::is_same<Tgt, bool>::value,
     Expected<Tgt, ConversionCode>>::type
-tryTo(const char* b, const char* e) {
+tryTo(const char* b, const char* e) noexcept {
   return detail::digits_to<Tgt>(b, e);
 }
 
@@ -1354,7 +1766,7 @@ inline std::string errorValue(const Src& value) {
 }
 
 template <typename Tgt, typename Src>
-using IsArithToArith = bool_constant<
+using IsArithToArith = std::bool_constant<
     !std::is_same<Tgt, Src>::value && !std::is_same<Tgt, bool>::value &&
     is_arithmetic_v<Src> && is_arithmetic_v<Tgt>>;
 
@@ -1424,14 +1836,12 @@ inline Expected<StringPiece, ConversionCode> parseTo(
   return detail::parseToStr(in, out);
 }
 
-#if FOLLY_HAS_STRING_VIEW
 FOLLY_NODISCARD
 inline Expected<StringPiece, ConversionCode> parseTo(
     StringPiece in, std::string_view& out) {
   out = std::string_view(in.data(), in.size());
   return StringPiece{in.end(), in.end()};
 }
-#endif
 
 FOLLY_NODISCARD
 inline Expected<StringPiece, ConversionCode> parseTo(
@@ -1503,7 +1913,7 @@ template <class Tgt>
 inline typename std::enable_if<
     !std::is_same<StringPiece, Tgt>::value,
     Expected<Tgt, detail::ParseToError<Tgt>>>::type
-tryTo(StringPiece src) {
+tryTo(StringPiece src) noexcept {
   Tgt result{};
   using Error = detail::ParseToError<Tgt>;
   using Check = typename std::conditional<
@@ -1551,7 +1961,7 @@ inline
  * check for trailing whitespace.
  */
 template <class Tgt>
-Expected<Tgt, detail::ParseToError<Tgt>> tryTo(StringPiece* src) {
+Expected<Tgt, detail::ParseToError<Tgt>> tryTo(StringPiece* src) noexcept {
   Tgt result;
   return parseTo(*src, result).then([&, src](StringPiece sp) -> Tgt {
     *src = sp;
@@ -1581,7 +1991,7 @@ typename std::enable_if<
     std::is_enum<Src>::value && !std::is_same<Src, Tgt>::value &&
         !std::is_convertible<Tgt, StringPiece>::value,
     Expected<Tgt, ConversionCode>>::type
-tryTo(const Src& value) {
+tryTo(const Src& value) noexcept {
   return tryTo<Tgt>(to_underlying(value));
 }
 
@@ -1590,7 +2000,7 @@ typename std::enable_if<
     !std::is_convertible<Src, StringPiece>::value && std::is_enum<Tgt>::value &&
         !std::is_same<Src, Tgt>::value,
     Expected<Tgt, ConversionCode>>::type
-tryTo(const Src& value) {
+tryTo(const Src& value) noexcept {
   using I = typename std::underlying_type<Tgt>::type;
   return tryTo<I>(value).then([](I i) { return static_cast<Tgt>(i); });
 }

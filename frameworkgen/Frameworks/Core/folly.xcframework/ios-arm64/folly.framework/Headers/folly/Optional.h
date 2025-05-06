@@ -62,17 +62,15 @@
 #include <cstddef>
 #include <functional>
 #include <new>
+#include <optional>
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
-#if __cplusplus >= 201703L && __has_include(<optional>)
-#define FOLLY_HAS_STD_OPTIONAL
-#include <optional>
-#endif
 
 #include <folly/Portability.h>
 #include <folly/Traits.h>
 #include <folly/Utility.h>
+#include <folly/hash/traits.h>
 #include <folly/lang/Exception.h>
 
 namespace folly {
@@ -156,18 +154,18 @@ class Optional {
   /**
    * Creates an Optional with a value, where that value is constructed in-place.
    *
-   * The in_place_t argument exists so that values can be default constructed
+   * The std::in_place argument exists so that values can be default constructed
    * (i.e. have no arguments), since this would otherwise be confused with
    * default-constructing an Optional, which in turn results in None.
    */
   template <typename... Args>
-  constexpr explicit Optional(in_place_t, Args&&... args) noexcept(
+  constexpr explicit Optional(std::in_place_t, Args&&... args) noexcept(
       std::is_nothrow_constructible<Value, Args...>::value)
       : Optional{PrivateConstructor{}, std::forward<Args>(args)...} {}
 
   template <typename U, typename... Args>
   constexpr explicit Optional(
-      in_place_t,
+      std::in_place_t,
       std::initializer_list<U> il,
       Args&&... args) noexcept(std::
                                    is_nothrow_constructible<
@@ -182,8 +180,8 @@ class Optional {
     p.promise_->value_ = this;
   }
 
-// Conversions to ease migration to std::optional
-#ifdef FOLLY_HAS_STD_OPTIONAL
+  // Conversions to ease migration to std::optional
+
   /// Allow construction of Optional from std::optional.
   template <
       typename U,
@@ -204,7 +202,7 @@ class Optional {
       construct(*newValue);
     }
   }
-  /// Allow implict cast to std::optional
+  /// Allow explicit cast to std::optional
   /// @methodset Migration
   explicit operator std::optional<Value>() && noexcept(
       std::is_nothrow_move_constructible<Value>::value) {
@@ -219,7 +217,14 @@ class Optional {
     return storage_.hasValue ? std::optional<Value>(storage_.value)
                              : std::nullopt;
   }
-#endif
+
+  std::optional<Value> toStdOptional() && noexcept {
+    return static_cast<std::optional<Value>>(std::move(*this));
+  }
+
+  std::optional<Value> toStdOptional() const& noexcept {
+    return static_cast<std::optional<Value>>(*this);
+  }
 
   /// Set the Optional
   /// @methodset Modifiers
@@ -312,7 +317,7 @@ class Optional {
   void clear() noexcept { reset(); }
 
   /// @methodset Modifiers
-  void swap(Optional& that) noexcept(IsNothrowSwappable<Value>::value) {
+  void swap(Optional& that) noexcept(std::is_nothrow_swappable_v<Value>) {
     if (hasValue() && that.hasValue()) {
       using std::swap;
       swap(value(), that.value());
@@ -651,12 +656,10 @@ constexpr bool operator>=(None, const Optional<V>& a) noexcept {
 // Allow usage of Optional<T> in std::unordered_map and std::unordered_set
 FOLLY_NAMESPACE_STD_BEGIN
 template <class T>
-struct hash<folly::Optional<T>> {
+struct hash<
+    folly::enable_std_hash_helper<folly::Optional<T>, remove_const_t<T>>> {
   size_t operator()(folly::Optional<T> const& obj) const {
-    if (!obj.hasValue()) {
-      return 0;
-    }
-    return hash<typename remove_const<T>::type>()(*obj);
+    return static_cast<bool>(obj) ? hash<remove_const_t<T>>()(*obj) : 0;
   }
 };
 FOLLY_NAMESPACE_STD_END
@@ -664,7 +667,7 @@ FOLLY_NAMESPACE_STD_END
 // Enable the use of folly::Optional with `co_await`
 // Inspired by https://github.com/toby-allsopp/coroutine_monad
 #if FOLLY_HAS_COROUTINES
-#include <folly/experimental/coro/Coroutine.h>
+#include <folly/coro/Coroutine.h>
 
 namespace folly {
 namespace detail {

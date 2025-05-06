@@ -47,7 +47,21 @@ using atomic_value_type_t = typename conditional_t<
     detail::atomic_value_type_alias_,
     detail::atomic_value_type_load_>::template apply<Atomic>;
 template <typename Atomic>
-struct atomic_value_type : type_t<atomic_value_type_t<Atomic>> {};
+struct atomic_value_type {
+  using type = atomic_value_type_t<Atomic>;
+};
+
+/// memory_order_load
+///
+/// The load part of a possibly-composite memory-order.
+constexpr std::memory_order memory_order_load( //
+    std::memory_order order) noexcept;
+
+/// memory_order_store
+///
+/// The store part of a possibly-composite memory-order.
+constexpr std::memory_order memory_order_store(
+    std::memory_order order) noexcept;
 
 //  atomic_compare_exchange_weak_explicit
 //
@@ -97,7 +111,7 @@ struct atomic_fetch_set_fn {
       std::size_t bit,
       std::memory_order order = std::memory_order_seq_cst) const;
 };
-FOLLY_INLINE_VARIABLE constexpr atomic_fetch_set_fn atomic_fetch_set{};
+inline constexpr atomic_fetch_set_fn atomic_fetch_set{};
 
 //  atomic_fetch_reset
 //
@@ -119,7 +133,7 @@ struct atomic_fetch_reset_fn {
       std::size_t bit,
       std::memory_order order = std::memory_order_seq_cst) const;
 };
-FOLLY_INLINE_VARIABLE constexpr atomic_fetch_reset_fn atomic_fetch_reset{};
+inline constexpr atomic_fetch_reset_fn atomic_fetch_reset{};
 
 //  atomic_fetch_flip
 //
@@ -140,7 +154,7 @@ struct atomic_fetch_flip_fn {
       std::size_t bit,
       std::memory_order order = std::memory_order_seq_cst) const;
 };
-FOLLY_INLINE_VARIABLE constexpr atomic_fetch_flip_fn atomic_fetch_flip{};
+inline constexpr atomic_fetch_flip_fn atomic_fetch_flip{};
 
 //  atomic_fetch_modify
 //
@@ -170,7 +184,7 @@ struct atomic_fetch_modify_fn {
       Op op,
       std::memory_order = std::memory_order_seq_cst) const;
 };
-FOLLY_INLINE_VARIABLE constexpr atomic_fetch_modify_fn atomic_fetch_modify{};
+inline constexpr atomic_fetch_modify_fn atomic_fetch_modify{};
 
 } // namespace folly
 

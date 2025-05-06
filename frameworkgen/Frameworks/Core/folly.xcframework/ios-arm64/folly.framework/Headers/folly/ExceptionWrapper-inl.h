@@ -14,112 +14,54 @@
  * limitations under the License.
  */
 
-/*
- *
- * Author: Eric Niebler <eniebler@fb.com>
- */
-
 #include <folly/Portability.h>
 
 namespace folly {
 
-template <class Fn>
-struct exception_wrapper::arg_type_
-    : public arg_type_<decltype(&Fn::operator())> {};
-template <class Ret, class Class, class Arg>
-struct exception_wrapper::arg_type_<Ret (Class::*)(Arg)> {
-  using type = Arg;
-};
-template <class Ret, class Class, class Arg>
-struct exception_wrapper::arg_type_<Ret (Class::*)(Arg) const> {
-  using type = Arg;
-};
-template <class Ret, class Arg>
-struct exception_wrapper::arg_type_<Ret(Arg)> {
-  using type = Arg;
-};
-template <class Ret, class Arg>
-struct exception_wrapper::arg_type_<Ret (*)(Arg)> {
-  using type = Arg;
-};
-template <class Ret, class Class>
-struct exception_wrapper::arg_type_<Ret (Class::*)(...)> {
-  using type = void;
-};
-template <class Ret, class Class>
-struct exception_wrapper::arg_type_<Ret (Class::*)(...) const> {
-  using type = void;
-};
-template <class Ret>
-struct exception_wrapper::arg_type_<Ret(...)> {
-  using type = void;
-};
-template <class Ret>
-struct exception_wrapper::arg_type_<Ret (*)(...)> {
-  using type = void;
-};
-
-#ifdef FOLLY_HAVE_NOEXCEPT_FUNCTION_TYPE
-template <class Ret, class Class, class Arg>
-struct exception_wrapper::arg_type_<Ret (Class::*)(Arg) noexcept> {
-  using type = Arg;
-};
-template <class Ret, class Class, class Arg>
-struct exception_wrapper::arg_type_<Ret (Class::*)(Arg) const noexcept> {
-  using type = Arg;
-};
-template <class Ret, class Arg>
-struct exception_wrapper::arg_type_<Ret(Arg) noexcept> {
-  using type = Arg;
-};
-template <class Ret, class Arg>
-struct exception_wrapper::arg_type_<Ret (*)(Arg) noexcept> {
-  using type = Arg;
-};
-template <class Ret, class Class>
-struct exception_wrapper::arg_type_<Ret (Class::*)(...) noexcept> {
-  using type = void;
-};
-template <class Ret, class Class>
-struct exception_wrapper::arg_type_<Ret (Class::*)(...) const noexcept> {
-  using type = void;
-};
-template <class Ret>
-struct exception_wrapper::arg_type_<Ret(...) noexcept> {
-  using type = void;
-};
-template <class Ret>
-struct exception_wrapper::arg_type_<Ret (*)(...) noexcept> {
-  using type = void;
-};
-#endif
-
 struct exception_wrapper::with_exception_from_fn_ {
+  struct impl_var_ {
+    template <typename>
+    using apply = void;
+  };
+  struct impl_arg_ {
+    template <typename F>
+    using apply = typename function_traits<F>::template argument<0>;
+  };
+  struct impl_bye_;
+  template <
+      typename Sig,
+      typename Traits = function_traits<Sig>,
+      std::size_t NArgs = Traits::template arguments<type_pack_size_t>::value>
+  using impl_ = conditional_t<
+      Traits::is_variadic,
+      impl_var_,
+      conditional_t<NArgs == 1, impl_arg_, impl_bye_>>;
+
+  template <typename T>
+  using member_ = typename member_pointer_traits<T>::member_type;
+
+  template <typename Void, typename>
+  struct arg_type_;
+  template <class Sig>
+  struct arg_type_<std::enable_if_t<std::is_function<Sig>::value>, Sig> {
+    using type = typename impl_<Sig>::template apply<Sig>;
+  };
+  template <class Ptr>
+  struct arg_type_<std::enable_if_t<std::is_pointer<Ptr>::value>, Ptr>
+      : arg_type_<void, std::remove_pointer_t<Ptr>> {};
+  template <class Obj>
+  struct arg_type_<void_t<decltype(&Obj::operator())>, Obj>
+      : arg_type_<void, member_<decltype(&Obj::operator())>> {};
+
+  // void if Fn is a variadic callable; otherwise the first arg type
   template <typename, typename Fn>
-  using apply = arg_type<Fn>;
+  using apply = _t<arg_type_<void, Fn>>;
 };
 
 struct exception_wrapper::with_exception_from_ex_ {
   template <typename Ex, typename>
   using apply = Ex;
 };
-
-template <class Ex, typename... As>
-inline exception_wrapper::exception_wrapper(
-    PrivateCtor, in_place_type_t<Ex>, As&&... as)
-    : ptr_{std::make_exception_ptr(Ex(std::forward<As>(as)...))} {}
-
-namespace exception_wrapper_detail {
-template <class Ex>
-Ex&& dont_slice(Ex&& ex) {
-  assert(
-      (!type_info_of(ex) || !type_info_of<std::decay_t<Ex>>() ||
-       (*type_info_of(ex) == *type_info_of<std::decay_t<Ex>>())) &&
-      "Dynamic and static exception types don't match. Exception would "
-      "be sliced when storing in exception_wrapper.");
-  return std::forward<Ex>(ex);
-}
-} // namespace exception_wrapper_detail
 
 // The libc++ and cpplib implementations do not have a move constructor or a
 // move-assignment operator. To avoid refcount operations, we must improvise.
@@ -153,28 +95,23 @@ template <
                        exception_wrapper::IsStdException<Ex_>,
                        exception_wrapper::IsRegularExceptionType<Ex_>>::value)>
 inline exception_wrapper::exception_wrapper(Ex&& ex)
-    : exception_wrapper{
-          PrivateCtor{},
-          in_place_type<Ex_>,
-          exception_wrapper_detail::dont_slice(std::forward<Ex>(ex))} {}
+    : ptr_{make_exception_ptr_with(std::in_place, std::forward<Ex>(ex))} {}
 
 template <
     class Ex,
     class Ex_,
     FOLLY_REQUIRES_DEF(exception_wrapper::IsRegularExceptionType<Ex_>::value)>
-inline exception_wrapper::exception_wrapper(in_place_t, Ex&& ex)
-    : exception_wrapper{
-          PrivateCtor{},
-          in_place_type<Ex_>,
-          exception_wrapper_detail::dont_slice(std::forward<Ex>(ex))} {}
+inline exception_wrapper::exception_wrapper(std::in_place_t, Ex&& ex)
+    : ptr_{make_exception_ptr_with(std::in_place, std::forward<Ex>(ex))} {}
 
 template <
     class Ex,
     typename... As,
     FOLLY_REQUIRES_DEF(exception_wrapper::IsRegularExceptionType<Ex>::value)>
-inline exception_wrapper::exception_wrapper(in_place_type_t<Ex>, As&&... as)
-    : exception_wrapper{
-          PrivateCtor{}, in_place_type<Ex>, std::forward<As>(as)...} {}
+inline exception_wrapper::exception_wrapper(
+    std::in_place_type_t<Ex>, As&&... as)
+    : ptr_{make_exception_ptr_with(
+          std::in_place_type<Ex>, std::forward<As>(as)...)} {}
 
 inline exception_wrapper& exception_wrapper::operator=(
     exception_wrapper&& that) noexcept {
@@ -221,15 +158,20 @@ inline std::exception const* exception_wrapper::get_exception() const noexcept {
 
 template <typename Ex>
 inline Ex* exception_wrapper::get_exception() noexcept {
-  return exception_ptr_get_object<Ex>(ptr_);
+  return exception_ptr_get_object_hint<Ex>(ptr_, tag<Ex>);
 }
 
 template <typename Ex>
 inline Ex const* exception_wrapper::get_exception() const noexcept {
-  return exception_ptr_get_object<Ex>(ptr_);
+  return exception_ptr_get_object_hint<Ex>(ptr_, tag<Ex>);
 }
 
 inline std::exception_ptr exception_wrapper::to_exception_ptr() const noexcept {
+  return ptr_;
+}
+
+inline std::exception_ptr const& exception_wrapper::exception_ptr_ref()
+    const noexcept {
   return ptr_;
 }
 

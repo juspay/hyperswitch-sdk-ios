@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-// @author Nathan Bronson (ngbronson@fb.com)
-
 #pragma once
 
 #include <stdint.h>
@@ -30,7 +28,9 @@
 #include <utility>
 
 #include <folly/CPortability.h>
+#include <folly/CppAttributes.h>
 #include <folly/Likely.h>
+#include <folly/chrono/Hardware.h>
 #include <folly/concurrency/CacheLocality.h>
 #include <folly/detail/Futex.h>
 #include <folly/portability/Asm.h>
@@ -100,13 +100,6 @@
 //    implementations do allow new readers while the upgradeable mode
 //    is held.  See https://github.com/boostorg/thread/blob/master/
 //      include/boost/thread/pthread/shared_mutex.hpp
-//
-//  * RWSpinLock::UpgradedHolder maps to SharedMutex::UpgradeHolder
-//    (UpgradeableHolder would be even more pedantically correct).
-//    SharedMutex's holders have fewer methods (no reset) and are less
-//    tolerant (promotion and downgrade crash if the donor doesn't own
-//    the lock, and you must use the default constructor rather than
-//    passing a nullptr to the pointer constructor).
 //
 // Both SharedMutex and RWSpinLock provide "exclusive", "upgrade",
 // and "shared" modes.  At all times num_threads_holding_exclusive +
@@ -193,7 +186,7 @@
 // recorded the lock, which might be in the lock itself or in any of
 // the shared slots.  If you can conveniently pass state from lock
 // acquisition to release then the fastest mechanism is to std::move
-// the SharedMutex::ReadHolder instance or an SharedMutex::Token (using
+// the std::shared_lock instance or an SharedMutex::Token (using
 // lock_shared(Token&) and unlock_shared(Token&)).  The guard or token
 // will tell unlock_shared where in deferredReaders[] to look for the
 // deferred lock.  The Token-less version of unlock_shared() works in all
@@ -262,19 +255,9 @@ struct SharedMutexToken {
   explicit operator bool() const { return state_ != State::Invalid; }
 };
 
-#ifndef FOLLY_SHARED_MUTEX_MAX_SPIN_DEFAULT
-#define FOLLY_SHARED_MUTEX_MAX_SPIN_DEFAULT 2
-#endif
-
-#ifndef FOLLY_SHARED_MUTEX_MAX_YIELD_DEFAULT
-#define FOLLY_SHARED_MUTEX_MAX_YIELD_DEFAULT 1
-#endif
-
 struct SharedMutexPolicyDefault {
-  static constexpr uint32_t max_spin_count =
-      FOLLY_SHARED_MUTEX_MAX_SPIN_DEFAULT;
-  static constexpr uint32_t max_soft_yield_count =
-      FOLLY_SHARED_MUTEX_MAX_YIELD_DEFAULT;
+  static constexpr uint64_t max_spin_cycles = 4000;
+  static constexpr uint32_t max_soft_yield_count = 1;
   static constexpr bool track_thread_id = false;
   static constexpr bool skip_annotate_rwlock = false;
 };
@@ -294,7 +277,8 @@ std::unique_lock<std::mutex> annotationGuard(void* ptr);
 
 constexpr uint32_t kMaxDeferredReadersAllocated = 256 * 2;
 
-FOLLY_COLD uint32_t getMaxDeferredReadersSlow(relaxed_atomic<uint32_t>& cache);
+[[FOLLY_ATTR_GNU_COLD]] uint32_t getMaxDeferredReadersSlow(
+    relaxed_atomic<uint32_t>& cache);
 
 long getCurrentThreadInvoluntaryContextSwitchCount();
 
@@ -374,10 +358,6 @@ class SharedMutexImpl : std::conditional_t<
   typedef Tag_ Tag;
 
   typedef SharedMutexToken Token;
-
-  class FOLLY_NODISCARD ReadHolder;
-  class FOLLY_NODISCARD UpgradeHolder;
-  class FOLLY_NODISCARD WriteHolder;
 
   constexpr SharedMutexImpl() noexcept : state_(0) {}
 
@@ -964,9 +944,8 @@ class SharedMutexImpl : std::conditional_t<
   // each time a lock is held in exclusive mode.
   static constexpr uint32_t kNumSharedToStartDeferring = 2;
 
-  // The typical number of spins that a thread will wait for a state
-  // transition.
-  static constexpr uint32_t kMaxSpinCount = Policy::max_spin_count;
+  // Maximum time in cycles a thread will spin waiting for a state transition.
+  static constexpr uint64_t kMaxSpinCycles = Policy::max_spin_cycles;
 
   // The maximum number of soft yields before falling back to futex.
   // If the preemption heuristic is activated we will fall back before
@@ -1133,18 +1112,19 @@ class SharedMutexImpl : std::conditional_t<
   template <class WaitContext>
   bool waitForZeroBits(
       uint32_t& state, uint32_t goal, uint32_t waitMask, WaitContext& ctx) {
-    uint32_t spinCount = 0;
-    while (true) {
+    for (uint64_t start = hardware_timestamp();;) {
       state = state_.load(std::memory_order_acquire);
       if ((state & goal) == 0) {
         return true;
       }
-      if (FOLLY_UNLIKELY(spinCount == kMaxSpinCount)) {
+      const uint64_t elapsed = hardware_timestamp() - start;
+      // NOTE: This is also true if hardware_timestamp() goes back in time, as
+      // elapsed underflows.
+      if (FOLLY_UNLIKELY(elapsed >= kMaxSpinCycles)) {
         return ctx.canBlock() &&
             yieldWaitForZeroBits(state, goal, waitMask, ctx);
       }
       asm_volatile_pause();
-      ++spinCount;
     }
   }
 
@@ -1226,6 +1206,7 @@ class SharedMutexImpl : std::conditional_t<
     }
   }
 
+  [[FOLLY_ATTR_GNU_USED]]
   void wakeRegisteredWaitersImpl(uint32_t& state, uint32_t wakeMask) {
     // If there are multiple lock() pending only one of them will actually
     // get to wake up, so issuing futexWakeAll will make a thundering herd.
@@ -1281,21 +1262,23 @@ class SharedMutexImpl : std::conditional_t<
   void applyDeferredReaders(uint32_t& state, WaitContext& ctx) {
     uint32_t slot = 0;
 
-    uint32_t spinCount = 0;
     const uint32_t maxDeferredReaders =
         shared_mutex_detail::getMaxDeferredReaders();
-    while (true) {
+    for (uint64_t start = hardware_timestamp();;) {
       while (!slotValueIsThis(
           deferredReader(slot)->load(std::memory_order_acquire))) {
         if (++slot == maxDeferredReaders) {
           return;
         }
       }
-      asm_volatile_pause();
-      if (FOLLY_UNLIKELY(++spinCount >= kMaxSpinCount)) {
+      const uint64_t elapsed = hardware_timestamp() - start;
+      // NOTE: This is also true if hardware_timestamp() goes back in time, as
+      // elapsed underflows.
+      if (FOLLY_UNLIKELY(elapsed >= kMaxSpinCycles)) {
         applyDeferredReaders(state, ctx, slot);
         return;
       }
+      asm_volatile_pause();
     }
   }
 
@@ -1431,193 +1414,6 @@ class SharedMutexImpl : std::conditional_t<
     } while (!state_.compare_exchange_strong(state, state | kHasU));
     return true;
   }
-
- public:
-  class FOLLY_NODISCARD ReadHolder {
-    using folly_is_unsafe_for_async_usage = std::true_type;
-
-    ReadHolder() : lock_(nullptr) {}
-
-   public:
-    explicit ReadHolder(const SharedMutexImpl* lock)
-        : lock_(const_cast<SharedMutexImpl*>(lock)) {
-      if (lock_) {
-        lock_->lock_shared(token_);
-      }
-    }
-
-    explicit ReadHolder(const SharedMutexImpl& lock)
-        : lock_(const_cast<SharedMutexImpl*>(&lock)) {
-      lock_->lock_shared(token_);
-    }
-
-    ReadHolder(ReadHolder&& rhs) noexcept
-        : lock_(rhs.lock_), token_(rhs.token_) {
-      rhs.lock_ = nullptr;
-    }
-
-    // Downgrade from upgrade mode
-    explicit ReadHolder(UpgradeHolder&& upgraded) : lock_(upgraded.lock_) {
-      assert(upgraded.lock_ != nullptr);
-      upgraded.lock_ = nullptr;
-      lock_->unlock_upgrade_and_lock_shared(token_);
-    }
-
-    // Downgrade from exclusive mode
-    explicit ReadHolder(WriteHolder&& writer) : lock_(writer.lock_) {
-      assert(writer.lock_ != nullptr);
-      writer.lock_ = nullptr;
-      lock_->unlock_and_lock_shared(token_);
-    }
-
-    ReadHolder& operator=(ReadHolder&& rhs) noexcept {
-      std::swap(lock_, rhs.lock_);
-      std::swap(token_, rhs.token_);
-      return *this;
-    }
-
-    ReadHolder(const ReadHolder& rhs) = delete;
-    ReadHolder& operator=(const ReadHolder& rhs) = delete;
-
-    ~ReadHolder() { unlock(); }
-
-    void unlock() {
-      if (lock_) {
-        lock_->unlock_shared(token_);
-        lock_ = nullptr;
-      }
-    }
-
-   private:
-    friend class UpgradeHolder;
-    friend class WriteHolder;
-    SharedMutexImpl* lock_;
-    SharedMutexToken token_;
-  };
-
-  class FOLLY_NODISCARD UpgradeHolder {
-    using folly_is_unsafe_for_async_usage = std::true_type;
-
-    UpgradeHolder() : lock_(nullptr) {}
-
-   public:
-    explicit UpgradeHolder(SharedMutexImpl* lock) : lock_(lock) {
-      if (lock_) {
-        lock_->lock_upgrade();
-      }
-    }
-
-    explicit UpgradeHolder(SharedMutexImpl& lock) : lock_(&lock) {
-      lock_->lock_upgrade();
-    }
-
-    // Downgrade from exclusive mode
-    explicit UpgradeHolder(WriteHolder&& writer) : lock_(writer.lock_) {
-      assert(writer.lock_ != nullptr);
-      writer.lock_ = nullptr;
-      lock_->unlock_and_lock_upgrade();
-    }
-
-    UpgradeHolder(UpgradeHolder&& rhs) noexcept : lock_(rhs.lock_) {
-      rhs.lock_ = nullptr;
-    }
-
-    UpgradeHolder& operator=(UpgradeHolder&& rhs) noexcept {
-      std::swap(lock_, rhs.lock_);
-      return *this;
-    }
-
-    UpgradeHolder(const UpgradeHolder& rhs) = delete;
-    UpgradeHolder& operator=(const UpgradeHolder& rhs) = delete;
-
-    ~UpgradeHolder() { unlock(); }
-
-    void unlock() {
-      if (lock_) {
-        lock_->unlock_upgrade();
-        lock_ = nullptr;
-      }
-    }
-
-   private:
-    friend class WriteHolder;
-    friend class ReadHolder;
-    SharedMutexImpl* lock_;
-  };
-
-  class FOLLY_NODISCARD WriteHolder {
-    using folly_is_unsafe_for_async_usage = std::true_type;
-
-    WriteHolder() : lock_(nullptr) {}
-
-   public:
-    explicit WriteHolder(SharedMutexImpl* lock) : lock_(lock) {
-      if (lock_) {
-        lock_->lock();
-      }
-    }
-
-    explicit WriteHolder(SharedMutexImpl& lock) : lock_(&lock) {
-      lock_->lock();
-    }
-
-    // Promotion from upgrade mode
-    explicit WriteHolder(UpgradeHolder&& upgrade) : lock_(upgrade.lock_) {
-      assert(upgrade.lock_ != nullptr);
-      upgrade.lock_ = nullptr;
-      lock_->unlock_upgrade_and_lock();
-    }
-
-    // README:
-    //
-    // It is intended that WriteHolder(ReadHolder&& rhs) do not exist.
-    //
-    // Shared locks (read) can not safely upgrade to unique locks (write).
-    // That upgrade path is a well-known recipe for deadlock, so we explicitly
-    // disallow it.
-    //
-    // If you need to do a conditional mutation, you have a few options:
-    // 1. Check the condition under a shared lock and release it.
-    //    Then maybe check the condition again under a unique lock and maybe do
-    //    the mutation.
-    // 2. Check the condition once under an upgradeable lock.
-    //    Then maybe upgrade the lock to a unique lock and do the mutation.
-    // 3. Check the condition and maybe perform the mutation under a unique
-    //    lock.
-    //
-    // Relevant upgradeable lock notes:
-    // * At most one upgradeable lock can be held at a time for a given shared
-    //   mutex, just like a unique lock.
-    // * An upgradeable lock may be held concurrently with any number of shared
-    //   locks.
-    // * An upgradeable lock may be upgraded atomically to a unique lock.
-
-    WriteHolder(WriteHolder&& rhs) noexcept : lock_(rhs.lock_) {
-      rhs.lock_ = nullptr;
-    }
-
-    WriteHolder& operator=(WriteHolder&& rhs) noexcept {
-      std::swap(lock_, rhs.lock_);
-      return *this;
-    }
-
-    WriteHolder(const WriteHolder& rhs) = delete;
-    WriteHolder& operator=(const WriteHolder& rhs) = delete;
-
-    ~WriteHolder() { unlock(); }
-
-    void unlock() {
-      if (lock_) {
-        lock_->unlock();
-        lock_ = nullptr;
-      }
-    }
-
-   private:
-    friend class ReadHolder;
-    friend class UpgradeHolder;
-    SharedMutexImpl* lock_;
-  };
 };
 
 using SharedMutexReadPriority = SharedMutexImpl<true>;

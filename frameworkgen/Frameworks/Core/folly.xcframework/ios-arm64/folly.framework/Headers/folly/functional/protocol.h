@@ -58,7 +58,7 @@ struct match_empty_function_protocol_fn {
 
   template <typename T>
   static constexpr bool cx_matches_v =
-      sizeof(T) && is_detected_v<detect_from_eq_nullptr, T>;
+      require_sizeof<T> && is_detected_v<detect_from_eq_nullptr, T>;
 
  public:
   template <typename T, std::enable_if_t<!cx_matches_v<T>, int> = 0>
@@ -70,7 +70,7 @@ struct match_empty_function_protocol_fn {
     return static_cast<bool>(t == nullptr);
   }
 };
-FOLLY_INLINE_VARIABLE constexpr match_empty_function_protocol_fn
+inline constexpr match_empty_function_protocol_fn
     match_empty_function_protocol{};
 
 //  ----
@@ -97,7 +97,7 @@ FOLLY_INLINE_VARIABLE constexpr match_empty_function_protocol_fn
 template <typename F>
 static constexpr bool match_static_lambda_protocol_v = ( //
     std::is_empty<F>::value && //
-    is_trivially_copyable_v<F> && //
+    std::is_trivially_copyable_v<F> && //
     true);
 
 //  ----
@@ -143,7 +143,7 @@ struct match_safely_invocable_as_protocol_impl_ {
   template <typename F, typename FCVR = fun_cvref<F>>
   static constexpr bool is_invocable_r_v = std::is_reference<FCVR>::value
       ? is_invocable_r_<F>::value
-      : is_invocable_r_<F&>::value&& is_invocable_r_<F&&>::value;
+      : is_invocable_r_<F&>::value && is_invocable_r_<F&&>::value;
 };
 
 template <
@@ -197,7 +197,7 @@ using match_safely_invocable_as_protocol_detect_ =
 //  volatile qualifications. See:
 //    http://eel.is/c++draft/func.wrap.move
 template <typename F, typename Sig>
-FOLLY_INLINE_VARIABLE constexpr bool match_safely_invocable_as_protocol_v =
+inline constexpr bool match_safely_invocable_as_protocol_v =
     is_detected_v<detail::match_safely_invocable_as_protocol_detect_, F, Sig>;
 
 } // namespace folly

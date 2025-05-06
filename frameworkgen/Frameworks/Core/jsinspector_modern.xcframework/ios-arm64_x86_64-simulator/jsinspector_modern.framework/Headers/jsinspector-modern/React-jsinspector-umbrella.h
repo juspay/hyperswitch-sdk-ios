@@ -10,13 +10,13 @@
 #endif
 #endif
 
+#import "Base64.h"
 #import "CdpJson.h"
 #import "ConsoleMessage.h"
 #import "ExecutionContext.h"
 #import "ExecutionContextManager.h"
 #import "FallbackRuntimeAgentDelegate.h"
 #import "FallbackRuntimeTargetDelegate.h"
-#import "ForwardingConsoleMethods.def"
 #import "HostAgent.h"
 #import "HostCommand.h"
 #import "HostTarget.h"
@@ -27,6 +27,7 @@
 #import "InspectorUtilities.h"
 #import "InstanceAgent.h"
 #import "InstanceTarget.h"
+#import "NetworkIOAgent.h"
 #import "ReactCdp.h"
 #import "RuntimeAgent.h"
 #import "RuntimeAgentDelegate.h"
@@ -34,7 +35,9 @@
 #import "ScopedExecutor.h"
 #import "SessionState.h"
 #import "StackTrace.h"
+#import "TracingAgent.h"
 #import "UniqueMonostate.h"
+#import "Utf8.h"
 #import "WeakList.h"
 #import "WebSocketInterfaces.h"
 

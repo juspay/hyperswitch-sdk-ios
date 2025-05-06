@@ -1,0 +1,6 @@
+framework module React_renderercss {
+  umbrella header "React-renderercss-umbrella.h"
+
+  export *
+  module * { export * }
+}

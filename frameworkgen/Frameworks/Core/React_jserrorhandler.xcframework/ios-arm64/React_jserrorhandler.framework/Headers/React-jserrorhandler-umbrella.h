@@ -11,6 +11,7 @@
 #endif
 
 #import "jserrorhandler/JsErrorHandler.h"
+#import "jserrorhandler/StackTraceParser.h"
 
 FOUNDATION_EXPORT double React_jserrorhandlerVersionNumber;
 FOUNDATION_EXPORT const unsigned char React_jserrorhandlerVersionString[];

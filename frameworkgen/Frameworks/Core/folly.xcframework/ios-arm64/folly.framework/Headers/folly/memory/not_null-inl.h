@@ -27,7 +27,7 @@ namespace detail {
 template <typename T>
 inline constexpr bool is_not_null_v = is_instantiation_of_v<not_null, T>;
 template <typename T>
-struct is_not_null : bool_constant<is_not_null_v<T>> {};
+struct is_not_null : std::bool_constant<is_not_null_v<T>> {};
 
 template <
     typename T,
@@ -493,15 +493,30 @@ not_null_shared_ptr<T> const_pointer_cast(not_null_shared_ptr<U>&& r) {
 template <typename T, typename U>
 not_null_shared_ptr<T> reinterpret_pointer_cast(
     const not_null_shared_ptr<U>& r) {
-  auto p = folly::reinterpret_pointer_cast<T, U>(r.unwrap());
+  auto p = std::reinterpret_pointer_cast<T, U>(r.unwrap());
   return not_null_shared_ptr<T>(
       std::move(p), detail::secret_guaranteed_not_null::get());
 }
 template <typename T, typename U>
 not_null_shared_ptr<T> reinterpret_pointer_cast(not_null_shared_ptr<U>&& r) {
-  auto p = folly::reinterpret_pointer_cast<T, U>(std::move(r).unwrap());
+  auto p = std::reinterpret_pointer_cast<T, U>(std::move(r).unwrap());
   return not_null_shared_ptr<T>(
       std::move(p), detail::secret_guaranteed_not_null::get());
 }
+
+static_assert(
+    std::is_same_v<decltype(not_null(std::declval<int*>())), not_null<int*>>);
+
+static_assert(std::is_same_v<
+              decltype(not_null(std::declval<std::unique_ptr<int>>())),
+              not_null_unique_ptr<int>>);
+
+static_assert(std::is_same_v<
+              decltype(not_null(std::declval<std::unique_ptr<int>&&>())),
+              not_null_unique_ptr<int>>);
+
+static_assert(std::is_same_v<
+              decltype(not_null(std::declval<const std::shared_ptr<int>&>())),
+              not_null_shared_ptr<int>>);
 
 } // namespace folly

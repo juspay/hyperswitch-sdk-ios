@@ -52,23 +52,23 @@ namespace folly {
 namespace detail {
 
 template <typename, typename Mutex>
-FOLLY_INLINE_VARIABLE constexpr bool kSynchronizedMutexIsUnique = false;
+inline constexpr bool kSynchronizedMutexIsUnique = false;
 template <typename Mutex>
-FOLLY_INLINE_VARIABLE constexpr bool kSynchronizedMutexIsUnique<
+inline constexpr bool kSynchronizedMutexIsUnique<
     decltype(void(std::declval<Mutex&>().lock())),
     Mutex> = true;
 
 template <typename, typename Mutex>
-FOLLY_INLINE_VARIABLE constexpr bool kSynchronizedMutexIsShared = false;
+inline constexpr bool kSynchronizedMutexIsShared = false;
 template <typename Mutex>
-FOLLY_INLINE_VARIABLE constexpr bool kSynchronizedMutexIsShared<
+inline constexpr bool kSynchronizedMutexIsShared<
     decltype(void(std::declval<Mutex&>().lock_shared())),
     Mutex> = true;
 
 template <typename, typename Mutex>
-FOLLY_INLINE_VARIABLE constexpr bool kSynchronizedMutexIsUpgrade = false;
+inline constexpr bool kSynchronizedMutexIsUpgrade = false;
 template <typename Mutex>
-FOLLY_INLINE_VARIABLE constexpr bool kSynchronizedMutexIsUpgrade<
+inline constexpr bool kSynchronizedMutexIsUpgrade<
     decltype(void(std::declval<Mutex&>().lock_upgrade())),
     Mutex> = true;
 
@@ -82,7 +82,7 @@ FOLLY_INLINE_VARIABLE constexpr bool kSynchronizedMutexIsUpgrade<
 enum class SynchronizedMutexLevel { Unknown, Unique, Shared, Upgrade };
 
 template <typename Mutex>
-FOLLY_INLINE_VARIABLE constexpr SynchronizedMutexLevel kSynchronizedMutexLevel =
+inline constexpr SynchronizedMutexLevel kSynchronizedMutexLevel =
     kSynchronizedMutexIsUpgrade<void, Mutex>  ? SynchronizedMutexLevel::Upgrade
     : kSynchronizedMutexIsShared<void, Mutex> ? SynchronizedMutexLevel::Shared
     : kSynchronizedMutexIsUnique<void, Mutex> ? SynchronizedMutexLevel::Unique
@@ -708,7 +708,7 @@ struct Synchronized : public SynchronizedBase<
    * instance `in_place` as the first argument.
    */
   template <typename... Args>
-  explicit constexpr Synchronized(in_place_t, Args&&... args)
+  explicit constexpr Synchronized(std::in_place_t, Args&&... args)
       : datum_(std::forward<Args>(args)...) {}
 
   /**
@@ -829,38 +829,6 @@ struct Synchronized : public SynchronizedBase<
   }
 
   /**
-   * @brief Access the datum under lock.
-   *
-   * deprecated
-   *
-   * This accessor offers a LockedPtr. In turn, LockedPtr offers
-   * operator-> returning a pointer to T. The operator-> keeps
-   * expanding until it reaches a pointer, so syncobj->foo() will lock
-   * the object and call foo() against it.
-   *
-   * NOTE: This API is planned to be deprecated in an upcoming diff.
-   * Prefer using lock(), wlock(), or rlock() instead.
-   */
-  [[deprecated("use explicit lock(), wlock(), or rlock() instead")]] LockedPtr
-  operator->() {
-    return LockedPtr(this);
-  }
-
-  /**
-   * deprecated
-   *
-   * Obtain a ConstLockedPtr.
-   *
-   * NOTE: This API is planned to be deprecated in an upcoming diff.
-   * Prefer using lock(), wlock(), or rlock() instead.
-   */
-  [[deprecated(
-      "use explicit lock(), wlock(), or rlock() instead")]] ConstLockedPtr
-  operator->() const {
-    return ConstLockedPtr(this);
-  }
-
-  /**
    * @brief Acquire a LockedPtr with timeout.
    *
    * Attempts to acquire for a given number of milliseconds. If
@@ -960,6 +928,17 @@ struct Synchronized : public SynchronizedBase<
   T& unsafeGetUnlocked() { return datum_; }
   const T& unsafeGetUnlocked() const { return datum_; }
 
+  /**
+   * @brief Access underlying mutex_ directly.
+   *
+   * Provided as a backdoor for call-sites where the lock and unlock are paired
+   * in different calls. For example, in fork handlers. Use carefully as the
+   * caller is responsible to ensure it is paired with an unlock and there is
+   * nothing else in between that tries to implicitly or explicitly acquire the
+   * lock again.
+   */
+  Mutex& unsafeGetMutex() { return mutex_; }
+
  private:
   template <class LockedType, class MutexType, class LockPolicy>
   friend class folly::LockedPtrBase;
@@ -1028,6 +1007,38 @@ struct [[deprecated(
 
   using Base::Base;
   using Base::operator=;
+
+  /**
+   * @brief Access the datum under lock.
+   *
+   * deprecated
+   *
+   * This accessor offers a LockedPtr. In turn, LockedPtr offers
+   * operator-> returning a pointer to T. The operator-> keeps
+   * expanding until it reaches a pointer, so syncobj->foo() will lock
+   * the object and call foo() against it.
+   *
+   * NOTE: This API is planned to be deprecated in an upcoming diff.
+   * Prefer using lock(), wlock(), or rlock() instead.
+   */
+  [[deprecated("use explicit lock(), wlock(), or rlock() instead")]] LockedPtr
+  operator->() {
+    return LockedPtr(this);
+  }
+
+  /**
+   * deprecated
+   *
+   * Obtain a ConstLockedPtr.
+   *
+   * NOTE: This API is planned to be deprecated in an upcoming diff.
+   * Prefer using lock(), wlock(), or rlock() instead.
+   */
+  [[deprecated(
+      "use explicit lock(), wlock(), or rlock() instead")]] ConstLockedPtr
+  operator->() const {
+    return ConstLockedPtr(this);
+  }
 };
 
 template <class SynchronizedType, class LockPolicy>
@@ -1309,7 +1320,11 @@ class LockedPtr {
   LockedPtr(
       SynchronizedType* parent,
       const std::chrono::duration<Rep, Period>& timeout)
-      : lock_{parent ? LockType{parent->mutex_, timeout} : LockType{}} {}
+      : lock_{parent ? LockType{parent->mutex_, timeout} : LockType{}} {
+    if (isNull()) {
+      lock_ = {};
+    }
+  }
 
   /**
    * Move constructor.
@@ -1512,7 +1527,7 @@ class LockedPtr {
     using simulacrum = typename SynchronizedType::Simulacrum;
     static_assert(sizeof(simulacrum) == sizeof(SynchronizedType), "mismatch");
     static_assert(alignof(simulacrum) == alignof(SynchronizedType), "mismatch");
-    constexpr auto off = offsetof(simulacrum, mutex_);
+    auto off = offsetof(simulacrum, mutex_);
     const auto raw = reinterpret_cast<char*>(lock_.mutex());
     return reinterpret_cast<SynchronizedType*>(raw - (raw ? off : 0));
   }
@@ -1668,9 +1683,7 @@ void lock(LockableOne& one, LockableTwo& two, Lockables&... lockables) {
         lockable,
         [](auto& l) { return std::unique_lock<Lockable>{l}; },
         [](auto& l) {
-          auto lock = std::unique_lock<Lockable>{l, std::defer_lock};
-          lock.try_lock();
-          return lock;
+          return std::unique_lock<Lockable>{l, std::try_to_lock};
         });
   };
   auto locks = lock(locker(one), locker(two), locker(lockables)...);
@@ -1740,8 +1753,9 @@ void swap(Synchronized<T, M>& lhs, Synchronized<T, M>& rhs) {
 
 namespace detail {
 struct [[deprecated(
-    "use explicit lock(), wlock(), or rlock() instead")]] SYNCHRONIZED_macro_is_deprecated{};
-}
+    "use explicit lock(), wlock(), or rlock() instead")]] SYNCHRONIZED_macro_is_deprecated {
+};
+} // namespace detail
 
 /**
  * NOTE: This API is deprecated.  Use lock(), wlock(), rlock() or the withLock
@@ -1796,7 +1810,7 @@ struct [[deprecated(
 #define SYNCHRONIZED_CONST(...)            \
   SYNCHRONIZED(                            \
       FB_VA_GLUE(FB_ARG_1, (__VA_ARGS__)), \
-      as_const(FB_VA_GLUE(FB_ARG_2_OR_1, (__VA_ARGS__))))
+      std::as_const(FB_VA_GLUE(FB_ARG_2_OR_1, (__VA_ARGS__))))
 
 /**
  * NOTE: This API is deprecated.  Use lock(), wlock(), rlock() or the withLock

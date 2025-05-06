@@ -248,43 +248,43 @@ template <typename F>
 typename std::enable_if<
     !std::is_same<invoke_result_t<F>, void>::value,
     Try<invoke_result_t<F>>>::type
-makeTryWithNoUnwrap(F&& f) {
+makeTryWithNoUnwrap(F&& f) noexcept {
   using ResultType = invoke_result_t<F>;
   try {
     return Try<ResultType>(f());
   } catch (...) {
-    return Try<ResultType>(exception_wrapper(std::current_exception()));
+    return Try<ResultType>(exception_wrapper(current_exception()));
   }
 }
 
 template <typename F>
 typename std::
     enable_if<std::is_same<invoke_result_t<F>, void>::value, Try<void>>::type
-    makeTryWithNoUnwrap(F&& f) {
+    makeTryWithNoUnwrap(F&& f) noexcept {
   try {
     f();
     return Try<void>();
   } catch (...) {
-    return Try<void>(exception_wrapper(std::current_exception()));
+    return Try<void>(exception_wrapper(current_exception()));
   }
 }
 
 template <typename F>
 typename std::
     enable_if<!isTry<invoke_result_t<F>>::value, Try<invoke_result_t<F>>>::type
-    makeTryWith(F&& f) {
+    makeTryWith(F&& f) noexcept {
   return makeTryWithNoUnwrap(std::forward<F>(f));
 }
 
 template <typename F>
 typename std::enable_if<isTry<invoke_result_t<F>>::value, invoke_result_t<F>>::
     type
-    makeTryWith(F&& f) {
+    makeTryWith(F&& f) noexcept {
   using ResultType = invoke_result_t<F>;
   try {
     return f();
   } catch (...) {
-    return ResultType(exception_wrapper(std::current_exception()));
+    return ResultType(exception_wrapper(current_exception()));
   }
 }
 
@@ -293,7 +293,7 @@ T* tryEmplace(Try<T>& t, Args&&... args) noexcept {
   try {
     return std::addressof(t.emplace(static_cast<Args&&>(args)...));
   } catch (...) {
-    t.emplaceException(std::current_exception());
+    t.emplaceException(current_exception());
     return nullptr;
   }
 }
@@ -310,7 +310,7 @@ T* tryEmplaceWith(Try<T>& t, Func&& func) noexcept {
   try {
     return std::addressof(t.emplace(static_cast<Func&&>(func)()));
   } catch (...) {
-    t.emplaceException(std::current_exception());
+    t.emplaceException(current_exception());
     return nullptr;
   }
 }
@@ -325,7 +325,7 @@ bool tryEmplaceWith(Try<void>& t, Func&& func) noexcept {
     t.emplace();
     return true;
   } catch (...) {
-    t.emplaceException(std::current_exception());
+    t.emplaceException(current_exception());
     return false;
   }
 }
@@ -362,7 +362,7 @@ void tryAssign(Try<T>& t, Try<T>&& other) noexcept {
   try {
     t = std::move(other);
   } catch (...) {
-    t.emplaceException(std::current_exception());
+    t.emplaceException(current_exception());
   }
 }
 

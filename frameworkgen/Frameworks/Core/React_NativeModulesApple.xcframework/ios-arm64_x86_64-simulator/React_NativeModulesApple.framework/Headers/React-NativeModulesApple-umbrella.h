@@ -11,7 +11,6 @@
 #endif
 
 #import "ReactCommon/RCTInteropTurboModule.h"
-#import "ReactCommon/RCTRuntimeExecutor.h"
 #import "ReactCommon/RCTTurboModule.h"
 #import "ReactCommon/RCTTurboModuleManager.h"
 #import "ReactCommon/RCTTurboModuleWithJSIBindings.h"

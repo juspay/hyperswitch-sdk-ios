@@ -33,21 +33,20 @@
 #include <limits>
 #include <memory>
 #include <string>
+#include <string_view>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 
 #include <folly/CPortability.h>
+#include <folly/Portability.h>
 #include <folly/Traits.h>
 #include <folly/Utility.h>
 #include <folly/functional/ApplyTuple.h>
+#include <folly/hash/MurmurHash.h>
 #include <folly/hash/SpookyHashV1.h>
 #include <folly/hash/SpookyHashV2.h>
 #include <folly/lang/Bits.h>
-
-#if FOLLY_HAS_STRING_VIEW
-#include <string_view>
-#endif
 
 namespace folly {
 namespace hash {
@@ -517,7 +516,7 @@ namespace detail {
 template <typename Int>
 struct integral_hasher {
   using folly_is_avalanching =
-      bool_constant<(sizeof(Int) >= 8 || sizeof(size_t) == 4)>;
+      std::bool_constant<(sizeof(Int) >= 8 || sizeof(size_t) == 4)>;
 
   constexpr size_t operator()(Int const& i) const noexcept {
     static_assert(sizeof(Int) <= 16, "Input type is too wide");
@@ -614,13 +613,14 @@ struct IsAvalanchingHasher;
 
 namespace detail {
 template <typename Hasher, typename Void = void>
-struct IsAvalanchingHasherFromMemberType : bool_constant<!sizeof(Hasher)> {};
+struct IsAvalanchingHasherFromMemberType
+    : std::bool_constant<!require_sizeof<Hasher>> {};
 
 template <typename Hasher>
 struct IsAvalanchingHasherFromMemberType<
     Hasher,
     void_t<typename Hasher::folly_is_avalanching>>
-    : bool_constant<Hasher::folly_is_avalanching::value> {};
+    : std::bool_constant<Hasher::folly_is_avalanching::value> {};
 } // namespace detail
 
 template <typename Hasher, typename Key>
@@ -708,7 +708,6 @@ struct hasher<std::string> {
 template <typename K>
 struct IsAvalanchingHasher<hasher<std::string>, K> : std::true_type {};
 
-#if FOLLY_HAS_STRING_VIEW
 template <>
 struct hasher<std::string_view> {
   using folly_is_avalanching = std::true_type;
@@ -720,7 +719,6 @@ struct hasher<std::string_view> {
 };
 template <typename K>
 struct IsAvalanchingHasher<hasher<std::string_view>, K> : std::true_type {};
-#endif
 
 template <typename T>
 struct hasher<T, std::enable_if_t<std::is_enum<T>::value>> {
@@ -784,6 +782,24 @@ struct IsAvalanchingHasher<hasher<std::tuple<T1, T2, Ts...>>, K>
     : std::true_type {};
 
 namespace hash {
+
+// Compatible with std::hash implementation of hashing for std::string_view.
+// We use hash::murmurHash64 as a replacement of libstdc++ implementation
+// for better performance, for other implementations of C++ Standard Libraries
+// we fallback to std::hash.
+#if defined(_GLIBCXX_STRING) && FOLLY_X64
+FOLLY_ALWAYS_INLINE size_t stdCompatibleHash(std::string_view sv) noexcept {
+  static_assert(sizeof(size_t) == sizeof(uint64_t));
+  constexpr uint64_t kSeed = 0xc70f6907ULL;
+  return hash::murmurHash64(sv.data(), sv.size(), kSeed);
+}
+#else
+FOLLY_ALWAYS_INLINE size_t stdCompatibleHash(std::string_view sv) noexcept(
+    noexcept(std::hash<std::string_view>{}(sv))) {
+  return std::hash<std::string_view>{}(sv);
+}
+#endif // defined(_GLIBCXX_STRING) && FOLLY_X64
+
 // Simply uses std::hash to hash.  Note that std::hash is not guaranteed
 // to be a very good hash function; provided std::hash doesn't collide on
 // the individual inputs, you are fine, but that won't be true for, say,
@@ -796,6 +812,16 @@ class StdHasher {
   template <typename T>
   size_t operator()(const T& t) const noexcept(noexcept(std::hash<T>()(t))) {
     return std::hash<T>()(t);
+  }
+
+  size_t operator()(std::string_view sv) const
+      noexcept(noexcept(stdCompatibleHash(sv))) {
+    return stdCompatibleHash(sv);
+  }
+
+  size_t operator()(const std::string& s) const
+      noexcept(noexcept(stdCompatibleHash(s))) {
+    return stdCompatibleHash(s);
   }
 };
 
@@ -988,7 +1014,7 @@ struct hash<std::tuple<Ts...>> {
   using FirstT = std::decay_t<std::tuple_element_t<0, std::tuple<Ts..., bool>>>;
 
  public:
-  using folly_is_avalanching = folly::bool_constant<(
+  using folly_is_avalanching = std::bool_constant<(
       sizeof...(Ts) != 1 ||
       folly::IsAvalanchingHasher<std::hash<FirstT>, FirstT>::value)>;
 

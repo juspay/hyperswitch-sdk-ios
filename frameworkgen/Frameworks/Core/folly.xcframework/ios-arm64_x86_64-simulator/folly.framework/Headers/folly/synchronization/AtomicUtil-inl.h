@@ -31,6 +31,30 @@
 
 namespace folly {
 
+constexpr std::memory_order memory_order_load(
+    std::memory_order const order) noexcept {
+  constexpr auto relaxed = std::memory_order_relaxed;
+  constexpr auto release = std::memory_order_release;
+  constexpr auto acquire = std::memory_order_acquire;
+  constexpr auto acq_rel = std::memory_order_acq_rel;
+  return order == acq_rel ? acquire : order == release ? relaxed : order;
+}
+
+constexpr std::memory_order memory_order_store(
+    std::memory_order const order) noexcept {
+  constexpr auto relaxed = std::memory_order_relaxed;
+  constexpr auto release = std::memory_order_release;
+  constexpr auto consume = std::memory_order_consume;
+  constexpr auto acquire = std::memory_order_acquire;
+  constexpr auto acq_rel = std::memory_order_acq_rel;
+  // clang-format off
+  return
+      order == acq_rel ? release :
+      order == acquire || order == consume ? relaxed :
+      order;
+  // clang-format on
+}
+
 template <typename T>
 class atomic_ref;
 
@@ -83,7 +107,6 @@ constexpr std::memory_order atomic_compare_exchange_succ(
 constexpr std::memory_order atomic_compare_exchange_succ(
     std::memory_order succ, std::memory_order fail) {
   constexpr auto const cond = false //
-      || (FOLLY_CPLUSPLUS < 201702L) //
       || (kGlibcxxVer && kGlibcxxVer < 12 && kGlibcxxAssertions) //
       || (kIsSanitizeThread && kIsClang) //
       || (kIsSanitize && !kIsClang && kGnuc) //
@@ -133,8 +156,7 @@ struct atomic_fetch_set_fallback_fn {
     return (atomic.fetch_or(mask, order) & mask);
   }
 };
-FOLLY_INLINE_VARIABLE constexpr atomic_fetch_set_fallback_fn
-    atomic_fetch_set_fallback{};
+inline constexpr atomic_fetch_set_fallback_fn atomic_fetch_set_fallback{};
 
 struct atomic_fetch_reset_fallback_fn {
   template <typename Atomic>
@@ -145,8 +167,7 @@ struct atomic_fetch_reset_fallback_fn {
     return (atomic.fetch_and(Integer(~mask), order) & mask);
   }
 };
-FOLLY_INLINE_VARIABLE constexpr atomic_fetch_reset_fallback_fn
-    atomic_fetch_reset_fallback{};
+inline constexpr atomic_fetch_reset_fallback_fn atomic_fetch_reset_fallback{};
 
 struct atomic_fetch_flip_fallback_fn {
   template <typename Atomic>
@@ -157,8 +178,7 @@ struct atomic_fetch_flip_fallback_fn {
     return (atomic.fetch_xor(mask, order) & mask);
   }
 };
-FOLLY_INLINE_VARIABLE constexpr atomic_fetch_flip_fallback_fn
-    atomic_fetch_flip_fallback{};
+inline constexpr atomic_fetch_flip_fallback_fn atomic_fetch_flip_fallback{};
 
 #if FOLLY_X64
 
@@ -232,7 +252,7 @@ enum class atomic_fetch_bit_op_native_instr_mnem { bts, btr, btc };
 enum class atomic_fetch_bit_op_native_instr_suff { w, l, q };
 
 #define FOLLY_DETAIL_ATOMIC_BIT_OP_ONE(mnem, suff)                            \
-  if FOLLY_CXX17_CONSTEXPR (                                                  \
+  if constexpr (                                                              \
       Instr == mnem_t::mnem && sizeof(Int) == 1 << (int(suff_t::suff) + 1)) { \
     if (order == ::std::memory_order_relaxed) {                               \
       asm("lock " #mnem #suff " %[bit], %[ptr]"                               \
@@ -267,7 +287,7 @@ struct atomic_fetch_bit_op_native_do_instr_fn {
   }
 };
 template <atomic_fetch_bit_op_native_instr_mnem Instr>
-FOLLY_INLINE_VARIABLE constexpr atomic_fetch_bit_op_native_do_instr_fn<Instr>
+inline constexpr atomic_fetch_bit_op_native_do_instr_fn<Instr>
     atomic_fetch_bit_op_native_do_instr{};
 
 static constexpr auto& atomic_fetch_bit_op_native_bts =
@@ -431,16 +451,13 @@ bool atomic_fetch_flip_native(
 #else
 
 using atomic_fetch_set_native_fn = detail::atomic_fetch_set_fallback_fn;
-FOLLY_INLINE_VARIABLE constexpr atomic_fetch_set_native_fn
-    atomic_fetch_set_native{};
+inline constexpr atomic_fetch_set_native_fn atomic_fetch_set_native{};
 
 using atomic_fetch_reset_native_fn = detail::atomic_fetch_reset_fallback_fn;
-FOLLY_INLINE_VARIABLE constexpr atomic_fetch_reset_native_fn
-    atomic_fetch_reset_native{};
+inline constexpr atomic_fetch_reset_native_fn atomic_fetch_reset_native{};
 
 using atomic_fetch_flip_native_fn = detail::atomic_fetch_flip_fallback_fn;
-FOLLY_INLINE_VARIABLE constexpr atomic_fetch_flip_native_fn
-    atomic_fetch_flip_native{};
+inline constexpr atomic_fetch_flip_native_fn atomic_fetch_flip_native{};
 
 #endif
 

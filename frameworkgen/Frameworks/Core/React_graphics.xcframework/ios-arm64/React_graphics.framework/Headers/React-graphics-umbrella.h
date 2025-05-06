@@ -10,16 +10,17 @@
 #endif
 #endif
 
+#import "react/renderer/graphics/BackgroundImage.h"
+#import "react/renderer/graphics/BlendMode.h"
+#import "react/renderer/graphics/BoxShadow.h"
 #import "react/renderer/graphics/Color.h"
 #import "react/renderer/graphics/ColorComponents.h"
 #import "react/renderer/graphics/conversions.h"
 #import "react/renderer/graphics/Filter.h"
 #import "react/renderer/graphics/fromRawValueShared.h"
 #import "react/renderer/graphics/Geometry.h"
-#import "react/renderer/graphics/platform/ios/react/renderer/graphics/Float.h"
-#import "react/renderer/graphics/platform/ios/react/renderer/graphics/HostPlatformColor.h"
-#import "react/renderer/graphics/platform/ios/react/renderer/graphics/PlatformColorParser.h"
-#import "react/renderer/graphics/platform/ios/react/renderer/graphics/RCTPlatformColorUtils.h"
+#import "react/renderer/graphics/Isolation.h"
+#import "react/renderer/graphics/LinearGradient.h"
 #import "react/renderer/graphics/Point.h"
 #import "react/renderer/graphics/Rect.h"
 #import "react/renderer/graphics/RectangleCorners.h"
@@ -29,6 +30,10 @@
 #import "react/renderer/graphics/Transform.h"
 #import "react/renderer/graphics/ValueUnit.h"
 #import "react/renderer/graphics/Vector.h"
+#import "react/renderer/graphics/platform/ios/react/renderer/graphics/Float.h"
+#import "react/renderer/graphics/platform/ios/react/renderer/graphics/HostPlatformColor.h"
+#import "react/renderer/graphics/platform/ios/react/renderer/graphics/PlatformColorParser.h"
+#import "react/renderer/graphics/platform/ios/react/renderer/graphics/RCTPlatformColorUtils.h"
 
 FOUNDATION_EXPORT double React_graphicsVersionNumber;
 FOUNDATION_EXPORT const unsigned char React_graphicsVersionString[];

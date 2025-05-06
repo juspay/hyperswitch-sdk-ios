@@ -86,7 +86,7 @@ using pretty_default_tag = std::conditional_t< //
 
 template <typename T>
 static constexpr auto pretty_raw(pretty_tag_msc) {
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__clang__)
   return pretty_carray_from(__FUNCSIG__);
 #endif
 }
@@ -135,12 +135,6 @@ struct pretty_name_zarray {
   }
   static constexpr pretty_carray<size + 1> zarray = zarray_();
 };
-
-#if FOLLY_CPLUSPLUS < 201703L
-template <typename T, typename Tag>
-constexpr pretty_carray<pretty_name_zarray<T, Tag>::size + 1>
-    pretty_name_zarray<T, Tag>::zarray;
-#endif
 
 template <typename T>
 constexpr const auto& pretty_name_carray() {

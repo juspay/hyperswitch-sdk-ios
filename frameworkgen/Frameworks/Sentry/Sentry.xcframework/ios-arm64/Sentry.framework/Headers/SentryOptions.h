@@ -8,9 +8,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class SentryDsn, SentryMeasurementValue, SentryHttpStatusCodeRange, SentryScope,
-    SentryReplayOptions;
+@class SentryDsn;
 @class SentryExperimentalOptions;
+@class SentryHttpStatusCodeRange;
+@class SentryMeasurementValue;
+@class SentryReplayOptions;
+#if SENTRY_TARGET_PROFILING_SUPPORTED
+@class SentryProfileOptions;
+#endif // SENTRY_TARGET_PROFILING_SUPPORTED
+@class SentryScope;
 
 NS_SWIFT_NAME(Options)
 @interface SentryOptions : NSObject
@@ -270,13 +276,11 @@ NS_SWIFT_NAME(Options)
 @property (nonatomic, assign) BOOL enableAutoPerformanceTracing;
 
 /**
- * @warning This is an experimental feature and may still have bugs.
- *
- * Sentry works on reworking the whole performance offering with the code Mobile Starfish, which
- * aims to provide better insights into the performance of mobile apps and highlight clear actions
- * to improve app performance to developers. This feature flag enables experimental features that
- * impact the v1 performance offering and would require a major version update. Sentry aims to
- * include most features in the next major by default.
+ * We're working to update our Performance product offering in order to be able to provide better
+ * insights and highlight specific actions you can take to improve your mobile app's overall
+ * performance. The performanceV2 option changes the following behavior: The app start duration will
+ * now finish when the first frame is drawn instead of when the OS posts the
+ * UIWindowDidBecomeVisibleNotification. This change will be the default in the next major version.
  */
 @property (nonatomic, assign) BOOL enablePerformanceV2;
 
@@ -368,6 +372,15 @@ NS_SWIFT_NAME(Options)
 @property (nonatomic, assign) BOOL enablePreWarmedAppStartTracing;
 
 #endif // SENTRY_UIKIT_AVAILABLE
+
+#if SENTRY_TARGET_REPLAY_SUPPORTED
+
+/**
+ * Settings to configure the session replay.
+ */
+@property (nonatomic, strong) SentryReplayOptions *sessionReplay;
+
+#endif // SENTRY_TARGET_REPLAY_SUPPORTED
 
 /**
  * When enabled, the SDK tracks performance for HTTP requests if auto performance tracking and
@@ -504,6 +517,20 @@ NS_SWIFT_NAME(Options)
 
 #if SENTRY_TARGET_PROFILING_SUPPORTED
 /**
+ * Block used to configure the continuous profiling options.
+ * @warning Continuous profiling is an experimental feature and may contain bugs.
+ * @seealso @c SentryProfileOptions, @c SentrySDK.startProfiler and @c SentrySDK.stopProfiler .
+ */
+typedef void (^SentryProfilingConfigurationBlock)(SentryProfileOptions *_Nonnull profiling);
+
+/**
+ * Configuration for the Sentry profiler.
+ * @warning: Continuous profiling is an experimental feature and may still contain bugs.
+ * @warning: Profiling is automatically disabled if a thread sanitizer is attached.
+ */
+@property (nullable, nonatomic, copy) SentryProfilingConfigurationBlock configureProfiling;
+
+/**
  * @warning This is an experimental feature and may still have bugs.
  * Set to @c YES to run the profiler as early as possible in an app launch, before you would
  * normally have the opportunity to call @c SentrySDK.start . If @c profilesSampleRate is nonnull,
@@ -512,6 +539,8 @@ NS_SWIFT_NAME(Options)
  * @warning If @c profilesSampleRate is @c nil then a continuous profile will be started on every
  * launch; if you desire sampling profiled launches, you must compute your own sample rate to decide
  * whether to set this property to @c YES or @c NO .
+ * @warning This property is deprecated and will be removed in a future version of the SDK. See
+ * @c SentryProfileOptions.startOnAppStart and @c SentryProfileOptions.lifecycle .
  * @note Profiling is automatically disabled if a thread sanitizer is attached.
  */
 @property (nonatomic, assign) BOOL enableAppLaunchProfiling;
@@ -538,6 +567,8 @@ NS_SWIFT_NAME(Options)
  * @note The default is @c nil (which implies continuous profiling mode).
  * @warning The new continuous profiling mode is experimental and may still contain bugs.
  * @note Profiling is automatically disabled if a thread sanitizer is attached.
+ * @warning This property is deprecated and will be removed in a future version of the SDK. See
+ * @c  SentryProfileOptions.sessionSampleRate.
  */
 @property (nullable, nonatomic, strong) NSNumber *profilesSampleRate;
 
@@ -550,6 +581,8 @@ NS_SWIFT_NAME(Options)
  * with @c SentrySamplingContext.forNextAppLaunch set to @c YES, and the result will be persisted to
  * disk for use on the next app launch.
  * @note Profiling is automatically disabled if a thread sanitizer is attached.
+ * @warning This property is deprecated and will be removed in a future version of the SDK. See
+ * @c SentryProfileOptions.sessionSampleRate .
  */
 @property (nullable, nonatomic) SentryTracesSamplerCallback profilesSampler NS_SWIFT_SENDABLE;
 
@@ -562,6 +595,7 @@ NS_SWIFT_NAME(Options)
  * @returns @c YES if either @c profilesSampleRate > @c 0 and \<= @c 1 , or @c profilesSampler is
  * set, otherwise @c NO.
  * @note Profiling is automatically disabled if a thread sanitizer is attached.
+ * @warning This property is deprecated and will be removed in a future version of the SDK.
  */
 @property (nonatomic, assign, readonly) BOOL isProfilingEnabled;
 
@@ -754,6 +788,23 @@ NS_SWIFT_NAME(Options)
  * Be aware that the options available for experimental can change at any time.
  */
 @property (nonatomic, readonly) SentryExperimentalOptions *experimental;
+
+#if TARGET_OS_IOS && SENTRY_HAS_UIKIT
+
+/**
+ * A block that can be defined that receives a user feedback configuration object to modify.
+ * @warning This is an experimental feature and may still have bugs.
+ * @note This is unrelated to @c SentrySDK.captureUserFeedback , which is the deprecated method of
+ * submitting user feedback you've already gathered via your own UI (see
+ * https://docs.sentry.io/platforms/apple/user-feedback/#user-feedback-api). The new strategy uses
+ * either this block to configure a widget and UI form to gather feedback, or directly submits
+ * feedback you've gathered using your own UI by calling the method @c SentrySDK.captureFeedback
+ * (se https://docs.sentry.io/platforms/apple/user-feedback/configuration/).
+ */
+@property (nonatomic, copy, nullable)
+    SentryUserFeedbackConfigurationBlock configureUserFeedback API_AVAILABLE(ios(13.0));
+
+#endif // TARGET_OS_IOS && SENTRY_HAS_UIKIT
 
 @end
 

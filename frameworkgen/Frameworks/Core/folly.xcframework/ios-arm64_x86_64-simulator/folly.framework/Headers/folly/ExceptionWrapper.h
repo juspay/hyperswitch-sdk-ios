@@ -14,10 +14,6 @@
  * limitations under the License.
  */
 
-/*
- * Author: Eric Niebler <eniebler@fb.com>
- */
-
 #pragma once
 
 #include <cassert>
@@ -38,10 +34,9 @@
 #include <folly/Portability.h>
 #include <folly/Traits.h>
 #include <folly/Utility.h>
+#include <folly/functional/traits.h>
 #include <folly/lang/Assume.h>
 #include <folly/lang/Exception.h>
-
-#define FOLLY_EXCEPTION_WRAPPER_H_INCLUDED
 
 namespace folly {
 
@@ -102,11 +97,6 @@ namespace folly {
 //! \endcode
 class exception_wrapper final {
  private:
-  template <class Fn>
-  struct arg_type_;
-  template <class Fn>
-  using arg_type = _t<arg_type_<Fn>>;
-
   struct with_exception_from_fn_;
   struct with_exception_from_ex_;
 
@@ -114,15 +104,8 @@ class exception_wrapper final {
 
   template <class Ex>
   using IsStdException = std::is_base_of<std::exception, std::decay_t<Ex>>;
-  template <class CatchFn>
-  using IsCatchAll = std::is_same<arg_type<std::decay_t<CatchFn>>, void>;
-
-  struct PrivateCtor {};
 
   std::exception_ptr ptr_;
-
-  template <class Ex, typename... As>
-  exception_wrapper(PrivateCtor, in_place_type_t<Ex>, As&&... as);
 
   template <class T>
   struct IsRegularExceptionType
@@ -192,18 +175,18 @@ class exception_wrapper final {
   //! \post `type() == &typeid(ex)`
   //! \note Exceptions of types not derived from `std::exception` can still be
   //!     used to construct an `exception_wrapper`, but you must specify
-  //!     `folly::in_place` as the first parameter.
+  //!     `std::in_place` as the first parameter.
   template <
       class Ex,
       class Ex_ = std::decay_t<Ex>,
       FOLLY_REQUIRES(IsRegularExceptionType<Ex_>::value)>
-  exception_wrapper(in_place_t, Ex&& ex);
+  exception_wrapper(std::in_place_t, Ex&& ex);
 
   template <
       class Ex,
       typename... As,
       FOLLY_REQUIRES(IsRegularExceptionType<Ex>::value)>
-  exception_wrapper(in_place_type_t<Ex>, As&&... as);
+  exception_wrapper(std::in_place_type_t<Ex>, As&&... as);
 
   //! Swaps the value of `*this` with the value of `that`
   void swap(exception_wrapper& that) noexcept;
@@ -239,6 +222,7 @@ class exception_wrapper final {
   //! \return A `std::exception_ptr` that references the exception held by
   //!     `*this`.
   std::exception_ptr to_exception_ptr() const noexcept;
+  std::exception_ptr const& exception_ptr_ref() const noexcept;
 
   //! Returns the `typeid` of the wrapped exception object. If there is no
   //!     wrapped exception object, returns `nullptr`.
@@ -351,7 +335,7 @@ class exception_wrapper final {
  */
 template <class Ex, typename... As>
 exception_wrapper make_exception_wrapper(As&&... as) {
-  return exception_wrapper{in_place_type<Ex>, std::forward<As>(as)...};
+  return exception_wrapper{std::in_place_type<Ex>, std::forward<As>(as)...};
 }
 
 /**
@@ -383,7 +367,7 @@ fbstring exceptionStr(exception_wrapper const& ew);
 template <typename F>
 exception_wrapper try_and_catch(F&& fn) noexcept {
   auto x = [&] { return void(static_cast<F&&>(fn)()), std::exception_ptr{}; };
-  return exception_wrapper{catch_exception(x, std::current_exception)};
+  return exception_wrapper{catch_exception(x, current_exception)};
 }
 } // namespace folly
 

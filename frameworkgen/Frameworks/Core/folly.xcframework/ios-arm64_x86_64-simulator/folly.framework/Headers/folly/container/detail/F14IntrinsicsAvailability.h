@@ -32,7 +32,9 @@
 // If FOLLY_F14_VECTOR_INTRINSICS_AVAILABLE differs across compilation
 // units the program will fail to link due to a missing definition of
 // folly::container::detail::F14LinkCheck<X>::check() for some X.
-#if (FOLLY_SSE >= 2 || (FOLLY_NEON && FOLLY_AARCH64)) && !FOLLY_MOBILE
+#if (FOLLY_SSE >= 2 || (FOLLY_NEON && FOLLY_AARCH64) || FOLLY_RISCV64) && \
+    !FOLLY_MOBILE &&                                                      \
+    !(defined(FOLLY_F14_FORCE_FALLBACK) && FOLLY_F14_FORCE_FALLBACK)
 #define FOLLY_F14_VECTOR_INTRINSICS_AVAILABLE 1
 #else
 #define FOLLY_F14_VECTOR_INTRINSICS_AVAILABLE 0
@@ -42,14 +44,6 @@
 #define FOLLY_F14_CRC_INTRINSIC_AVAILABLE 1
 #else
 #define FOLLY_F14_CRC_INTRINSIC_AVAILABLE 0
-#endif
-
-// The F14 extension eraseInto is only available in fallback mode for
-// c++17 or later, because it relies on unordered_map::extract.
-#if FOLLY_F14_VECTOR_INTRINSICS_AVAILABLE || __cplusplus >= 201703L
-#define FOLLY_F14_ERASE_INTO_AVAILABLE 1
-#else
-#define FOLLY_F14_ERASE_INTO_AVAILABLE 0
 #endif
 
 namespace folly {

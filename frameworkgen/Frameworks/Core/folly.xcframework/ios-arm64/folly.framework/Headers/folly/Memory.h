@@ -38,17 +38,66 @@
 #include <folly/lang/Thunk.h>
 #include <folly/memory/Malloc.h>
 #include <folly/portability/Config.h>
+#include <folly/portability/Constexpr.h>
 #include <folly/portability/Malloc.h>
 
 namespace folly {
 
+namespace access {
+
+/// to_address_fn
+/// to_address
+///
+/// mimic: std::to_address (C++20)
+///
+/// adapted from: https://en.cppreference.com/w/cpp/memory/to_address, CC-BY-SA
+struct to_address_fn {
+ private:
+  template <template <typename...> typename T, typename A, typename... B>
+  static tag_t<A> get_first_arg(tag_t<T<A, B...>>);
+  template <typename T>
+  using first_arg_of = type_list_element_t<0, decltype(get_first_arg(tag<T>))>;
+  template <typename T>
+  using detect_element_type = typename T::element_type;
+  template <typename T>
+  using element_type_of =
+      detected_or_t<first_arg_of<T>, detect_element_type, T>;
+
+  template <typename T>
+  using detect_to_address =
+      decltype(std::pointer_traits<T>::to_address(FOLLY_DECLVAL(T const&)));
+
+  template <typename T>
+  static inline constexpr bool use_pointer_traits_to_address = Conjunction<
+      is_detected<element_type_of, T>,
+      is_detected<detect_to_address, T>>::value;
+
+ public:
+  template <typename T>
+  constexpr T* operator()(T* p) const noexcept {
+    static_assert(!std::is_function_v<T>);
+    return p;
+  }
+
+  template <typename T>
+  constexpr auto operator()(T const& p) const noexcept {
+    if constexpr (use_pointer_traits_to_address<T>) {
+      static_assert(noexcept(std::pointer_traits<T>::to_address(p)));
+      return std::pointer_traits<T>::to_address(p);
+    } else {
+      static_assert(noexcept(operator()(p.operator->())));
+      return operator()(p.operator->());
+    }
+  }
+};
+inline constexpr to_address_fn to_address;
+
+} // namespace access
+
 #if (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE >= 200112L) || \
     (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE >= 600) ||         \
     (defined(__ANDROID__) && (__ANDROID_API__ > 16)) ||         \
-    (defined(__APPLE__) &&                                      \
-     (__MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_6 ||          \
-      __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_3_0)) ||     \
-    defined(__FreeBSD__) || defined(__wasm32__)
+    (defined(__APPLE__)) || defined(__FreeBSD__) || defined(__wasm32__)
 
 inline void* aligned_malloc(size_t size, size_t align) {
   // use posix_memalign, but mimic the behaviour of memalign
@@ -230,41 +279,6 @@ size_t allocationBytesForOverAligned(size_t n) {
 }
 
 /**
- * For exception safety and consistency with make_shared. Erase me when
- * we have std::make_unique().
- *
- * @author Louis Brandy (ldbrandy@fb.com)
- * @author Xu Ning (xning@fb.com)
- */
-
-#if __cplusplus >= 201402L || __cpp_lib_make_unique >= 201304L || \
-    (__ANDROID__ && __cplusplus >= 201300L) || _MSC_VER >= 1900
-
-/* using override */ using std::make_unique;
-
-#else
-
-template <typename T, typename... Args>
-typename std::enable_if<!std::is_array<T>::value, std::unique_ptr<T>>::type
-make_unique(Args&&... args) {
-  return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
-}
-
-// Allows 'make_unique<T[]>(10)'. (N3690 s20.9.1.4 p3-4)
-template <typename T>
-typename std::enable_if<std::is_array<T>::value, std::unique_ptr<T>>::type
-make_unique(const size_t n) {
-  return std::unique_ptr<T>(new typename std::remove_extent<T>::type[n]());
-}
-
-// Disallows 'make_unique<T[10]>()'. (N3690 s20.9.1.4 p5)
-template <typename T, typename... Args>
-typename std::enable_if<std::extent<T>::value != 0, std::unique_ptr<T>>::type
-make_unique(Args&&...) = delete;
-
-#endif
-
-/**
  * static_function_deleter
  *
  * So you can write this:
@@ -399,11 +413,11 @@ std::weak_ptr<U> to_weak_ptr_aliasing(const std::shared_ptr<T>& r, U* ptr) {
  *
  *  Move or copy the argument to the heap and return it owned by a unique_ptr.
  *
- *  Like make_unique, but deduces the type of the owned object.
+ *  Like std::make_unique, but deduces the type of the owned object.
  */
 template <typename T>
 std::unique_ptr<remove_cvref_t<T>> copy_to_unique_ptr(T&& t) {
-  return make_unique<remove_cvref_t<T>>(static_cast<T&&>(t));
+  return std::make_unique<remove_cvref_t<T>>(static_cast<T&&>(t));
 }
 
 /**
@@ -483,21 +497,6 @@ erased_unique_ptr copy_to_erased_unique_ptr(T&& obj) {
 inline erased_unique_ptr empty_erased_unique_ptr() {
   return {nullptr, nullptr};
 }
-
-//  reinterpret_pointer_cast
-//
-//  import or backport
-#if FOLLY_CPLUSPLUS >= 201703L && __cpp_lib_shared_ptr_arrays >= 201611
-using std::reinterpret_pointer_cast;
-#else
-template <typename T, typename U>
-std::shared_ptr<T> reinterpret_pointer_cast(
-    const std::shared_ptr<U>& r) noexcept {
-  auto p =
-      reinterpret_cast<typename std::shared_ptr<T>::element_type*>(r.get());
-  return std::shared_ptr<T>{r, p};
-}
-#endif
 
 /**
  * SysAllocator

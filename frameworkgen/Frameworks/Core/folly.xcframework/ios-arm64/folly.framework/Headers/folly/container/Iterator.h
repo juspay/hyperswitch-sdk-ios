@@ -26,6 +26,7 @@
 #include <folly/Traits.h>
 #include <folly/Utility.h>
 #include <folly/container/Access.h>
+#include <folly/functional/Invoke.h>
 #include <folly/lang/RValueReferenceWrapper.h>
 
 namespace folly {
@@ -35,10 +36,10 @@ namespace folly {
 //  Whether std::distance over a pair of iterators is reasonably known to give
 //  the distance without advancing the iterators or copies of them.
 template <typename Iter, typename SentinelIter>
-FOLLY_INLINE_VARIABLE constexpr bool iterator_has_known_distance_v =
-    !sizeof(Iter) && !sizeof(SentinelIter);
+inline constexpr bool iterator_has_known_distance_v =
+    !require_sizeof<Iter> || !require_sizeof<SentinelIter>;
 template <typename Iter>
-FOLLY_INLINE_VARIABLE constexpr bool iterator_has_known_distance_v<Iter, Iter> =
+inline constexpr bool iterator_has_known_distance_v<Iter, Iter> =
     std::is_base_of<
         std::random_access_iterator_tag,
         typename std::iterator_traits<Iter>::iterator_category>::value;
@@ -69,7 +70,7 @@ FOLLY_INLINE_VARIABLE constexpr bool iterator_has_known_distance_v<Iter, Iter> =
 //      }
 //      return results;
 template <typename Range>
-FOLLY_INLINE_VARIABLE constexpr bool range_has_known_distance_v =
+inline constexpr bool range_has_known_distance_v =
     iterator_has_known_distance_v<
         invoke_result_t<access::begin_fn, Range>,
         invoke_result_t<access::end_fn, Range>>;
@@ -84,10 +85,10 @@ using iterator_category_t =
 namespace detail {
 
 template <typename Iter, typename Category, typename = void>
-FOLLY_INLINE_VARIABLE constexpr bool iterator_category_matches_v_ =
-    !sizeof(Iter) && !sizeof(Category);
+inline constexpr bool iterator_category_matches_v_ =
+    !require_sizeof<Iter> || !require_sizeof<Category>;
 template <typename Iter, typename Category>
-FOLLY_INLINE_VARIABLE constexpr bool iterator_category_matches_v_<
+inline constexpr bool iterator_category_matches_v_<
     Iter,
     Category,
     void_t<iterator_category_t<Iter>>> =
@@ -102,7 +103,7 @@ FOLLY_INLINE_VARIABLE constexpr bool iterator_category_matches_v_<
 //
 //  Useful for containers deduction guides implementation.
 template <typename Iter, typename Category>
-FOLLY_INLINE_VARIABLE constexpr bool iterator_category_matches_v =
+inline constexpr bool iterator_category_matches_v =
     detail::iterator_category_matches_v_<Iter, Category>;
 
 //  iterator_value_type_t
@@ -110,6 +111,12 @@ FOLLY_INLINE_VARIABLE constexpr bool iterator_category_matches_v =
 //  Extracts a value type from an iterator.
 template <typename Iter>
 using iterator_value_type_t = typename std::iterator_traits<Iter>::value_type;
+
+//  iterator_reference_type_t
+//
+//  Extracts reference from an iterator (C++20 iter_reference_t backported)
+template <typename Iter>
+using iterator_reference_t = decltype(*std::declval<Iter&>());
 
 //  iterator_key_type_t
 //
@@ -597,7 +604,23 @@ struct arrow_proxy {
   explicit arrow_proxy(Ref* ref) : res(*ref) {}
 };
 
+struct index_iterator_access_at {
+  template <typename Container, typename Index>
+  constexpr decltype(auto) operator()(Container& container, Index index) const {
+    if constexpr (folly::is_tag_invocable_v<
+                      index_iterator_access_at,
+                      Container&,
+                      Index>) {
+      return folly::tag_invoke(*this, container, index);
+    } else {
+      return container[index];
+    }
+  }
+};
+
 } // namespace detail
+
+FOLLY_DEFINE_CPO(detail::index_iterator_access_at, index_iterator_access_at)
 
 /**
  * index_iterator
@@ -625,8 +648,20 @@ struct arrow_proxy {
  *  Note that `some_ref_type` can be any proxy reference, as long as the
  *  algorithms support that (for example from range-v3).
  *
- * NOTE: there is no way to override `operator[]`, if that's needed
- *       we recommend to wrap your data in a struct with `operator[]`.
+ * NOTE: if `operator[]` doesn't work for you for some reason
+ *       you can specify:
+ *
+ * ```
+ *  friend some_ref_type tag_invoke(
+ *    folly::cpo_t<index_iterator_access_at>,
+ *    Container& c,
+ *    std::size_t index);
+ *
+ *  friend some_cref_type tag_invoke(
+ *    folly::cpo_t<index_iterator_access_at>,
+ *    const Container& c,
+ *    std::size_t index);
+ * ```
  **/
 
 template <typename Container>
@@ -636,6 +671,12 @@ class index_iterator {
 
   template <typename T>
   using get_difference_type_t = typename std::remove_cv_t<T>::difference_type;
+
+  template <typename IndexType>
+  constexpr static decltype(auto) get_reference_by_index(
+      Container& container, IndexType index) {
+    return index_iterator_access_at(container, index);
+  }
 
  public:
   // index iterator specific types
@@ -647,7 +688,8 @@ class index_iterator {
 
   using value_type = typename std::remove_const_t<container_type>::value_type;
   using iterator_category = std::random_access_iterator_tag;
-  using reference = decltype(FOLLY_DECLVAL(container_type&)[size_type{}]);
+  using reference = decltype(get_reference_by_index(
+      FOLLY_DECLVAL(container_type&), size_type{}));
   using difference_type =
       detected_or_t<std::ptrdiff_t, get_difference_type_t, Container>;
 
@@ -683,7 +725,9 @@ class index_iterator {
 
   // access ---
 
-  constexpr reference operator*() const { return (*container_)[index_]; }
+  constexpr reference operator*() const {
+    return get_reference_by_index(*container_, index_);
+  }
 
   pointer operator->() const {
     // It's equivalent to pointer{&**this} but compiler stops

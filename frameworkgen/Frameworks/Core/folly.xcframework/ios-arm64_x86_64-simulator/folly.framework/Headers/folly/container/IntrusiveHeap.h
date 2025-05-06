@@ -12,8 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * @author Tom Jackson <tjackson@fb.com>
  */
 
 /**
@@ -27,6 +25,7 @@
 #pragma once
 
 #include <functional>
+#include <utility>
 
 #include <boost/intrusive/parent_from_member.hpp>
 #include <boost/noncopyable.hpp>

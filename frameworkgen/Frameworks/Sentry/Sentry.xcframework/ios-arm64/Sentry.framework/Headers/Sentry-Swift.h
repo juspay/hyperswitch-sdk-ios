@@ -304,6 +304,12 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 #endif
 
 #if defined(__OBJC__)
+
+
+
+
+
+
 @class NSString;
 
 SWIFT_CLASS("_TtC6Sentry19HTTPHeaderSanitizer")
@@ -311,6 +317,8 @@ SWIFT_CLASS("_TtC6Sentry19HTTPHeaderSanitizer")
 + (NSDictionary<NSString *, NSString *> * _Nonnull)sanitizeHeaders:(NSDictionary<NSString *, NSString *> * _Nonnull)headers SWIFT_WARN_UNUSED_RESULT;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
+
+
 
 
 
@@ -344,6 +352,16 @@ SWIFT_CLASS("_TtC6Sentry15RRWebTouchEvent")
 - (nonnull instancetype)initWithType:(enum SentryRRWebEventType)type timestamp:(NSDate * _Nonnull)timestamp data:(NSDictionary<NSString *, id> * _Nullable)data SWIFT_UNAVAILABLE;
 @end
 
+
+SWIFT_CLASS("_TtC6Sentry22SentryANRStoppedResult")
+@interface SentryANRStoppedResult : NSObject
+@property (nonatomic, readonly) NSTimeInterval minDuration;
+@property (nonatomic, readonly) NSTimeInterval maxDuration;
+- (nonnull instancetype)initWithMinDuration:(NSTimeInterval)minDuration maxDuration:(NSTimeInterval)maxDuration OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
++ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+@end
+
 @protocol SentryANRTrackerDelegate;
 
 SWIFT_PROTOCOL("_TtP6Sentry16SentryANRTracker_")
@@ -360,19 +378,22 @@ enum SentryANRType : NSInteger;
 SWIFT_PROTOCOL("_TtP6Sentry24SentryANRTrackerDelegate_")
 @protocol SentryANRTrackerDelegate
 - (void)anrDetectedWithType:(enum SentryANRType)type;
-- (void)anrStopped;
+- (void)anrStoppedWithResult:(SentryANRStoppedResult * _Nullable)result;
 @end
 
 typedef SWIFT_ENUM(NSInteger, SentryANRType, closed) {
-  SentryANRTypeFullyBlocking = 0,
-  SentryANRTypeNonFullyBlocking = 1,
-  SentryANRTypeUnknown = 2,
+  SentryANRTypeFatalFullyBlocking = 0,
+  SentryANRTypeFatalNonFullyBlocking = 1,
+  SentryANRTypeFullyBlocking = 2,
+  SentryANRTypeNonFullyBlocking = 3,
+  SentryANRTypeUnknown = 4,
 };
 
 
 SWIFT_CLASS("_TtC6Sentry23SentryAppHangTypeMapper")
 @interface SentryAppHangTypeMapper : NSObject
 + (NSString * _Nonnull)getExceptionTypeWithAnrType:(enum SentryANRType)anrType SWIFT_WARN_UNUSED_RESULT;
++ (NSString * _Nonnull)getFatalExceptionTypeWithNonFatalErrorType:(NSString * _Nonnull)nonFatalErrorType SWIFT_WARN_UNUSED_RESULT;
 + (BOOL)isExceptionTypeAppHangWithExceptionType:(NSString * _Nonnull)exceptionType SWIFT_WARN_UNUSED_RESULT;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
@@ -406,25 +427,124 @@ SWIFT_CLASS("_TtC6Sentry32SentryDefaultCurrentDateProvider")
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
+
+SWIFT_CLASS("_TtC6Sentry25SentryDefaultMaskRenderer")
+@interface SentryDefaultMaskRenderer : NSObject
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
+@end
+
+@class UIView;
+@class UIImage;
+
+SWIFT_PROTOCOL("_TtP6Sentry18SentryViewRenderer_")
+@protocol SentryViewRenderer
+- (UIImage * _Nonnull)renderWithView:(UIView * _Nonnull)view SWIFT_WARN_UNUSED_RESULT;
+@end
+
+
+SWIFT_CLASS("_TtC6Sentry25SentryDefaultViewRenderer")
+@interface SentryDefaultViewRenderer : NSObject <SentryViewRenderer>
+- (UIImage * _Nonnull)renderWithView:(UIView * _Nonnull)view SWIFT_WARN_UNUSED_RESULT;
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
+@end
+
 @class SentryOptions;
 
 SWIFT_CLASS("_TtC6Sentry28SentryEnabledFeaturesBuilder")
 @interface SentryEnabledFeaturesBuilder : NSObject
-+ (NSArray<NSString *> * _Nonnull)getEnabledFeaturesWithOptions:(SentryOptions * _Nonnull)options SWIFT_WARN_UNUSED_RESULT;
++ (NSArray<NSString *> * _Nonnull)getEnabledFeaturesWithOptions:(SentryOptions * _Nullable)options SWIFT_WARN_UNUSED_RESULT;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
-@class SentryReplayOptions;
+
+@class NSData;
+@class SentryEvent;
+
+SWIFT_CLASS("_TtC6Sentry18SentryEventDecoder")
+@interface SentryEventDecoder : NSObject
++ (SentryEvent * _Nullable)decodeEventWithJsonData:(NSData * _Nonnull)jsonData SWIFT_WARN_UNUSED_RESULT;
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
+@end
+
+
+SWIFT_CLASS("_TtC6Sentry30SentryExperimentalMaskRenderer")
+@interface SentryExperimentalMaskRenderer : SentryDefaultMaskRenderer
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
+@end
+
 
 SWIFT_CLASS("_TtC6Sentry25SentryExperimentalOptions")
 @interface SentryExperimentalOptions : NSObject
-/// Settings to configure the session replay.
-@property (nonatomic, strong) SentryReplayOptions * _Nonnull sessionReplay;
+/// Enables swizzling of<code>NSData</code> to automatically track file operations.
+/// note:
+/// Swizzling is enabled by setting <code>SentryOptions.enableSwizzling</code> to <code>true</code>.
+/// This option allows you to disable swizzling for <code>NSData</code> only, while keeping swizzling enabled for other classes.
+/// This is useful if you want to use manual tracing for file operations.
+@property (nonatomic) BOOL enableDataSwizzling;
+/// Enables swizzling of<code>NSFileManager</code> to automatically track file operations.
+/// note:
+/// Swizzling is enabled by setting <code>SentryOptions.enableSwizzling</code> to <code>true</code>.
+/// This option allows you to disable swizzling for <code>NSFileManager</code> only, while keeping swizzling enabled for other classes.
+/// This is useful if you want to use manual tracing for file operations.
+/// experiment:
+/// This is an experimental feature and is therefore disabled by default. We’ll enable it by default in a future release.
+@property (nonatomic) BOOL enableFileManagerSwizzling;
 - (void)validateOptions:(NSDictionary<NSString *, id> * _Nullable)options;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
-@class NSData;
+
+SWIFT_CLASS("_TtC6Sentry30SentryExperimentalViewRenderer")
+@interface SentryExperimentalViewRenderer : NSObject <SentryViewRenderer>
+@property (nonatomic, readonly) BOOL enableFastViewRendering;
+- (nonnull instancetype)initWithEnableFastViewRendering:(BOOL)enableFastViewRendering OBJC_DESIGNATED_INITIALIZER;
+- (UIImage * _Nonnull)renderWithView:(UIView * _Nonnull)view SWIFT_WARN_UNUSED_RESULT;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
++ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+@end
+
+enum SentryFeedbackSource : NSInteger;
+@class SentryId;
+
+SWIFT_CLASS("_TtC6Sentry14SentryFeedback")
+@interface SentryFeedback : NSObject
+@property (nonatomic, copy) NSString * _Nullable name;
+@property (nonatomic, copy) NSString * _Nullable email;
+@property (nonatomic, copy) NSString * _Nonnull message;
+@property (nonatomic) enum SentryFeedbackSource source;
+@property (nonatomic, readonly, strong) SentryId * _Nonnull eventId;
+/// The event id that this feedback is associated with, like a crash report.
+@property (nonatomic, strong) SentryId * _Nullable associatedEventId;
+/// \param associatedEventId The ID for an event you’d like associated with the feedback. 
+///
+/// \param attachments Data objects for any attachments. Currently the web UI only supports showing one attached image, like for a screenshot. 
+///
+- (nonnull instancetype)initWithMessage:(NSString * _Nonnull)message name:(NSString * _Nullable)name email:(NSString * _Nullable)email source:(enum SentryFeedbackSource)source associatedEventId:(SentryId * _Nullable)associatedEventId attachments:(NSArray<NSData *> * _Nullable)attachments OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
++ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+@end
+
+typedef SWIFT_ENUM(NSInteger, SentryFeedbackSource, open) {
+  SentryFeedbackSourceWidget = 0,
+  SentryFeedbackSourceCustom = 1,
+};
+
+
+@interface SentryFeedback (SWIFT_EXTENSION(Sentry)) <SentrySerializable>
+- (NSDictionary<NSString *, id> * _Nonnull)serialize SWIFT_WARN_UNUSED_RESULT;
+@end
+
+@class SentryAttachment;
+
+@interface SentryFeedback (SWIFT_EXTENSION(Sentry))
+/// note:
+/// This dictionary is to pass to the block <code>SentryUserFeedbackConfiguration.onSubmitSuccess</code>, describing the contents submitted. This is different from the serialized form of the feedback for envelope transmission, because there are some internal details in that serialization that are irrelevant to the consumer and are not available at the time <code>onSubmitSuccess</code> is called.
+- (NSDictionary<NSString *, id> * _Nonnull)dataDictionary SWIFT_WARN_UNUSED_RESULT;
+/// note:
+/// Currently there is only a single attachment possible, for the screenshot, of which there can be only one.
+- (NSArray<SentryAttachment *> * _Nonnull)attachmentsForEnvelope SWIFT_WARN_UNUSED_RESULT;
+@end
+
 
 SWIFT_CLASS("_TtC6Sentry18SentryFileContents")
 @interface SentryFileContents : NSObject
@@ -434,6 +554,7 @@ SWIFT_CLASS("_TtC6Sentry18SentryFileContents")
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
+
 
 
 SWIFT_CLASS("_TtC6Sentry23SentryFramesDelayResult")
@@ -451,9 +572,8 @@ SWIFT_CLASS("_TtC6Sentry23SentryFramesDelayResult")
 SWIFT_CLASS("_TtC6Sentry8SentryId")
 @interface SentryId : NSObject
 /// A @c SentryId with an empty UUID “00000000000000000000000000000000”.
-SWIFT_CLASS_PROPERTY(@property (nonatomic, class, strong) SentryId * _Nonnull empty;)
+SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) SentryId * _Nonnull empty;)
 + (SentryId * _Nonnull)empty SWIFT_WARN_UNUSED_RESULT;
-+ (void)setEmpty:(SentryId * _Nonnull)value;
 /// Returns a 32 lowercase character hexadecimal string description of the @c SentryId, such as
 /// “12c2d058d58442709aa2eca08bf20986”.
 @property (nonatomic, readonly, copy) NSString * _Nonnull sentryIdString;
@@ -574,7 +694,20 @@ SWIFT_PROTOCOL("_TtP6Sentry23SentryMXManagerDelegate_") SWIFT_AVAILABILITY(watch
 - (void)didReceiveHangDiagnostic:(MXHangDiagnostic * _Nonnull)diagnostic callStackTree:(SentryMXCallStackTree * _Nonnull)callStackTree timeStampBegin:(NSDate * _Nonnull)timeStampBegin timeStampEnd:(NSDate * _Nonnull)timeStampEnd;
 @end
 
-@class UIImage;
+@protocol SentryRedactOptions;
+@class NSCoder;
+
+SWIFT_CLASS("_TtC6Sentry24SentryMaskingPreviewView")
+@interface SentryMaskingPreviewView : UIView
+@property (nonatomic) float opacity;
+- (nonnull instancetype)initWithRedactOptions:(id <SentryRedactOptions> _Nonnull)redactOptions OBJC_DESIGNATED_INITIALIZER;
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+- (void)didMoveToSuperview;
+- (nonnull instancetype)initWithFrame:(CGRect)frame SWIFT_UNAVAILABLE;
+@end
+
+
+
 @class SentryVideoInfo;
 
 SWIFT_PROTOCOL("_TtP6Sentry22SentryReplayVideoMaker_")
@@ -603,6 +736,104 @@ SWIFT_CLASS("_TtC6Sentry20SentryOnDemandReplay")
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
+
+enum SentryProfileLifecycle : NSInteger;
+
+/// An object containing configuration for the Sentry profiler.
+/// warning:
+/// Continuous profiling is an experimental feature and may still contain bugs.
+/// note:
+/// If either <code>SentryOptions.profilesSampleRate</code> or <code>SentryOptions.profilesSampler</code> are
+/// set to a non-nil value such that transaction-based profiling is being used, these settings
+/// will have no effect, nor will <code>SentrySDK.startProfiler()</code> or <code>SentrySDK.stopProfiler()</code>.
+/// note:
+/// Profiling is automatically disabled if a thread sanitizer is attached.
+SWIFT_CLASS("_TtC6Sentry20SentryProfileOptions")
+@interface SentryProfileOptions : NSObject
+/// The mode to use for starting and stopping the profiler, either manually or automatically.
+/// warning:
+/// Continuous profiling is an experimental feature and may still contain bugs.
+/// note:
+/// Default: <code>SentryProfileLifecycleManual</code>.
+/// note:
+/// If either <code>SentryOptions.profilesSampleRate</code> or <code>SentryOptions.profilesSampler</code> are
+/// set to a non-nil value such that transaction-based profiling is being used, then setting
+/// this property has no effect.
+/// note:
+/// Profiling is automatically disabled if a thread sanitizer is attached.
+@property (nonatomic) enum SentryProfileLifecycle lifecycle;
+/// The % of user sessions in which to enable profiling.
+/// warning:
+/// Continuous profiling is an experimental feature and may still contain bugs.
+/// note:
+/// The decision whether or not to sample profiles is computed using this sample rate
+/// when the SDK is started, and applies to any requests to start the profiler–regardless of
+/// <code>lifecycle</code>– until the app resigns its active status. It is then reevaluated on subsequent
+/// foreground events. The duration of time that a sample decision prevails between
+/// launch/foreground and background is referred to as a profile session.
+/// note:
+/// Backgrounding and foregrounding the app starts a new user session and sampling is
+/// re-evaluated. If there is no active trace when the app is backgrounded, profiling stops
+/// before the app backgrounds. If there is an active trace and profiling is in-flight when the
+/// app is foregrounded again, the same profiling session should continue until the last root
+/// span in that trace finishes — this means that the re-evaluated sample rate does not actually
+/// take effect until the profiler is started again.
+/// note:
+/// Profiling is automatically disabled if a thread sanitizer is attached.
+@property (nonatomic) float sessionSampleRate;
+/// Start the profiler as early as possible during the app lifecycle to capture more activity
+/// during your app’s launch.
+/// warning:
+/// Continuous profiling is an experimental feature and may still contain bugs.
+/// note:
+/// <code>sessionSampleRate</code> is evaluated on the previous launch and only takes effect when
+/// app start profiling activates on the next launch.
+/// note:
+/// If <code>lifecycle</code> is <code>manual</code>, profiling is started automatically on startup, but you
+/// must manually call <code>SentrySDK.stopProfiler()</code> whenever you app startup to be complete. If
+/// <code>lifecycle</code> is <code>trace</code>, profiling is started automatically on startup, and will
+/// automatically be stopped when the root span that is associated with app startup ends.
+/// note:
+/// Profiling is automatically disabled if a thread sanitizer is attached.
+@property (nonatomic) BOOL profileAppStarts;
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
+@end
+
+/// Different modes for starting and stopping the profiler.
+typedef SWIFT_ENUM(NSInteger, SentryProfileLifecycle, open) {
+/// Profiling is controlled manually, and is independent of transactions & spans. Developers
+/// must use<code>SentrySDK.startProfiler()</code> and <code>SentrySDK.stopProfiler()</code> to manage the profile
+/// session. If the session is sampled, <code>SentrySDK.startProfiler()</code> will always start
+/// profiling.
+/// warning:
+/// Continuous profiling is an experimental feature and may still contain bugs.
+/// note:
+/// Profiling is automatically disabled if a thread sanitizer is attached.
+  SentryProfileLifecycleManual = 0,
+/// Profiling is automatically started when there is at least 1 active root span, and
+/// automatically stopped when there are 0 root spans.
+/// warning:
+/// Continuous profiling is an experimental feature and may still contain bugs.
+/// note:
+/// This mode only works if tracing is enabled.
+/// note:
+/// Profiling respects both <code>SentryProfileOptions.profileSessionSampleRate</code> and
+/// the existing sampling configuration for tracing
+/// (<code>SentryOptions.tracesSampleRate</code>/<code>SentryOptions.tracesSampler</code>). Sampling will be
+/// re-evaluated on a per root span basis.
+/// note:
+/// If there are multiple overlapping root spans, where some are sampled and some or
+/// not, profiling will continue until the end of the last sampled root span. Profiling data
+/// will not be linked with spans that are not sampled.
+/// note:
+/// When the last root span finishes, the profiler will continue running until the
+/// end of the current timed interval. If a new root span starts before this interval
+/// completes, the profiler will instead continue running until the next root span stops, at
+/// which time it will attempt to stop again in the same way.
+/// note:
+/// Profiling is automatically disabled if a thread sanitizer is attached.
+  SentryProfileLifecycleTrace = 1,
+};
 
 
 SWIFT_CLASS("_TtC6Sentry22SentryRRWebCustomEvent")
@@ -636,6 +867,15 @@ SWIFT_CLASS("_TtC6Sentry20SentryRRWebMetaEvent")
 - (nonnull instancetype)initWithType:(enum SentryRRWebEventType)type timestamp:(NSDate * _Nonnull)timestamp data:(NSDictionary<NSString *, id> * _Nullable)data SWIFT_UNAVAILABLE;
 @end
 
+@class SentryReplayOptions;
+
+SWIFT_CLASS("_TtC6Sentry23SentryRRWebOptionsEvent")
+@interface SentryRRWebOptionsEvent : SentryRRWebCustomEvent
+- (nonnull instancetype)initWithTimestamp:(NSDate * _Nonnull)timestamp customOptions:(NSDictionary<NSString *, id> * _Nonnull)customOptions OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithTimestamp:(NSDate * _Nonnull)timestamp options:(SentryReplayOptions * _Nonnull)options OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithTimestamp:(NSDate * _Nonnull)timestamp tag:(NSString * _Nonnull)tag payload:(NSDictionary<NSString *, id> * _Nonnull)payload SWIFT_UNAVAILABLE;
+@end
+
 
 SWIFT_CLASS("_TtC6Sentry20SentryRRWebSpanEvent")
 @interface SentryRRWebSpanEvent : SentryRRWebCustomEvent
@@ -659,7 +899,17 @@ SWIFT_PROTOCOL("_TtP6Sentry19SentryRedactOptions_")
 @property (nonatomic, readonly, copy) NSArray<Class> * _Nonnull unmaskedViewClasses;
 @end
 
-@class UIView;
+
+SWIFT_CLASS("_TtC6Sentry26SentryRedactDefaultOptions")
+@interface SentryRedactDefaultOptions : NSObject <SentryRedactOptions>
+@property (nonatomic) BOOL maskAllText;
+@property (nonatomic) BOOL maskAllImages;
+@property (nonatomic, copy) NSArray<Class> * _Nonnull maskedViewClasses;
+@property (nonatomic, copy) NSArray<Class> * _Nonnull unmaskedViewClasses;
+- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
+@end
+
+
 
 SWIFT_CLASS("_TtC6Sentry22SentryRedactViewHelper")
 @interface SentryRedactViewHelper : NSObject
@@ -750,6 +1000,33 @@ SWIFT_CLASS("_TtC6Sentry19SentryReplayOptions")
 /// The views of given classes will not be redacted but their children may be.
 /// This property has precedence over <code>redactViewTypes</code>.
 @property (nonatomic, copy) NSArray<Class> * _Nonnull unmaskedViewClasses;
+/// Enables the up to 5x faster experimental view renderer used by the Session Replay integration.
+/// Enabling this flag will reduce the amount of time it takes to render each frame of the session replay on the main thread, therefore reducing
+/// interruptions and visual lag. <a href="https://github.com/getsentry/sentry-cocoa/pull/4940">Our benchmarks</a> have shown a significant improvement of
+/// <em>up to 4-5x faster rendering</em> (reducing <code>~160ms</code> to <code>~36ms</code> per frame).
+/// experiment:
+/// This is an experimental feature and is therefore disabled by default. In case you are noticing issues with the experimental
+/// view renderer, please report the issue on <a href="https://github.com/getsentry/sentry-cocoa">GitHub</a>. Eventually, we will
+/// remove this feature flag and use the experimental view renderer by default.
+@property (nonatomic) BOOL enableExperimentalViewRenderer;
+/// Enables up to 5x faster but incommpelte view rendering used by the Session Replay integration.
+/// Enabling this flag will reduce the amount of time it takes to render each frame of the session replay on the main thread, therefore reducing
+/// interruptions and visual lag. <a href="https://github.com/getsentry/sentry-cocoa/pull/4940">Our benchmarks</a> have shown a significant improvement of
+/// up to <em>5x faster render times</em> (reducing <code>~160ms</code> to <code>~30ms</code> per frame).
+/// This flag controls the way the view hierarchy is drawn into a graphics context for the session replay. By default, the view hierarchy is drawn using
+/// the <code>UIView.drawHierarchy(in:afterScreenUpdates:)</code> method, which is the most complete way to render the view hierarchy. However,
+/// this method can be slow, especially when rendering complex views, therefore enabling this flag will switch to render the underlying <code>CALayer</code> instead.
+/// note:
+/// This flag can only be used together with <code>enableExperimentalViewRenderer</code> with up to 20% faster render times.
+/// warning:
+/// Rendering the view hiearchy using the <code>CALayer.render(in:)</code> method can lead to rendering issues, especially when using custom views.
+/// For complete rendering, it is recommended to set this option to <code>false</code>. In case you prefer performance over completeness, you can
+/// set this option to <code>true</code>.
+/// experiment:
+/// This is an experimental feature and is therefore disabled by default. In case you are noticing issues with the experimental
+/// view renderer, please report the issue on <a href="https://github.com/getsentry/sentry-cocoa">GitHub</a>. Eventually, we will
+/// mark this feature as stable and remove the experimental flag, but will keep it disabled by default.
+@property (nonatomic) BOOL enableFastViewRendering;
 /// Defines the quality of the session replay.
 /// Higher bit rates better quality, but also bigger files to transfer.
 @property (nonatomic, readonly) NSInteger replayBitRate;
@@ -765,6 +1042,8 @@ SWIFT_CLASS("_TtC6Sentry19SentryReplayOptions")
 @property (nonatomic, readonly) NSTimeInterval sessionSegmentDuration;
 /// The maximum duration of a replay session.
 @property (nonatomic, readonly) NSTimeInterval maximumDuration;
+/// Used by hybrid SDKs to be able to configure SDK info for Session Replay
+@property (nonatomic, copy) NSDictionary<NSString *, id> * _Nullable sdkInfo;
 /// Inittialize session replay options disabled
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 /// Initialize session replay options
@@ -780,7 +1059,7 @@ SWIFT_CLASS("_TtC6Sentry19SentryReplayOptions")
 ///     error events.
 ///   </li>
 /// </ul>
-- (nonnull instancetype)initWithSessionSampleRate:(float)sessionSampleRate onErrorSampleRate:(float)onErrorSampleRate maskAllText:(BOOL)maskAllText maskAllImages:(BOOL)maskAllImages OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithSessionSampleRate:(float)sessionSampleRate onErrorSampleRate:(float)onErrorSampleRate maskAllText:(BOOL)maskAllText maskAllImages:(BOOL)maskAllImages enableExperimentalViewRenderer:(BOOL)enableExperimentalViewRenderer enableFastViewRendering:(BOOL)enableFastViewRendering OBJC_DESIGNATED_INITIALIZER;
 - (nonnull instancetype)initWithDictionary:(NSDictionary<NSString *, id> * _Nonnull)dictionary;
 @end
 
@@ -825,6 +1104,7 @@ typedef SWIFT_ENUM(NSInteger, SentryReplayType, closed) {
 
 
 
+
 SWIFT_CLASS("_TtC6Sentry34SentrySRDefaultBreadcrumbConverter")
 @interface SentrySRDefaultBreadcrumbConverter : NSObject <SentryReplayBreadcrumbConverter>
 /// This function will convert the SDK breadcrumbs to session replay breadcrumbs in a format that the front-end understands.
@@ -853,6 +1133,7 @@ SWIFT_CLASS("_TtC6Sentry19SentrySessionReplay")
 @property (nonatomic, readonly) BOOL isFullSession;
 @property (nonatomic, readonly, strong) SentryId * _Nullable sessionReplayId;
 @property (nonatomic, readonly) BOOL isSessionPaused;
+@property (nonatomic, copy) NSDictionary<NSString *, id> * _Nullable replayTags;
 @property (nonatomic, readonly) BOOL isRunning;
 @property (nonatomic, strong) id <SentryViewScreenshotProvider> _Nonnull screenshotProvider;
 @property (nonatomic, strong) id <SentryReplayBreadcrumbConverter> _Nonnull breadcrumbConverter;
@@ -878,17 +1159,20 @@ SWIFT_PROTOCOL("_TtP6Sentry27SentrySessionReplayDelegate_")
 @end
 
 
+
 SWIFT_CLASS("_TtC6Sentry29SentrySwizzleClassNameExclude")
 @interface SentrySwizzleClassNameExclude : NSObject
 + (BOOL)shouldExcludeClassWithClassName:(NSString * _Nonnull)className swizzleClassNameExcludes:(NSSet<NSString *> * _Nonnull)swizzleClassNameExcludes SWIFT_WARN_UNUSED_RESULT;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
+
 @class UIEvent;
 
 SWIFT_CLASS("_TtC6Sentry18SentryTouchTracker")
 @interface SentryTouchTracker : NSObject
-- (nonnull instancetype)initWithDateProvider:(id <SentryCurrentDateProvider> _Nonnull)dateProvider scale:(float)scale OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithDateProvider:(id <SentryCurrentDateProvider> _Nonnull)dateProvider scale:(float)scale dispatchQueue:(SentryDispatchQueueWrapper * _Nonnull)dispatchQueue OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithDateProvider:(id <SentryCurrentDateProvider> _Nonnull)dateProvider scale:(float)scale;
 - (void)trackTouchFromEvent:(UIEvent * _Nonnull)event;
 - (void)flushFinishedEvents;
 - (NSArray<SentryRRWebEvent *> * _Nonnull)replayEventsFrom:(NSDate * _Nonnull)from until:(NSDate * _Nonnull)until SWIFT_WARN_UNUSED_RESULT;
@@ -905,6 +1189,17 @@ typedef SWIFT_ENUM(NSInteger, SentryTransactionNameSource, open) {
   kSentryTransactionNameSourceTask SWIFT_COMPILE_NAME("sourceTask") = 5,
 };
 
+
+/// Use this protocol to customize the name used in the automatic
+/// UIViewController performance tracker, view hierarchy, and breadcrumbs.
+SWIFT_PROTOCOL("_TtP6Sentry32SentryUIViewControllerDescriptor_")
+@protocol SentryUIViewControllerDescriptor <NSObject>
+/// The custom name of the UIViewController
+/// that the Sentry SDK uses for transaction names, breadcrumbs, and
+/// view hierarchy.
+@property (nonatomic, readonly, copy) NSString * _Nonnull sentryName;
+@end
+
 @class SentryUserFeedbackWidgetConfiguration;
 @class SentryUserFeedbackFormConfiguration;
 @class SentryUserFeedbackThemeConfiguration;
@@ -913,6 +1208,10 @@ typedef SWIFT_ENUM(NSInteger, SentryTransactionNameSource, open) {
 /// it’s submitted, and some auxiliary hooks to customize the workflow.
 SWIFT_CLASS("_TtC6Sentry31SentryUserFeedbackConfiguration") SWIFT_AVAILABILITY(ios,introduced=13.0)
 @interface SentryUserFeedbackConfiguration : NSObject
+/// Whether or not to show animations, like for presenting and dismissing the form.
+/// note:
+/// Default: <code>true</code>.
+@property (nonatomic) BOOL animations;
 /// Configuration settings specific to the managed widget that displays the UI form.
 /// note:
 /// Default: <code>nil</code> to use the default widget settings.
@@ -940,28 +1239,24 @@ SWIFT_CLASS("_TtC6Sentry31SentryUserFeedbackConfiguration") SWIFT_AVAILABILITY(i
 /// note:
 /// Default: <code>nil</code>
 @property (nonatomic, copy) NSDictionary<NSString *, id> * _Nullable tags;
-/// Sets the email and name field text content to <code>SentryUser.email</code> and <code>SentryUser.name</code>.
-/// note:
-/// Default: <code>false</code>
-@property (nonatomic) BOOL useSentryUser;
-/// Called when the feedback form is opened.
+/// Called when the managed feedback form is opened.
 /// note:
 /// Default: <code>nil</code>
 @property (nonatomic, copy) void (^ _Nullable onFormOpen)(void);
-/// Called when the feedback form is closed.
+/// Called when the managed feedback form is closed.
 /// note:
 /// Default: <code>nil</code>
 @property (nonatomic, copy) void (^ _Nullable onFormClose)(void);
-/// Called when feedback is successfully submitted via the prepared form.
-/// The data dictionary contains the feedback details.
+/// Called when feedback is successfully submitted via the managed feedback form, indicating that the
+/// user correctly filled out the form and confirmed submission. The data dictionary contains the feedback details.
 /// note:
 /// Default: <code>nil</code>
 /// note:
 /// This is unrelated to <code>SentrySDK.captureUserFeedback</code> and is not called when using
 /// that function.
 @property (nonatomic, copy) void (^ _Nullable onSubmitSuccess)(NSDictionary<NSString *, id> * _Nonnull);
-/// Called when there is an error submitting feedback via the prepared form.
-/// The error object contains details of the error.
+/// Called when there is an error submitting feedback via the managed feedback form, like missing
+/// required inputs. The error object contains details of the error.
 /// note:
 /// Default: <code>nil</code>
 /// note:
@@ -988,8 +1283,14 @@ SWIFT_CLASS("_TtC6Sentry31SentryUserFeedbackConfiguration") SWIFT_AVAILABILITY(i
 @property (nonatomic) CGFloat textEffectiveHeightCenter;
 /// The ratio of the configured font size to the system default font size, to know how large to scale things like the icon and lozenge shape.
 @property (nonatomic) CGFloat scaleFactor;
+- (CGFloat)calculateScaleFactor SWIFT_WARN_UNUSED_RESULT;
 /// Too much padding as the font size grows larger makes the button look weird with lots of negative space. Keeping the padding constant looks weird if the text is too small. So, scale it down below system default font sizes, but keep it fixed with larger font sizes.
 @property (nonatomic) CGFloat paddingScaleFactor;
+- (CGFloat)calculatePaddingScaleFactor SWIFT_WARN_UNUSED_RESULT;
+- (void)recalculateScaleFactors;
+@property (nonatomic, readonly) CGFloat padding;
+@property (nonatomic, readonly) CGFloat spacing;
+@property (nonatomic, readonly) CGFloat margin;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
@@ -997,6 +1298,13 @@ SWIFT_CLASS("_TtC6Sentry31SentryUserFeedbackConfiguration") SWIFT_AVAILABILITY(i
 /// Settings to control the behavior and appearance of the UI form.
 SWIFT_CLASS("_TtC6Sentry35SentryUserFeedbackFormConfiguration") SWIFT_AVAILABILITY(ios,introduced=13.0)
 @interface SentryUserFeedbackFormConfiguration : NSObject
+/// Sets the email and name field text content to the values contained in the current scope’s
+/// <code>SentryUser</code> instance, if any.
+/// seealso:
+/// <code>- [SentrySDK setUser:]</code>
+/// note:
+/// Default: <code>true</code>
+@property (nonatomic) BOOL useSentryUser;
 /// Displays the Sentry logo inside of the form.
 /// note:
 /// Default: <code>true</code>
@@ -1009,34 +1317,23 @@ SWIFT_CLASS("_TtC6Sentry35SentryUserFeedbackFormConfiguration") SWIFT_AVAILABILI
 /// note:
 /// Default: <code>"Description"</code>
 @property (nonatomic, copy) NSString * _Nonnull messageLabel;
+@property (nonatomic, copy) NSString * _Nonnull messageLabelContents;
 /// The placeholder for the feedback description input field.
 /// note:
 /// Default: <code>"What's the bug? What did you expect?"</code>
 @property (nonatomic, copy) NSString * _Nonnull messagePlaceholder;
+@property (nonatomic, copy) NSString * _Nonnull messageTextViewAccessibilityLabel;
 /// The label shown next to an input field that is required.
 /// note:
-/// Default: <code>"(required)"</code>
+/// Default: <code>"(Required)"</code>
 @property (nonatomic, copy) NSString * _Nonnull isRequiredLabel;
-/// The message displayed after a successful feedback submission.
-/// note:
-/// Default: <code>"Thank you for your report!"</code>
-@property (nonatomic, copy) NSString * _Nonnull successMessageText;
-/// Allows the user to send a screenshot attachment with their feedback.
-/// note:
-/// Default: <code>true</code>
-@property (nonatomic) BOOL enableScreenshot;
-/// The label of the button to add a screenshot to the form.
-/// note:
-/// Default: <code>"Add a screenshot"</code>
-/// note:
-/// ignored if <code>enableScreenshot</code> is <code>false</code>.`
-@property (nonatomic, copy) NSString * _Nonnull addScreenshotButtonLabel;
 /// The label of the button to remove the screenshot from the form.
 /// note:
 /// Default: <code>"Remove screenshot"</code>
 /// note:
-/// ignored if <code>enableScreenshot</code> is <code>false</code>.
+/// ignored if <code>SentryUserFeedbackConfiguration.showFormForScreenshots</code> is <code>false</code>.
 @property (nonatomic, copy) NSString * _Nonnull removeScreenshotButtonLabel;
+@property (nonatomic, copy) NSString * _Nonnull removeScreenshotButtonAccessibilityLabel;
 /// Requires the name field on the feedback form to be filled in.
 /// note:
 /// Default: <code>false</code>
@@ -1053,12 +1350,14 @@ SWIFT_CLASS("_TtC6Sentry35SentryUserFeedbackFormConfiguration") SWIFT_AVAILABILI
 /// note:
 /// ignored if <code>showName</code> is <code>false</code>.
 @property (nonatomic, copy) NSString * _Nonnull nameLabel;
+@property (nonatomic, copy) NSString * _Nonnull nameLabelContents;
 /// The placeholder for the name input field.
 /// note:
 /// Default: <code>"Your Name"</code>
 /// note:
 /// ignored if <code>showName</code> is <code>false</code>.
 @property (nonatomic, copy) NSString * _Nonnull namePlaceholder;
+@property (nonatomic, copy) NSString * _Nonnull nameTextFieldAccessibilityLabel;
 /// Requires the email field on the feedback form to be filled in.
 /// note:
 /// Default: <code>false</code>
@@ -1073,10 +1372,12 @@ SWIFT_CLASS("_TtC6Sentry35SentryUserFeedbackFormConfiguration") SWIFT_AVAILABILI
 /// note:
 /// Default: <code>"Email"</code>
 @property (nonatomic, copy) NSString * _Nonnull emailLabel;
+@property (nonatomic, copy) NSString * _Nonnull emailLabelContents;
 /// The placeholder for the email input field.
 /// note:
 /// Default: <code>"your.email@example.org"</code>
 @property (nonatomic, copy) NSString * _Nonnull emailPlaceholder;
+@property (nonatomic, copy) NSString * _Nonnull emailTextFieldAccessibilityLabel;
 /// The label of the submit button used in the feedback form.
 /// note:
 /// Default: <code>"Send Bug Report"</code>
@@ -1084,7 +1385,7 @@ SWIFT_CLASS("_TtC6Sentry35SentryUserFeedbackFormConfiguration") SWIFT_AVAILABILI
 /// The accessibility label of the form’s “Submit” button.
 /// note:
 /// Default: <code>submitButtonLabel</code> value
-@property (nonatomic, copy) NSString * _Nullable submitButtonAccessibilityLabel;
+@property (nonatomic, copy) NSString * _Nonnull submitButtonAccessibilityLabel;
 /// The label of cancel buttons used in the feedback form.
 /// note:
 /// Default: <code>"Cancel"</code>
@@ -1092,19 +1393,127 @@ SWIFT_CLASS("_TtC6Sentry35SentryUserFeedbackFormConfiguration") SWIFT_AVAILABILI
 /// The accessibility label of the form’s “Cancel” button.
 /// note:
 /// Default: <code>cancelButtonLabel</code> value
-@property (nonatomic, copy) NSString * _Nullable cancelButtonAccessibilityLabel;
-/// The label of confirm buttons used in the feedback form.
-/// note:
-/// Default: <code>"Confirm"</code>
-@property (nonatomic, copy) NSString * _Nonnull confirmButtonLabel;
-/// The accessibility label of the form’s “Confirm” button.
-/// note:
-/// Default: <code>confirmButtonLabel</code> value
-@property (nonatomic, copy) NSString * _Nullable confirmButtonAccessibilityLabel;
+@property (nonatomic, copy) NSString * _Nonnull cancelButtonAccessibilityLabel;
+- (NSString * _Nonnull)fullLabelTextWithLabelText:(NSString * _Nonnull)labelText required:(BOOL)required SWIFT_WARN_UNUSED_RESULT;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
+@class SentryUserFeedbackFormViewModel;
+@class UITraitCollection;
+@class NSBundle;
+
+SWIFT_CLASS("_TtC6Sentry32SentryUserFeedbackFormController") SWIFT_AVAILABILITY(ios,introduced=13.0)
+@interface SentryUserFeedbackFormController : UIViewController
+@property (nonatomic, readonly, strong) SentryUserFeedbackConfiguration * _Nonnull config;
+@property (nonatomic, readonly, strong) UIImage * _Nullable screenshot;
+@property (nonatomic, strong) SentryUserFeedbackFormViewModel * _Nonnull viewModel;
+- (void)traitCollectionDidChange:(UITraitCollection * _Nullable)previousTraitCollection;
+- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)coder OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)initWithNibName:(NSString * _Nullable)nibNameOrNil bundle:(NSBundle * _Nullable)nibBundleOrNil SWIFT_UNAVAILABLE;
+@end
+
+@class UITextView;
+
+SWIFT_AVAILABILITY(ios,introduced=13.0)
+@interface SentryUserFeedbackFormController (SWIFT_EXTENSION(Sentry)) <UITextViewDelegate>
+- (void)textViewDidChange:(UITextView * _Nonnull)textView;
+@end
+
+
+SWIFT_AVAILABILITY(ios,introduced=13.0)
+@interface SentryUserFeedbackFormController (SWIFT_EXTENSION(Sentry))
+- (void)submitFeedback;
+- (void)cancel;
+@end
+
+@class UITextField;
+
+SWIFT_AVAILABILITY(ios,introduced=13.0)
+@interface SentryUserFeedbackFormController (SWIFT_EXTENSION(Sentry)) <UITextFieldDelegate>
+- (BOOL)textFieldShouldReturn:(UITextField * _Nonnull)textField SWIFT_WARN_UNUSED_RESULT;
+- (void)textFieldDidChangeSelection:(UITextField * _Nonnull)textField;
+@end
+
+@class NSNotification;
+
+SWIFT_AVAILABILITY(ios,introduced=13.0)
+@interface SentryUserFeedbackFormController (SWIFT_EXTENSION(Sentry))
+- (void)initLayout SWIFT_METHOD_FAMILY(none);
+- (void)showedKeyboardWithNote:(NSNotification * _Nonnull)note;
+- (void)hidKeyboard;
+@end
+
+@class NSDateFormatter;
+@class UILabel;
+@class UIImageView;
 @class UIButton;
+@class UIStackView;
+@class UIScrollView;
+@class NSLayoutConstraint;
+
+SWIFT_CLASS("_TtC6Sentry31SentryUserFeedbackFormViewModel") SWIFT_AVAILABILITY(ios,introduced=13.0)
+@interface SentryUserFeedbackFormViewModel : NSObject
+@property (nonatomic, readonly, strong) SentryUserFeedbackConfiguration * _Nonnull config;
+@property (nonatomic, readonly, unsafe_unretained) SentryUserFeedbackFormController * _Nonnull controller;
+@property (nonatomic, readonly, strong) UIImage * _Nullable screenshot;
+SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) NSDateFormatter * _Nonnull dateFormatter;)
++ (NSDateFormatter * _Nonnull)dateFormatter SWIFT_WARN_UNUSED_RESULT;
+- (nonnull instancetype)initWithConfig:(SentryUserFeedbackConfiguration * _Nonnull)config controller:(SentryUserFeedbackFormController * _Nonnull)controller screenshot:(UIImage * _Nullable)screenshot OBJC_DESIGNATED_INITIALIZER;
+@property (nonatomic, strong) UILabel * _Nonnull formTitleLabel;
+@property (nonatomic, strong) UIView * _Nonnull sentryLogoView;
+@property (nonatomic, strong) UILabel * _Nonnull fullNameLabel;
+@property (nonatomic, strong) UITextField * _Nonnull fullNameTextField;
+@property (nonatomic, strong) UILabel * _Nonnull emailLabel;
+@property (nonatomic, strong) UITextField * _Nonnull emailTextField;
+@property (nonatomic, strong) UILabel * _Nonnull messageLabel;
+@property (nonatomic, strong) UILabel * _Nonnull messageTextViewPlaceholder;
+@property (nonatomic, strong) UITextView * _Nonnull messageTextView;
+@property (nonatomic, strong) UIImageView * _Nonnull screenshotImageView;
+@property (nonatomic, strong) UIButton * _Nonnull removeScreenshotButton;
+@property (nonatomic, strong) UIButton * _Nonnull submitButton;
+@property (nonatomic, strong) UIButton * _Nonnull cancelButton;
+@property (nonatomic, strong) UIStackView * _Nonnull removeScreenshotStack;
+@property (nonatomic, strong) UIStackView * _Nonnull stack;
+@property (nonatomic, strong) UIScrollView * _Nonnull scrollView;
+@property (nonatomic, readonly) CGFloat formElementHeight;
+@property (nonatomic, readonly) CGFloat logoWidth;
+@property (nonatomic, strong) NSLayoutConstraint * _Nonnull messageTextViewHeightConstraint;
+@property (nonatomic, strong) NSLayoutConstraint * _Nonnull logoViewWidthConstraint;
+@property (nonatomic, strong) NSLayoutConstraint * _Nonnull fullNameTextFieldHeightConstraint;
+@property (nonatomic, strong) NSLayoutConstraint * _Nonnull emailTextFieldHeightConstraint;
+@property (nonatomic, strong) NSLayoutConstraint * _Nonnull removeScreenshotButtonHeightConstraint;
+@property (nonatomic, strong) NSLayoutConstraint * _Nonnull submitButtonHeightConstraint;
+@property (nonatomic, strong) NSLayoutConstraint * _Nonnull cancelButtonHeightConstraint;
+@property (nonatomic, strong) NSLayoutConstraint * _Nonnull screenshotImageAspectRatioConstraint;
+@property (nonatomic, strong) NSLayoutConstraint * _Nonnull messagePlaceholderLeadingConstraint;
+@property (nonatomic, strong) NSLayoutConstraint * _Nonnull messagePlaceholderTrailingConstraint;
+@property (nonatomic, strong) NSLayoutConstraint * _Nonnull messagePlaceholderTopConstraint;
+@property (nonatomic, strong) NSLayoutConstraint * _Nonnull messagePlaceholderBottomConstraint;
+- (NSArray<NSLayoutConstraint *> * _Nonnull)allConstraintsWithView:(UIView * _Nonnull)view SWIFT_WARN_UNUSED_RESULT;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
++ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+@end
+
+
+SWIFT_AVAILABILITY(ios,introduced=13.0)
+@interface SentryUserFeedbackFormViewModel (SWIFT_EXTENSION(Sentry))
+- (void)removeScreenshotTapped;
+- (void)submitFeedback;
+- (void)cancel;
+@end
+
+
+SWIFT_AVAILABILITY(ios,introduced=13.0)
+@interface SentryUserFeedbackFormViewModel (SWIFT_EXTENSION(Sentry))
+- (void)updateSubmitButtonAccessibilityHint;
+- (void)themeElements;
+- (void)setScrollViewBottomInset:(CGFloat)inset;
+- (void)updateLayout;
+- (SentryFeedback * _Nonnull)feedbackObject SWIFT_WARN_UNUSED_RESULT;
+@end
+
+@protocol SentryUserFeedbackIntegrationDriverDelegate;
+@class SentryScreenshot;
 
 /// An integration managing a workflow for end users to report feedback via Sentry.
 /// note:
@@ -1112,7 +1521,9 @@ SWIFT_CLASS("_TtC6Sentry35SentryUserFeedbackFormConfiguration") SWIFT_AVAILABILI
 SWIFT_CLASS("_TtC6Sentry35SentryUserFeedbackIntegrationDriver") SWIFT_AVAILABILITY(ios,introduced=13.0)
 @interface SentryUserFeedbackIntegrationDriver : NSObject
 @property (nonatomic, readonly, strong) SentryUserFeedbackConfiguration * _Nonnull configuration;
-- (nonnull instancetype)initWithConfiguration:(SentryUserFeedbackConfiguration * _Nonnull)configuration OBJC_DESIGNATED_INITIALIZER;
+@property (nonatomic, weak) id <SentryUserFeedbackIntegrationDriverDelegate> _Nullable delegate;
+@property (nonatomic, readonly, strong) SentryScreenshot * _Nonnull screenshotProvider;
+- (nonnull instancetype)initWithConfiguration:(SentryUserFeedbackConfiguration * _Nonnull)configuration delegate:(id <SentryUserFeedbackIntegrationDriverDelegate> _Nonnull)delegate screenshotProvider:(SentryScreenshot * _Nonnull)screenshotProvider OBJC_DESIGNATED_INITIALIZER;
 /// Attaches the feedback widget to a specified UIButton. The button will trigger the feedback form.
 /// \param button The UIButton to attach the widget to.
 ///
@@ -1122,31 +1533,44 @@ SWIFT_CLASS("_TtC6Sentry35SentryUserFeedbackIntegrationDriver") SWIFT_AVAILABILI
 - (void)createWidget;
 /// Removes the feedback widget from the view hierarchy. Useful for cleanup when the widget is no longer needed.
 - (void)removeWidget;
-/// Captures feedback using custom UI. This method allows you to submit feedback data directly.
-/// \param message The feedback message (required).
-///
-/// \param name The name of the user (optional).
-///
-/// \param email The email of the user (optional).
-///
-/// \param hints Additional hints or metadata for the feedback submission (optional).
-///
-- (void)captureFeedbackWithMessage:(NSString * _Nonnull)message name:(NSString * _Nullable)name email:(NSString * _Nullable)email hints:(NSDictionary<NSString *, id> * _Nullable)hints;
+- (void)captureWithFeedback:(SentryFeedback * _Nonnull)feedback;
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
 
+
+SWIFT_PROTOCOL("_TtP6Sentry43SentryUserFeedbackIntegrationDriverDelegate_") SWIFT_AVAILABILITY(ios,introduced=13.0)
+@protocol SentryUserFeedbackIntegrationDriverDelegate <NSObject>
+- (void)captureWithFeedback:(SentryFeedback * _Nonnull)feedback;
+@end
+
 @class UIFont;
 @class UIColor;
-@class NSNumber;
+@class SentryFormElementOutlineStyle;
 
 /// Settings for overriding theming components for the User Feedback Widget and Form.
 SWIFT_CLASS("_TtC6Sentry36SentryUserFeedbackThemeConfiguration") SWIFT_AVAILABILITY(ios,introduced=13.0)
 @interface SentryUserFeedbackThemeConfiguration : NSObject
-/// The default font to use.
+/// The font family to use for form text elements.
 /// note:
-/// Defaults to the current system default.
+/// Defaults to the system default, if this property is <code>nil</code>.
+@property (nonatomic, copy) NSString * _Nullable fontFamily;
+/// Font for form input elements and the widget button label.
+/// note:
+/// Defaults to <code>UIFont.TextStyle.callout</code>.
 @property (nonatomic, strong) UIFont * _Nonnull font;
+/// Font for the main header title of the feedback form.
+/// note:
+/// Defaults to <code>UIFont.TextStyle.title1</code>.
+@property (nonatomic, strong) UIFont * _Nonnull headerFont;
+/// Font for titles of text fields and buttons in the form.
+/// note:
+/// Defaults to <code>UIFont.TextStyle.headline</code>.
+@property (nonatomic, strong) UIFont * _Nonnull titleFont;
+/// Return a scaled font for the given style, using the configured font family.
+- (UIFont * _Nonnull)scaledFontWithStyle:(UIFontTextStyle _Nonnull)style SWIFT_WARN_UNUSED_RESULT;
+/// Helps respond to dynamic font size changes when the app is in the background, and then comes back to the foreground.
+- (void)updateDefaultFonts;
 /// Foreground text color of the widget and form.
 /// note:
 /// Default light mode: <code>rgb(43, 34, 51)</code>; dark mode: <code>rgb(235, 230, 239)</code>
@@ -1158,43 +1582,43 @@ SWIFT_CLASS("_TtC6Sentry36SentryUserFeedbackThemeConfiguration") SWIFT_AVAILABIL
 /// Foreground color for the form submit button.
 /// note:
 /// Default: <code>rgb(255, 255, 255)</code> for both dark and light modes
-@property (nonatomic, strong) UIColor * _Nonnull accentForeground;
+@property (nonatomic, strong) UIColor * _Nonnull submitForeground;
 /// Background color for the form submit button in light and dark modes.
 /// note:
 /// Default: <code>rgb(88, 74, 192)</code> for both light and dark modes
-@property (nonatomic, strong) UIColor * _Nonnull accentBackground;
-/// Color used for success-related components (such as text color when feedback is submitted successfully).
+@property (nonatomic, strong) UIColor * _Nonnull submitBackground;
+/// Foreground color for the cancel and screenshot buttons.
 /// note:
-/// Default light mode: <code>rgb(38, 141, 117)</code>; dark mode: <code>rgb(45, 169, 140)</code>
-@property (nonatomic, strong) UIColor * _Nonnull successColor;
+/// Default: Same as <code>foreground</code> for both dark and light modes
+@property (nonatomic, strong) UIColor * _Nonnull buttonForeground;
+/// Background color for the form cancel and screenshot buttons in light and dark modes.
+/// note:
+/// Default: Transparent for both light and dark modes
+@property (nonatomic, strong) UIColor * _Nonnull buttonBackground;
 /// Color used for error-related components (such as text color when there’s an error submitting feedback).
 /// note:
 /// Default light mode: <code>rgb(223, 51, 56)</code>; dark mode: <code>rgb(245, 84, 89)</code>
 @property (nonatomic, strong) UIColor * _Nonnull errorColor;
-/// Normal outline color for form inputs.
 /// note:
-/// Default: <code>nil (system default)</code>
-@property (nonatomic, strong) UIColor * _Nonnull outlineColor;
-/// Outline color for form inputs when focused.
-/// note:
-/// Default: <code>nil (system default)</code>
-@property (nonatomic, strong) UIColor * _Nullable outlineColorFocussed;
-/// Normal outline thickness for form inputs.
-/// note:
-/// Default: <code>nil (system default)</code>
-@property (nonatomic, strong) NSNumber * _Nullable outlineThickness;
-/// Outline thickness for form inputs when focused.
-/// note:
-/// Default: <code>nil (system default)</code>
-@property (nonatomic, strong) NSNumber * _Nullable outlineThicknessFocussed;
-/// Outline corner radius for form input elements.
-/// note:
-/// Default: <code>nil (system default)</code>
-@property (nonatomic, strong) NSNumber * _Nullable cornerRadius;
+/// We need to keep a reference to a default instance of this for comparison purposes later. We don’t use the default to give UITextFields a default style, instead, we use <code>UITextField.BorderStyle.roundedRect</code> if <code>SentryUserFeedbackThemeConfiguration.outlineStyle == defaultOutlineStyle</code>.
+@property (nonatomic, readonly, strong) SentryFormElementOutlineStyle * _Nonnull defaultOutlineStyle;
+/// Options for styling the outline of input elements and buttons in the feedback form.
+@property (nonatomic, strong) SentryFormElementOutlineStyle * _Nonnull outlineStyle;
+/// Background color to use for text inputs in the feedback form.
+@property (nonatomic, strong) UIColor * _Nonnull inputBackground;
+/// Background color to use for text inputs in the feedback form.
+@property (nonatomic, strong) UIColor * _Nonnull inputForeground;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
 
-@class NSCoder;
+
+SWIFT_CLASS("_TtCC6Sentry36SentryUserFeedbackThemeConfiguration29SentryFormElementOutlineStyle")
+@interface SentryFormElementOutlineStyle : NSObject
+- (nonnull instancetype)initWithColor:(UIColor * _Nonnull)color cornerRadius:(CGFloat)cornerRadius outlineWidth:(CGFloat)outlineWidth OBJC_DESIGNATED_INITIALIZER;
+- (nonnull instancetype)init SWIFT_UNAVAILABLE;
++ (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+@end
+
 
 SWIFT_CLASS("_TtC6Sentry47SentryUserFeedbackWidgetButtonMegaphoneIconView") SWIFT_AVAILABILITY(ios,introduced=13.0)
 @interface SentryUserFeedbackWidgetButtonMegaphoneIconView : UIView
@@ -1220,10 +1644,7 @@ SWIFT_CLASS("_TtC6Sentry37SentryUserFeedbackWidgetConfiguration") SWIFT_AVAILABI
 /// note:
 /// Default: <code>true</code>
 @property (nonatomic) BOOL autoInject;
-/// Whether or not to show animations, like for presenting and dismissing the form.
-/// note:
-/// Default: <code>true</code>.
-@property (nonatomic) BOOL animations;
+@property (nonatomic, readonly, copy) NSString * _Nonnull defaultLabelText;
 /// The label of the injected button that opens up the feedback form when clicked. If <code>nil</code>, no text is displayed and only the icon image is shown.
 /// note:
 /// Default: <code>"Report a Bug"</code>
@@ -1272,14 +1693,26 @@ SWIFT_CLASS("_TtC6Sentry15SentryVideoInfo")
 
 SWIFT_PROTOCOL("_TtP6Sentry28SentryViewScreenshotProvider_")
 @protocol SentryViewScreenshotProvider <NSObject>
-- (void)imageWithView:(UIView * _Nonnull)view options:(id <SentryRedactOptions> _Nonnull)options onComplete:(void (^ _Nonnull)(UIImage * _Nonnull))onComplete;
+- (void)imageWithView:(UIView * _Nonnull)view onComplete:(void (^ _Nonnull)(UIImage * _Nonnull))onComplete;
 @end
 
 
 SWIFT_CLASS("_TtC6Sentry22SentryViewPhotographer")
 @interface SentryViewPhotographer : NSObject <SentryViewScreenshotProvider>
-- (nonnull instancetype)initWithRedactOptions:(id <SentryRedactOptions> _Nonnull)redactOptions OBJC_DESIGNATED_INITIALIZER;
-- (void)imageWithView:(UIView * _Nonnull)view options:(id <SentryRedactOptions> _Nonnull)options onComplete:(void (^ _Nonnull)(UIImage * _Nonnull))onComplete;
+@property (nonatomic, strong) id <SentryViewRenderer> _Nonnull renderer;
+/// Creates a view photographer used to convert a view hierarchy to an image.
+/// note:
+/// The option <code>enableExperimentalMaskRenderer</code> is an internal flag, which is not part of the public API.
+/// Therefore, it is not part of the the <code>redactOptions</code> parameter, to not further expose it.
+/// \param renderer Implementation of the view renderer.
+///
+/// \param redactOptions Options provided to redact sensitive information.
+///
+/// \param enableExperimentalMaskRenderer Flag to enable experimental view renderer.
+///
+- (nonnull instancetype)initWithRenderer:(id <SentryViewRenderer> _Nonnull)renderer redactOptions:(id <SentryRedactOptions> _Nonnull)redactOptions enableExperimentalMaskRenderer:(BOOL)enableExperimentalMaskRenderer OBJC_DESIGNATED_INITIALIZER;
+- (void)imageWithView:(UIView * _Nonnull)view onComplete:(void (^ _Nonnull)(UIImage * _Nonnull))onComplete;
+- (UIImage * _Nonnull)imageWithView:(UIView * _Nonnull)view SWIFT_WARN_UNUSED_RESULT;
 - (void)addIgnoreClasses:(NSArray<Class> * _Nonnull)classes;
 - (void)addRedactClasses:(NSArray<Class> * _Nonnull)classes;
 - (void)setIgnoreContainerClass:(Class _Nonnull)containerClass;
@@ -1290,12 +1723,17 @@ SWIFT_CLASS("_TtC6Sentry22SentryViewPhotographer")
 
 
 
+
 SWIFT_CLASS("_TtC6Sentry15SwiftDescriptor")
 @interface SwiftDescriptor : NSObject
 + (NSString * _Nonnull)getObjectClassName:(id _Nonnull)object SWIFT_WARN_UNUSED_RESULT;
++ (NSString * _Nonnull)getViewControllerClassName:(UIViewController * _Nonnull)object SWIFT_WARN_UNUSED_RESULT;
 + (NSString * _Nullable)getSwiftErrorDescription:(NSError * _Nonnull)error SWIFT_WARN_UNUSED_RESULT;
 - (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
 @end
+
+
+
 
 
 @class NSURLSessionTask;
@@ -1320,6 +1758,7 @@ SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, copy) NSString * _No
 - (nonnull instancetype)init SWIFT_UNAVAILABLE;
 + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
 @end
+
 
 #endif
 #if __has_attribute(external_source_symbol)

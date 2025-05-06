@@ -27,10 +27,23 @@
 #define FOLLY_CPLUSPLUS __cplusplus
 #endif
 
-static_assert(FOLLY_CPLUSPLUS >= 201402L, "__cplusplus >= 201402L");
+// On MSVC an incorrect <version> header get's picked up
+#if !defined(_MSC_VER) && __has_include(<version>)
+#include <version>
+#endif
+
+static_assert(FOLLY_CPLUSPLUS >= 201703L, "__cplusplus >= 201703L");
 
 #if defined(__GNUC__) && !defined(__clang__)
-static_assert(__GNUC__ >= 7, "__GNUC__ >= 7");
+#if defined(FOLLY_CONFIG_TEMPORARY_DOWNGRADE_GCC)
+static_assert(__GNUC__ >= 9, "__GNUC__ >= 9");
+#else
+static_assert(__GNUC__ >= 10, "__GNUC__ >= 10");
+#endif
+#endif
+
+#if defined(_MSC_VER)
+static_assert(_MSC_VER >= 1920);
 #endif
 
 #if defined(_MSC_VER) || defined(_CPPLIB_VER)
@@ -68,18 +81,21 @@ constexpr bool kHasUnalignedAccess = false;
 // warn unused result
 #if defined(__has_cpp_attribute)
 #if __has_cpp_attribute(nodiscard)
+#if defined(__clang__) || defined(__GNUC__)
+#if __clang_major__ >= 10 || __GNUC__ >= 10
+// early clang and gcc both warn on [[nodiscard]] when applied to class ctors
+// easiest option is just to avoid emitting [[nodiscard]] under early clang/gcc
 #define FOLLY_NODISCARD [[nodiscard]]
 #endif
 #endif
-#if !defined FOLLY_NODISCARD
-#if defined(_MSC_VER) && (_MSC_VER >= 1700)
-#define FOLLY_NODISCARD _Check_return_
-#elif defined(__GNUC__)
-#define FOLLY_NODISCARD __attribute__((__warn_unused_result__))
-#else
+#endif
+#endif
+#ifndef FOLLY_NODISCARD
 #define FOLLY_NODISCARD
 #endif
-#endif
+
+// older clang-format gets confused by [[deprecated(...)]] on class decls
+#define FOLLY_DEPRECATED(...) [[deprecated(__VA_ARGS__)]]
 
 // target
 #ifdef _MSC_VER
@@ -119,12 +135,19 @@ constexpr bool kHasUnalignedAccess = false;
 #define FOLLY_S390X 0
 #endif
 
+#if defined(__riscv)
+#define FOLLY_RISCV64 1
+#else
+#define FOLLY_RISCV64 0
+#endif
+
 namespace folly {
 constexpr bool kIsArchArm = FOLLY_ARM == 1;
 constexpr bool kIsArchAmd64 = FOLLY_X64 == 1;
 constexpr bool kIsArchAArch64 = FOLLY_AARCH64 == 1;
 constexpr bool kIsArchPPC64 = FOLLY_PPC64 == 1;
 constexpr bool kIsArchS390X = FOLLY_S390X == 1;
+constexpr bool kIsArchRISCV64 = FOLLY_RISCV64 == 1;
 } // namespace folly
 
 namespace folly {
@@ -163,6 +186,18 @@ constexpr bool kIsSanitizeDataflow = false;
 constexpr bool kIsSanitize = true;
 #else
 constexpr bool kIsSanitize = false;
+#endif
+
+#if defined(__OPTIMIZE__)
+constexpr bool kIsOptimize = true;
+#else
+constexpr bool kIsOptimize = false;
+#endif
+
+#if defined(__OPTIMIZE_SIZE__)
+constexpr bool kIsOptimizeSize = true;
+#else
+constexpr bool kIsOptimizeSize = false;
 #endif
 } // namespace folly
 
@@ -342,6 +377,38 @@ constexpr auto kHasWeakSymbols = false;
 #endif
 #endif
 
+#ifndef FOLLY_ARM_FEATURE_CRYPTO
+#ifdef __ARM_FEATURE_CRYPTO
+#define FOLLY_ARM_FEATURE_CRYPTO 1
+#else
+#define FOLLY_ARM_FEATURE_CRYPTO 0
+#endif
+#endif
+
+#ifndef FOLLY_ARM_FEATURE_AES
+#ifdef __ARM_FEATURE_AES
+#define FOLLY_ARM_FEATURE_AES 1
+#else
+#define FOLLY_ARM_FEATURE_AES 0
+#endif
+#endif
+
+#ifndef FOLLY_ARM_FEATURE_SHA2
+#ifdef __ARM_FEATURE_SHA2
+#define FOLLY_ARM_FEATURE_SHA2 1
+#else
+#define FOLLY_ARM_FEATURE_SHA2 0
+#endif
+#endif
+
+#ifndef FOLLY_ARM_FEATURE_SHA3
+#ifdef __ARM_FEATURE_SHA3
+#define FOLLY_ARM_FEATURE_SHA3 1
+#else
+#define FOLLY_ARM_FEATURE_SHA3 0
+#endif
+#endif
+
 // RTTI may not be enabled for this compilation unit.
 #if defined(__GXX_RTTI) || defined(__cpp_rtti) || \
     (defined(_MSC_VER) && defined(_CPPRTTI))
@@ -506,16 +573,6 @@ constexpr auto kCpplibVer = 0;
 #define FOLLY_STORAGE_CONSTEXPR constexpr
 #endif
 
-//  FOLLY_CXX17_CONSTEXPR
-//
-//  C++17 permits more cases to be marked constexpr, including lambda bodies and
-//  the `if` keyword.
-#if FOLLY_CPLUSPLUS >= 201703L
-#define FOLLY_CXX17_CONSTEXPR constexpr
-#else
-#define FOLLY_CXX17_CONSTEXPR
-#endif
-
 //  FOLLY_CXX20_CONSTEXPR
 //
 //  C++20 permits more cases to be marked constexpr, including constructors that
@@ -524,6 +581,17 @@ constexpr auto kCpplibVer = 0;
 #define FOLLY_CXX20_CONSTEXPR constexpr
 #else
 #define FOLLY_CXX20_CONSTEXPR
+#endif
+
+//  FOLLY_CXX23_CONSTEXPR
+//
+//  C++23 permits more cases to be marked constexpr, including definitions of
+//  variables of non-literal type in constexpr function as long as they are not
+//  constant-evaluated.
+#if FOLLY_CPLUSPLUS >= 202302L
+#define FOLLY_CXX23_CONSTEXPR constexpr
+#else
+#define FOLLY_CXX23_CONSTEXPR
 #endif
 
 // C++20 constinit
@@ -536,17 +604,21 @@ constexpr auto kCpplibVer = 0;
 #if defined(FOLLY_CFG_NO_COROUTINES)
 #define FOLLY_HAS_COROUTINES 0
 #else
-#if FOLLY_CPLUSPLUS >= 201703L
 // folly::coro requires C++17 support
 #if defined(__NVCC__)
 // For now, NVCC matches other compilers but does not offer coroutines.
 #define FOLLY_HAS_COROUTINES 0
-#elif defined(_WIN32) && defined(__clang__) && !defined(LLVM_COROUTINES)
+#elif defined(_WIN32) && defined(__clang__) && !defined(LLVM_COROUTINES) && \
+    !defined(LLVM_COROUTINES_CPP20)
 // LLVM and MSVC coroutines are ABI incompatible, so for the MSVC implementation
 // of <experimental/coroutine> on Windows we *don't* have coroutines.
 //
 // LLVM_COROUTINES indicates that LLVM compatible header is added to include
 // path and can be used.
+//
+// LLVM_COROUTINES_CPP20 indicates that an LLVM compatible header using
+// <coroutine> is added to the include path and can be used.
+
 //
 // Worse, if we define FOLLY_HAS_COROUTINES 1 we will include
 // <experimental/coroutine> which will conflict with anyone who wants to load
@@ -567,43 +639,11 @@ constexpr auto kCpplibVer = 0;
 #else
 #define FOLLY_HAS_COROUTINES 0
 #endif
-#else
-#define FOLLY_HAS_COROUTINES 0
-#endif // FOLLY_CPLUSPLUS >= 201703L
 #endif // FOLLY_CFG_NO_COROUTINES
-
-// MSVC 2017.5 && C++17
-#if __cpp_noexcept_function_type >= 201510 || \
-    (_MSC_FULL_VER >= 191225816 && _MSVC_LANG > 201402)
-#define FOLLY_HAVE_NOEXCEPT_FUNCTION_TYPE 1
-#endif
-
-#if __cpp_inline_variables >= 201606L || FOLLY_CPLUSPLUS >= 201703L
-#define FOLLY_HAS_INLINE_VARIABLES 1
-#define FOLLY_INLINE_VARIABLE inline
-#else
-#define FOLLY_HAS_INLINE_VARIABLES 0
-#define FOLLY_INLINE_VARIABLE
-#endif
-
-// feature test __cpp_lib_string_view is defined in <string>, which is
-// too heavy to include here.
-#if __has_include(<string_view>) && FOLLY_CPLUSPLUS >= 201703L
-#define FOLLY_HAS_STRING_VIEW 1
-#else
-#define FOLLY_HAS_STRING_VIEW 0
-#endif
 
 // C++20 consteval
 #if FOLLY_CPLUSPLUS >= 202002L
 #define FOLLY_CONSTEVAL consteval
 #else
 #define FOLLY_CONSTEVAL constexpr
-#endif
-
-// C++17 deduction guides
-#if defined(__cpp_deduction_guides) && __cpp_deduction_guides >= 201703L
-#define FOLLY_HAS_DEDUCTION_GUIDES 1
-#else
-#define FOLLY_HAS_DEDUCTION_GUIDES 0
 #endif

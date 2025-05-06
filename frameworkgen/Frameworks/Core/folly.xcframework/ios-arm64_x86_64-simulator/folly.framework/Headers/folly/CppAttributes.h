@@ -16,8 +16,6 @@
 
 /**
  * GCC compatible wrappers around clang attributes.
- *
- * @author Dominik Gabi
  */
 
 #pragma once
@@ -40,49 +38,6 @@
 #define FOLLY_HAS_EXTENSION(x) 0
 #else
 #define FOLLY_HAS_EXTENSION(x) __has_extension(x)
-#endif
-
-/**
- * Fallthrough to indicate that `break` was left out on purpose in a switch
- * statement, e.g.
- *
- * switch (n) {
- *   case 22:
- *   case 33:  // no warning: no statements between case labels
- *     f();
- *   case 44:  // warning: unannotated fall-through
- *     g();
- *     FOLLY_FALLTHROUGH; // no warning: annotated fall-through
- * }
- */
-#if FOLLY_HAS_CPP_ATTRIBUTE(fallthrough)
-#define FOLLY_FALLTHROUGH [[fallthrough]]
-#elif FOLLY_HAS_CPP_ATTRIBUTE(clang::fallthrough)
-#define FOLLY_FALLTHROUGH [[clang::fallthrough]]
-#elif FOLLY_HAS_CPP_ATTRIBUTE(gnu::fallthrough)
-#define FOLLY_FALLTHROUGH [[gnu::fallthrough]]
-#else
-#define FOLLY_FALLTHROUGH
-#endif
-
-/**
- *  Maybe_unused indicates that a function, variable or parameter might or
- *  might not be used, e.g.
- *
- *  int foo(FOLLY_MAYBE_UNUSED int x) {
- *    #ifdef USE_X
- *      return x;
- *    #else
- *      return 0;
- *    #endif
- *  }
- */
-#if FOLLY_HAS_CPP_ATTRIBUTE(maybe_unused) && FOLLY_CPLUSPLUS >= 201703L
-#define FOLLY_MAYBE_UNUSED [[maybe_unused]]
-#elif FOLLY_HAS_CPP_ATTRIBUTE(gnu::unused) || __GNUC__
-#define FOLLY_MAYBE_UNUSED [[gnu::unused]]
-#else
-#define FOLLY_MAYBE_UNUSED
 #endif
 
 /**
@@ -125,10 +80,21 @@
  * optimizer both when processing the function body and when analyzing
  * call-sites.
  */
-#if defined(__GNUC__) && __GNUC__
-#define FOLLY_COLD __attribute__((__cold__))
+#if FOLLY_HAS_CPP_ATTRIBUTE(gnu::cold)
+#define FOLLY_ATTR_GNU_COLD gnu::cold
 #else
-#define FOLLY_COLD
+#define FOLLY_ATTR_GNU_COLD
+#endif
+
+/// FOLLY_ATTR_MAYBE_UNUSED_IF_NDEBUG
+///
+/// When defined(NDEBUG), expands to maybe_unused; otherwise, expands to empty.
+/// Useful for marking variables that are used, in the sense checked for by the
+/// attribute maybe_unused, only in debug builds.
+#if defined(NDEBUG)
+#define FOLLY_ATTR_MAYBE_UNUSED_IF_NDEBUG maybe_unused
+#else
+#define FOLLY_ATTR_MAYBE_UNUSED_IF_NDEBUG
 #endif
 
 /**
@@ -138,7 +104,7 @@
  *  class Empty {};
  *
  *  class NonEmpty1 {
- *    FOLLY_NO_UNIQUE_ADDRESS Empty e;
+ *    [[FOLLY_ATTR_NO_UNIQUE_ADDRESS]] Empty e;
  *    int f;
  *  };
  *
@@ -151,7 +117,7 @@
  *  sizeof(NonEmpty2); // must be > sizeof(int)
  */
 #if FOLLY_HAS_CPP_ATTRIBUTE(no_unique_address)
-#define FOLLY_ATTR_NO_UNIQUE_ADDRESS [[no_unique_address]]
+#define FOLLY_ATTR_NO_UNIQUE_ADDRESS no_unique_address
 #else
 #define FOLLY_ATTR_NO_UNIQUE_ADDRESS
 #endif
@@ -162,21 +128,27 @@
 #define FOLLY_ATTR_CLANG_NO_DESTROY
 #endif
 
+#if FOLLY_HAS_CPP_ATTRIBUTE(clang::uninitialized)
+#define FOLLY_ATTR_CLANG_UNINITIALIZED clang::uninitialized
+#else
+#define FOLLY_ATTR_CLANG_UNINITIALIZED
+#endif
+
 /**
  * Accesses to objects with types with this attribute are not subjected to
  * type-based alias analysis, but are instead assumed to be able to alias any
  * other type of objects, just like the char type.
  */
 #if FOLLY_HAS_CPP_ATTRIBUTE(gnu::may_alias)
-#define FOLLY_ATTR_MAY_ALIAS gnu::may_alias
+#define FOLLY_ATTR_GNU_MAY_ALIAS gnu::may_alias
 #else
-#define FOLLY_ATTR_MAY_ALIAS
+#define FOLLY_ATTR_GNU_MAY_ALIAS
 #endif
 
 #if FOLLY_HAS_CPP_ATTRIBUTE(gnu::pure)
-#define FOLLY_ATTR_PURE gnu::pure
+#define FOLLY_ATTR_GNU_PURE gnu::pure
 #else
-#define FOLLY_ATTR_PURE
+#define FOLLY_ATTR_GNU_PURE
 #endif
 
 #if FOLLY_HAS_CPP_ATTRIBUTE(clang::preserve_most)
@@ -189,4 +161,23 @@
 #define FOLLY_ATTR_CLANG_PRESERVE_ALL clang::preserve_all
 #else
 #define FOLLY_ATTR_CLANG_PRESERVE_ALL
+#endif
+
+#if FOLLY_HAS_CPP_ATTRIBUTE(gnu::used)
+#define FOLLY_ATTR_GNU_USED gnu::used
+#else
+#define FOLLY_ATTR_GNU_USED
+#endif
+
+#if FOLLY_HAS_CPP_ATTRIBUTE(clang::coro_await_elidable)
+#define FOLLY_ATTR_CLANG_CORO_AWAIT_ELIDABLE clang::coro_await_elidable
+#else
+#define FOLLY_ATTR_CLANG_CORO_AWAIT_ELIDABLE
+#endif
+
+#if FOLLY_HAS_CPP_ATTRIBUTE(clang::coro_await_elidable_argument)
+#define FOLLY_ATTR_CLANG_CORO_AWAIT_ELIDABLE_ARGUMENT \
+  clang::coro_await_elidable_argument
+#else
+#define FOLLY_ATTR_CLANG_CORO_AWAIT_ELIDABLE_ARGUMENT
 #endif

@@ -434,9 +434,6 @@ class F14BasicMap : public std::unordered_map<K, M, H, E, A> {
 
   //// PUBLIC - F14 Extensions
 
-#if FOLLY_F14_ERASE_INTO_AVAILABLE
-  // emulation of eraseInto requires unordered_map::extract
-
   template <typename BeforeDestroy>
   iterator eraseInto(const_iterator pos, BeforeDestroy&& beforeDestroy) {
     iterator it = erase(pos, pos);
@@ -490,7 +487,6 @@ class F14BasicMap : public std::unordered_map<K, M, H, E, A> {
       K2 const& key, BeforeDestroy&& beforeDestroy) {
     return eraseIntoImpl(key, beforeDestroy);
   }
-#endif
 
   bool containsEqualValue(value_type const& value) const {
     // bucket isn't valid if bucket_count is zero
@@ -533,6 +529,90 @@ class F14BasicMap : public std::unordered_map<K, M, H, E, A> {
       value_type const* b = std::addressof(entry);
       visitor(b, b + 1);
     }
+  }
+
+  /// F14HashToken interface
+  template <typename V>
+  std::pair<iterator, bool> insert_or_assign(
+      F14HashToken const&, key_type const& key, V&& obj) {
+    return insert_or_assign(key, std::forward<V>(obj));
+  }
+
+  template <typename V>
+  std::pair<iterator, bool> insert_or_assign(
+      F14HashToken const&, key_type&& key, V&& obj) {
+    return insert_or_assign(std::move(key), std::forward<V>(obj));
+  }
+
+  template <typename K2, typename V>
+  EnableHeterogeneousInsert<K2, std::pair<iterator, bool>> insert_or_assign(
+      F14HashToken const&, K2&& key, V&& obj) {
+    return insert_or_assign(std::forward<K2>(key), std::forward<V>(obj));
+  }
+
+  template <typename... Args>
+  std::pair<iterator, bool> try_emplace_token(
+      F14HashToken const&, key_type const& key, Args&&... args) {
+    return try_emplace(key, std::forward<Args>(args)...);
+  }
+
+  template <typename... Args>
+  std::pair<iterator, bool> try_emplace_token(
+      F14HashToken const&, key_type&& key, Args&&... args) {
+    return try_emplace(std::move(key), std::forward<Args>(args)...);
+  }
+
+  template <typename K2, typename... Args>
+  EnableHeterogeneousInsert<K2, std::pair<iterator, bool>> try_emplace_token(
+      F14HashToken const&, K2&& key, Args&&... args) {
+    return try_emplace(std::forward<K2>(key), std::forward<Args>(args)...);
+  }
+
+  F14HashToken prehash(key_type const&) const {
+    return {}; // Ignored.
+  }
+  F14HashToken prehash(key_type const&, std::size_t) const {
+    return {}; // Ignored.
+  }
+
+  template <typename K2>
+  EnableHeterogeneousFind<K2, F14HashToken> prehash(K2 const&) const {
+    return {}; // Ignored.
+  }
+  template <typename K2>
+  EnableHeterogeneousFind<K2, F14HashToken> prehash(
+      K2 const&, std::size_t) const {
+    return {}; // Ignored.
+  }
+
+  void prefetch(F14HashToken const&) const {}
+
+  iterator find(F14HashToken const&, key_type const& key) { return find(key); }
+
+  const_iterator find(F14HashToken const&, key_type const& key) const {
+    return find(key);
+  }
+
+  template <typename K2>
+  EnableHeterogeneousFind<K2, iterator> find(
+      F14HashToken const&, K2 const& key) {
+    return find(key);
+  }
+
+  template <typename K2>
+  EnableHeterogeneousFind<K2, const_iterator> find(
+      F14HashToken const&, K2 const& key) const {
+    return find(key);
+  }
+
+  bool contains(F14HashToken const&, key_type const& key) const {
+    return contains(key);
+  }
+
+  template <typename K2>
+  EnableHeterogeneousFind<K2, bool> contains(
+      F14HashToken const&, K2 const& key) const {
+    return contains(key);
   }
 };
 } // namespace detail

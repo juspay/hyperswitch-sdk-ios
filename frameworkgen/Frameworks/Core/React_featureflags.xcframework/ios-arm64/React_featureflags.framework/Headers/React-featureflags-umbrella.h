@@ -13,6 +13,7 @@
 #import "react/featureflags/ReactNativeFeatureFlags.h"
 #import "react/featureflags/ReactNativeFeatureFlagsAccessor.h"
 #import "react/featureflags/ReactNativeFeatureFlagsDefaults.h"
+#import "react/featureflags/ReactNativeFeatureFlagsDynamicProvider.h"
 #import "react/featureflags/ReactNativeFeatureFlagsProvider.h"
 
 FOUNDATION_EXPORT double React_featureflagsVersionNumber;

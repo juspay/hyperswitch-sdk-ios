@@ -528,14 +528,21 @@ public:
   virtual jsi::Value captureReplay(jsi::Runtime &rt, bool isHardCrash) = 0;
   virtual std::optional<jsi::String> getCurrentReplayId(jsi::Runtime &rt) = 0;
   virtual jsi::Value crashedLastRun(jsi::Runtime &rt) = 0;
+  virtual jsi::Value getDataFromUri(jsi::Runtime &rt, jsi::String uri) = 0;
+  virtual jsi::Value popTimeToDisplayFor(jsi::Runtime &rt, jsi::String key) = 0;
+  virtual bool setActiveSpanId(jsi::Runtime &rt, jsi::String spanId) = 0;
 
 };
 
 template <typename T>
 class JSI_EXPORT NativeRNSentryCxxSpec : public TurboModule {
 public:
-  jsi::Value get(jsi::Runtime &rt, const jsi::PropNameID &propName) override {
-    return delegate_.get(rt, propName);
+  jsi::Value create(jsi::Runtime &rt, const jsi::PropNameID &propName) override {
+    return delegate_.create(rt, propName);
+  }
+
+  std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& runtime) override {
+    return delegate_.getPropertyNames(runtime);
   }
 
   static constexpr std::string_view kModuleName = "RNSentry";
@@ -801,6 +808,30 @@ private:
 
       return bridging::callFromJs<jsi::Value>(
           rt, &T::crashedLastRun, jsInvoker_, instance_);
+    }
+    jsi::Value getDataFromUri(jsi::Runtime &rt, jsi::String uri) override {
+      static_assert(
+          bridging::getParameterCount(&T::getDataFromUri) == 2,
+          "Expected getDataFromUri(...) to have 2 parameters");
+
+      return bridging::callFromJs<jsi::Value>(
+          rt, &T::getDataFromUri, jsInvoker_, instance_, std::move(uri));
+    }
+    jsi::Value popTimeToDisplayFor(jsi::Runtime &rt, jsi::String key) override {
+      static_assert(
+          bridging::getParameterCount(&T::popTimeToDisplayFor) == 2,
+          "Expected popTimeToDisplayFor(...) to have 2 parameters");
+
+      return bridging::callFromJs<jsi::Value>(
+          rt, &T::popTimeToDisplayFor, jsInvoker_, instance_, std::move(key));
+    }
+    bool setActiveSpanId(jsi::Runtime &rt, jsi::String spanId) override {
+      static_assert(
+          bridging::getParameterCount(&T::setActiveSpanId) == 2,
+          "Expected setActiveSpanId(...) to have 2 parameters");
+
+      return bridging::callFromJs<bool>(
+          rt, &T::setActiveSpanId, jsInvoker_, instance_, std::move(spanId));
     }
 
   private:

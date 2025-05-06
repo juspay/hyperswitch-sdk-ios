@@ -7,10 +7,11 @@
 
 #pragma once
 
-#include <functional>
 #include <memory>
+#include <vector>
 
 #include <react/debug/react_native_assert.h>
+#include <react/featureflags/ReactNativeFeatureFlags.h>
 #include <react/renderer/core/ComponentDescriptor.h>
 #include <react/renderer/core/EventDispatcher.h>
 #include <react/renderer/core/Props.h>
@@ -19,7 +20,6 @@
 #include <react/renderer/core/ShadowNodeFragment.h>
 #include <react/renderer/core/State.h>
 #include <react/renderer/graphics/Float.h>
-#include <react/utils/CoreFeatures.h>
 
 namespace facebook::react {
 
@@ -46,8 +46,10 @@ class ConcreteComponentDescriptor : public ComponentDescriptor {
   using ConcreteState = typename ShadowNodeT::ConcreteState;
   using ConcreteStateData = typename ShadowNodeT::ConcreteState::Data;
 
-  ConcreteComponentDescriptor(const ComponentDescriptorParameters& parameters)
-      : ComponentDescriptor(parameters) {
+  explicit ConcreteComponentDescriptor(
+      const ComponentDescriptorParameters& parameters,
+      RawPropsParser&& rawPropsParser = {})
+      : ComponentDescriptor(parameters, std::move(rawPropsParser)) {
     rawPropsParser_.prepare<ConcreteProps>();
   }
 
@@ -112,20 +114,25 @@ class ConcreteComponentDescriptor : public ComponentDescriptor {
 
     rawProps.parse(rawPropsParser_);
 
-    // Call old-style constructor
     auto shadowNodeProps = ShadowNodeT::Props(context, rawProps, props);
-
     // Use the new-style iterator
     // Note that we just check if `Props` has this flag set, no matter
     // the type of ShadowNode; it acts as the single global flag.
-    if (CoreFeatures::enablePropIteratorSetter) {
-      rawProps.iterateOverValues([&](RawPropsPropNameHash hash,
-                                     const char* propName,
-                                     const RawValue& fn) {
-        shadowNodeProps.get()->setProp(context, hash, propName, fn);
-      });
+    if (ReactNativeFeatureFlags::enableCppPropsIteratorSetter()) {
+#ifdef ANDROID
+      const auto& dynamic = shadowNodeProps->rawProps;
+#else
+      const auto& dynamic = static_cast<folly::dynamic>(rawProps);
+#endif
+      for (const auto& pair : dynamic.items()) {
+        const auto& name = pair.first.getString();
+        shadowNodeProps->setProp(
+            context,
+            RAW_PROPS_KEY_HASH(name),
+            name.c_str(),
+            RawValue(pair.second));
+      }
     }
-
     return shadowNodeProps;
   };
 
@@ -161,7 +168,8 @@ class ConcreteComponentDescriptor : public ComponentDescriptor {
   ShadowNodeFamily::Shared createFamily(
       const ShadowNodeFamilyFragment& fragment) const override {
     auto eventEmitter = std::make_shared<const ConcreteEventEmitter>(
-        std::make_shared<EventTarget>(fragment.instanceHandle),
+        std::make_shared<EventTarget>(
+            fragment.instanceHandle, fragment.surfaceId),
         eventDispatcher_);
     return std::make_shared<ShadowNodeFamily>(
         fragment, std::move(eventEmitter), eventDispatcher_, *this);
@@ -174,5 +182,18 @@ class ConcreteComponentDescriptor : public ComponentDescriptor {
         shadowNode.getComponentHandle() == getComponentHandle());
   }
 };
+
+template <typename TManager>
+std::shared_ptr<TManager> getManagerByName(
+    std::shared_ptr<const ContextContainer>& contextContainer,
+    const char name[]) {
+  if (contextContainer) {
+    if (auto manager = contextContainer->find<std::shared_ptr<TManager>>(name);
+        manager.has_value()) {
+      return manager.value();
+    }
+  }
+  return std::make_shared<TManager>(contextContainer);
+}
 
 } // namespace facebook::react

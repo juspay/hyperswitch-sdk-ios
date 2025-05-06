@@ -6,11 +6,18 @@
 
 @protocol SentrySpan;
 
-@class SentryOptions, SentryEvent, SentryBreadcrumb, SentryScope, SentryUser, SentryId,
-    SentryUserFeedback, SentryTransactionContext;
+@class SentryBreadcrumb;
+@class SentryEvent;
+@class SentryFeedback;
+@class SentryId;
 @class SentryMetricsAPI;
-@class UIView;
+@class SentryOptions;
 @class SentryReplayApi;
+@class SentryScope;
+@class SentryTransactionContext;
+@class SentryUser;
+@class SentryUserFeedback;
+@class UIView;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -246,27 +253,22 @@ SENTRY_NO_INIT
 /**
  * Captures user feedback that was manually gathered and sends it to Sentry.
  * @param userFeedback The user feedback to send to Sentry.
- * @note If you'd prefer not to have to build the UI required to gather the feedback from the user,
- * consider using `showUserFeedbackForm`, which delivers a prepackaged user feedback experience. See
- * @c SentryOptions.configureUserFeedback to customize a fully managed integration. See
- * https://docs.sentry.io/platforms/apple/user-feedback/#user-feedback-api and (TODO: add link to
- * new docs) for more information on each approach.
+ * @deprecated Use @c SentrySDK.captureFeedback or use or configure our new managed UX with
+ * @c SentryOptions.configureUserFeedback .
  */
 + (void)captureUserFeedback:(SentryUserFeedback *)userFeedback
-    NS_SWIFT_NAME(capture(userFeedback:));
+    NS_SWIFT_NAME(capture(userFeedback:)) DEPRECATED_MSG_ATTRIBUTE(
+        "Use SentrySDK.captureFeedback or use or configure our new managed UX with "
+        "SentryOptions.configureUserFeedback.");
 
 /**
- * Display a form to gather information from an end user in the app to send to Sentry as a user
- * feedback event.
- * @see @c SentryOptions.enableUserFeedbackIntegration and @c SentryOptions.configureUserFeedback to
- * enable the functionality and customize the experience.
- * @note If @c SentryOptions.enableUserFeedbackIntegration is @c NO, this method is a no-op.
- * @note This is a fully managed user feedback flow; there will be no need to call
- * @c SentrySDK.captureUserFeedback . See
- * https://docs.sentry.io/platforms/apple/user-feedback/#user-feedback-api and (TODO: add link to
- * new docs) for more information on each approach.
+ * Captures user feedback that was manually gathered and sends it to Sentry.
+ * @param feedback The feedback to send to Sentry.
+ * @note If you'd prefer not to have to build the UI required to gather the feedback from the user,
+ * see @c SentryOptions.configureUserFeedback to customize a fully managed integration. See
+ * https://docs.sentry.io/platforms/apple/user-feedback/ for more information.
  */
-+ (void)showUserFeedbackForm;
++ (void)captureFeedback:(SentryFeedback *)feedback NS_SWIFT_NAME(capture(feedback:));
 
 /**
  * Adds a Breadcrumb to the current Scope of the current Hub. If the total number of breadcrumbs
@@ -300,6 +302,8 @@ SENTRY_NO_INIT
 /**
  * Set user to the current Scope of the current Hub.
  * @param user The user to set to the current Scope.
+ *
+ * @note You must start the SDK before calling this method, otherwise it doesn't set the user.
  */
 + (void)setUser:(nullable SentryUser *)user;
 
@@ -367,11 +371,23 @@ SENTRY_NO_INIT
 #if SENTRY_TARGET_PROFILING_SUPPORTED
 /**
  * Start a new continuous profiling session if one is not already running.
- * @note Unlike trace-based profiling, continuous profiling does not take into account @c
- * SentryOptions.profilesSampleRate ; a call to this method will always start a profile if one is
- * not already running. This includes app launch profiles configured with @c
- * SentryOptions.enableAppLaunchProfiling .
  * @warning Continuous profiling mode is experimental and may still contain bugs.
+ * @note Unlike transaction-based profiling, continuous profiling does not take into account
+ * @c SentryOptions.profilesSampleRate or @c SentryOptions.profilesSampler . If either of those
+ * options are set, this method does nothing.
+ * @note Taking into account the above note, if @c SentryOptions.configureProfiling is not set,
+ * calls to this method will always start a profile if one is not already running. This includes app
+ * launch profiles configured with @c SentryOptions.enableAppLaunchProfiling .
+ * @note If neither @c SentryOptions.profilesSampleRate nor @c SentryOptions.profilesSampler are
+ * set, and @c SentryOptions.configureProfiling is set, this method does nothing if the profiling
+ * session is not sampled with respect to @c SentryOptions.profileSessionSampleRate , or if it is
+ * sampled but the profiler is already running.
+ * @note If neither @c SentryOptions.profilesSampleRate nor @c SentryOptions.profilesSampler are
+ * set, and @c SentryOptions.configureProfiling is set, this method does nothing if
+ * @c SentryOptions.profileLifecycle is set to @c trace . In this scenario, the profiler is
+ * automatically started and stopped depending on whether there is an active sampled span, so it is
+ * not permitted to manually start profiling.
+ * @note Profiling is automatically disabled if a thread sanitizer is attached.
  * @seealso https://docs.sentry.io/platforms/apple/guides/ios/profiling/#continuous-profiling
  */
 + (void)startProfiler;
@@ -379,6 +395,13 @@ SENTRY_NO_INIT
 /**
  * Stop a continuous profiling session if there is one ongoing.
  * @warning Continuous profiling mode is experimental and may still contain bugs.
+ * @note Does nothing if @c SentryOptions.profileLifecycle is set to @c trace .
+ * @note Does not immediately stop the profiler. Profiling data is uploaded at regular timed
+ * intervals; when the current interval completes, then the profiler stops and the data gathered
+ * during that last interval is uploaded.
+ * @note If a new call to @c startProfiler that would start the profiler is made before the last
+ * interval completes, the profiler will continue running until another call to stop is made.
+ * @note Profiling is automatically disabled if a thread sanitizer is attached.
  * @seealso https://docs.sentry.io/platforms/apple/guides/ios/profiling/#continuous-profiling
  */
 + (void)stopProfiler;

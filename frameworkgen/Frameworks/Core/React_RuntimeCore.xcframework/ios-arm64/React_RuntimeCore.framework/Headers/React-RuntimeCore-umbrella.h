@@ -13,7 +13,6 @@
 #import "react/runtime/BindingsInstaller.h"
 #import "react/runtime/BridgelessNativeMethodCallInvoker.h"
 #import "react/runtime/BufferedRuntimeExecutor.h"
-#import "react/runtime/JSRuntimeFactory.h"
 #import "react/runtime/PlatformTimerRegistry.h"
 #import "react/runtime/ReactInstance.h"
 #import "react/runtime/TimerManager.h"

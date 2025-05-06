@@ -10,6 +10,7 @@
 #endif
 #endif
 
+#import "AppleEventBeat.h"
 #import "RCTActivityIndicatorViewComponentView.h"
 #import "RCTDebuggingOverlayComponentView.h"
 #import "RCTImageComponentView.h"
@@ -57,14 +58,16 @@
 #import "RCTSurfacePresenterBridgeAdapter.h"
 #import "RCTSurfaceRegistry.h"
 #import "RCTSurfaceTouchHandler.h"
-#import "RCTThirdPartyFabricComponentsProvider.h"
 #import "RCTTouchableComponentViewProtocol.h"
 #import "RCTFabricSurface.h"
 #import "PlatformRunLoopObserver.h"
+#import "RCTBoxShadow.h"
 #import "RCTColorSpaceUtils.h"
 #import "RCTGenericDelegateSplitter.h"
 #import "RCTIdentifierPool.h"
+#import "RCTLinearGradient.h"
 #import "RCTReactTaggedView.h"
+#import "RCTViewFinder.h"
 
 FOUNDATION_EXPORT double RCTFabricVersionNumber;
 FOUNDATION_EXPORT const unsigned char RCTFabricVersionString[];

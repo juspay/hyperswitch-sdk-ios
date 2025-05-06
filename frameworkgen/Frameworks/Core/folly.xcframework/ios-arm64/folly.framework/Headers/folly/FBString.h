@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-// @author: Andrei Alexandrescu (aalexandre)
 // String type.
 
 #pragma once
@@ -28,6 +27,7 @@
 #include <limits>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 
@@ -42,10 +42,6 @@
 #include <folly/lang/CheckedMath.h>
 #include <folly/lang/Exception.h>
 #include <folly/memory/Malloc.h>
-
-#if FOLLY_HAS_STRING_VIEW
-#include <string_view>
-#endif
 
 #if FOLLY_CPLUSPLUS >= 202002L
 #include <compare>
@@ -699,13 +695,13 @@ inline void fbstring_core<Char>::initSmall(
     switch ((byteSize + wordWidth - 1) / wordWidth) { // Number of words.
       case 3:
         ml_.capacity_ = reinterpret_cast<const size_t*>(data)[2];
-        FOLLY_FALLTHROUGH;
+        [[fallthrough]];
       case 2:
         ml_.size_ = reinterpret_cast<const size_t*>(data)[1];
-        FOLLY_FALLTHROUGH;
+        [[fallthrough]];
       case 1:
         ml_.data_ = *reinterpret_cast<Char**>(const_cast<Char*>(data));
-        FOLLY_FALLTHROUGH;
+        [[fallthrough]];
       case 0:
         break;
     }
@@ -1016,6 +1012,17 @@ class basic_fbstring {
   typedef std::true_type IsRelocatable;
 
  private:
+  using string_view_type = std::basic_string_view<value_type, traits_type>;
+
+  template <typename StringViewLike>
+  static inline constexpr bool is_string_view_like_v =
+      std::is_convertible_v<StringViewLike const&, string_view_type> &&
+      !std::is_convertible_v<StringViewLike const&, const_pointer>;
+
+  template <typename StringViewLike, typename Dummy>
+  using if_is_string_view_like_t =
+      std::enable_if_t<is_string_view_like_v<StringViewLike>, Dummy>;
+
   static void procrustes(size_type& n, size_type nmax) {
     if (n > nmax) {
       n = nmax;
@@ -1023,6 +1030,11 @@ class basic_fbstring {
   }
 
   static size_type traitsLength(const value_type* s);
+
+  struct string_view_ctor {};
+  FOLLY_NOINLINE basic_fbstring(
+      string_view_type view, const A&, string_view_ctor)
+      : store_(view.data(), view.size()) {}
 
  public:
   // C++11 21.4.2 construct/copy/destroy
@@ -1040,6 +1052,7 @@ class basic_fbstring {
   // these two separate constructors.
 
   basic_fbstring() noexcept : basic_fbstring(A()) {}
+  /* implicit */ basic_fbstring(std::nullptr_t) = delete;
 
   explicit basic_fbstring(const A&) noexcept {}
 
@@ -1103,6 +1116,20 @@ class basic_fbstring {
     assign(il.begin(), il.end());
   }
 
+  template <
+      typename StringViewLike,
+      if_is_string_view_like_t<StringViewLike, int> = 0>
+  explicit basic_fbstring(const StringViewLike& view, const A& a = A())
+      : basic_fbstring(string_view_type(view), a, string_view_ctor{}) {}
+
+  template <
+      typename StringViewLike,
+      if_is_string_view_like_t<StringViewLike, int> = 0>
+  basic_fbstring(
+      const StringViewLike& view, size_type pos, size_type n, const A& a = A())
+      : basic_fbstring(
+            string_view_type(view).substr(pos, n), a, string_view_ctor{}) {}
+
   ~basic_fbstring() noexcept {}
 
   basic_fbstring& operator=(const basic_fbstring& lhs);
@@ -1120,6 +1147,8 @@ class basic_fbstring {
   std::basic_string<E, T, A> toStdString() const {
     return std::basic_string<E, T, A>(data(), size());
   }
+
+  basic_fbstring& operator=(std::nullptr_t) = delete;
 
   basic_fbstring& operator=(const value_type* s) { return assign(s); }
 
@@ -1148,11 +1177,7 @@ class basic_fbstring {
     return assign(il.begin(), il.end());
   }
 
-#if FOLLY_HAS_STRING_VIEW
-  operator std::basic_string_view<value_type, traits_type>() const noexcept {
-    return {data(), size()};
-  }
-#endif
+  operator string_view_type() const noexcept { return {data(), size()}; }
 
   // C++11 21.4.3 iterators:
   iterator begin() { return store_.mutableData(); }
@@ -1260,6 +1285,14 @@ class basic_fbstring {
     return *this;
   }
 
+  template <
+      typename StringViewLike,
+      if_is_string_view_like_t<StringViewLike, int> = 0>
+  basic_fbstring& operator+=(const StringViewLike& like) {
+    append(like);
+    return *this;
+  }
+
   basic_fbstring& append(const basic_fbstring& str);
 
   basic_fbstring& append(
@@ -1281,6 +1314,14 @@ class basic_fbstring {
 
   basic_fbstring& append(std::initializer_list<value_type> il) {
     return append(il.begin(), il.end());
+  }
+
+  template <
+      typename StringViewLike,
+      if_is_string_view_like_t<StringViewLike, int> = 0>
+  basic_fbstring& append(const StringViewLike& like) {
+    string_view_type view = like;
+    return append(view.begin(), view.end());
   }
 
   void push_back(const value_type c) { // primitive
@@ -1388,7 +1429,8 @@ class basic_fbstring {
  public:
   template <class ItOrLength, class ItOrChar>
   iterator insert(const_iterator p, ItOrLength first_or_n, ItOrChar last_or_c) {
-    using Sel = bool_constant<std::numeric_limits<ItOrLength>::is_specialized>;
+    using Sel =
+        std::bool_constant<std::numeric_limits<ItOrLength>::is_specialized>;
     return insertImplDiscr(p, first_or_n, last_or_c, Sel());
   }
 
@@ -2140,7 +2182,7 @@ inline void basic_fbstring<E, T, A, S>::replaceImpl(
   Invariant checker(*this);
 
   // Handle aliased replace
-  using Sel = bool_constant<
+  using Sel = std::bool_constant<
       std::is_same<FwdIterator, iterator>::value ||
       std::is_same<FwdIterator, const_iterator>::value>;
   if (replaceAliased(i1, i2, s1, s2, Sel())) {
@@ -2414,11 +2456,19 @@ inline bool operator==(
 }
 
 template <typename E, class T, class A, class S>
+inline bool operator==(std::nullptr_t, const basic_fbstring<E, T, A, S>&) =
+    delete;
+
+template <typename E, class T, class A, class S>
 inline bool operator==(
     const typename basic_fbstring<E, T, A, S>::value_type* lhs,
     const basic_fbstring<E, T, A, S>& rhs) {
   return rhs == lhs;
 }
+
+template <typename E, class T, class A, class S>
+inline bool operator==(const basic_fbstring<E, T, A, S>&, std::nullptr_t) =
+    delete;
 
 template <typename E, class T, class A, class S>
 inline bool operator==(
@@ -2435,6 +2485,10 @@ inline bool operator!=(
 }
 
 template <typename E, class T, class A, class S>
+inline bool operator!=(std::nullptr_t, const basic_fbstring<E, T, A, S>&) =
+    delete;
+
+template <typename E, class T, class A, class S>
 inline bool operator!=(
     const typename basic_fbstring<E, T, A, S>::value_type* lhs,
     const basic_fbstring<E, T, A, S>& rhs) {
@@ -2442,6 +2496,10 @@ inline bool operator!=(
 }
 
 template <typename E, class T, class A, class S>
+inline bool operator!=(const basic_fbstring<E, T, A, S>&, std::nullptr_t) =
+    delete;
+
+template <typename E, class T, class A, class S>
 inline bool operator!=(
     const basic_fbstring<E, T, A, S>& lhs,
     const typename basic_fbstring<E, T, A, S>::value_type* rhs) {
@@ -2456,11 +2514,19 @@ inline bool operator<(
 }
 
 template <typename E, class T, class A, class S>
+inline bool operator<(const basic_fbstring<E, T, A, S>&, std::nullptr_t) =
+    delete;
+
+template <typename E, class T, class A, class S>
 inline bool operator<(
     const basic_fbstring<E, T, A, S>& lhs,
     const typename basic_fbstring<E, T, A, S>::value_type* rhs) {
   return lhs.compare(rhs) < 0;
 }
+
+template <typename E, class T, class A, class S>
+inline bool operator<(std::nullptr_t, const basic_fbstring<E, T, A, S>&) =
+    delete;
 
 template <typename E, class T, class A, class S>
 inline bool operator<(
@@ -2477,6 +2543,10 @@ inline bool operator>(
 }
 
 template <typename E, class T, class A, class S>
+inline bool operator>(const basic_fbstring<E, T, A, S>&, std::nullptr_t) =
+    delete;
+
+template <typename E, class T, class A, class S>
 inline bool operator>(
     const basic_fbstring<E, T, A, S>& lhs,
     const typename basic_fbstring<E, T, A, S>::value_type* rhs) {
@@ -2484,6 +2554,10 @@ inline bool operator>(
 }
 
 template <typename E, class T, class A, class S>
+inline bool operator>(std::nullptr_t, const basic_fbstring<E, T, A, S>&) =
+    delete;
+
+template <typename E, class T, class A, class S>
 inline bool operator>(
     const typename basic_fbstring<E, T, A, S>::value_type* lhs,
     const basic_fbstring<E, T, A, S>& rhs) {
@@ -2498,11 +2572,19 @@ inline bool operator<=(
 }
 
 template <typename E, class T, class A, class S>
+inline bool operator<=(const basic_fbstring<E, T, A, S>&, std::nullptr_t) =
+    delete;
+
+template <typename E, class T, class A, class S>
 inline bool operator<=(
     const basic_fbstring<E, T, A, S>& lhs,
     const typename basic_fbstring<E, T, A, S>::value_type* rhs) {
   return !(rhs < lhs);
 }
+
+template <typename E, class T, class A, class S>
+inline bool operator<=(std::nullptr_t, const basic_fbstring<E, T, A, S>&) =
+    delete;
 
 template <typename E, class T, class A, class S>
 inline bool operator<=(
@@ -2519,6 +2601,10 @@ inline bool operator>=(
 }
 
 template <typename E, class T, class A, class S>
+inline bool operator>=(const basic_fbstring<E, T, A, S>&, std::nullptr_t) =
+    delete;
+
+template <typename E, class T, class A, class S>
 inline bool operator>=(
     const basic_fbstring<E, T, A, S>& lhs,
     const typename basic_fbstring<E, T, A, S>::value_type* rhs) {
@@ -2526,11 +2612,25 @@ inline bool operator>=(
 }
 
 template <typename E, class T, class A, class S>
+inline bool operator>=(std::nullptr_t, const basic_fbstring<E, T, A, S>&) =
+    delete;
+
+template <typename E, class T, class A, class S>
 inline bool operator>=(
     const typename basic_fbstring<E, T, A, S>::value_type* lhs,
     const basic_fbstring<E, T, A, S>& rhs) {
   return !(lhs < rhs);
 }
+
+#if FOLLY_CPLUSPLUS >= 202002
+template <typename E, class T, class A, class S>
+inline bool operator<=>(std::nullptr_t, const basic_fbstring<E, T, A, S>&) =
+    delete;
+
+template <typename E, class T, class A, class S>
+inline bool operator<=>(const basic_fbstring<E, T, A, S>&, std::nullptr_t) =
+    delete;
+#endif
 
 // C++11 21.4.8.8
 template <typename E, class T, class A, class S>
@@ -2626,12 +2726,6 @@ operator<<(
 #endif
   return os;
 }
-
-#if FOLLY_CPLUSPLUS < 201703L
-template <typename E1, class T, class A, class S>
-constexpr typename basic_fbstring<E1, T, A, S>::size_type
-    basic_fbstring<E1, T, A, S>::npos;
-#endif
 
 // basic_string compatibility routines
 

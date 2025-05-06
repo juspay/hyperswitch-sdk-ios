@@ -115,7 +115,7 @@ class ScopeGuardImpl : public ScopeGuardImplBase {
   explicit ScopeGuardImpl(FunctionType& fn) noexcept(
       std::is_nothrow_copy_constructible<FunctionType>::value)
       : ScopeGuardImpl(
-            folly::as_const(fn),
+            std::as_const(fn),
             makeFailsafe(
                 std::is_nothrow_copy_constructible<FunctionType>{}, &fn)) {}
 
@@ -176,11 +176,9 @@ class ScopeGuardImpl : public ScopeGuardImplBase {
   void* operator new(std::size_t) = delete;
 
   void execute() noexcept(InvokeNoexcept) {
-    if (InvokeNoexcept) {
-      using R = decltype(function_());
-      auto catcher_word = reinterpret_cast<uintptr_t>(&terminate);
-      auto catcher = reinterpret_cast<R (*)()>(catcher_word);
-      catch_exception(function_, catcher);
+    if constexpr (InvokeNoexcept) {
+      static_assert(std::is_same_v<void, decltype(function_())>);
+      catch_exception(function_, &terminate);
     } else {
       function_();
     }
@@ -358,8 +356,8 @@ ScopeGuardImpl<typename std::decay<FunctionType>::type, true> operator+(
  *
  * @def SCOPE_EXIT
  */
-#define SCOPE_EXIT                               \
-  auto FB_ANONYMOUS_VARIABLE(SCOPE_EXIT_STATE) = \
+#define SCOPE_EXIT                                        \
+  auto FB_ANONYMOUS_VARIABLE_ODR_SAFE(SCOPE_EXIT_STATE) = \
       ::folly::detail::ScopeGuardOnExit() + [&]() noexcept
 
 //  SCOPE_FAIL
@@ -388,8 +386,8 @@ ScopeGuardImpl<typename std::decay<FunctionType>::type, true> operator+(
  *
  * @def SCOPE_FAIL
  */
-#define SCOPE_FAIL                               \
-  auto FB_ANONYMOUS_VARIABLE(SCOPE_FAIL_STATE) = \
+#define SCOPE_FAIL                                        \
+  auto FB_ANONYMOUS_VARIABLE_ODR_SAFE(SCOPE_FAIL_STATE) = \
       ::folly::detail::ScopeGuardOnFail() + [&]() noexcept
 
 //  SCOPE_SUCCESS
@@ -417,6 +415,6 @@ ScopeGuardImpl<typename std::decay<FunctionType>::type, true> operator+(
  *
  * @def SCOPE_SUCCESS
  */
-#define SCOPE_SUCCESS                               \
-  auto FB_ANONYMOUS_VARIABLE(SCOPE_SUCCESS_STATE) = \
+#define SCOPE_SUCCESS                                        \
+  auto FB_ANONYMOUS_VARIABLE_ODR_SAFE(SCOPE_SUCCESS_STATE) = \
       ::folly::detail::ScopeGuardOnSuccess() + [&]()

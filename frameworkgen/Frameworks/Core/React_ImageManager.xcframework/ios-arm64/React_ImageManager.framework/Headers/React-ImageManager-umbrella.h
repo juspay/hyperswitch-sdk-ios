@@ -10,6 +10,7 @@
 #endif
 #endif
 
+#import "react/renderer/imagemanager/ImageRequestParams.h"
 #import "react/renderer/imagemanager/RCTImageManager.h"
 #import "react/renderer/imagemanager/RCTImageManagerProtocol.h"
 #import "react/renderer/imagemanager/RCTImagePrimitivesConversions.h"

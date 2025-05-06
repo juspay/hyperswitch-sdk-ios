@@ -17,9 +17,12 @@
 #pragma once
 
 #include <atomic>
+#include <cassert>
+#include <cstddef>
 #include <type_traits>
 
 #include <folly/Traits.h>
+#include <folly/lang/SafeAssert.h>
 
 namespace folly {
 
@@ -28,10 +31,15 @@ namespace detail {
 template <typename T>
 struct atomic_ref_base {
   static_assert(sizeof(T) == sizeof(std::atomic<T>), "size mismatch");
-  static_assert(alignof(T) == alignof(std::atomic<T>), "alignment mismatch");
-  static_assert(is_trivially_copyable_v<T>, "value not trivially-copyable");
+  static_assert(
+      std::is_trivially_copyable_v<T>, "value not trivially-copyable");
 
-  explicit atomic_ref_base(T& ref) : ref_(ref) {}
+  using value_type = T;
+
+  static inline constexpr std::size_t required_alignment =
+      alignof(std::atomic<T>);
+
+  explicit atomic_ref_base(T& ref) : ref_(ref) { check_alignment_(); }
   atomic_ref_base(atomic_ref_base const&) = default;
 
   void store(T desired, std::memory_order order = std::memory_order_seq_cst)
@@ -81,6 +89,13 @@ struct atomic_ref_base {
 
   std::atomic<T>& atomic() const noexcept {
     return reinterpret_cast<std::atomic<T>&>(ref_); // ub dragons be here
+  }
+
+ private:
+  void check_alignment_() const noexcept {
+    auto ptr = reinterpret_cast<uintptr_t>(
+        &reinterpret_cast<unsigned char const&>(ref_));
+    FOLLY_SAFE_DCHECK(ptr % required_alignment == 0);
   }
 
   T& ref_;
@@ -145,18 +160,15 @@ class atomic_ref : public detail::atomic_ref_select<T> {
   using base::base;
 };
 
-#if __cpp_deduction_guides >= 201703
-
 template <typename T>
 atomic_ref(T&) -> atomic_ref<T>;
-
-#endif
 
 struct make_atomic_ref_t {
   template <
       typename T,
       std::enable_if_t<
-          is_trivially_copyable_v<T> && sizeof(T) == sizeof(std::atomic<T>) &&
+          std::is_trivially_copyable_v<T> &&
+              sizeof(T) == sizeof(std::atomic<T>) &&
               alignof(T) == alignof(std::atomic<T>),
           int> = 0>
   atomic_ref<T> operator()(T& ref) const {
@@ -164,6 +176,6 @@ struct make_atomic_ref_t {
   }
 };
 
-FOLLY_INLINE_VARIABLE constexpr make_atomic_ref_t make_atomic_ref;
+inline constexpr make_atomic_ref_t make_atomic_ref;
 
 } // namespace folly

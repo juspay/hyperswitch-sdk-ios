@@ -11,6 +11,7 @@
 #endif
 
 #import "fmt/args.h"
+#import "fmt/base.h"
 #import "fmt/chrono.h"
 #import "fmt/color.h"
 #import "fmt/compile.h"

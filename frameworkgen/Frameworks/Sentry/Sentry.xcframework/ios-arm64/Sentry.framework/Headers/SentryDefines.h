@@ -1,5 +1,26 @@
 #import <Foundation/Foundation.h>
 
+// SentryDefines.h is a key header and will be checked early,
+// ensuring this error appears first during the compile process.
+//
+// Setting APPLICATION_EXTENSION_API_ONLY to YES has a side effect of
+// including all Swift classes in the `Sentry-Swift.h` header which is
+// required for the SDK to work.
+//
+// https://github.com/getsentry/sentry-cocoa/issues/4426
+//
+// This mainly came up in RN SDK, because
+// some libraries advice to users
+// to set APPLICATION_EXTENSION_API_ONLY_NO
+// for all cocoapods targets, instead of
+// only to their pod.
+// https://github.com/getsentry/sentry-react-native/issues/3908
+#if APPLICATION_EXTENSION_API_ONLY_NO
+#    error "Set APPLICATION_EXTENSION_API_ONLY to YES in the Sentry build settings.\
+ Setting the flag to YES is required for the SDK to work.\
+ For more information, visit https://docs.sentry.io/platforms/apple/troubleshooting/#unknown-receiver-somereceiver-use-of-undeclared-identifier-someidentifier
+#endif
+
 #ifdef __cplusplus
 #    define SENTRY_EXTERN extern "C" __attribute__((visibility("default")))
 #else
@@ -136,7 +157,8 @@ typedef NSNumber *_Nullable (^SentryTracesSamplerCallback)(
  * Function pointer for span manipulation.
  * @param span The span to be used.
  */
-typedef void (^SentrySpanCallback)(id<SentrySpan> _Nullable span);
+typedef void (^SentrySpanCallback)(id<SentrySpan> _Nullable span DEPRECATED_MSG_ATTRIBUTE(
+    "See `SentryScope.useSpan` for reasoning of deprecation."));
 
 /**
  * Log level.
@@ -178,3 +200,14 @@ static NSString *_Nonnull const kSentryFalseString = @"false";
  */
 typedef NS_ENUM(NSInteger, SentryTransactionNameSource); // This is a forward declaration, the
                                                          // actual enum is implemented in Swift.
+
+#if TARGET_OS_IOS && SENTRY_HAS_UIKIT
+
+/**
+ * Block used to configure the user feedback widget, form, behaviors and submission data.
+ */
+API_AVAILABLE(ios(13.0))
+typedef void (^SentryUserFeedbackConfigurationBlock)(
+    SentryUserFeedbackConfiguration *_Nonnull configuration);
+
+#endif // TARGET_OS_IOS && SENTRY_HAS_UIKIT

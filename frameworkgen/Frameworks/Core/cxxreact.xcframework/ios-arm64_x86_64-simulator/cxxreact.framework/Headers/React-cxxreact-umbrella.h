@@ -33,6 +33,7 @@
 #import "RecoverableError.h"
 #import "SharedProxyCxxModule.h"
 #import "SystraceSection.h"
+#import "TraceSection.h"
 
 FOUNDATION_EXPORT double cxxreactVersionNumber;
 FOUNDATION_EXPORT const unsigned char cxxreactVersionString[];
