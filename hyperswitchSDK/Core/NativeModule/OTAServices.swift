@@ -88,12 +88,12 @@ public final class OTAServices {
     public func initialize(publishableKey : String) {
         if(self.otaServices == nil) {
             let environment = SDKEnvironment.getEnvironment(publishableKey)
-            let configKey = (environment == .PROD) ? "releaseConfigURL" : "sandBoxReleaseConfigURL"
+            let configKey = (environment == .SANDBOX) ? "sandBoxReleaseConfigURL" : "releaseConfigURL" 
             let payload = [
                 "clientId": getHyperOTAPlist("clientId") ?? "" ,
                 "namespace": getHyperOTAPlist("namespace") ?? "",
                 "forceUpdate": true,
-                "localAssets": (getHyperOTAPlist("releaseConfigURL") ?? "releaseConfigURL") == "releaseConfigURL",
+                "localAssets": (getHyperOTAPlist(configKey) ?? "releaseConfigURL") == "releaseConfigURL",
                 "fileName": getHyperOTAPlist("fileName") ?? "" ,
                 "releaseConfigURL": (getHyperOTAPlist(configKey) ?? "") +  "/mobile-ota/ios/" + SDKVersion.current + "/config.json",
             ] as [String: Any]
