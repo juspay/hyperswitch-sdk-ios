@@ -24,6 +24,11 @@ public class PaymentSession {
         APIClient.shared.customBackendUrl = customBackendUrl
         APIClient.shared.customLogUrl = customLogUrl
         APIClient.shared.customParams = customParams
+
+       #if canImport(HyperOTA)
+       OTAServices.shared.initialize(publishableKey: publishableKey) // TODO: disable for headless
+       LogManager.initialize(publishableKey: publishableKey) // TODO: enable logs for lite sdk                                               
+       #endif
     }
     
     public func initPaymentSession(paymentIntentClientSecret: String){
