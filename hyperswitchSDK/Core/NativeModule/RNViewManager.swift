@@ -12,18 +12,20 @@ internal class RNViewManager: NSObject {
     
     internal var responseHandler: RNResponseHandler?
     internal var rootView: RCTRootView?
-    
+    private var isHeadlessMode: Bool = false
+
     internal lazy var bridge: RCTBridge = {
-        RCTBridge.init(delegate: self, launchOptions: nil)
+        RCTBridge(delegate: self, launchOptions: nil)
     }()
     
     internal lazy var bridgeHeadless: RCTBridge = {
-        RCTBridge.init(delegate: self, launchOptions: nil)
+        RCTBridge(delegate: self, launchOptions: nil)
     }()
     
     internal static let sharedInstance = RNViewManager()
     
     internal func viewForModule(_ moduleName: String, initialProperties: [String : Any]?) -> RCTRootView {
+        self.setHeadlessMode(moduleName == "dummy" ? true : false)
         let rootView: RCTRootView = RCTRootView(
             bridge: moduleName == "dummy" ? bridgeHeadless : bridge,
             moduleName: moduleName,
@@ -32,21 +34,36 @@ internal class RNViewManager: NSObject {
         return rootView
     }
     
-    internal func reinvalidateBridge(){
-        self.bridgeHeadless.invalidate()
-        self.bridgeHeadless = RCTBridge.init(delegate: self, launchOptions: nil)
+    internal func setHeadlessMode(_ isHeadless: Bool) {
+        self.isHeadlessMode = isHeadless
     }
+    
+    internal func reinvalidateBridge(isHeadless: Bool = true) {
+            if isHeadless {
+                self.setHeadlessMode(true)
+                self.bridgeHeadless.invalidate()
+                self.bridgeHeadless = RCTBridge(delegate: self, launchOptions: nil)
+            } else {
+                self.setHeadlessMode(false)
+                self.bridge.invalidate()
+                self.bridge = RCTBridge(delegate: self, launchOptions: nil)
+            }
+        }
 }
 
 extension RNViewManager: RCTBridgeDelegate {
     func sourceURL(for bridge: RCTBridge) -> URL? {
-        switch getInfoPlist("HyperswitchSource") {
-        case "LocalHosted":
-            return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
-        case "LocalBundle":
+        if self.isHeadlessMode {
             return Bundle.main.url(forResource: "hyperswitch", withExtension: "bundle")
-        default:
-            return OTAServices.shared.getBundleURL()
+        }else{
+            switch getInfoPlist("HyperswitchSource") {
+            case "LocalHosted":
+                return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+            case "LocalBundle":
+                return Bundle.main.url(forResource: "hyperswitch", withExtension: "bundle")
+            default:
+                return OTAServices.shared.getBundleURL()
+            }
         }
     }
 }

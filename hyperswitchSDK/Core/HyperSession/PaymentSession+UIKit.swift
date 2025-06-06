@@ -30,6 +30,7 @@ extension PaymentSession {
     public func presentPaymentSheet(viewController: UIViewController, configuration: PaymentSheet.Configuration, completion: @escaping (PaymentSheetResult) -> ()){
         PaymentSession.isPresented = true
         let paymentSheet = PaymentSheet(paymentIntentClientSecret: PaymentSession.paymentIntentClientSecret ?? "", configuration: configuration)
+        RNViewManager.sharedInstance.reinvalidateBridge(isHeadless: false)
         paymentSheet.present(from: viewController, completion: completion)
     }
     
@@ -37,6 +38,7 @@ extension PaymentSession {
     public func presentPaymentSheetWithParams(viewController: UIViewController, params: [String: Any], completion: @escaping (PaymentSheetResult) -> ()){
         PaymentSession.isPresented = true
         let paymentSheet = PaymentSheet(paymentIntentClientSecret: PaymentSession.paymentIntentClientSecret ?? "", configuration: PaymentSheet.Configuration())
+        RNViewManager.sharedInstance.reinvalidateBridge(isHeadless: false)
         paymentSheet.presentWithParams(from: viewController, props: params, completion: completion)
     }
     
@@ -44,7 +46,7 @@ extension PaymentSession {
         PaymentSession.hasResponded = false
         PaymentSession.isPresented = false
         PaymentSession.headlessCompletion = func_
-        RNViewManager.sharedInstance.reinvalidateBridge()
+        RNViewManager.sharedInstance.reinvalidateBridge(isHeadless: true)
         let _ = RNViewManager.sharedInstance.viewForModule("dummy", initialProperties: [:])
     }
     
