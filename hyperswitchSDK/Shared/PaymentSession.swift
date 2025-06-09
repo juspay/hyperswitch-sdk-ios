@@ -27,7 +27,7 @@ public class PaymentSession {
 
        #if canImport(HyperOTA)
        OTAServices.shared.initialize(publishableKey: publishableKey) // TODO: disable for headless
-       LogManager.initialize(publishableKey: publishableKey) // TODO: enable logs for lite sdk                                               
+       LogManager.initialize(publishableKey: publishableKey) // TODO: enable logs for lite sdk
        #endif
     }
     
