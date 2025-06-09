@@ -33,6 +33,46 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@protocol NativeKlarnaSignInSpec <RCTBridgeModule, RCTTurboModule>
+
+- (void)init:(NSString *)instanceId
+ environment:(NSString *)environment
+      region:(NSString *)region
+   returnUrl:(NSString *)returnUrl
+     resolve:(RCTPromiseResolveBlock)resolve
+      reject:(RCTPromiseRejectBlock)reject;
+- (void)dispose:(NSString *)instanceId
+        resolve:(RCTPromiseResolveBlock)resolve
+         reject:(RCTPromiseRejectBlock)reject;
+- (void)signIn:(NSString *)instanceId
+      clientId:(NSString *)clientId
+         scope:(NSString *)scope
+        market:(NSString *)market
+        locale:(NSString *)locale
+tokenizationId:(NSString *)tokenizationId
+       resolve:(RCTPromiseResolveBlock)resolve
+        reject:(RCTPromiseRejectBlock)reject;
+
+@end
+
+@interface NativeKlarnaSignInSpecBase : NSObject {
+@protected
+facebook::react::EventEmitterCallback _eventEmitterCallback;
+}
+- (void)setEventEmitterCallback:(EventEmitterCallbackWrapper *)eventEmitterCallbackWrapper;
+
+
+@end
+
+namespace facebook::react {
+  /**
+   * ObjC++ class for module 'NativeKlarnaSignIn'
+   */
+  class JSI_EXPORT NativeKlarnaSignInSpecJSI : public ObjCTurboModule {
+  public:
+    NativeKlarnaSignInSpecJSI(const ObjCTurboModule::InitParams &params);
+  };
+} // namespace facebook::react
 
 NS_ASSUME_NONNULL_END
 #endif // RNKlarnaMobileSDK_H

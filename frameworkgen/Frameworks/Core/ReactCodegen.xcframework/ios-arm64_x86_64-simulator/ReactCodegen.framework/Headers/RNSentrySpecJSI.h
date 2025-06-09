@@ -531,6 +531,7 @@ public:
   virtual jsi::Value getDataFromUri(jsi::Runtime &rt, jsi::String uri) = 0;
   virtual jsi::Value popTimeToDisplayFor(jsi::Runtime &rt, jsi::String key) = 0;
   virtual bool setActiveSpanId(jsi::Runtime &rt, jsi::String spanId) = 0;
+  virtual jsi::Value encodeToBase64(jsi::Runtime &rt, jsi::Array data) = 0;
 
 };
 
@@ -832,6 +833,14 @@ private:
 
       return bridging::callFromJs<bool>(
           rt, &T::setActiveSpanId, jsInvoker_, instance_, std::move(spanId));
+    }
+    jsi::Value encodeToBase64(jsi::Runtime &rt, jsi::Array data) override {
+      static_assert(
+          bridging::getParameterCount(&T::encodeToBase64) == 2,
+          "Expected encodeToBase64(...) to have 2 parameters");
+
+      return bridging::callFromJs<jsi::Value>(
+          rt, &T::encodeToBase64, jsInvoker_, instance_, std::move(data));
     }
 
   private:

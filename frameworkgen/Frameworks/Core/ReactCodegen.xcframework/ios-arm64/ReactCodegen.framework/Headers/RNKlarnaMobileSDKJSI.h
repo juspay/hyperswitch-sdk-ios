@@ -15,5 +15,75 @@
 namespace facebook::react {
 
 
+  class JSI_EXPORT NativeKlarnaSignInCxxSpecJSI : public TurboModule {
+protected:
+  NativeKlarnaSignInCxxSpecJSI(std::shared_ptr<CallInvoker> jsInvoker);
+
+public:
+  virtual jsi::Value init(jsi::Runtime &rt, jsi::String instanceId, jsi::String environment, jsi::String region, jsi::String returnUrl) = 0;
+  virtual jsi::Value dispose(jsi::Runtime &rt, jsi::String instanceId) = 0;
+  virtual jsi::Value signIn(jsi::Runtime &rt, jsi::String instanceId, jsi::String clientId, jsi::String scope, jsi::String market, jsi::String locale, std::optional<jsi::String> tokenizationId) = 0;
+
+};
+
+template <typename T>
+class JSI_EXPORT NativeKlarnaSignInCxxSpec : public TurboModule {
+public:
+  jsi::Value create(jsi::Runtime &rt, const jsi::PropNameID &propName) override {
+    return delegate_.create(rt, propName);
+  }
+
+  std::vector<jsi::PropNameID> getPropertyNames(jsi::Runtime& runtime) override {
+    return delegate_.getPropertyNames(runtime);
+  }
+
+  static constexpr std::string_view kModuleName = "RNKlarnaSignIn";
+
+protected:
+  NativeKlarnaSignInCxxSpec(std::shared_ptr<CallInvoker> jsInvoker)
+    : TurboModule(std::string{NativeKlarnaSignInCxxSpec::kModuleName}, jsInvoker),
+      delegate_(reinterpret_cast<T*>(this), jsInvoker) {}
+
+
+private:
+  class Delegate : public NativeKlarnaSignInCxxSpecJSI {
+  public:
+    Delegate(T *instance, std::shared_ptr<CallInvoker> jsInvoker) :
+      NativeKlarnaSignInCxxSpecJSI(std::move(jsInvoker)), instance_(instance) {
+
+    }
+
+    jsi::Value init(jsi::Runtime &rt, jsi::String instanceId, jsi::String environment, jsi::String region, jsi::String returnUrl) override {
+      static_assert(
+          bridging::getParameterCount(&T::init) == 5,
+          "Expected init(...) to have 5 parameters");
+
+      return bridging::callFromJs<jsi::Value>(
+          rt, &T::init, jsInvoker_, instance_, std::move(instanceId), std::move(environment), std::move(region), std::move(returnUrl));
+    }
+    jsi::Value dispose(jsi::Runtime &rt, jsi::String instanceId) override {
+      static_assert(
+          bridging::getParameterCount(&T::dispose) == 2,
+          "Expected dispose(...) to have 2 parameters");
+
+      return bridging::callFromJs<jsi::Value>(
+          rt, &T::dispose, jsInvoker_, instance_, std::move(instanceId));
+    }
+    jsi::Value signIn(jsi::Runtime &rt, jsi::String instanceId, jsi::String clientId, jsi::String scope, jsi::String market, jsi::String locale, std::optional<jsi::String> tokenizationId) override {
+      static_assert(
+          bridging::getParameterCount(&T::signIn) == 7,
+          "Expected signIn(...) to have 7 parameters");
+
+      return bridging::callFromJs<jsi::Value>(
+          rt, &T::signIn, jsInvoker_, instance_, std::move(instanceId), std::move(clientId), std::move(scope), std::move(market), std::move(locale), std::move(tokenizationId));
+    }
+
+  private:
+    friend class NativeKlarnaSignInCxxSpec;
+    T *instance_;
+  };
+
+  Delegate delegate_;
+};
 
 } // namespace facebook::react

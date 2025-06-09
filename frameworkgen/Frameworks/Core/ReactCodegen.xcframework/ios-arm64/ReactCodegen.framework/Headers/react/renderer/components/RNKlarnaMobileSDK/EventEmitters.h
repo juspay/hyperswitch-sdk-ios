@@ -39,11 +39,17 @@ class RNKlarnaCheckoutViewEventEmitter : public ViewEventEmitter {
   struct OnResized {
       std::string height;
     };
+
+  struct OnCheckoutViewReady {
+      
+    };
   void onEvent(OnEvent value) const;
 
   void onError(OnError value) const;
 
   void onResized(OnResized value) const;
+
+  void onCheckoutViewReady(OnCheckoutViewReady value) const;
 };
 class RNKlarnaPaymentViewEventEmitter : public ViewEventEmitter {
  public:

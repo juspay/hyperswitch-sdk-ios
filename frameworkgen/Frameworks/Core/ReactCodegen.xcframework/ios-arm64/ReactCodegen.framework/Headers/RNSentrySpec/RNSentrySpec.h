@@ -110,6 +110,9 @@ namespace JS {
                     resolve:(RCTPromiseResolveBlock)resolve
                      reject:(RCTPromiseRejectBlock)reject;
 - (NSNumber *)setActiveSpanId:(NSString *)spanId;
+- (void)encodeToBase64:(NSArray *)data
+               resolve:(RCTPromiseResolveBlock)resolve
+                reject:(RCTPromiseRejectBlock)reject;
 
 @end
 

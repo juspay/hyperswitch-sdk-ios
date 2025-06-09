@@ -3,6 +3,7 @@
 // swift-module-flags: -target x86_64-apple-ios15.1-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name Sentry
 import AVFoundation
 import CoreGraphics
+import CoreMedia
 import Foundation
 import MetricKit
 import ObjectiveC.NSObjCRuntime
@@ -98,10 +99,6 @@ extension Sentry.Geo : Swift.Decodable {
   }
   @objc deinit
 }
-@objc public protocol SentryIntegrationProtocol : ObjectiveC.NSObjectProtocol {
-  @objc(installWithOptions:) func install(with options: Sentry.Options) -> Swift.Bool
-  @objc func uninstall()
-}
 @objc public enum SentryLevel : Swift.UInt {
   @objc(kSentryLevelNone) case none = 0
   @objc(kSentryLevelDebug) case debug = 1
@@ -154,7 +151,19 @@ extension Sentry.SentryNSError : Swift.Decodable {
   @objc var maskedViewClasses: [Swift.AnyClass] { get }
   @objc var unmaskedViewClasses: [Swift.AnyClass] { get }
 }
-@objc @_inheritsConvenienceInitializers @objcMembers public class SentryReplayOptions : ObjectiveC.NSObject, Sentry.SentryRedactOptions {
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objcMembers public class SentryReplayOptions : ObjectiveC.NSObject, Sentry.SentryRedactOptions {
+  @_hasMissingDesignatedInitializers public class DefaultValues {
+    public static let sessionSampleRate: Swift.Float
+    public static let onErrorSampleRate: Swift.Float
+    public static let maskAllText: Swift.Bool
+    public static let maskAllImages: Swift.Bool
+    public static let enableViewRendererV2: Swift.Bool
+    public static let enableFastViewRendering: Swift.Bool
+    public static let quality: Sentry.SentryReplayOptions.SentryReplayQuality
+    public static let maskedViewClasses: [Swift.AnyClass]
+    public static let unmaskedViewClasses: [Swift.AnyClass]
+    @objc deinit
+  }
   @objc public enum SentryReplayQuality : Swift.Int, Swift.CustomStringConvertible {
     case low
     case medium
@@ -175,10 +184,15 @@ extension Sentry.SentryNSError : Swift.Decodable {
   @objc public var quality: Sentry.SentryReplayOptions.SentryReplayQuality
   @objc public var maskedViewClasses: [Swift.AnyClass]
   @objc public var unmaskedViewClasses: [Swift.AnyClass]
-  @objc public var enableExperimentalViewRenderer: Swift.Bool
+  @objc @available(*, deprecated, renamed: "enableViewRendererV2")
+  public var enableExperimentalViewRenderer: Swift.Bool {
+    @objc get
+    @objc set
+  }
+  @objc public var enableViewRendererV2: Swift.Bool
   @objc public var enableFastViewRendering: Swift.Bool
-  @objc override dynamic public init()
-  @objc public init(sessionSampleRate: Swift.Float = 0, onErrorSampleRate: Swift.Float = 0, maskAllText: Swift.Bool = true, maskAllImages: Swift.Bool = true, enableExperimentalViewRenderer: Swift.Bool = false, enableFastViewRendering: Swift.Bool = false)
+  @objc convenience override dynamic public init()
+  @objc convenience public init(sessionSampleRate: Swift.Float = DefaultValues.sessionSampleRate, onErrorSampleRate: Swift.Float = DefaultValues.onErrorSampleRate, maskAllText: Swift.Bool = DefaultValues.maskAllText, maskAllImages: Swift.Bool = DefaultValues.maskAllImages, enableViewRendererV2: Swift.Bool = DefaultValues.enableViewRendererV2, enableFastViewRendering: Swift.Bool = DefaultValues.enableFastViewRendering)
   @objc deinit
 }
 extension Sentry.SentryRequest : Swift.Decodable {
@@ -213,6 +227,7 @@ extension Sentry.User : Swift.Decodable {
   @objc public var configureWidget: ((Sentry.SentryUserFeedbackWidgetConfiguration) -> Swift.Void)?
   @objc public var useShakeGesture: Swift.Bool
   @objc public var showFormForScreenshots: Swift.Bool
+  @objc public var customButton: UIKit.UIButton?
   @objc public var configureForm: ((Sentry.SentryUserFeedbackFormConfiguration) -> Swift.Void)?
   @objc public var tags: [Swift.String : Any]?
   @objc public var onFormOpen: (() -> Swift.Void)?
