@@ -1,5 +1,5 @@
 //
-//  RNHeadlessManger.swift
+//  RNHeadlessManager.swift
 //  Hyperswitch
 //
 //  Created by Shivam Shashank on 09/11/22.
@@ -8,7 +8,7 @@
 import Foundation
 import React
 
-internal class RNHeadlessManger: NSObject {
+internal class RNHeadlessManager: NSObject {
     
     internal var responseHandler: RNResponseHandler?
     internal var rootView: RCTRootView?
@@ -17,7 +17,7 @@ internal class RNHeadlessManger: NSObject {
         RCTBridge.init(delegate: self, launchOptions: nil)
     }()
     
-    internal static let sharedInstance = RNHeadlessManger()
+    internal static let sharedInstance = RNHeadlessManager()
     
     internal func viewForModule(_ moduleName: String, initialProperties: [String : Any]?) -> RCTRootView {
         let rootView: RCTRootView = RCTRootView(
@@ -34,13 +34,13 @@ internal class RNHeadlessManger: NSObject {
     }
 }
 
-extension RNHeadlessManger: RCTBridgeDelegate {
+extension RNHeadlessManager: RCTBridgeDelegate {
     func sourceURL(for bridge: RCTBridge) -> URL? {
-      switch getInfoPlist("HyperswitchSource") {
+        switch getInfoPlist("HyperswitchSource") {
         case "LocalHosted":
             return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
         default:
-           return Bundle.main.url(forResource: "hyperswitch", withExtension: "bundle")
+            return Bundle(for: RNHeadlessManager.self).url(forResource: "hyperswitch", withExtension: "bundle")
         }
     }
 }
