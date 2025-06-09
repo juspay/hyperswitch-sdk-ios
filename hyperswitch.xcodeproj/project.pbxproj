@@ -45,6 +45,7 @@
 		66486FAB2943580F00150E4F /* HyperModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66486FA42943580F00150E4F /* HyperModule.swift */; };
 		66486FAD2943580F00150E4F /* HyperModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 66486FA62943580F00150E4F /* HyperModule.m */; };
 		66C2F89B29444E6700ACD32D /* ApplePayHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C2F89A29444E6700ACD32D /* ApplePayHandler.swift */; };
+		752CF93C2DF6D47A0056F58A /* RNHeadlessManger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752CF93B2DF6D47A0056F58A /* RNHeadlessManger.swift */; };
 		75AA28DE2D477F9D00CD88A6 /* Debouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28DD2D477F9D00CD88A6 /* Debouncer.swift */; };
 		75AA28E02D477FB100CD88A6 /* LogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28DF2D477FB100CD88A6 /* LogManager.swift */; };
 		75AA28E42D477FDA00CD88A6 /* LogFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28E32D477FDA00CD88A6 /* LogFileManager.swift */; };
@@ -188,6 +189,7 @@
 		66486FA42943580F00150E4F /* HyperModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HyperModule.swift; sourceTree = "<group>"; };
 		66486FA62943580F00150E4F /* HyperModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HyperModule.m; sourceTree = "<group>"; };
 		66C2F89A29444E6700ACD32D /* ApplePayHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayHandler.swift; sourceTree = "<group>"; };
+		752CF93B2DF6D47A0056F58A /* RNHeadlessManger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNHeadlessManger.swift; sourceTree = "<group>"; };
 		75AA28DD2D477F9D00CD88A6 /* Debouncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debouncer.swift; sourceTree = "<group>"; };
 		75AA28DF2D477FB100CD88A6 /* LogManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogManager.swift; sourceTree = "<group>"; };
 		75AA28E32D477FDA00CD88A6 /* LogFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFileManager.swift; sourceTree = "<group>"; };
@@ -524,6 +526,7 @@
 				792D6A072B99C215001598CD /* HyperHeadless.swift */,
 				79D474B62CC6FDE50022C47E /* RNResponseHandler.swift */,
 				66486FA32943580F00150E4F /* RNViewManager.swift */,
+				752CF93B2DF6D47A0056F58A /* RNHeadlessManger.swift */,
 				75E692F92D5B28D70077C0F3 /* OTAServices.swift */,
 			);
 			path = NativeModule;
@@ -695,9 +698,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -732,9 +739,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -771,9 +782,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -831,6 +846,7 @@
 				792D69F82B95E94C001598CD /* ExpressCheckoutWidget.swift in Sources */,
 				66486FAA2943580F00150E4F /* RNViewManager.swift in Sources */,
 				75AA28DE2D477F9D00CD88A6 /* Debouncer.swift in Sources */,
+				752CF93C2DF6D47A0056F58A /* RNHeadlessManger.swift in Sources */,
 				DC4AC9F5296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift in Sources */,
 				DC5D0127294853A90017C67A /* PaymentSheetView.swift in Sources */,
 				792D6A062B99C204001598CD /* HyperHeadless.m in Sources */,
