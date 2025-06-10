@@ -21,7 +21,7 @@ Pod::Spec.new do |s|
     core.dependency 'hyperswitch-sdk-ios/common'
     core.dependency 'hyperswitch-ios-hermes', '0.79.1'
     core.dependency 'KlarnaMobileSDK'
-    core.dependency 'HyperOTA', '0.0.4'
+    core.dependency 'HyperOTA', '0.0.7'
   end
 
   s.subspec 'sentry' do |sentry|

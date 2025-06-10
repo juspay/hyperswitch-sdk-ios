@@ -21,7 +21,7 @@ internal class EventLogger: NSObject, HPJPLoggerDelegate {
     private func isJSONSerializable(_ value: Any) -> Bool {
         return JSONSerialization.isValidJSONObject(["key": value])
     }
-    internal func addLog(eventData: [String: Any], logLevel : String, eventLabel: String){
+    internal func addLog(eventData: [String: Any], logLevel : String, key: String?){
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: eventData, options: [])
             guard let jsonString = String(data: jsonData, encoding: .utf8) else {
@@ -32,11 +32,18 @@ internal class EventLogger: NSObject, HPJPLoggerDelegate {
                 .setLogType(logLevel)
                 .setValue(jsonString)
             
-            switch eventLabel {
+            switch key {
+            case "init_with_local_config_versions":
+                log = log.setEventName(.HYPER_OTA_INIT)
+                break
             case "init":
                 log = log.setEventName(.HYPER_OTA_INIT)
+                break
+            case "update_end":
+                log = log.setEventName(.HYPER_OTA_FINISH)
             case "end":
                 log = log.setEventName(.HYPER_OTA_FINISH)
+                break
             default:
                 log = log.setEventName(.HYPER_OTA_EVENT)
             }
@@ -61,8 +68,7 @@ internal class EventLogger: NSObject, HPJPLoggerDelegate {
             "category": eventCategory,
             "subcategory": eventSubcategory
         ]
-        addLog(eventData: eventData, logLevel: logLevel, eventLabel:eventLabel)
-        
+        addLog(eventData: eventData, logLevel: logLevel, key : eventKey)
     }
     func trackEvent(
         withLevel logLevel: String,
@@ -77,7 +83,7 @@ internal class EventLogger: NSObject, HPJPLoggerDelegate {
             "category": eventCategory,
             "subcategory": eventSubcategory
         ]
-        addLog(eventData: eventData, logLevel: logLevel, eventLabel:eventLabel)
+        addLog(eventData: eventData, logLevel: logLevel, key : eventLabel)
         
     }
 }
@@ -85,6 +91,7 @@ internal class EventLogger: NSObject, HPJPLoggerDelegate {
 public final class OTAServices {
     public static var shared = OTAServices()
     public var otaServices : HyperOTAServices? = nil
+    let logger = EventLogger()
     public func initialize(publishableKey : String) {
         if(self.otaServices == nil) {
             let environment = SDKEnvironment.getEnvironment(publishableKey)
@@ -97,7 +104,6 @@ public final class OTAServices {
                 "fileName": getHyperOTAPlist("fileName") ?? "" ,
                 "releaseConfigURL": (getHyperOTAPlist(configKey) ?? "") +  "/mobile-ota/ios/" + SDKVersion.current + "/config.json",
             ] as [String: Any]
-            let logger = EventLogger()
             self.otaServices = HyperOTAServices(payload: payload, loggerDelegate: logger, baseBundle: Bundle(for: OTAServices.self))
         }
     }
