@@ -15,7 +15,7 @@ end
 
 target 'hyperswitch' do
   config = use_native_modules!
-  pod 'HyperOTA', '0.0.7'
+  pod 'HyperOTA', '0.0.8'
   use_react_native!(
     :path => config[:reactNativePath],
     :hermes_enabled => true,
