@@ -40,6 +40,42 @@ extension Swift.FixedWidthInteger {
         return lhs
     }
 }
+@_spi(Private) @objc public protocol SentryANRTracker {
+  @_spi(Private) @objc(addListener:) func add(listener: any Sentry.SentryANRTrackerDelegate)
+  @_spi(Private) @objc(removeListener:) func remove(listener: any Sentry.SentryANRTrackerDelegate)
+  @_spi(Private) @objc func clear()
+}
+@_spi(Private) @objc public protocol SentryANRTrackerDelegate {
+  @_spi(Private) @objc func anrDetected(type: Sentry.SentryANRType)
+  @_spi(Private) @objc func anrStopped(result: Sentry.SentryANRStoppedResult?)
+}
+@_spi(Private) @objc @_hasMissingDesignatedInitializers @objcMembers public class SentryANRStoppedResult : ObjectiveC.NSObject {
+  @_spi(Private) @objc deinit
+}
+@_spi(Private) @objc public enum SentryANRType : Swift.Int {
+  @_spi(Private) case fatalFullyBlocking
+  @_spi(Private) case fatalNonFullyBlocking
+  @_spi(Private) case fullyBlocking
+  @_spi(Private) case nonFullyBlocking
+  @_spi(Private) case unknown
+  @_spi(Private) public init?(rawValue: Swift.Int)
+  @_spi(Private) public typealias RawValue = Swift.Int
+  @_spi(Private) public var rawValue: Swift.Int {
+    @_spi(Private) get
+  }
+}
+@_spi(Private) @_inheritsConvenienceInitializers @objc public class SentryAppHangTypeMapper : ObjectiveC.NSObject {
+  @_spi(Private) @objc public static func getExceptionType(anrType: Sentry.SentryANRType) -> Swift.String
+  @_spi(Private) @objc public static func isExceptionTypeAppHang(exceptionType: Swift.String) -> Swift.Bool
+  @_spi(Private) @objc override dynamic public init()
+  @_spi(Private) @objc deinit
+}
+@_spi(Private) @objc @_inheritsConvenienceInitializers @objcMembers public class SentryBaggageSerialization : ObjectiveC.NSObject {
+  @_spi(Private) @objc public static func encodeDictionary(_ dictionary: [Swift.String : Swift.String]) -> Swift.String
+  @_spi(Private) @objc public static func decode(_ baggage: Swift.String) -> [Swift.String : Swift.String]
+  @_spi(Private) @objc override dynamic public init()
+  @_spi(Private) @objc deinit
+}
 extension Sentry.Breadcrumb : Swift.Decodable {
   required convenience public init(from decoder: any Swift.Decoder) throws
 }
@@ -47,6 +83,7 @@ extension Sentry.Breadcrumb : Swift.Decodable {
   @_spi(Private) @objc public func date() -> Foundation.Date
   @_spi(Private) @objc public func timezoneOffset() -> Swift.Int
   @_spi(Private) @objc public func systemTime() -> Swift.UInt64
+  @_spi(Private) @objc public func systemUptime() -> Foundation.TimeInterval
   @_spi(Private) @objc public static func getAbsoluteTime() -> Swift.UInt64
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
@@ -73,6 +110,7 @@ extension Sentry.Exception : Swift.Decodable {
 @objc @_inheritsConvenienceInitializers @objcMembers public class SentryExperimentalOptions : ObjectiveC.NSObject {
   @objc public var enableDataSwizzling: Swift.Bool
   @objc public var enableFileManagerSwizzling: Swift.Bool
+  @_spi(Private) @objc public func validateOptions(_ options: [Swift.String : Any]?)
   @objc override dynamic public init()
   @objc deinit
 }
@@ -89,11 +127,15 @@ extension Sentry.Exception : Swift.Decodable {
       get
     }
   }
+  @_spi(Private) @objc final public let eventId: Sentry.SentryId
   @objc public init(message: Swift.String, name: Swift.String?, email: Swift.String?, source: Sentry.SentryFeedback.SentryFeedbackSource = .widget, associatedEventId: Sentry.SentryId? = nil, attachments: [Foundation.Data]? = nil)
   @objc deinit
 }
 extension Sentry.SentryFeedback : Sentry.SentrySerializable {
   @objc dynamic public func serialize() -> [Swift.String : Any]
+}
+extension Sentry.SentryFeedback {
+  @_spi(Private) @objc dynamic public func attachmentsForEnvelope() -> [Sentry.Attachment]
 }
 @_spi(Private) @objc @objcMembers public class SentryFileContents : ObjectiveC.NSObject {
   @_spi(Private) @objc final public let path: Swift.String
@@ -294,6 +336,8 @@ extension Sentry.SentryNSError : Swift.Decodable {
   @objc deinit
 }
 @_spi(Private) @objc @_hasMissingDesignatedInitializers @objcMembers public class SentryReplayRecording : ObjectiveC.NSObject {
+  @_spi(Private) @objc public func headerForReplayRecording() -> [Swift.String : Any]
+  @_spi(Private) @objc public func serialize() -> [[Swift.String : Any]]
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @objc public enum SentryReplayType : Swift.Int {
@@ -490,6 +534,9 @@ extension UIKit.UIView {
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
 }
+@_spi(Private) extension Sentry.SentryANRType : Swift.Equatable {}
+@_spi(Private) extension Sentry.SentryANRType : Swift.Hashable {}
+@_spi(Private) extension Sentry.SentryANRType : Swift.RawRepresentable {}
 extension Sentry.SentryFeedback.SentryFeedbackSource : Swift.Equatable {}
 extension Sentry.SentryFeedback.SentryFeedbackSource : Swift.Hashable {}
 extension Sentry.SentryFeedback.SentryFeedbackSource : Swift.RawRepresentable {}

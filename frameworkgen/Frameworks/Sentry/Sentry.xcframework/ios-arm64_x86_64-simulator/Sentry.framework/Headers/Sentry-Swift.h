@@ -382,7 +382,7 @@ SWIFT_PROTOCOL("_TtP6Sentry24SentryANRTrackerDelegate_")
 - (void)anrStoppedWithResult:(SentryANRStoppedResult * _Nullable)result;
 @end
 
-typedef SWIFT_ENUM(NSInteger, SentryANRType, closed) {
+typedef SWIFT_ENUM(NSInteger, SentryANRType, open) {
   SentryANRTypeFatalFullyBlocking = 0,
   SentryANRTypeFatalNonFullyBlocking = 1,
   SentryANRTypeFullyBlocking = 2,
@@ -2254,7 +2254,7 @@ SWIFT_PROTOCOL("_TtP6Sentry24SentryANRTrackerDelegate_")
 - (void)anrStoppedWithResult:(SentryANRStoppedResult * _Nullable)result;
 @end
 
-typedef SWIFT_ENUM(NSInteger, SentryANRType, closed) {
+typedef SWIFT_ENUM(NSInteger, SentryANRType, open) {
   SentryANRTypeFatalFullyBlocking = 0,
   SentryANRTypeFatalNonFullyBlocking = 1,
   SentryANRTypeFullyBlocking = 2,

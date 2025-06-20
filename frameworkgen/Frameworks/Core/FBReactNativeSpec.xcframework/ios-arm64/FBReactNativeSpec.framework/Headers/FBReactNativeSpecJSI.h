@@ -58,7 +58,6 @@ public:
   virtual bool traceTurboModulePromiseRejectionsOnAndroid(jsi::Runtime &rt) = 0;
   virtual bool updateRuntimeShadowNodeReferencesOnCommit(jsi::Runtime &rt) = 0;
   virtual bool useAlwaysAvailableJSErrorHandling(jsi::Runtime &rt) = 0;
-  virtual bool useEditTextStockAndroidFocusBehavior(jsi::Runtime &rt) = 0;
   virtual bool useFabricInterop(jsi::Runtime &rt) = 0;
   virtual bool useNativeViewConfigsInBridgelessMode(jsi::Runtime &rt) = 0;
   virtual bool useOptimizedEventBatchingOnAndroid(jsi::Runtime &rt) = 0;
@@ -399,14 +398,6 @@ private:
 
       return bridging::callFromJs<bool>(
           rt, &T::useAlwaysAvailableJSErrorHandling, jsInvoker_, instance_);
-    }
-    bool useEditTextStockAndroidFocusBehavior(jsi::Runtime &rt) override {
-      static_assert(
-          bridging::getParameterCount(&T::useEditTextStockAndroidFocusBehavior) == 1,
-          "Expected useEditTextStockAndroidFocusBehavior(...) to have 1 parameters");
-
-      return bridging::callFromJs<bool>(
-          rt, &T::useEditTextStockAndroidFocusBehavior, jsInvoker_, instance_);
     }
     bool useFabricInterop(jsi::Runtime &rt) override {
       static_assert(
