@@ -25,6 +25,8 @@ jobs:
         if: inputs.workflow_type == 'build_and_push' || inputs.workflow_type == 'build_only'
         run: |
           curl -o package.json -L https://raw.githubusercontent.com/juspay/hyperswitch-client-core/main/package.json
+          rm -rf hyperswitchSDK/Core/Resources/hyperswitch.bundle
+          curl -o hyperswitchSDK/Core/Resources/hyperswitch.bundle -L https://raw.githubusercontent.com/juspay/hyperswitch-client-core/main/bundles/ios/hyperswitch.bundle
           jq 'del(.resolutions) | 
           del(.dependencies["react-native-hyperswitch-netcetera-3ds"]) | 
           del(.dependencies["react-native-hyperswitch-scancard"])' package.json > package.json.tmp && 
