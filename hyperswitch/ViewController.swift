@@ -24,6 +24,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         self.view.backgroundColor = UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 0.2)
         super.viewDidLoad()
+        hyperViewModel.fetchNetceteraSDKApiKey()
         hyperViewModel.preparePaymentSheet()
         asyncBind()
     }
@@ -66,6 +67,9 @@ class ViewController: UIViewController {
         appearance.colors.primary = UIColor(red: 0.55, green: 0.74, blue: 0.00, alpha: 1.00)
         appearance.primaryButton.cornerRadius = 32
         configuration.appearance = appearance
+        if let netceteraApiKey = hyperViewModel.netceteraApiKey {
+            configuration.netceteraSDKApiKey = netceteraApiKey
+        }
         
         hyperViewModel.paymentSession?.presentPaymentSheet(viewController: self, configuration: configuration, completion: { result in
             DispatchQueue.main.async {
@@ -94,6 +98,7 @@ class ViewController: UIViewController {
     
     @objc
     func reload(_ sender: Any) {
+        hyperViewModel.fetchNetceteraSDKApiKey()
         hyperViewModel.preparePaymentSheet()
         self.reloadButton.isUserInteractionEnabled = false
         UIView.animate(withDuration: 1.6, animations: {
