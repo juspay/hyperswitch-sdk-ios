@@ -13,6 +13,7 @@ class HyperViewModel: ObservableObject {
     
     @Published var paymentSession: PaymentSession?
     @Published var status: APIStatus = .loading
+    internal var netceteraApiKey: String?
     
     enum APIStatus {
         case loading
@@ -82,13 +83,34 @@ class HyperViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     self.status = .success
                     self.paymentSession = PaymentSession(publishableKey: publishableKey)
-
+                    
                     self.paymentSession?.initPaymentManagementSession(ephemeralKey: ephemeralKey, paymentIntentClientSecret: nil)
                     self.paymentSession?.initPaymentSession(paymentIntentClientSecret: paymentIntentClientSecret)
                 }
             } catch {
                 DispatchQueue.main.async {
                     self.status = .failure(error.localizedDescription)
+                }
+            }
+        }
+    }
+    
+    func fetchNetceteraSDKApiKey() {
+        Task {
+            do {
+                let apiKey = try await fetchData(from: "/netcetera-sdk-api-key");
+                guard let netceteraApiKey = apiKey["netceteraApiKey"] as? String else {
+                    DispatchQueue.main.async {
+                        self.netceteraApiKey = nil
+                    }
+                    return
+                }
+                DispatchQueue.main.async {
+                    self.netceteraApiKey = netceteraApiKey
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.netceteraApiKey = nil
                 }
             }
         }
