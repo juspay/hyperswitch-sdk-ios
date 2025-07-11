@@ -1,3 +1,5 @@
+
+import Foundation
 import HyperswitchScanCard
 
 @objc(HyperswitchScancard)

@@ -214,7 +214,7 @@ extension WebViewController: WKNavigationDelegate {
             
             webView.translatesAutoresizingMaskIntoConstraints = false
             webView.backgroundColor = .clear
-            webView.isOpaque = false
+            webView.isOpaque = true
             webView.scrollView.isScrollEnabled = false
             webView.scrollView.bounces = false
             webView.scrollView.contentInsetAdjustmentBehavior = .never
