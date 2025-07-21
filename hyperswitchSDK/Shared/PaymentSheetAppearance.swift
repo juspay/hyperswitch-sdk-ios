@@ -114,23 +114,7 @@ public extension PaymentSheet {
             public var cardTextSizeAdjust: CGFloat?
             
             /// the font Attributes for PaymentSheetLite
-            public var lite: LiteFont = LiteFont()
-        }
-        
-        public struct LiteFont: Equatable, DictionaryConverter {
-            
-            public init() {}
-            
-            /// The scale factor for all font sizes in PaymentSheetLite.
-            /// Font sizes are multiplied by this value before being displayed. For example, setting this to 1.2 increases the size of all text by 20%.
-            /// - Note: This value must be greater than 0. The default value is 1.0.
-            /// - Note: This is used in conjunction with the Dynamic Type accessibility text size.
-            public var sizeScaleFactor: CGFloat?
-            
-            /// The font family of this font is used throughout PaymentSheetLite. PaymentSheetLite uses this font at multiple weights (e.g., regular, medium, semibold) if they exist.
-            /// - Note: The size and weight of the font is ignored. To adjust font sizes, see `sizeScaleFactor`.
-            public var base: String?
-            
+            public var family: String?
         }
 
         // MARK: Colors
