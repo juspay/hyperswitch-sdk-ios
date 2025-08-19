@@ -108,6 +108,17 @@ internal class HyperHeadless: RCTEventEmitter {
     }
     
     @objc
+    private func initialiseAuthSession (_ rnCallback: @escaping RCTResponseSenderBlock) {
+        DispatchQueue.main.async {
+            let props: [String: Any] = [
+                "clientSecret": PaymentSession.authSession?.authIntentClientSecret as Any,
+                "publishableKey": APIClient.shared.publishableKey as Any,
+            ]
+            rnCallback([props])
+        }
+    }
+    
+    @objc
     private func getPaymentSession(_ rnMessage: NSDictionary, _ rnMessage2: NSDictionary, _ rnMessage3: NSArray, _ rnCallback: @escaping RCTResponseSenderBlock) {
         PaymentSession.getPaymentSession(getPaymentMethodData: rnMessage, getPaymentMethodData2: rnMessage2, getPaymentMethodDataArray: rnMessage3, callback: rnCallback)
     }
@@ -128,9 +139,7 @@ internal class HyperHeadless: RCTEventEmitter {
             "paymentMethodData": [
                 "threeDsSdkApiKey": threeDsSdkApiKey ?? "",
                 "environment": environment ?? "sandbox"
-            ].compactMapValues { $0 },
-            "clientSecret": PaymentSession.paymentIntentClientSecret ?? "",
-            "publishableKey": APIClient.shared.publishableKey ?? "",
+            ].compactMapValues { $0 }
         ]
         
         DispatchQueue.main.async {
@@ -146,9 +155,9 @@ internal class HyperHeadless: RCTEventEmitter {
     // Public method to emit generateAReqParams event from other parts of the app
     internal func emitGenerateAReqParamsEvent(messageVersion: String?, directoryServerId: String?, cardNetwork: String?) {
         let aReqData: [String: Any] = [
-            "messageVersion": messageVersion ?? "2.3.1",
-            "directoryServerId": directoryServerId ?? "A000000004",
-            "cardNetworkForTridentOnly": cardNetwork ?? "VISA"
+            "messageVersion": messageVersion ?? "",
+            "directoryServerId": directoryServerId ?? "",
+            "cardNetwork": cardNetwork as Any
         ]
         
         DispatchQueue.main.async {
@@ -248,5 +257,4 @@ internal class HyperHeadless: RCTEventEmitter {
         // Emit the event to trigger doChallenge
         emitDoChallengeEvent()
     }
-        
 }

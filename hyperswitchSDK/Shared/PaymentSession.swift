@@ -18,6 +18,7 @@ public class PaymentSession {
     internal static var isPresented: Bool = false
     internal static var paymentIntentClientSecret: String?
     internal static var ephemeralKey: String?
+    internal static var authSession: AuthenticationSession?
     
     public init(publishableKey: String, customBackendUrl: String? = nil, customParams: [String : Any]? = nil, customLogUrl: String? = nil){
         APIClient.shared.publishableKey = publishableKey

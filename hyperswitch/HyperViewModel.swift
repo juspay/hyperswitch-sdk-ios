@@ -7,6 +7,28 @@
 
 import SwiftUI
 
+class AuthChallengeStatusReceiver: ChallengeStatusReceiver {
+    func completed() {
+        print("-- Challenge completed successfully")
+    }
+    
+    func cancelled() {
+        print("-- Challenge was cancelled")
+    }
+    
+    func timedout() {
+        print("-- Challenge timed out")
+    }
+    
+    func protocolError() {
+        print("-- Challenge protocol error occurred")
+    }
+    
+    func runtimeError() {
+        print("-- Challenge runtime error occurred")
+    }
+}
+
 class HyperViewModel: ObservableObject {
     
     let backendUrl = URL(string: "http://localhost:5252")!
@@ -14,6 +36,7 @@ class HyperViewModel: ObservableObject {
     @Published var paymentSession: PaymentSession?
     @Published var status: APIStatus = .loading
     internal var netceteraApiKey: String?
+    private var transaction: Transaction?
     
     enum APIStatus {
         case loading
@@ -114,5 +137,53 @@ class HyperViewModel: ObservableObject {
                 }
             }
         }
+    }
+    
+    func prepareAuthentication() {
+        Task {
+            do {
+                let json = try await fetchData(from: "/create-payment-intent")
+                guard let paymentIntentClientSecret = json["clientSecret"] as? String,
+                      let publishableKey = json["publishableKey"] as? String
+                else {
+                    throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing required fields"])
+                }
+                
+                DispatchQueue.main.async {
+                    self.status = .success
+                    self.paymentSession = PaymentSession(publishableKey: publishableKey)
+                    self.paymentSession?.initAuthenticationSession(authIntentClientSecret: paymentIntentClientSecret, configuration: AuthenticationConfiguration(apiKey: self.netceteraApiKey, environment: "SANDBOX"))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.status = .failure(error.localizedDescription)
+                }
+            }
+        }
+    }
+    
+    func createTransaction() {
+        self.transaction = self.paymentSession?.createTransaction(messageVersion: "2.3.1", directoryServerId: "A000000004", cardNetwork: "VISA")
+    }
+    
+    func generateAuthRequest() {
+        self.transaction?.getAuthenticationRequestParameters {
+            params in
+            print("-- recieved arreq params: ", params)
+            // TODO: Handle the received authentication request parameters
+            // and generate challenge params based on these aReqs using 3ds-server s2s calls
+        }
+    }
+    
+    func presentChallenge() {
+        self.transaction?.doChallenge(
+            challengeParameters: ChallengeParameters(
+                threeDSServerTransactionID: "23c13695-8efc-4875-a322-0ccb13c3a8c4",
+                acsTransactionID: "649c6f76-13e6-49e3-b14f-a30686b7f109",
+                acsRefNumber: "3DS_LOA_ACS_201_13579",
+                acsSignedContent: "acs-signed-content",
+                threeDSRequestorAppURL: ""),
+            challengeStatusReceiver: AuthChallengeStatusReceiver(),
+            timeOut: 5)
     }
 }

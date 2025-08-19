@@ -26,8 +26,8 @@ class HeadlessViewController: UIViewController {
     private let confirm = UIButton()
     private let reloadButton = UIButton()
     private let init3dsButton = UIButton()
+    private let createTransButton = UIButton()
     private let generateAReqParamsButton = UIButton()
-    private let receiveChallengeParamsButton = UIButton()
     private let doChallengeButton = UIButton()
     
     private var headlessbuttonConfig = UIButton.Configuration.filled()
@@ -39,8 +39,8 @@ class HeadlessViewController: UIViewController {
     private var confirmConfig = UIButton.Configuration.filled()
     private var reloadButtonConfiguration = UIButton.Configuration.plain()
     private var init3dsButtonConfig = UIButton.Configuration.filled()
+    private var createTransButtonConfig = UIButton.Configuration.filled()
     private var generateAReqParamsButtonConfig = UIButton.Configuration.filled()
-    private var receiveChallengeParamsButtonConfig = UIButton.Configuration.filled()
     private var doChallengeButtonConfig = UIButton.Configuration.filled()
     
     private var handler: PaymentSessionHandler?
@@ -176,45 +176,21 @@ class HeadlessViewController: UIViewController {
 //        handler?.confirmWithCustomerPaymentToken(<#T##String#>, <#T##String?#>, <#T##(PaymentResult) -> Void#>)
     }
     
-    @objc func initializeThreeDs(_ sender: Any) {
-        // Call the HyperHeadless module to emit the init3ds event
-        HyperHeadless.shared?.emitInit3DsEvent(
-            threeDsSdkApiKey: "test_api_key_123", 
-            environment: "sandbox"
-        )
-        self.statusLabel.text = "3DS Initialization Event Emitted"
-        print("3DS Initialization Event Emitted with API Key: test_api_key_123, Environment: sandbox")
+    @objc func initAuthSession(_ sender: Any) {
+        hyperViewModel.prepareAuthentication()
+    }
+    
+    @objc func createTransaction(_ sender: Any) {
+        hyperViewModel.createTransaction()
     }
     
     @objc func generateAReqParams(_ sender: Any) {
-        // Call the HyperHeadless module to emit the generateAReqParams event
-        HyperHeadless.shared?.emitGenerateAReqParamsEvent(
-            messageVersion: "2.3.1",
-            directoryServerId: "A000000004", 
-            cardNetwork: "VISA"
-        )
-        self.statusLabel.text = "Generate AReq Params Event Emitted"
-        print("Generate AReq Params Event Emitted with MessageVersion: 2.1.0, DirectoryServerId: A0100020, CardNetwork: VISA")
-    }
-    
-    @objc func receiveChallengeParams(_ sender: Any) {
-        // Call the HyperHeadless module to emit the receiveChallengeParams event
-        HyperHeadless.shared?.emitReceiveChallengeParamsEvent(
-            acsSignedContent: "eyJhbGciOiJQUzI1NiIsIng1YyI6WyJNSUlFRURDQ0F2aWdBd0lCQWdJSWFYL2RWZE9CM0hnd0RRWUpLb1pJaHZjTkFRRUxCUUF3ZERFTE1Ba0dBMVVFQmhNQ1EwZ3hDekFKQmdOVkJBZ1RBbHBJTVE4d0RRWURWUVFIRXdaYWRYSnBZMmd4RlRBVEJnTlZCQW9UREU1bGRHTmxkR1Z5WVNCQlJ6RWJNQmtHQTFVRUN4TVNRV054ZFdseWFXNW5JRkJ5YjJSMVkzUnpNUk13RVFZRFZRUURFd296WkhOemNISmxka05CTUI0WERUSTBNVEV4TVRFMU1EZ3dNRm9YRFRNek1URXhNVEUxTURnd01Gb3dnWk14Q3pBSkJnTlZCQVlUQWtOSU1ROHdEUVlEVlFRSURBWmFkWEpwWTJneEN6QUpCZ05WQkFjTUFscElNUlV3RXdZRFZRUUtEQXhPWlhSalpYUmxjbUVnUVVjeElEQWVCZ05WQkFzTUYxTmxZM1Z5WlNCRWFXZHBkR0ZzSUZCaGVXMWxiblJ6TVMwd0t3WURWUVFERENSall6WmhOelUwWWkwMU9EQTNMVFF6TkRNdFlUbGxNQzA0TjJNMlpqTTNaREJqTURVd2dnRWlNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0SUJEd0F3Z2dFS0FvSUJBUUMvLzdpT3RaK0ljS1E3MWtnNENxS2hmR2ZqdXVDV3N2OUh1d1c0WXgyMkFGa0RyRGpNOURsZmJkaVo2VEpyNFFjaU9hcm95QkJONTRTT25LclE2MjRJbytpdCtXRWZ0cFhKNDg1V2xydUF3TUdFU1lrTmtnRmdNOEtFbEdIOU54UlJUR2MxQnd0WHdTdjZwbnE4TTRXc0s4SXpVWlZodU9RQ3ZYOEVsK3UzM2RrSEsrbnFLTGpENEZtUlZBeHdKTFJTcWJBeitUMlJmQWJtOHVWUVQvSlVLb3h5cVhGZlFOSVhCZGRLZEdyQXhYdUJUMTBsbjZtYlkwcE9GQi93enAxVnlxdlYvckNLL3dVSVpnTVNXRzN5djVUSnREV2ZHZmk0TVg4ajg3Tit0VlFia1J4d2d3bmgrWWVFaW10cm9VbEV0aUsxc04zYURWbExGK0JoME8rdkFnTUJBQUdqZ1lVd2dZSXdIZ1lKWUlaSUFZYjRRZ0VOQkJFV0QzaGpZU0JqWlhKMGFXWnBZMkYwWlRBTUJnTlZIUk1CQWY4RUFqQUFNQjBHQTFVZERnUVdCQlRRb0hrUG1qcEkydnVIYkFwVit1ekVWbXhRTWpBTEJnTlZIUThFQkFNQ0E3Z3dFd1lEVlIwbEJBd3dDZ1lJS3dZQkJRVUhBd0l3RVFZSllJWklBWWI0UWdFQkJBUURBZ1dnTUEwR0NTcUdTSWIzRFFFQkN3VUFBNElCQVFBQnB4V0piM1ZTL242MmVNeUNhOEZJNnJCY0FFOXZndkYxZ2xJczg4Vk5ENGYyUXpJODFzenBKejZlTjJWRWFnL2VyaEpLTUVoTkk2ZzllRXVMS3ZZbmVxMUFVd3BYdG1rczVhSlhVRC95d0RWS2w1eXpwMzB4WWxZamtlWVQzbVRhNkVsU3BRQ2h5UnBjbkNDVDlCRDRncXFnOVRGZ2NTb1BqcDRKbXJ0TnpsODJIV2NFRUZLbE1DMXVwbDY1M0xzZUprdFduekxlbkg5dkt2OGFyZWRDSVNibllsV05pT2ZoVEZmUmZ3dE5qMmRaNXlZSFMycnl4TVBzUTh5a3EwYllaSjlHOVd3UXJQM0w5RUtEalV6WEJjL29hR0RMY3k2akZ3TnBvaldKSVh4alBTSWRkZTNNUGx4SXY4YWQyYjBhbS9LWi9IMk1xOHhURFhUbGNrcTAiLCJNSUlEdkRDQ0FxU2dBd0lCQWdJSVh4MUhUcVhOaTljd0RRWUpLb1pJaHZjTkFRRU1CUUF3ZERFTE1Ba0dBMVVFQmhNQ1EwZ3hDekFKQmdOVkJBZ1RBbHBJTVE4d0RRWURWUVFIRXdaYWRYSnBZMmd4RlRBVEJnTlZCQW9UREU1bGRHTmxkR1Z5WVNCQlJ6RWJNQmtHQTFVRUN4TVNRV054ZFdseWFXNW5JRkJ5YjJSMVkzUnpNUk13RVFZRFZRUURFd296WkhOemNISmxka05CTUI0WERUSTBNRGd3TnpFeU1EUXdNRm9YRFRNME1EZ3dOekV5TURRd01Gb3dkREVMTUFrR0ExVUVCaE1DUTBneEN6QUpCZ05WQkFnVEFscElNUTh3RFFZRFZRUUhFd1phZFhKcFkyZ3hGVEFUQmdOVkJBb1RERTVsZEdObGRHVnlZU0JCUnpFYk1Ca0dBMVVFQ3hNU1FXTnhkV2x5YVc1bklGQnliMlIxWTNSek1STXdFUVlEVlFRREV3b3paSE56Y0hKbGRrTkJNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQTM1NTMwMG5lR0tFSkpsY1pCSDdOMEs3dCtVWC82Y2dZUkd4amx2ak9hRzdFaHV5QllyLzdodUxidGtVc2YwRVl4dWJnNWkwWlI3ZlREa1U1czZKZ1JoZmVFTlZndXNUTVB5WU5rN2lPS3NFWHdhaHY0VW11dGh2T3RZaWRWL1d3OXkrZHZjRWIxNHBsWDY4NXE5bnpOcGp4eHdnMFBBdkJJQzNhOWU2Yi82WXgvQ0UwZm5iR05wU1FETFl4QzhBL3ZCMXk4RStBaFJpR0F4Tk5CdHkva3VVdkJsRDVLZCtmc0ZqSnRVK2hJMERFV0VYVmVlR3FVME9aeWZMb2JxUFVNbk5LWVRTR2o3SG5YVWtCYkZLWE9LN0V5MURnc3hCdUFsaUlsV0x4YXRBQ245QnpzdXN2cU51U3Z5L2lxZHdOUVp2MENBcnQ0TWZsV3RNSW5kd1JHUUlEQVFBQm8xSXdVREFQQmdOVkhSTUJBZjhFQlRBREFRSC9NQjBHQTFVZERnUVdCQlRKMk9aSWpLcS9TSTM3SXNValhzYlI4cEZQN2pBTEJnTlZIUThFQkFNQ0FRWXdFUVlKWUlaSUFZYjRRZ0VCQkFRREFnQUhNQTBHQ1NxR1NJYjNEUUVCREFVQUE0SUJBUUFmZWQ5T3RWdHhQR3B6TS9KS3g4TUsrWm5XYjI0c0VGMlNXaERhNzhmZ2syRWFzbmsrT1hrTzd1R0tTdm5uTFB1UXFEbzBiZmhhS1lwQ1QvTjNTYk8vbXZ0NHdORzBwc0EySGUvYXBvWEUzdEN1eFdYaGg4SnVkTnlEQzBCaHRTVXE2WDliWVlNOFhzUnE0LzQ1ejY3bnlCYlowVHExRVdMQ1BKci82b1FxTXlNTTFvVFp3WnFETlpjMzd3TkFCelVpVnVtNGdUQW9YZTdwNDJVdVNsdXJZS3hmTzZpeExoaFNOWWtta2lhRHl2QlNwVFFJWitBc2REcUI5OFdIeDBiYUlqSmpCZU1tZSt1L1BpZmVGRjNDUUxSa28wSWxKUWdldDczZlBZNGFzWXhwekx0M1lQNE1lbmg2dTVLVHFucTJWUGd2aGZMTGp1R3libkNDLytERSJdfQ.eyJhY3NVUkwiOiJodHRwczovL25kbS1wcmV2LjNkc3Mtbm9uLXByb2QuY2xvdWQubmV0Y2V0ZXJhLmNvbS9hY3MvY2hhbGxlbmdlIiwiYWNzRXBoZW1QdWJLZXkiOnsia3R5IjoiRUMiLCJ4IjoiYXJ5Q2NsRnhKNkFDZEVLdlBGQzc5NVVOQ0NsTjA3Tnh1N2VkZGMzWFBiRSIsInkiOiJmaXhXb3JwcnZvNTlrcHFtbFNpMEw1UGlOSHJKOS1fNjNWaTdBQU01RTl3IiwiY3J2IjoiUC0yNTYifSwic2RrRXBoZW1QdWJLZXkiOnsia3R5IjoiRUMiLCJjcnYiOiJQLTI1NiIsIngiOiJYcjF0TEdBMkFWNEF2NDgzNUd6UG5pcl9Yd1dFNmhUaVl1bjRORXBadEJzIiwieSI6InFmR2J5RWhjaHliakVzSm9TNFctQmpteTdXS3VNYUVvRjVnVXhrZkd1MGcifX0.Z1l8rY3FATzQ-DN_fKS4BVhRtN9EFQ7E2g6M_3ojf_OOYJ-IXoYTye0DtxgM_DU9m_KzVZdtks_vjRuF9XwVp2GTHkdUzc7fLLkh6ninikZslBACaILsQxHsB_UqNVHpI85RQcQEdRJSf2SBYNy6lB4bJsMI7Ia_rL8EQOAeI8vDGdKx2G_HleXsAKek4sKRefLyLZzf_sjHEC3VazFbfbnDqLtUv1Pv1ADmIhmzhp9WfptB0Lg5Y0CalNCXLaJKiRAfXQJFtU8WPdGDGgYhf2N9VAwgG1ZkJoMI8L18N3-l2zWZXFK0flPb0ZRuKbVp0b4w2pyKtuvMEywMXs5fJA",
-            acsTransactionId: "649c6f76-13e6-49e3-b14f-a30686b7f109",
-            acsRefNumber: "3DS_LOA_ACS_201_13579",
-            threeDSServerTransId: "23c13695-8efc-4875-a322-0ccb13c3a8c4",
-            threeDSRequestorAppURL: ""
-        )
-        self.statusLabel.text = "Receive Challenge Params Event Emitted"
-        print("Receive Challenge Params Event Emitted with test challenge parameters")
+        hyperViewModel.generateAuthRequest()
     }
     
     @objc func doChallenge(_ sender: Any) {
-        // Call the HyperHeadless module to emit the doChallenge event
-        HyperHeadless.shared?.emitDoChallengeEvent()
+        hyperViewModel.presentChallenge()
         self.statusLabel.text = "Do Challenge Event Emitted"
-        print("Do Challenge Event Emitted")
     }
     
     func resultHandler(_ paymentResult: PaymentResult) {
@@ -247,8 +223,8 @@ extension HeadlessViewController {
         stackView.addArrangedSubview(confirmLast)
         stackView.addArrangedSubview(confirm)
         stackView.addArrangedSubview(init3dsButton)
+        stackView.addArrangedSubview(createTransButton)
         stackView.addArrangedSubview(generateAReqParamsButton)
-        stackView.addArrangedSubview(receiveChallengeParamsButton)
         stackView.addArrangedSubview(doChallengeButton)
         stackView.addArrangedSubview(statusLabel)
         view.addSubview(stackView)
@@ -323,11 +299,19 @@ extension HeadlessViewController {
         
         init3dsButton.setTitle("Initialize 3DS", for: .normal)
         init3dsButton.setTitleColor(.white, for: .normal)
-        init3dsButton.addTarget(self, action: #selector(initializeThreeDs), for: .touchUpInside)
+        init3dsButton.addTarget(self, action: #selector(initAuthSession), for: .touchUpInside)
         init3dsButtonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
         init3dsButtonConfig.baseBackgroundColor = .systemBlue
         init3dsButton.configuration = init3dsButtonConfig
         init3dsButton.layer.cornerRadius = 10
+        
+        createTransButton.setTitle("Create Transaction", for: .normal)
+        createTransButton.setTitleColor(.white, for: .normal)
+        createTransButton.addTarget(self, action: #selector(createTransaction), for: .touchUpInside)
+        createTransButtonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        createTransButtonConfig.baseBackgroundColor = .systemBlue
+        createTransButton.configuration = createTransButtonConfig
+        createTransButton.layer.cornerRadius = 10
         
         generateAReqParamsButton.setTitle("Generate AReq Params", for: .normal)
         generateAReqParamsButton.setTitleColor(.white, for: .normal)
@@ -337,13 +321,6 @@ extension HeadlessViewController {
         generateAReqParamsButton.configuration = generateAReqParamsButtonConfig
         generateAReqParamsButton.layer.cornerRadius = 10
         
-        receiveChallengeParamsButton.setTitle("Receive Challenge Params", for: .normal)
-        receiveChallengeParamsButton.setTitleColor(.white, for: .normal)
-        receiveChallengeParamsButton.addTarget(self, action: #selector(receiveChallengeParams), for: .touchUpInside)
-        receiveChallengeParamsButtonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
-        receiveChallengeParamsButtonConfig.baseBackgroundColor = .systemBlue
-        receiveChallengeParamsButton.configuration = receiveChallengeParamsButtonConfig
-        receiveChallengeParamsButton.layer.cornerRadius = 10
         
         doChallengeButton.setTitle("Do Challenge", for: .normal)
         doChallengeButton.setTitleColor(.white, for: .normal)

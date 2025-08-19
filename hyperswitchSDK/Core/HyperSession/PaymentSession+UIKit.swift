@@ -33,6 +33,22 @@ extension PaymentSession {
         paymentSheet.present(from: viewController, completion: completion)
     }
     
+    public func initAuthenticationSession(authIntentClientSecret: String, configuration: AuthenticationConfiguration? = nil) {
+        RNHeadlessManager.sharedInstance.reinvalidateBridge()
+        let _ = RNHeadlessManager.sharedInstance.viewForModule("dummy", initialProperties: [:])
+        
+        PaymentSession.authSession = AuthenticationSession(authIntentClientSecret: authIntentClientSecret, authConfiguration: configuration)
+    }
+    
+    public func createTransaction(messageVersion: String, directoryServerId: String?, cardNetwork: String?) -> Transaction{
+        let transaction = Transaction(messageVersion: messageVersion, directoryServerId: directoryServerId, cardNetwork: cardNetwork)
+        let apiKey = PaymentSession.authSession?.authConfiguration?.apiKey
+        let environment = PaymentSession.authSession?.authConfiguration?.environment
+        
+        HyperHeadless.shared?.emitInit3DsEvent(threeDsSdkApiKey: apiKey, environment: environment)
+        return transaction
+    }
+    
     // for external frameworks
     public func presentPaymentSheetWithParams(viewController: UIViewController, params: [String: Any], completion: @escaping (PaymentSheetResult) -> ()){
         PaymentSession.isPresented = true
