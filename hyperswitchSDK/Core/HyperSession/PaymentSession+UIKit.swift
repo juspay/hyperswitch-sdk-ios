@@ -42,10 +42,7 @@ extension PaymentSession {
     
     public func createTransaction(messageVersion: String, directoryServerId: String?, cardNetwork: String?) -> Transaction{
         let transaction = Transaction(messageVersion: messageVersion, directoryServerId: directoryServerId, cardNetwork: cardNetwork)
-        let apiKey = PaymentSession.authSession?.authConfiguration?.apiKey
-        let environment = PaymentSession.authSession?.authConfiguration?.environment
         
-        HyperHeadless.shared?.emitInit3DsEvent(threeDsSdkApiKey: apiKey, environment: environment)
         return transaction
     }
     

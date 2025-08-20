@@ -9,11 +9,9 @@ import Foundation
 
 public struct AuthenticationConfiguration {
     public let apiKey: String?
-    public let environment: String?
     
-    public init(apiKey: String? = nil, environment: String? = "sandbox") {
+    public init(apiKey: String? = nil) {
         self.apiKey = apiKey
-        self.environment = environment
     }
 }
 
@@ -34,18 +32,39 @@ public class AuthenticationSession {
 public class AuthenticationRequestParameters {
     final public let sdkTransactionID: String
     final public let deviceData: String
-    final public let sdkEphemeralPublicKey: String
+    final public let sdkEphemeralPublicKey: Any
     final public let sdkAppID: String
     final public let sdkReferenceNumber: String
     final public let messageVersion: String
     
-    public init(sdkTransactionID: String, deviceData: String, sdkEphemeralPublicKey: String, sdkAppID: String, sdkReferenceNumber: String, messageVersion: String) {
+    public init(sdkTransactionID: String, deviceData: String, sdkEphemeralPublicKey: Any, sdkAppID: String, sdkReferenceNumber: String, messageVersion: String) {
         self.sdkTransactionID = sdkTransactionID
         self.deviceData = deviceData
         self.sdkEphemeralPublicKey = sdkEphemeralPublicKey
         self.sdkAppID = sdkAppID
         self.sdkReferenceNumber = sdkReferenceNumber
         self.messageVersion = messageVersion
+    }
+    
+    /// Convenience initializer to create AuthenticationRequestParameters from NSDictionary
+    convenience init?(from dictionary: NSDictionary) {
+        guard let sdkTransactionID = dictionary["sdkTransId"] as? String,
+              let deviceData = dictionary["deviceData"] as? String,
+              let sdkEphemeralPublicKey = dictionary["sdkEphemeralKey"],
+              let sdkAppID = dictionary["sdkAppId"] as? String,
+              let sdkReferenceNumber = dictionary["sdkReferenceNo"] as? String,
+              let messageVersion = dictionary["messageVersion"] as? String else {
+            return nil
+        }
+        
+        self.init(
+            sdkTransactionID: sdkTransactionID,
+            deviceData: deviceData,
+            sdkEphemeralPublicKey: sdkEphemeralPublicKey,
+            sdkAppID: sdkAppID,
+            sdkReferenceNumber: sdkReferenceNumber,
+            messageVersion: messageVersion
+        )
     }
 }
 
@@ -101,82 +120,17 @@ public class Transaction {
     }
     
     public func getAuthenticationRequestParameters(completion: @escaping (AuthenticationRequestParameters) -> Void) {
-        // Request AReq params with completion handler
-        HyperHeadless.shared?.requestAReqParams(
-            messageVersion: messageVersion,
-            directoryServerId: directoryServerId,
-            cardNetwork: cardNetwork
-        ) { [weak self] (response: String?, error: Error?) in
-            
-            if let error = error {
-                print("Error getting AReq params: \(error.localizedDescription)")
-                // Return default parameters with messageVersion
-                let defaultParams = AuthenticationRequestParameters(
-                    sdkTransactionID: "",
-                    deviceData: "",
-                    sdkEphemeralPublicKey: "",
-                    sdkAppID: "",
-                    sdkReferenceNumber: "",
-                    messageVersion: self?.messageVersion ?? ""
-                )
-                completion(defaultParams)
-                return
-            }
-            
-            guard let response = response,
-                  let data = response.data(using: String.Encoding.utf8),
-                  let responseDict = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                  let aReqParamsDict = responseDict["aReqParams"] as? [String: Any] else {
-                print("Failed to parse AReq params response")
-                let defaultParams = AuthenticationRequestParameters(
-                    sdkTransactionID: "",
-                    deviceData: "",
-                    sdkEphemeralPublicKey: "",
-                    sdkAppID: "",
-                    sdkReferenceNumber: "",
-                    messageVersion: self?.messageVersion ?? ""
-                )
-                completion(defaultParams)
-                return
-            }
-            
-            // Extract parameters from the response
-            let sdkTransactionID = aReqParamsDict["sdkTransId"] as? String ?? ""
-            let deviceData = aReqParamsDict["deviceData"] as? String ?? ""
-            let sdkAppID = aReqParamsDict["sdkAppId"] as? String ?? ""
-            let sdkReferenceNumber = aReqParamsDict["sdkReferenceNo"] as? String ?? ""
-            let messageVersion = aReqParamsDict["messageVersion"] as? String ?? self?.messageVersion ?? ""
-            
-            // Convert sdkEphemeralKey to JSON string
-            var sdkEphemeralPublicKey = ""
-            if let ephemeralKey = aReqParamsDict["sdkEphemeralKey"] {
-                // Check if ephemeralKey is already a string
-                if let keyString = ephemeralKey as? String {
-                    sdkEphemeralPublicKey = keyString
-                } else if JSONSerialization.isValidJSONObject(ephemeralKey) {
-                    // Only serialize if it's a valid JSON object
-                    if let ephemeralKeyData = try? JSONSerialization.data(withJSONObject: ephemeralKey, options: []),
-                       let ephemeralKeyString = String(data: ephemeralKeyData, encoding: .utf8) {
-                        sdkEphemeralPublicKey = ephemeralKeyString
-                    }
-                } else {
-                    // If it's not a valid JSON object, convert to string representation
-                    sdkEphemeralPublicKey = String(describing: ephemeralKey)
-                }
-            }
-            
-            // Create the authentication request parameters
-            let authParams = AuthenticationRequestParameters(
-                sdkTransactionID: sdkTransactionID,
-                deviceData: deviceData,
-                sdkEphemeralPublicKey: sdkEphemeralPublicKey,
-                sdkAppID: sdkAppID,
-                sdkReferenceNumber: sdkReferenceNumber,
-                messageVersion: messageVersion
-            )
-            
-            completion(authParams)
-        }
+        let props: [String: Any] = [
+            "messageVersion": self.messageVersion,
+            "directoryServerId": self.directoryServerId as Any,
+            "cardNetwork": self.cardNetwork as Any
+        ]
+        
+        // Store the completion callback in HyperHeadless for automatic invocation when aReqParams are available
+        HyperHeadless.shared?.authParametersCompletion = completion
+        
+        // Trigger the native parameter generation
+        HyperHeadless.shared?.generateAReqParamsCallback?([props])
     }
     
     public func doChallenge(
@@ -184,88 +138,14 @@ public class Transaction {
         challengeStatusReceiver: ChallengeStatusReceiver,
         timeOut: Int
     ) {
-        // Step 1: Send challenge parameters to the ReScript side
-        HyperHeadless.shared?.requestReceiveChallengeParams(
-            acsSignedContent: challengeParameters.acsSignedContent,
-            acsTransactionId: challengeParameters.acsTransactionID,
-            acsRefNumber: challengeParameters.acsRefNumber,
-            threeDSServerTransId: challengeParameters.threeDSServerTransactionID,
-            threeDSRequestorAppURL: challengeParameters.threeDSRequestorAppURL.isEmpty ? nil : challengeParameters.threeDSRequestorAppURL
-        ) { [weak self] (response: String?, error: Error?) in
-            
-            if let error = error {
-                print("Error in receiveChallengeParams: \(error.localizedDescription)")
-                DispatchQueue.main.async {
-                    challengeStatusReceiver.runtimeError()
-                }
-                return
-            }
-            
-            guard let response = response,
-                  let data = response.data(using: String.Encoding.utf8),
-                  let responseDict = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
-                print("Failed to parse receiveChallengeParams response")
-                DispatchQueue.main.async {
-                    challengeStatusReceiver.protocolError()
-                }
-                return
-            }
-            
-            // Check the status of receiveChallengeParams
-            let status = responseDict["status"] as? String ?? "failed"
-            if status != "success" {
-                print("receiveChallengeParams failed with status: \(status)")
-                DispatchQueue.main.async {
-                    challengeStatusReceiver.protocolError()
-                }
-                return
-            }
-            
-            // Step 2: If receiveChallengeParams was successful, proceed with doChallenge
-            self?.performDoChallenge(challengeStatusReceiver: challengeStatusReceiver)
-        }
-    }
-    
-    private func performDoChallenge(challengeStatusReceiver: ChallengeStatusReceiver) {
-        HyperHeadless.shared?.requestDoChallenge { (response: String?, error: Error?) in
-            
-            if let error = error {
-                print("Error in doChallenge: \(error.localizedDescription)")
-                DispatchQueue.main.async {
-                    challengeStatusReceiver.runtimeError()
-                }
-                return
-            }
-            
-            guard let response = response,
-                  let data = response.data(using: String.Encoding.utf8),
-                  let responseDict = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
-                print("Failed to parse doChallenge response")
-                DispatchQueue.main.async {
-                    challengeStatusReceiver.protocolError()
-                }
-                return
-            }
-            
-            // Parse the challenge result
-            let status = responseDict["status"] as? String ?? "failed"
-            let message = responseDict["message"] as? String ?? ""
-            
-            DispatchQueue.main.async {
-                switch status.lowercased() {
-                case "success", "completed":
-                    challengeStatusReceiver.completed()
-                case "cancelled", "canceled":
-                    challengeStatusReceiver.cancelled()
-                case "timeout", "timedout":
-                    challengeStatusReceiver.timedout()
-                case "protocol_error", "protocolerror":
-                    challengeStatusReceiver.protocolError()
-                default:
-                    print("Unknown challenge status: \(status), message: \(message)")
-                    challengeStatusReceiver.runtimeError()
-                }
-            }
-        }
+        let props: [String: Any] = [
+            "acsSignedContent": challengeParameters.acsSignedContent,
+            "acsTransactionId": challengeParameters.acsTransactionID,
+            "acsRefNumber": challengeParameters.acsRefNumber,
+            "threeDSServerTransId": challengeParameters.threeDSServerTransactionID,
+            "threeDSRequestorAppURL": challengeParameters.threeDSRequestorAppURL
+        ]
+        
+        HyperHeadless.shared?.receiveChallengeParamsCallback?([props])
     }
 }
