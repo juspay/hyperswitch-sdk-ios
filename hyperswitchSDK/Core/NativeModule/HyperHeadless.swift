@@ -28,6 +28,9 @@ internal class HyperHeadless: RCTEventEmitter {
     // Completion handler for doChallenge response
     internal static var doChallengeCompletion: ((String?, Error?) -> Void)?
     
+    // Storage for authentication parameter completion callback
+    internal var authParametersCompletion: ((AuthenticationRequestParameters) -> Void)?
+    
     internal override init() {
         super.init()
         HyperHeadless.shared = self
@@ -40,7 +43,7 @@ internal class HyperHeadless: RCTEventEmitter {
     
     @objc 
     internal override func supportedEvents() -> [String] {
-        return ["test", "init3ds", "generateAReqParams", "receiveChallengeParams", "doChallenge"]
+        return ["test"]
     }
     
     @objc 
@@ -55,28 +58,13 @@ internal class HyperHeadless: RCTEventEmitter {
             if let data = rnMessage.data(using: .utf8) {
                 do {
                     if let responseDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                        // Check if this is an AReq params response
-                        if let aReqParams = responseDict["aReqParams"] as? [String: Any] {
-                            // Call the completion handler with the AReq params response
-                            print("-- aReqParams response: ", aReqParams)
-                            HyperHeadless.aReqParamsCompletion?(rnMessage, nil)
-                        } else if let challengeResult = responseDict["challengeResult"] as? [String: Any] {
-                            // Call the completion handler with the receiveChallengeParams response
-                            print("-- receiveChallengeParams response: ", challengeResult)
-                            HyperHeadless.receiveChallengeParamsCompletion?(rnMessage, nil)
-                        } else if let doChallengeResult = responseDict["doChallengeResult"] as? [String: Any] {
+                        if let doChallengeResult = responseDict["doChallengeResult"] as? [String: Any] {
                             // Call the completion handler with the doChallenge response
                             print("-- doChallenge response: ", doChallengeResult)
                             HyperHeadless.doChallengeCompletion?(rnMessage, nil)
-                        } else {
-                            // Handle other types of responses if needed
-                            print("-- Received message from ReScript: \(rnMessage)")
                         }
                     }
                 } catch {
-                    // Call completion handler with error
-                    HyperHeadless.aReqParamsCompletion?(nil, error)
-                    HyperHeadless.receiveChallengeParamsCompletion?(nil, error)
                     HyperHeadless.doChallengeCompletion?(nil, error)
                 }
             } else {
@@ -86,6 +74,30 @@ internal class HyperHeadless: RCTEventEmitter {
                 HyperHeadless.doChallengeCompletion?(nil, error)
             }
         }
+    }
+    
+    // MARK: - Authentication Parameters Completion Handling
+    
+    /// Trigger the stored authentication parameter completion callback
+    private func triggerAuthParametersCompletion() {
+        guard let aReqParams = self.aReqParams,
+              let completion = self.authParametersCompletion else {
+            return
+        }
+        
+        // Try to create AuthenticationRequestParameters from the stored aReqParams
+        if let authParams = AuthenticationRequestParameters(from: aReqParams) {
+            // Success - trigger the completion with the parameters on main queue
+            DispatchQueue.main.async {
+                completion(authParams)
+            }
+        } else {
+            // Log error for debugging purposes
+            print("HyperHeadless: Failed to parse aReqParams into AuthenticationRequestParameters")
+        }
+        
+        // Always clear the completion after attempting to call it to prevent memory leaks
+        self.authParametersCompletion = nil
     }
     
     @objc
@@ -110,12 +122,37 @@ internal class HyperHeadless: RCTEventEmitter {
     @objc
     private func initialiseAuthSession (_ rnCallback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
+            let apiKey = PaymentSession.authSession?.authConfiguration?.apiKey
             let props: [String: Any] = [
                 "clientSecret": PaymentSession.authSession?.authIntentClientSecret as Any,
                 "publishableKey": APIClient.shared.publishableKey as Any,
+                "hyperParams": HyperParams.getHyperParams() as Any,
+                "configuration": [
+                    "netceteraSDKApiKey": apiKey as Any,
+                ] as Any
             ]
             rnCallback([props])
         }
+    }
+
+    internal var generateAReqParamsCallback: RCTResponseSenderBlock?
+
+    @objc
+    private func getMessageVersion(_ rnCallback: @escaping RCTResponseSenderBlock) {
+        self.generateAReqParamsCallback = rnCallback
+    }
+
+    internal var aReqParams: NSDictionary?
+    internal var receiveChallengeParamsCallback: RCTResponseSenderBlock?
+
+    @objc
+    private func getChallengeParams(_ rnMessage: NSDictionary, _ rnCallback: @escaping RCTResponseSenderBlock) {
+        self.aReqParams = rnMessage["aReqParams"] as? NSDictionary
+        
+        self.receiveChallengeParamsCallback = rnCallback
+        
+        // Trigger the stored authentication parameter completion callback
+        triggerAuthParametersCompletion()
     }
     
     @objc
@@ -126,135 +163,5 @@ internal class HyperHeadless: RCTEventEmitter {
     @objc
     private func exitHeadless(_ rnMessage: String) {
         PaymentSession.exitHeadless(rnMessage: rnMessage)
-    }
-    
-    @objc
-    private func initThreeDs(_ threeDsData: NSDictionary) {
-        self.sendEvent(withName: "init3ds", body: threeDsData)
-    }
-    
-    // Public method to emit init3ds event from other parts of the app
-    internal func emitInit3DsEvent(threeDsSdkApiKey: String?, environment: String?) {
-        let threeDsData: [String: Any] = [
-            "paymentMethodData": [
-                "threeDsSdkApiKey": threeDsSdkApiKey ?? "",
-                "environment": environment ?? "sandbox"
-            ].compactMapValues { $0 }
-        ]
-        
-        DispatchQueue.main.async {
-            self.sendEvent(withName: "init3ds", body: threeDsData)
-        }
-    }
-    
-    @objc
-    private func generateAReqParams(_ aReqData: NSDictionary) {
-        self.sendEvent(withName: "generateAReqParams", body: aReqData)
-    }
-    
-    // Public method to emit generateAReqParams event from other parts of the app
-    internal func emitGenerateAReqParamsEvent(messageVersion: String?, directoryServerId: String?, cardNetwork: String?) {
-        let aReqData: [String: Any] = [
-            "messageVersion": messageVersion ?? "",
-            "directoryServerId": directoryServerId ?? "",
-            "cardNetwork": cardNetwork as Any
-        ]
-        
-        DispatchQueue.main.async {
-            self.sendEvent(withName: "generateAReqParams", body: aReqData)
-        }
-    }
-    
-    // Public method to request AReq params with completion handler
-    public func requestAReqParams(
-        messageVersion: String? = nil,
-        directoryServerId: String? = nil,
-        cardNetwork: String? = nil,
-        completion: @escaping (String?, Error?) -> Void
-    ) {
-        // Store the completion handler
-        HyperHeadless.aReqParamsCompletion = completion
-        
-        // Emit the event to trigger AReq params generation
-        emitGenerateAReqParamsEvent(
-            messageVersion: messageVersion,
-            directoryServerId: directoryServerId,
-            cardNetwork: cardNetwork
-        )
-    }
-    
-    @objc
-    private func receiveChallengeParams(_ challengeData: NSDictionary) {
-        self.sendEvent(withName: "receiveChallengeParams", body: challengeData)
-    }
-    
-    // Public method to emit receiveChallengeParams event from other parts of the app
-    internal func emitReceiveChallengeParamsEvent(
-        acsSignedContent: String?,
-        acsTransactionId: String?,
-        acsRefNumber: String?,
-        threeDSServerTransId: String?,
-        threeDSRequestorAppURL: String?
-    ) {
-        let challengeData: [String: Any] = [
-            "acsSignedContent": acsSignedContent ?? "",
-            "acsTransactionId": acsTransactionId ?? "",
-            "acsRefNumber": acsRefNumber ?? "",
-            "threeDSServerTransId": threeDSServerTransId ?? "",
-            "threeDSRequestorAppURL": threeDSRequestorAppURL ?? ""
-        ]
-        
-        DispatchQueue.main.async {
-            self.sendEvent(withName: "receiveChallengeParams", body: challengeData)
-        }
-    }
-    
-    // Public method to request receiveChallengeParams with completion handler
-    public func requestReceiveChallengeParams(
-        acsSignedContent: String? = nil,
-        acsTransactionId: String? = nil,
-        acsRefNumber: String? = nil,
-        threeDSServerTransId: String? = nil,
-        threeDSRequestorAppURL: String? = nil,
-        completion: @escaping (String?, Error?) -> Void
-    ) {
-        // Store the completion handler
-        HyperHeadless.receiveChallengeParamsCompletion = completion
-        
-        // Emit the event to trigger receiveChallengeParams
-        emitReceiveChallengeParamsEvent(
-            acsSignedContent: acsSignedContent,
-            acsTransactionId: acsTransactionId,
-            acsRefNumber: acsRefNumber,
-            threeDSServerTransId: threeDSServerTransId,
-            threeDSRequestorAppURL: threeDSRequestorAppURL
-        )
-    }
-    
-    @objc
-    private func doChallenge(_ challengeData: NSDictionary) {
-        self.sendEvent(withName: "doChallenge", body: challengeData)
-    }
-    
-    // Public method to emit doChallenge event from other parts of the app
-    internal func emitDoChallengeEvent() {
-        let challengeData: [String: Any] = [
-            "action": "doChallenge"
-        ]
-        
-        DispatchQueue.main.async {
-            self.sendEvent(withName: "doChallenge", body: challengeData)
-        }
-    }
-    
-    // Public method to request doChallenge with completion handler
-    public func requestDoChallenge(
-        completion: @escaping (String?, Error?) -> Void
-    ) {
-        // Store the completion handler
-        HyperHeadless.doChallengeCompletion = completion
-        
-        // Emit the event to trigger doChallenge
-        emitDoChallengeEvent()
     }
 }

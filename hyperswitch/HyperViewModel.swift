@@ -152,7 +152,7 @@ class HyperViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     self.status = .success
                     self.paymentSession = PaymentSession(publishableKey: publishableKey)
-                    self.paymentSession?.initAuthenticationSession(authIntentClientSecret: paymentIntentClientSecret, configuration: AuthenticationConfiguration(apiKey: self.netceteraApiKey, environment: "SANDBOX"))
+                    self.paymentSession?.initAuthenticationSession(authIntentClientSecret: paymentIntentClientSecret, configuration: AuthenticationConfiguration(apiKey: self.netceteraApiKey))
                 }
             } catch {
                 DispatchQueue.main.async {

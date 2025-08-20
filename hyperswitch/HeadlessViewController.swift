@@ -51,6 +51,7 @@ class HeadlessViewController: UIViewController {
         self.view.backgroundColor = UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 0.2)
         viewFrame()
         hyperViewModel.preparePaymentSheet()
+        hyperViewModel.fetchNetceteraSDKApiKey()
         asyncBind()
     }
     
@@ -73,6 +74,7 @@ class HeadlessViewController: UIViewController {
     @objc
     func reload(_ sender: Any) {
         hyperViewModel.preparePaymentSheet()
+        hyperViewModel.fetchNetceteraSDKApiKey()
         self.reloadButton.isUserInteractionEnabled = false
         UIView.animate(withDuration: 1.6, animations: {
             self.reloadButton.backgroundColor = .white
