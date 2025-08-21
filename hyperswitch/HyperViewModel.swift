@@ -169,7 +169,13 @@ class HyperViewModel: ObservableObject {
     func generateAuthRequest() {
         self.transaction?.getAuthenticationRequestParameters {
             params in
-            print("-- recieved arreq params: ", params)
+            print("-- recieved arreq params: ", [
+                "deviceData": params.deviceData,
+                "messageVersion": params.messageVersion,
+                "sdkAppID": params.sdkAppID,
+                "sdkTransactionID": params.sdkTransactionID,
+                "sdkReferenceNumber": params.sdkReferenceNumber
+            ])
             // TODO: Handle the received authentication request parameters
             // and generate challenge params based on these aReqs using 3ds-server s2s calls
         }

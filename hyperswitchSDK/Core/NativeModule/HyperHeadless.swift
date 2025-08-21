@@ -19,12 +19,6 @@ internal class HyperHeadless: RCTEventEmitter {
     private var confirmWithDefault: RCTResponseSenderBlock?
     private var defaultPMData: ((NSDictionary?) -> Void)?
     
-    // Completion handler for AReq params response
-    internal static var aReqParamsCompletion: ((String?, Error?) -> Void)?
-    
-    // Completion handler for receiveChallengeParams response
-    internal static var receiveChallengeParamsCompletion: ((String?, Error?) -> Void)?
-    
     // Completion handler for doChallenge response
     internal static var doChallengeCompletion: ((String?, Error?) -> Void)?
     
@@ -59,9 +53,9 @@ internal class HyperHeadless: RCTEventEmitter {
                 do {
                     if let responseDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                         if let doChallengeResult = responseDict["doChallengeResult"] as? [String: Any] {
-                            // Call the completion handler with the doChallenge response
-                            print("-- doChallenge response: ", doChallengeResult)
                             HyperHeadless.doChallengeCompletion?(rnMessage, nil)
+                        } else if let errorResponse = responseDict["error"] as? [String: Any] {
+                            print("-- errorResponse: ", errorResponse)
                         }
                     }
                 } catch {
@@ -69,8 +63,6 @@ internal class HyperHeadless: RCTEventEmitter {
                 }
             } else {
                 let error = NSError(domain: "HyperHeadless", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse message"])
-                HyperHeadless.aReqParamsCompletion?(nil, error)
-                HyperHeadless.receiveChallengeParamsCompletion?(nil, error)
                 HyperHeadless.doChallengeCompletion?(nil, error)
             }
         }
@@ -124,6 +116,7 @@ internal class HyperHeadless: RCTEventEmitter {
         DispatchQueue.main.async {
             let apiKey = PaymentSession.authSession?.authConfiguration?.apiKey
             let props: [String: Any] = [
+                "isAuthSession": true as Any,
                 "clientSecret": PaymentSession.authSession?.authIntentClientSecret as Any,
                 "publishableKey": APIClient.shared.publishableKey as Any,
                 "hyperParams": HyperParams.getHyperParams() as Any,

@@ -9,6 +9,7 @@
 
 @interface RCT_EXTERN_MODULE(HyperHeadless, RCTEventEmitter)
 
+RCT_EXTERN_METHOD(sendMessageToNative: (NSString)rnMessage)
 RCT_EXTERN_METHOD(initialisePaymentSession: (RCTResponseSenderBlock)rnCallback)
 RCT_EXTERN_METHOD(initialiseAuthSession: (RCTResponseSenderBlock)rnCallback)
 RCT_EXTERN_METHOD(getMessageVersion: (RCTResponseSenderBlock)rnCallback)
