@@ -20,7 +20,7 @@ internal class HyperHeadless: RCTEventEmitter {
     private var defaultPMData: ((NSDictionary?) -> Void)?
     
     // Completion handler for doChallenge response
-    internal static var doChallengeCompletion: ((String?, Error?) -> Void)?
+    internal static var doChallengeCompletion: (([String : Any]) -> Void)?
     
     // Storage for authentication parameter completion callback
     internal var authParametersCompletion: ((AuthenticationRequestParameters) -> Void)?
@@ -53,17 +53,17 @@ internal class HyperHeadless: RCTEventEmitter {
                 do {
                     if let responseDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
                         if let doChallengeResult = responseDict["doChallengeResult"] as? [String: Any] {
-                            HyperHeadless.doChallengeCompletion?(rnMessage, nil)
+                            HyperHeadless.doChallengeCompletion?(doChallengeResult)
                         } else if let errorResponse = responseDict["error"] as? [String: Any] {
                             print("-- errorResponse: ", errorResponse)
                         }
                     }
-                } catch {
-                    HyperHeadless.doChallengeCompletion?(nil, error)
+                } catch let error as Any {
+                    HyperHeadless.doChallengeCompletion?(["status": "error", "message": error])
                 }
             } else {
                 let error = NSError(domain: "HyperHeadless", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse message"])
-                HyperHeadless.doChallengeCompletion?(nil, error)
+                HyperHeadless.doChallengeCompletion?(["status": "error", "message": error])
             }
         }
     }
@@ -139,7 +139,7 @@ internal class HyperHeadless: RCTEventEmitter {
     internal var receiveChallengeParamsCallback: RCTResponseSenderBlock?
 
     @objc
-    private func getChallengeParams(_ rnMessage: NSDictionary, _ rnCallback: @escaping RCTResponseSenderBlock) {
+    private func sendAReqAndReceiveChallengeParams(_ rnMessage: NSDictionary, _ rnCallback: @escaping RCTResponseSenderBlock) {
         self.aReqParams = rnMessage["aReqParams"] as? NSDictionary
         
         self.receiveChallengeParamsCallback = rnCallback

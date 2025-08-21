@@ -146,6 +146,11 @@ public class Transaction {
             "threeDSRequestorAppURL": challengeParameters.threeDSRequestorAppURL
         ]
         
+        HyperHeadless.doChallengeCompletion = {
+            response in
+            print("-- doChallengeResponse: ", response)
+        }
+        
         HyperHeadless.shared?.receiveChallengeParamsCallback?([props])
     }
 }
