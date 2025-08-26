@@ -131,7 +131,7 @@ internal class HyperHeadless: RCTEventEmitter {
     internal var generateAReqParamsCallback: RCTResponseSenderBlock?
 
     @objc
-    private func getMessageVersion(_ rnCallback: @escaping RCTResponseSenderBlock) {
+    private func getAuthRequestParams(_ rnCallback: @escaping RCTResponseSenderBlock) {
         self.generateAReqParamsCallback = rnCallback
     }
 
