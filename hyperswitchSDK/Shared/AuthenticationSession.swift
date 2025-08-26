@@ -74,9 +74,9 @@ public class ChallengeParameters {
     public var acsTransactionID: String
     public var acsRefNumber: String
     public var acsSignedContent: String
-    public var threeDSRequestorAppURL: String
+    public var threeDSRequestorAppURL: String?
     
-    init(threeDSServerTransactionID: String, acsTransactionID: String, acsRefNumber: String, acsSignedContent: String, threeDSRequestorAppURL: String) {
+    init(threeDSServerTransactionID: String, acsTransactionID: String, acsRefNumber: String, acsSignedContent: String, threeDSRequestorAppURL: String? = nil) {
         self.threeDSServerTransactionID = threeDSServerTransactionID
         self.acsTransactionID = acsTransactionID
         self.acsRefNumber = acsRefNumber

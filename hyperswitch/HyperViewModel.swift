@@ -309,10 +309,9 @@ class HyperViewModel: ObservableObject {
                    let acsTransactionID = json["acs_trans_id"] as? String,
                    let acsRefNumber = json["acs_reference_number"] as? String,
                    let acsSignedContent = json["acs_signed_content"] as? String,
-                   let threeDSRequestorAppURL = json["three_ds_requestor_url"] as? Any
+                   let threeDSRequestorAppURL = json["three_ds_requestor_url"] as? String?
                 {
-                    ///NOTE: threeDSRequestorAppURL nil in BE responses for now, may change in prod
-                    self.challengeParams = ChallengeParameters(threeDSServerTransactionID: threeDSServerTransactionID, acsTransactionID: acsTransactionID, acsRefNumber: acsRefNumber, acsSignedContent: acsSignedContent, threeDSRequestorAppURL: nil)
+                    self.challengeParams = ChallengeParameters(threeDSServerTransactionID: threeDSServerTransactionID, acsTransactionID: acsTransactionID, acsRefNumber: acsRefNumber, acsSignedContent: acsSignedContent, threeDSRequestorAppURL: threeDSRequestorAppURL)
                 }
             } catch {
                 print("Failed to fetch challenge params: \(error)")
