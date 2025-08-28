@@ -19,6 +19,12 @@ internal class HyperHeadless: RCTEventEmitter {
     private var confirmWithDefault: RCTResponseSenderBlock?
     private var defaultPMData: ((NSDictionary?) -> Void)?
     
+    // Completion handler for doChallenge response
+    internal static var doChallengeCompletion: (([String : Any]) -> Void)?
+    
+    // Storage for authentication parameter completion callback
+    internal var authParametersCompletion: ((AuthenticationRequestParameters) -> Void)?
+    
     internal override init() {
         super.init()
         HyperHeadless.shared = self
@@ -40,7 +46,51 @@ internal class HyperHeadless: RCTEventEmitter {
     }
     
     @objc
-    private func sendMessageToNative(_ rnMessage: String) {}
+    private func sendMessageToNative(_ rnMessage: String) {
+        DispatchQueue.main.async {
+            // Parse the JSON response from ReScript side
+            if let data = rnMessage.data(using: .utf8) {
+                do {
+                    if let responseDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                        if let doChallengeResult = responseDict["doChallengeResult"] as? [String: Any] {
+                            HyperHeadless.doChallengeCompletion?(doChallengeResult)
+                        } else if let errorResponse = responseDict["error"] as? [String: Any] {
+                            print("-- errorResponse: ", errorResponse)
+                        }
+                    }
+                } catch let error as Any {
+                    HyperHeadless.doChallengeCompletion?(["status": "error", "message": error])
+                }
+            } else {
+                let error = NSError(domain: "HyperHeadless", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse message"])
+                HyperHeadless.doChallengeCompletion?(["status": "error", "message": error])
+            }
+        }
+    }
+    
+    // MARK: - Authentication Parameters Completion Handling
+    
+    /// Trigger the stored authentication parameter completion callback
+    private func triggerAuthParametersCompletion() {
+        guard let aReqParams = self.aReqParams,
+              let completion = self.authParametersCompletion else {
+            return
+        }
+        
+        // Try to create AuthenticationRequestParameters from the stored aReqParams
+        if let authParams = AuthenticationRequestParameters(from: aReqParams) {
+            // Success - trigger the completion with the parameters on main queue
+            DispatchQueue.main.async {
+                completion(authParams)
+            }
+        } else {
+            // Log error for debugging purposes
+            print("HyperHeadless: Failed to parse aReqParams into AuthenticationRequestParameters")
+        }
+        
+        // Always clear the completion after attempting to call it to prevent memory leaks
+        self.authParametersCompletion = nil
+    }
     
     @objc
     private func initialisePaymentSession (_ rnCallback: @escaping RCTResponseSenderBlock) {
@@ -62,6 +112,43 @@ internal class HyperHeadless: RCTEventEmitter {
     }
     
     @objc
+    private func initialiseAuthSession (_ rnCallback: @escaping RCTResponseSenderBlock) {
+        DispatchQueue.main.async {
+            let threeDsSdkApiKey = AuthenticationSession.authConfiguration?.apiKey
+            let props: [String: Any] = [
+                "isAuthSession": true as Any,
+                "clientSecret": AuthenticationSession.authIntentClientSecret as Any,
+                "publishableKey": APIClient.shared.publishableKey as Any,
+                "hyperParams": HyperParams.getHyperParams() as Any,
+                "configuration": [
+                    "netceteraSDKApiKey": threeDsSdkApiKey as Any,
+                ] as Any
+            ]
+            rnCallback([props])
+        }
+    }
+
+    internal var generateAReqParamsCallback: RCTResponseSenderBlock?
+
+    @objc
+    private func getAuthRequestParams(_ rnCallback: @escaping RCTResponseSenderBlock) {
+        self.generateAReqParamsCallback = rnCallback
+    }
+
+    internal var aReqParams: NSDictionary?
+    internal var receiveChallengeParamsCallback: RCTResponseSenderBlock?
+
+    @objc
+    private func sendAReqAndReceiveChallengeParams(_ rnMessage: NSDictionary, _ rnCallback: @escaping RCTResponseSenderBlock) {
+        self.aReqParams = rnMessage["aReqParams"] as? NSDictionary
+        
+        self.receiveChallengeParamsCallback = rnCallback
+        
+        // Trigger the stored authentication parameter completion callback
+        triggerAuthParametersCompletion()
+    }
+    
+    @objc
     private func getPaymentSession(_ rnMessage: NSDictionary, _ rnMessage2: NSDictionary, _ rnMessage3: NSArray, _ rnCallback: @escaping RCTResponseSenderBlock) {
         PaymentSession.getPaymentSession(getPaymentMethodData: rnMessage, getPaymentMethodData2: rnMessage2, getPaymentMethodDataArray: rnMessage3, callback: rnCallback)
     }
@@ -70,5 +157,4 @@ internal class HyperHeadless: RCTEventEmitter {
     private func exitHeadless(_ rnMessage: String) {
         PaymentSession.exitHeadless(rnMessage: rnMessage)
     }
-    
 }

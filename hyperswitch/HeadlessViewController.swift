@@ -25,6 +25,10 @@ class HeadlessViewController: UIViewController {
     private let confirmLast = UIButton()
     private let confirm = UIButton()
     private let reloadButton = UIButton()
+    private let init3dsButton = UIButton()
+    private let createTransButton = UIButton()
+    private let generateAReqParamsButton = UIButton()
+    private let doChallengeButton = UIButton()
     
     private var headlessbuttonConfig = UIButton.Configuration.filled()
     private var getDefaultConfig = UIButton.Configuration.filled()
@@ -34,6 +38,10 @@ class HeadlessViewController: UIViewController {
     private var confirmLastConfig = UIButton.Configuration.filled()
     private var confirmConfig = UIButton.Configuration.filled()
     private var reloadButtonConfiguration = UIButton.Configuration.plain()
+    private var init3dsButtonConfig = UIButton.Configuration.filled()
+    private var createTransButtonConfig = UIButton.Configuration.filled()
+    private var generateAReqParamsButtonConfig = UIButton.Configuration.filled()
+    private var doChallengeButtonConfig = UIButton.Configuration.filled()
     
     private var handler: PaymentSessionHandler?
     private var cancellables = Set<AnyCancellable>()
@@ -43,6 +51,7 @@ class HeadlessViewController: UIViewController {
         self.view.backgroundColor = UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 0.2)
         viewFrame()
         hyperViewModel.preparePaymentSheet()
+        hyperViewModel.fetchNetceteraSDKApiKey()
         asyncBind()
     }
     
@@ -65,6 +74,7 @@ class HeadlessViewController: UIViewController {
     @objc
     func reload(_ sender: Any) {
         hyperViewModel.preparePaymentSheet()
+        hyperViewModel.fetchNetceteraSDKApiKey()
         self.reloadButton.isUserInteractionEnabled = false
         UIView.animate(withDuration: 1.6, animations: {
             self.reloadButton.backgroundColor = .white
@@ -168,6 +178,23 @@ class HeadlessViewController: UIViewController {
 //        handler?.confirmWithCustomerPaymentToken(<#T##String#>, <#T##String?#>, <#T##(PaymentResult) -> Void#>)
     }
     
+    @objc func initAuthSession(_ sender: Any) {
+        hyperViewModel.prepareAuthentication()
+    }
+    
+    @objc func createTransaction(_ sender: Any) {
+        hyperViewModel.createTransaction()
+    }
+    
+    @objc func generateAReqParams(_ sender: Any) {
+        hyperViewModel.generateAuthRequest()
+    }
+    
+    @objc func doChallenge(_ sender: Any) {
+        hyperViewModel.presentChallenge()
+        self.statusLabel.text = "Do Challenge Event Emitted"
+    }
+    
     func resultHandler(_ paymentResult: PaymentResult) {
         switch paymentResult {
         case .completed(let data):
@@ -197,6 +224,10 @@ extension HeadlessViewController {
         stackView.addArrangedSubview(confirmDefault)
         stackView.addArrangedSubview(confirmLast)
         stackView.addArrangedSubview(confirm)
+        stackView.addArrangedSubview(init3dsButton)
+        stackView.addArrangedSubview(createTransButton)
+        stackView.addArrangedSubview(generateAReqParamsButton)
+        stackView.addArrangedSubview(doChallengeButton)
         stackView.addArrangedSubview(statusLabel)
         view.addSubview(stackView)
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -267,6 +298,39 @@ extension HeadlessViewController {
         confirmConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
         confirm.configuration = confirmConfig
         confirm.layer.cornerRadius = 10
+        
+        init3dsButton.setTitle("Initialize 3DS", for: .normal)
+        init3dsButton.setTitleColor(.white, for: .normal)
+        init3dsButton.addTarget(self, action: #selector(initAuthSession), for: .touchUpInside)
+        init3dsButtonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        init3dsButtonConfig.baseBackgroundColor = .systemBlue
+        init3dsButton.configuration = init3dsButtonConfig
+        init3dsButton.layer.cornerRadius = 10
+        
+        createTransButton.setTitle("Create Transaction", for: .normal)
+        createTransButton.setTitleColor(.white, for: .normal)
+        createTransButton.addTarget(self, action: #selector(createTransaction), for: .touchUpInside)
+        createTransButtonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        createTransButtonConfig.baseBackgroundColor = .systemBlue
+        createTransButton.configuration = createTransButtonConfig
+        createTransButton.layer.cornerRadius = 10
+        
+        generateAReqParamsButton.setTitle("Generate AReq Params", for: .normal)
+        generateAReqParamsButton.setTitleColor(.white, for: .normal)
+        generateAReqParamsButton.addTarget(self, action: #selector(generateAReqParams), for: .touchUpInside)
+        generateAReqParamsButtonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        generateAReqParamsButtonConfig.baseBackgroundColor = .systemBlue
+        generateAReqParamsButton.configuration = generateAReqParamsButtonConfig
+        generateAReqParamsButton.layer.cornerRadius = 10
+        
+        
+        doChallengeButton.setTitle("Do Challenge", for: .normal)
+        doChallengeButton.setTitleColor(.white, for: .normal)
+        doChallengeButton.addTarget(self, action: #selector(doChallenge), for: .touchUpInside)
+        doChallengeButtonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        doChallengeButtonConfig.baseBackgroundColor = .systemBlue
+        doChallengeButton.configuration = doChallengeButtonConfig
+        doChallengeButton.layer.cornerRadius = 10
         
         statusLabel.textAlignment = .center
         statusLabel.numberOfLines = 15
