@@ -34,6 +34,7 @@ class HyperViewModel: ObservableObject {
     let backendUrl = URL(string: "http://localhost:5252")!
     
     @Published var paymentSession: PaymentSession?
+    @Published var authSession: AuthenticationSession?
     @Published var status: APIStatus = .loading
     internal var netceteraApiKey: String?
     private var transaction: Transaction?
@@ -192,8 +193,8 @@ class HyperViewModel: ObservableObject {
                 
                 DispatchQueue.main.async {
                     self.status = .success
-                    self.paymentSession = PaymentSession(publishableKey: publishableKey)
-                    self.paymentSession?.initAuthenticationSession(authIntentClientSecret: paymentIntentClientSecret, configuration: AuthenticationConfiguration(apiKey: self.netceteraApiKey))
+                    self.authSession = AuthenticationSession(publishableKey: publishableKey)
+                    self.authSession?.initAuthenticationSession(authIntentClientSecret: paymentIntentClientSecret, configuration: AuthenticationConfiguration(apiKey: self.netceteraApiKey))
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -253,7 +254,7 @@ class HyperViewModel: ObservableObject {
     }
     
     func createTransaction() {
-        self.transaction = self.paymentSession?.createTransaction(messageVersion: "2.3.1", directoryServerId: "A000000004", cardNetwork: "MASTERCARD")
+        self.transaction = self.authSession?.createTransaction(messageVersion: "2.3.1", directoryServerId: "A000000004", cardNetwork: "MASTERCARD")
         
         self.createAuthSession()
     }

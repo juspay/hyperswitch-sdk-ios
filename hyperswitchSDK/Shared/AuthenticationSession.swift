@@ -16,12 +16,27 @@ public struct AuthenticationConfiguration {
 }
 
 public class AuthenticationSession {
-    internal var authIntentClientSecret: String
-    internal var authConfiguration: AuthenticationConfiguration?
+    internal static var authIntentClientSecret: String?
+    internal static var authConfiguration: AuthenticationConfiguration?
     
-    internal init(authIntentClientSecret: String, authConfiguration: AuthenticationConfiguration? = nil) {
-        self.authIntentClientSecret = authIntentClientSecret
-        self.authConfiguration = authConfiguration
+    public init(publishableKey: String, customBackendUrl: String? = nil, customParams: [String : Any]? = nil, customLogUrl: String? = nil) {
+        APIClient.shared.publishableKey = publishableKey
+        APIClient.shared.customBackendUrl = customBackendUrl
+        APIClient.shared.customLogUrl = customLogUrl
+        APIClient.shared.customParams = customParams
+        
+#if canImport(HyperOTA)
+        OTAServices.shared.initialize(publishableKey: publishableKey)
+        LogManager.initialize(publishableKey: publishableKey)
+#endif
+    }
+    
+    public func initAuthenticationSession(authIntentClientSecret: String, configuration: AuthenticationConfiguration? = nil) {
+        RNHeadlessManager.sharedInstance.reinvalidateBridge()
+        let _ = RNHeadlessManager.sharedInstance.viewForModule("dummy", initialProperties: [:])
+        
+        AuthenticationSession.authIntentClientSecret = authIntentClientSecret
+        AuthenticationSession.authConfiguration = configuration
     }
     
     public func createTransaction(messageVersion: String, directoryServerId: String?, cardNetwork: String?) -> Transaction{

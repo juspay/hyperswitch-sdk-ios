@@ -114,14 +114,14 @@ internal class HyperHeadless: RCTEventEmitter {
     @objc
     private func initialiseAuthSession (_ rnCallback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
-            let apiKey = PaymentSession.authSession?.authConfiguration?.apiKey
+            let threeDsSdkApiKey = AuthenticationSession.authConfiguration?.apiKey
             let props: [String: Any] = [
                 "isAuthSession": true as Any,
-                "clientSecret": PaymentSession.authSession?.authIntentClientSecret as Any,
+                "clientSecret": AuthenticationSession.authIntentClientSecret as Any,
                 "publishableKey": APIClient.shared.publishableKey as Any,
                 "hyperParams": HyperParams.getHyperParams() as Any,
                 "configuration": [
-                    "netceteraSDKApiKey": apiKey as Any,
+                    "netceteraSDKApiKey": threeDsSdkApiKey as Any,
                 ] as Any
             ]
             rnCallback([props])
