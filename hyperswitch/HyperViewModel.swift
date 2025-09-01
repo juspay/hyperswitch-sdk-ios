@@ -8,7 +8,7 @@
 import SwiftUI
 
 class AuthChallengeStatusReceiver: ChallengeStatusReceiver {
-    func completed() {
+    func completed(_ completionEvent: CompletionEvent) {
         print("-- Challenge completed successfully")
     }
     
@@ -20,11 +20,11 @@ class AuthChallengeStatusReceiver: ChallengeStatusReceiver {
         print("-- Challenge timed out")
     }
     
-    func protocolError() {
+    func protocolError(_ protocolErrorEvent: ProtocolErrorEvent) {
         print("-- Challenge protocol error occurred")
     }
     
-    func runtimeError() {
+    func runtimeError(_ runtimeErrorEvent: RuntimeErrorEvent) {
         print("-- Challenge runtime error occurred")
     }
 }
@@ -194,7 +194,15 @@ class HyperViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     self.status = .success
                     self.authSession = AuthenticationSession(publishableKey: publishableKey)
-                    self.authSession?.initAuthenticationSession(authIntentClientSecret: paymentIntentClientSecret, configuration: AuthenticationConfiguration(apiKey: self.netceteraApiKey))
+                    self.authSession?.initThreeDsSession(authIntentClientSecret: paymentIntentClientSecret, configuration: AuthenticationConfiguration(apiKey: self.netceteraApiKey)) {
+                        status in
+                        switch status {
+                            case .success:
+                            print("-- Authentication successful")
+                        case .failure(let error):
+                            print("-- Authentication failed: \(error)")
+                        }
+                    }
                 }
             } catch {
                 DispatchQueue.main.async {

@@ -7,17 +7,13 @@
 
 import Foundation
 
-public struct AuthenticationConfiguration {
-    public let apiKey: String?
-    
-    public init(apiKey: String? = nil) {
-        self.apiKey = apiKey
-    }
-}
-
 public class AuthenticationSession {
     internal static var authIntentClientSecret: String?
     internal static var authConfiguration: AuthenticationConfiguration?
+    
+    internal static var initialiseSdkCompletion: ((AuthenticationStatus) -> Void)?
+    internal static var authParametersCompletion: ((AuthenticationRequestParameters) -> Void)?
+    internal static var challengeStatusReceiver: ChallengeStatusReceiver?
     
     public init(publishableKey: String, customBackendUrl: String? = nil, customParams: [String : Any]? = nil, customLogUrl: String? = nil) {
         APIClient.shared.publishableKey = publishableKey
@@ -29,11 +25,13 @@ public class AuthenticationSession {
         OTAServices.shared.initialize(publishableKey: publishableKey)
         LogManager.initialize(publishableKey: publishableKey)
 #endif
-    }
-    
-    public func initAuthenticationSession(authIntentClientSecret: String, configuration: AuthenticationConfiguration? = nil) {
+        
         RNHeadlessManager.sharedInstance.reinvalidateBridge()
         let _ = RNHeadlessManager.sharedInstance.viewForModule("dummy", initialProperties: [:])
+    }
+    
+    public func initThreeDsSession(authIntentClientSecret: String, configuration: AuthenticationConfiguration? = nil, completion: @escaping ((AuthenticationStatus) -> Void)) {
+        AuthenticationSession.initialiseSdkCompletion = completion
         
         AuthenticationSession.authIntentClientSecret = authIntentClientSecret
         AuthenticationSession.authConfiguration = configuration
@@ -42,6 +40,19 @@ public class AuthenticationSession {
     public func createTransaction(messageVersion: String, directoryServerId: String?, cardNetwork: String?) -> Transaction{
         return Transaction(messageVersion: messageVersion, directoryServerId: directoryServerId, cardNetwork: cardNetwork)
     }
+}
+
+public struct AuthenticationConfiguration {
+    public let apiKey: String?
+    
+    public init(apiKey: String? = nil) {
+        self.apiKey = apiKey
+    }
+}
+
+public enum AuthenticationStatus {
+    case success
+    case failure([String: Any])
 }
 
 public class AuthenticationRequestParameters {
@@ -80,92 +91,5 @@ public class AuthenticationRequestParameters {
             sdkReferenceNumber: sdkReferenceNumber,
             messageVersion: messageVersion
         )
-    }
-}
-
-
-public class ChallengeParameters {
-    public var threeDSServerTransactionID: String
-    public var acsTransactionID: String
-    public var acsRefNumber: String
-    public var acsSignedContent: String
-    public var threeDSRequestorAppURL: String?
-    
-    init(threeDSServerTransactionID: String, acsTransactionID: String, acsRefNumber: String, acsSignedContent: String, threeDSRequestorAppURL: String? = nil) {
-        self.threeDSServerTransactionID = threeDSServerTransactionID
-        self.acsTransactionID = acsTransactionID
-        self.acsRefNumber = acsRefNumber
-        self.acsSignedContent = acsSignedContent
-        self.threeDSRequestorAppURL = threeDSRequestorAppURL
-    }
-}
-
-
-public protocol ChallengeStatusReceiver {
-    // TODO: add (_ completionEvent: CompletionEvent)
-    func completed()
-    
-    func cancelled()
-    
-    func timedout()
-    // TODO: add (_ protocolErrorEvent: ProtocolErrorEvent)
-    func protocolError()
-    
-    // TODO: add (_ runtimeErrorEvent: RuntimeErrorEvent)
-    func runtimeError()
-}
-
-
-public class Transaction {
-    private var messageVersion: String
-    private var directoryServerId: String?
-    private var cardNetwork: String?
-    private weak var authSession: AuthenticationSession?
-    
-    public init(messageVersion: String, directoryServerId: String? = nil, cardNetwork: String? = nil) {
-        self.messageVersion = messageVersion
-        self.directoryServerId = directoryServerId
-        self.cardNetwork = cardNetwork
-    }
-    
-    internal init(messageVersion: String, directoryServerId: String? = nil, authSession: AuthenticationSession) {
-        self.messageVersion = messageVersion
-        self.directoryServerId = directoryServerId
-        self.authSession = authSession
-    }
-    
-    public func getAuthenticationRequestParameters(completion: @escaping (AuthenticationRequestParameters) -> Void) {
-        let props: [String: Any] = [
-            "messageVersion": self.messageVersion,
-            "directoryServerId": self.directoryServerId as Any,
-            "cardNetwork": self.cardNetwork as Any
-        ]
-        
-        // Store the completion callback in HyperHeadless for automatic invocation when aReqParams are available
-        HyperHeadless.shared?.authParametersCompletion = completion
-        
-        // Trigger the native parameter generation
-        HyperHeadless.shared?.generateAReqParamsCallback?([props])
-    }
-    
-    public func doChallenge(
-        challengeParameters: ChallengeParameters,
-        challengeStatusReceiver: ChallengeStatusReceiver,
-        timeOut: Int
-    ) {
-        let props: [String: Any] = [
-            "acsSignedContent": challengeParameters.acsSignedContent,
-            "acsTransactionId": challengeParameters.acsTransactionID,
-            "acsRefNumber": challengeParameters.acsRefNumber,
-            "threeDSServerTransId": challengeParameters.threeDSServerTransactionID,
-            "threeDSRequestorAppURL": challengeParameters.threeDSRequestorAppURL
-        ]
-        
-        HyperHeadless.doChallengeCompletion = {
-            response in
-            print("-- doChallengeResponse: ", response)
-        }
-        
-        HyperHeadless.shared?.receiveChallengeParamsCallback?([props])
     }
 }
