@@ -54,7 +54,6 @@
 #import "SentryTraceHeader.h"
 #import "SentryTransactionContext.h"
 #import "SentryUser.h"
-#import "SentryUserFeedback.h"
 #import "SentryWithoutUIKit.h"
 #import "PrivateSentrySDKOnly.h"
 #import "PrivatesHeader.h"

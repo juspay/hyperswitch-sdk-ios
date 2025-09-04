@@ -1,6 +1,7 @@
 // swift-interface-format-version: 1.0
-// swift-compiler-version: Apple Swift version 5.10 (swiftlang-5.10.0.13 clang-1500.3.9.4)
-// swift-module-flags: -target arm64-apple-ios15.1-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name Sentry
+// swift-compiler-version: Apple Swift version 6.1.2 effective-5.10 (swiftlang-6.1.2.1.2 clang-1700.0.13.5)
+// swift-module-flags: -target arm64-apple-ios15.1-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -module-name Sentry
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -interface-compiler-version 6.1.2
 import AVFoundation
 import CoreGraphics
 import CoreMedia
@@ -41,8 +42,10 @@ extension Sentry.Breadcrumb : Swift.Decodable {
 extension Sentry.DebugMeta : Swift.Decodable {
   required convenience public init(from decoder: any Swift.Decoder) throws
 }
-extension Sentry.SentryEventDecodable : Swift.Decodable {
+@objc(SentryEventDecodable) open class SentryEventDecodable : Sentry.Event, Swift.Decodable {
   required convenience public init(from decoder: any Swift.Decoder) throws
+  @objc required dynamic public init()
+  @objc deinit
 }
 @objc @_inheritsConvenienceInitializers @objcMembers public class SentryEventDecoder : ObjectiveC.NSObject {
   @objc override dynamic public init()
@@ -54,8 +57,14 @@ extension Sentry.Exception : Swift.Decodable {
 @objc @_inheritsConvenienceInitializers @objcMembers public class SentryExperimentalOptions : ObjectiveC.NSObject {
   @objc public var enableDataSwizzling: Swift.Bool
   @objc public var enableFileManagerSwizzling: Swift.Bool
+  @objc public var enableUnhandledCPPExceptionsV2: Swift.Bool
   @objc override dynamic public init()
   @objc deinit
+}
+@objc extension Sentry.Options {
+  @objc dynamic open var experimental: Sentry.SentryExperimentalOptions {
+    @objc get
+  }
 }
 @objc @objcMembers public class SentryFeedback : ObjectiveC.NSObject {
   @objc public enum SentryFeedbackSource : Swift.Int {
@@ -151,6 +160,23 @@ extension Sentry.SentryNSError : Swift.Decodable {
   @objc var maskedViewClasses: [Swift.AnyClass] { get }
   @objc var unmaskedViewClasses: [Swift.AnyClass] { get }
 }
+public enum SentryRedactRegionType : Swift.String, Swift.Codable {
+  case redact
+  case clipOut
+  case clipBegin
+  case clipEnd
+  case redactSwiftUI
+  public init?(rawValue: Swift.String)
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objcMembers public class SentryRedactViewHelper : ObjectiveC.NSObject {
+  @objc public static func clipOutView(_ view: UIKit.UIView)
+  @objc public static func maskSwiftUI(_ view: UIKit.UIView)
+  @objc deinit
+}
 @objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objcMembers public class SentryReplayOptions : ObjectiveC.NSObject, Sentry.SentryRedactOptions {
   @_hasMissingDesignatedInitializers public class DefaultValues {
     public static let sessionSampleRate: Swift.Float
@@ -218,8 +244,20 @@ extension Sentry.SentryThread : Swift.Decodable {
   }
 }
 extension Sentry.User : Swift.Decodable {
-  @available(*, deprecated, message: "This method is only deprecated to silence the deprecation warning of the property segment. Our Xcode project has deprecations as warnings and warnings as errors configured. Therefore, compilation fails without marking this init method as deprecated. It is safe to use this deprecated init method. Instead of turning off deprecation warnings for the whole project, we accept the tradeoff of marking this init method as deprecated because we don't expect many users to use it. Sadly, Swift doesn't offer a better way of silencing a deprecation warning.")
+  @available(*, deprecated)
   required convenience public init(from decoder: any Swift.Decoder) throws
+}
+@available(*, deprecated, message: "Use SentryFeedback.")
+@objc(SentryUserFeedback) open class UserFeedback : ObjectiveC.NSObject, Sentry.SentrySerializable {
+  @objc open var eventId: Sentry.SentryId {
+    get
+  }
+  @objc open var name: Swift.String
+  @objc open var email: Swift.String
+  @objc open var comments: Swift.String
+  @objc public init(eventId: Sentry.SentryId)
+  @objc open func serialize() -> [Swift.String : Any]
+  @objc deinit
 }
 @objc @_inheritsConvenienceInitializers @available(iOS 13.0, *)
 @objcMembers public class SentryUserFeedbackConfiguration : ObjectiveC.NSObject {
@@ -338,14 +376,9 @@ extension Sentry.User : Swift.Decodable {
 @objc public protocol SentryUIViewControllerDescriptor : ObjectiveC.NSObjectProtocol {
   @objc var sentryName: Swift.String { get }
 }
-@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objcMembers public class SentryRedactViewHelper : ObjectiveC.NSObject {
-  @objc public static func clipOutView(_ view: UIKit.UIView)
-  @objc public static func maskSwiftUI(_ view: UIKit.UIView)
-  @objc deinit
-}
 extension UIKit.UIView {
-  @_Concurrency.MainActor(unsafe) public func sentryReplayMask()
-  @_Concurrency.MainActor(unsafe) public func sentryReplayUnmask()
+  @_Concurrency.MainActor @preconcurrency public func sentryReplayMask()
+  @_Concurrency.MainActor @preconcurrency public func sentryReplayUnmask()
 }
 extension Sentry.SentryFeedback.SentryFeedbackSource : Swift.Equatable {}
 extension Sentry.SentryFeedback.SentryFeedbackSource : Swift.Hashable {}
@@ -356,6 +389,9 @@ extension Sentry.SentryLevel : Swift.RawRepresentable {}
 extension Sentry.SentryProfileOptions.SentryProfileLifecycle : Swift.Equatable {}
 extension Sentry.SentryProfileOptions.SentryProfileLifecycle : Swift.Hashable {}
 extension Sentry.SentryProfileOptions.SentryProfileLifecycle : Swift.RawRepresentable {}
+extension Sentry.SentryRedactRegionType : Swift.Equatable {}
+extension Sentry.SentryRedactRegionType : Swift.Hashable {}
+extension Sentry.SentryRedactRegionType : Swift.RawRepresentable {}
 extension Sentry.SentryReplayOptions.SentryReplayQuality : Swift.Equatable {}
 extension Sentry.SentryReplayOptions.SentryReplayQuality : Swift.Hashable {}
 extension Sentry.SentryReplayOptions.SentryReplayQuality : Swift.RawRepresentable {}

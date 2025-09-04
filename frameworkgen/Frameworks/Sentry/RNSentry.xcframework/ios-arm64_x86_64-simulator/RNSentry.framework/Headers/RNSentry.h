@@ -9,12 +9,18 @@
 
 #import <Sentry/Sentry.h>
 #import <Sentry/SentryDebugImageProvider.h>
-#import <Sentry/SentryOptions.h>
 
 typedef int (*SymbolicateCallbackType)(const void *, Dl_info *);
 
+@class SentryOptions;
+@class SentryEvent;
+
+#if CROSS_PLATFORM_TEST
+@interface SentrySDKInternal : NSObject
+#else
 @interface
 SentrySDK (Private)
+#endif
 @property (nonatomic, nullable, readonly, class) SentryOptions *options;
 @end
 
@@ -24,6 +30,11 @@ SentrySDK (Private)
                                                   error:(NSError *_Nullable *_Nonnull)errorPointer;
 
 - (void)setEventOriginTag:(SentryEvent *)event;
+
+@end
+
+@interface
+RNSentry (fetchNativeStack)
 
 - (NSDictionary *_Nonnull)fetchNativeStackFramesBy:(NSArray<NSNumber *> *)instructionsAddr
                                        symbolicate:(SymbolicateCallbackType)symbolicate;
