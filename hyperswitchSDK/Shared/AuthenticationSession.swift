@@ -37,17 +37,26 @@ public class AuthenticationSession {
         AuthenticationSession.authConfiguration = configuration
     }
     
-    public func createTransaction(messageVersion: String, directoryServerId: String?, cardNetwork: String?) -> Transaction{
+    public func createTransaction(messageVersion: String, directoryServerId: String?, cardNetwork: String?) -> Transaction {
         return Transaction(messageVersion: messageVersion, directoryServerId: directoryServerId, cardNetwork: cardNetwork)
     }
 }
 
 public struct AuthenticationConfiguration {
     public let apiKey: String?
+    public let environment: ThreeDSEnvironment?
+    public let uiCustomization: AuthenticationSession.UICustomization?
     
     public init(apiKey: String? = nil) {
         self.apiKey = apiKey
+        self.environment = ThreeDSEnvironment.sandbox
+        self.uiCustomization = nil
     }
+}
+
+public enum ThreeDSEnvironment {
+    case sandbox
+    case production
 }
 
 public enum AuthenticationStatus {

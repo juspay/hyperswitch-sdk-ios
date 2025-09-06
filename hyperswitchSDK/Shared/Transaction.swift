@@ -13,16 +13,10 @@ public class Transaction {
     private var cardNetwork: String?
     private weak var authSession: AuthenticationSession?
     
-    public init(messageVersion: String, directoryServerId: String? = nil, cardNetwork: String? = nil) {
+    init(messageVersion: String, directoryServerId: String? = nil, cardNetwork: String? = nil) {
         self.messageVersion = messageVersion
         self.directoryServerId = directoryServerId
         self.cardNetwork = cardNetwork
-    }
-    
-    internal init(messageVersion: String, directoryServerId: String? = nil, authSession: AuthenticationSession) {
-        self.messageVersion = messageVersion
-        self.directoryServerId = directoryServerId
-        self.authSession = authSession
     }
     
     public func getAuthenticationRequestParameters(completion: @escaping (AuthenticationRequestParameters) -> Void) {
@@ -44,9 +38,9 @@ public class Transaction {
     ) {
         let props: [String: Any] = [
             "acsSignedContent": challengeParameters.acsSignedContent,
-            "acsTransactionId": challengeParameters.acsTransactionID,
+            "acsTransactionId": challengeParameters.acsTransactionId,
             "acsRefNumber": challengeParameters.acsRefNumber,
-            "threeDSServerTransId": challengeParameters.threeDSServerTransactionID,
+            "threeDSServerTransId": challengeParameters.threeDSServerTransactionId,
             "threeDSRequestorAppURL": challengeParameters.threeDSRequestorAppURL
         ]
         
@@ -57,15 +51,15 @@ public class Transaction {
 }
 
 public class ChallengeParameters {
-    public var threeDSServerTransactionID: String
-    public var acsTransactionID: String
+    public var threeDSServerTransactionId: String
+    public var acsTransactionId: String
     public var acsRefNumber: String
     public var acsSignedContent: String
     public var threeDSRequestorAppURL: String?
     
-    init(threeDSServerTransactionID: String, acsTransactionID: String, acsRefNumber: String, acsSignedContent: String, threeDSRequestorAppURL: String? = nil) {
-        self.threeDSServerTransactionID = threeDSServerTransactionID
-        self.acsTransactionID = acsTransactionID
+    init(threeDSServerTransactionId: String, acsTransactionId: String, acsRefNumber: String, acsSignedContent: String, threeDSRequestorAppURL: String? = nil) {
+        self.threeDSServerTransactionId = threeDSServerTransactionId
+        self.acsTransactionId = acsTransactionId
         self.acsRefNumber = acsRefNumber
         self.acsSignedContent = acsSignedContent
         self.threeDSRequestorAppURL = threeDSRequestorAppURL

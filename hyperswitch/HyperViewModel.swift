@@ -314,13 +314,13 @@ class HyperViewModel: ObservableObject {
                 
                 print("-- challenge params json: ", json)
                 
-                if let threeDSServerTransactionID = json["three_ds_server_transaction_id"] as? String,
-                   let acsTransactionID = json["acs_trans_id"] as? String,
+                if let threeDSServerTransactionId = json["three_ds_server_transaction_id"] as? String,
+                   let acsTransactionId = json["acs_trans_id"] as? String,
                    let acsRefNumber = json["acs_reference_number"] as? String,
                    let acsSignedContent = json["acs_signed_content"] as? String,
                    let threeDSRequestorAppURL = json["three_ds_requestor_url"] as? String?
                 {
-                    self.challengeParams = ChallengeParameters(threeDSServerTransactionID: threeDSServerTransactionID, acsTransactionID: acsTransactionID, acsRefNumber: acsRefNumber, acsSignedContent: acsSignedContent, threeDSRequestorAppURL: threeDSRequestorAppURL)
+                    self.challengeParams = ChallengeParameters(threeDSServerTransactionId: threeDSServerTransactionId, acsTransactionId: acsTransactionId, acsRefNumber: acsRefNumber, acsSignedContent: acsSignedContent, threeDSRequestorAppURL: threeDSRequestorAppURL)
                 }
             } catch {
                 print("Failed to fetch challenge params: \(error)")

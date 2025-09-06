@@ -33,6 +33,8 @@
 		4E80BB412E5340C90019E916 /* AuthenticationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E80BB402E5340C90019E916 /* AuthenticationSession.swift */; };
 		4E80BB422E5340C90019E916 /* AuthenticationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E80BB402E5340C90019E916 /* AuthenticationSession.swift */; };
 		4E87FA612CAAE8E300E74113 /* PaymentManagementConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E87FA602CAAE8E300E74113 /* PaymentManagementConfiguration.swift */; };
+		4E8A04D22E6C6162008C65B1 /* AuthenticationConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8A04D12E6C6162008C65B1 /* AuthenticationConfiguration.swift */; };
+		4E8A04D32E6C6162008C65B1 /* AuthenticationConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8A04D12E6C6162008C65B1 /* AuthenticationConfiguration.swift */; };
 		4E971A722CC2764F0040EFEB /* PaymentMethodManagementWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E971A712CC2764F0040EFEB /* PaymentMethodManagementWidget.swift */; };
 		4EB449672E657B1200C7DDD3 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB449662E657B1200C7DDD3 /* Transaction.swift */; };
 		4EB449682E657B1200C7DDD3 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB449662E657B1200C7DDD3 /* Transaction.swift */; };
@@ -158,6 +160,7 @@
 		4E69679A2CB7CF71000DBE0A /* PMMViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PMMViewController.swift; sourceTree = "<group>"; };
 		4E80BB402E5340C90019E916 /* AuthenticationSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationSession.swift; sourceTree = "<group>"; };
 		4E87FA602CAAE8E300E74113 /* PaymentManagementConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentManagementConfiguration.swift; sourceTree = "<group>"; };
+		4E8A04D12E6C6162008C65B1 /* AuthenticationConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationConfiguration.swift; sourceTree = "<group>"; };
 		4E971A712CC2764F0040EFEB /* PaymentMethodManagementWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodManagementWidget.swift; sourceTree = "<group>"; };
 		4EB449662E657B1200C7DDD3 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		4EEA67022D37B487000D4DC5 /* HyperParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperParams.swift; sourceTree = "<group>"; };
@@ -449,6 +452,7 @@
 				79D474B32CC6FDBF0022C47E /* Helper.swift */,
 				75AA28E82D47805800CD88A6 /* Environment.swift */,
 				79052A262C89237A0011804E /* Extensions.swift */,
+				4E8A04D12E6C6162008C65B1 /* AuthenticationConfiguration.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -838,6 +842,7 @@
 				792D6A062B99C204001598CD /* HyperHeadless.m in Sources */,
 				66486F92294355BD00150E4F /* hyperApp.swift in Sources */,
 				793083EB2A0DA9E300E78310 /* PaymentHandler.swift in Sources */,
+				4E8A04D32E6C6162008C65B1 /* AuthenticationConfiguration.swift in Sources */,
 				43F6051E2B45FA3300BAA90E /* PaymentSheetAppearance.swift in Sources */,
 				DC5D0116294731480017C67A /* PaymentSheetConfiguration.swift in Sources */,
 			);
@@ -863,6 +868,7 @@
 				79D474B52CC6FDC30022C47E /* Helper.swift in Sources */,
 				79EAB0292C81CDCE006B40AD /* HyperViewModel.swift in Sources */,
 				79EAB02C2C81CDEC006B40AD /* PaymentSheetAppearance.swift in Sources */,
+				4E8A04D22E6C6162008C65B1 /* AuthenticationConfiguration.swift in Sources */,
 				79232DBF2CA571A900E044E0 /* Extensions.swift in Sources */,
 				4EB449672E657B1200C7DDD3 /* Transaction.swift in Sources */,
 				7932B80F2CB4182100A40E1A /* HyperUIViewController.swift in Sources */,
