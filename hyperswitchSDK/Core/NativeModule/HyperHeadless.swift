@@ -13,17 +13,15 @@ import WebKit
 @objc(HyperHeadless)
 internal class HyperHeadless: RCTEventEmitter {
     
-    internal static var shared:HyperHeadless?
+    internal static var shared: HyperHeadless?
     
     private var setNativeProps: RCTResponseSenderBlock?
     private var confirmWithDefault: RCTResponseSenderBlock?
     private var defaultPMData: ((NSDictionary?) -> Void)?
     
-    // Completion handler for doChallenge response
-    internal static var doChallengeCompletion: (([String : Any]) -> Void)?
-    
-    // Storage for authentication parameter completion callback
-    internal var authParametersCompletion: ((AuthenticationRequestParameters) -> Void)?
+    internal var generateAReqParamsCallback: RCTResponseSenderBlock?
+    internal var aReqParams: NSDictionary?
+    internal var receiveChallengeParamsCallback: RCTResponseSenderBlock?
     
     internal override init() {
         super.init()
@@ -48,48 +46,143 @@ internal class HyperHeadless: RCTEventEmitter {
     @objc
     private func sendMessageToNative(_ rnMessage: String) {
         DispatchQueue.main.async {
-            // Parse the JSON response from ReScript side
             if let data = rnMessage.data(using: .utf8) {
                 do {
                     if let responseDict = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                        if let doChallengeResult = responseDict["doChallengeResult"] as? [String: Any] {
-                            HyperHeadless.doChallengeCompletion?(doChallengeResult)
-                        } else if let errorResponse = responseDict["error"] as? [String: Any] {
-                            print("-- errorResponse: ", errorResponse)
-                        }
+                        self.handleParsedResponse(responseDict)
                     }
                 } catch let error as Any {
-                    HyperHeadless.doChallengeCompletion?(["status": "error", "message": error])
+                    self.handleParsingError(error)
                 }
             } else {
-                let error = NSError(domain: "HyperHeadless", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse message"])
-                HyperHeadless.doChallengeCompletion?(["status": "error", "message": error])
+                let error = NSError(domain: "HyperHeadless", code: -1, userInfo: [NSLocalizedDescriptionKey: "Internal Error: Failed to parse response"])
+                self.handleParsingError(error)
             }
         }
     }
     
-    // MARK: - Authentication Parameters Completion Handling
+    private func handleParsedResponse(_ responseDict: [String: Any]) {
+        if let method = responseDict["method"] as? String {
+            self.handleMethodBasedResponse(method: method, responseDict: responseDict)
+        } else {
+            // Method of unsupported format
+        }
+    }
+    
+    private func handleMethodBasedResponse(method: String, responseDict: [String: Any]) {
+        let status = responseDict["status"] as? Bool ?? false
+        
+        switch method {
+        case "initialiseSdkFunc":
+            self.handleInitialiseSdk(responseDict: responseDict, status: status)
+        
+        case "generateChallenge":
+            self.handleGenerateChallenge(responseDict: responseDict, status: status)
+            
+        default:
+            print("-- HyperHeadless: Unknown method '\(method)'")
+        }
+    }
+        
+    private func handleInitialiseSdk(responseDict: [String: Any], status: Bool) {
+        if status {
+            AuthenticationSession.initialiseSdkCompletion?(AuthenticationStatus.success)
+        } else {
+            if let error = responseDict["error"] as? [String: Any] {
+                AuthenticationSession.initialiseSdkCompletion?(AuthenticationStatus.failure(error))
+            } else {
+                // Method of unsupported format
+            }
+        }
+    }
+
+    private func handleGenerateChallenge(responseDict: [String: Any], status: Bool) {
+        if let challengeReceiver = AuthenticationSession.challengeStatusReceiver {
+            if status {
+                if let data = responseDict["data"] as? [String: Any],
+                   let doChallengeResult = data["doChallengeResult"] as? [String: Any],
+                   let resultStatus = doChallengeResult["status"] as? String,
+                   let message = doChallengeResult["message"] as? String {
+                    self.parseAndCallReceiver(challengeReceiver, status: resultStatus, message: message)
+                } else {
+                    self.parseAndCallReceiver(challengeReceiver, status: "error", message: "Missing challenge result data")
+                }
+            } else {
+                if let error = responseDict["error"] as? [String: Any],
+                   let errorStatus = error["status"] as? String,
+                   let errorMessage = error["message"] as? String {
+                    
+                    self.parseAndCallReceiver(challengeReceiver, status: errorStatus, message: errorMessage)
+                } else {
+                    self.parseAndCallReceiver(challengeReceiver, status: "error", message: "Unknown challenge generation error")
+                }
+            }
+            
+            AuthenticationSession.challengeStatusReceiver = nil
+        }
+    }
+    
+    private func parseAndCallReceiver(_ receiver: ChallengeStatusReceiver, status: String, message: String) {
+        switch status {
+        case "success":
+            let completionEvent = CompletionEvent()
+            receiver.completed(completionEvent)
+        case "error":
+            if message == "challenge cancelled by user" {
+                receiver.cancelled()
+            } else if message == "challenge timeout" {
+                receiver.timedout()
+            } else if message.contains("Protocol error") {
+                let protocolError = ProtocolErrorEvent(errorMessage: message)
+                receiver.protocolError(protocolError)
+            } else if message.contains("Runtime error") {
+                let errorCode = self.extractErrorCode(from: message)
+                let runtimeError = RuntimeErrorEvent(errorMessage: message, errorCode: errorCode)
+                receiver.runtimeError(runtimeError)
+            } else {
+                let runtimeError = RuntimeErrorEvent(errorMessage: message, errorCode: nil)
+                receiver.runtimeError(runtimeError)
+            }
+        default:
+            let runtimeError = RuntimeErrorEvent(errorMessage: "Unknown status: \(status) - \(message)", errorCode: nil)
+            receiver.runtimeError(runtimeError)
+        }
+    }
+    
+    // TODO: sync the RN layer to emit challenge completion result in same format
+    private func extractErrorCode(from message: String) -> String? {
+        // Extract error code from runtime error message
+        // Expected format: "Runtime error: <message>\nError code: <code>\n"
+        let components = message.components(separatedBy: "\n")
+        for component in components {
+            if component.hasPrefix("Error code: ") {
+                return String(component.dropFirst("Error code: ".count))
+            }
+        }
+        return nil
+    }
+    
+    private func handleParsingError(_ error: Any) {
+        let errorResult = ["status": "error", "message": error]
+        AuthenticationSession.initialiseSdkCompletion?(AuthenticationStatus.failure(errorResult))
+    }
     
     /// Trigger the stored authentication parameter completion callback
     private func triggerAuthParametersCompletion() {
         guard let aReqParams = self.aReqParams,
-              let completion = self.authParametersCompletion else {
+              let completion = AuthenticationSession.authParametersCompletion else {
             return
         }
         
-        // Try to create AuthenticationRequestParameters from the stored aReqParams
         if let authParams = AuthenticationRequestParameters(from: aReqParams) {
-            // Success - trigger the completion with the parameters on main queue
             DispatchQueue.main.async {
                 completion(authParams)
             }
         } else {
             // Log error for debugging purposes
-            print("HyperHeadless: Failed to parse aReqParams into AuthenticationRequestParameters")
         }
         
-        // Always clear the completion after attempting to call it to prevent memory leaks
-        self.authParametersCompletion = nil
+        AuthenticationSession.authParametersCompletion = nil
     }
     
     @objc
@@ -114,29 +207,24 @@ internal class HyperHeadless: RCTEventEmitter {
     @objc
     private func initialiseAuthSession (_ rnCallback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
-            let apiKey = PaymentSession.authSession?.authConfiguration?.apiKey
+            let threeDsSdkApiKey = AuthenticationSession.authConfiguration?.apiKey
             let props: [String: Any] = [
                 "isAuthSession": true as Any,
-                "clientSecret": PaymentSession.authSession?.authIntentClientSecret as Any,
+                "clientSecret": AuthenticationSession.authIntentClientSecret as Any,
                 "publishableKey": APIClient.shared.publishableKey as Any,
                 "hyperParams": HyperParams.getHyperParams() as Any,
                 "configuration": [
-                    "netceteraSDKApiKey": apiKey as Any,
+                    "netceteraSDKApiKey": threeDsSdkApiKey as Any,
                 ] as Any
             ]
             rnCallback([props])
         }
     }
 
-    internal var generateAReqParamsCallback: RCTResponseSenderBlock?
-
     @objc
-    private func getMessageVersion(_ rnCallback: @escaping RCTResponseSenderBlock) {
+    private func getAuthRequestParams(_ rnCallback: @escaping RCTResponseSenderBlock) {
         self.generateAReqParamsCallback = rnCallback
     }
-
-    internal var aReqParams: NSDictionary?
-    internal var receiveChallengeParamsCallback: RCTResponseSenderBlock?
 
     @objc
     private func sendAReqAndReceiveChallengeParams(_ rnMessage: NSDictionary, _ rnCallback: @escaping RCTResponseSenderBlock) {

@@ -29,12 +29,15 @@
 		43E6687A2C084FB70094BD13 /* montserrat_blackitalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668672C084FB70094BD13 /* montserrat_blackitalic.ttf */; };
 		43F6051E2B45FA3300BAA90E /* PaymentSheetAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43F6051D2B45FA3300BAA90E /* PaymentSheetAppearance.swift */; };
 		4E0A93DE2CA2F29500E3A767 /* HyperUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A93DC2CA2F29500E3A767 /* HyperUIViewController.swift */; };
-		4E381A282E51B6AE0057B2A0 /* nca_demo_root.crt in Resources */ = {isa = PBXBuildFile; fileRef = 4E381A272E51B6AE0057B2A0 /* nca_demo_root.crt */; };
 		4E69679B2CB7CF71000DBE0A /* PMMViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E69679A2CB7CF71000DBE0A /* PMMViewController.swift */; };
 		4E80BB412E5340C90019E916 /* AuthenticationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E80BB402E5340C90019E916 /* AuthenticationSession.swift */; };
 		4E80BB422E5340C90019E916 /* AuthenticationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E80BB402E5340C90019E916 /* AuthenticationSession.swift */; };
 		4E87FA612CAAE8E300E74113 /* PaymentManagementConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E87FA602CAAE8E300E74113 /* PaymentManagementConfiguration.swift */; };
+		4E8A04D22E6C6162008C65B1 /* AuthenticationConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8A04D12E6C6162008C65B1 /* AuthenticationConfiguration.swift */; };
+		4E8A04D32E6C6162008C65B1 /* AuthenticationConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8A04D12E6C6162008C65B1 /* AuthenticationConfiguration.swift */; };
 		4E971A722CC2764F0040EFEB /* PaymentMethodManagementWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E971A712CC2764F0040EFEB /* PaymentMethodManagementWidget.swift */; };
+		4EB449672E657B1200C7DDD3 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB449662E657B1200C7DDD3 /* Transaction.swift */; };
+		4EB449682E657B1200C7DDD3 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB449662E657B1200C7DDD3 /* Transaction.swift */; };
 		4EEA67032D37B493000D4DC5 /* HyperParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA67022D37B487000D4DC5 /* HyperParams.swift */; };
 		4EEA67042D37B493000D4DC5 /* HyperParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA67022D37B487000D4DC5 /* HyperParams.swift */; };
 		663F68FC29CCC93C006E91BD /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663F68FB29CCC93C006E91BD /* APIClient.swift */; };
@@ -154,11 +157,12 @@
 		43E668672C084FB70094BD13 /* montserrat_blackitalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_blackitalic.ttf; sourceTree = "<group>"; };
 		43F6051D2B45FA3300BAA90E /* PaymentSheetAppearance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentSheetAppearance.swift; sourceTree = "<group>"; };
 		4E0A93DC2CA2F29500E3A767 /* HyperUIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperUIViewController.swift; sourceTree = "<group>"; };
-		4E381A272E51B6AE0057B2A0 /* nca_demo_root.crt */ = {isa = PBXFileReference; lastKnownFileType = text; path = nca_demo_root.crt; sourceTree = "<group>"; };
 		4E69679A2CB7CF71000DBE0A /* PMMViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PMMViewController.swift; sourceTree = "<group>"; };
 		4E80BB402E5340C90019E916 /* AuthenticationSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationSession.swift; sourceTree = "<group>"; };
 		4E87FA602CAAE8E300E74113 /* PaymentManagementConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentManagementConfiguration.swift; sourceTree = "<group>"; };
+		4E8A04D12E6C6162008C65B1 /* AuthenticationConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationConfiguration.swift; sourceTree = "<group>"; };
 		4E971A712CC2764F0040EFEB /* PaymentMethodManagementWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodManagementWidget.swift; sourceTree = "<group>"; };
+		4EB449662E657B1200C7DDD3 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		4EEA67022D37B487000D4DC5 /* HyperParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperParams.swift; sourceTree = "<group>"; };
 		663F68FB29CCC93C006E91BD /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		66486F8E294355BD00150E4F /* hyperswitch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hyperswitch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -316,7 +320,6 @@
 				66486F8F294355BD00150E4F /* Products */,
 				255968CC569349C97C21931C /* Pods */,
 				5C7ECC79FDCE9EFB3DB59509 /* Frameworks */,
-				4E381A272E51B6AE0057B2A0 /* nca_demo_root.crt */,
 			);
 			sourceTree = "<group>";
 		};
@@ -437,6 +440,7 @@
 				4EEA67022D37B487000D4DC5 /* HyperParams.swift */,
 				66486FA02943580F00150E4F /* SwiftUIManager.swift */,
 				4E80BB402E5340C90019E916 /* AuthenticationSession.swift */,
+				4EB449662E657B1200C7DDD3 /* Transaction.swift */,
 				790BA8262B99DB5E006678FD /* PaymentSession.swift */,
 				DC5D0111294731480017C67A /* PaymentSheet.swift */,
 				DC5D0113294731480017C67A /* PaymentSheetConfiguration.swift */,
@@ -448,6 +452,7 @@
 				79D474B32CC6FDBF0022C47E /* Helper.swift */,
 				75AA28E82D47805800CD88A6 /* Environment.swift */,
 				79052A262C89237A0011804E /* Extensions.swift */,
+				4E8A04D12E6C6162008C65B1 /* AuthenticationConfiguration.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -621,7 +626,6 @@
 				43E668732C084FB70094BD13 /* montserrat_mediumitalic.ttf in Resources */,
 				43E668702C084FB70094BD13 /* montserrat_light.ttf in Resources */,
 				43E668722C084FB70094BD13 /* montserrat_extralightitalic.ttf in Resources */,
-				4E381A282E51B6AE0057B2A0 /* nca_demo_root.crt in Resources */,
 				799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */,
 				7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */,
 				43E668782C084FB70094BD13 /* montserrat_thinitalic.ttf in Resources */,
@@ -682,9 +686,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -719,9 +727,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -736,9 +748,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -818,6 +834,7 @@
 				DCF9779029517BBB00596F78 /* DictionaryConverter.swift in Sources */,
 				792D69F82B95E94C001598CD /* ExpressCheckoutWidget.swift in Sources */,
 				66486FAA2943580F00150E4F /* RNViewManager.swift in Sources */,
+				4EB449682E657B1200C7DDD3 /* Transaction.swift in Sources */,
 				75AA28DE2D477F9D00CD88A6 /* Debouncer.swift in Sources */,
 				752CF93C2DF6D47A0056F58A /* RNHeadlessManager.swift in Sources */,
 				DC4AC9F5296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift in Sources */,
@@ -825,6 +842,7 @@
 				792D6A062B99C204001598CD /* HyperHeadless.m in Sources */,
 				66486F92294355BD00150E4F /* hyperApp.swift in Sources */,
 				793083EB2A0DA9E300E78310 /* PaymentHandler.swift in Sources */,
+				4E8A04D32E6C6162008C65B1 /* AuthenticationConfiguration.swift in Sources */,
 				43F6051E2B45FA3300BAA90E /* PaymentSheetAppearance.swift in Sources */,
 				DC5D0116294731480017C67A /* PaymentSheetConfiguration.swift in Sources */,
 			);
@@ -850,7 +868,9 @@
 				79D474B52CC6FDC30022C47E /* Helper.swift in Sources */,
 				79EAB0292C81CDCE006B40AD /* HyperViewModel.swift in Sources */,
 				79EAB02C2C81CDEC006B40AD /* PaymentSheetAppearance.swift in Sources */,
+				4E8A04D22E6C6162008C65B1 /* AuthenticationConfiguration.swift in Sources */,
 				79232DBF2CA571A900E044E0 /* Extensions.swift in Sources */,
+				4EB449672E657B1200C7DDD3 /* Transaction.swift in Sources */,
 				7932B80F2CB4182100A40E1A /* HyperUIViewController.swift in Sources */,
 				79EAB0412C81D330006B40AD /* PaymentSession.swift in Sources */,
 				79EAB03F2C81D292006B40AD /* PaymentSheetView+Lite.swift in Sources */,
