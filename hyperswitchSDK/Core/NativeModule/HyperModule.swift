@@ -49,7 +49,7 @@ internal class HyperModule: RCTEventEmitter {
         DispatchQueue.main.async {
             let paymentSheet = PaymentSheet(paymentIntentClientSecret: "", configuration: PaymentSheet.Configuration())
             paymentSheet.presentWithParams(
-                from: (UIApplication.shared.delegate?.window??.rootViewController)!,
+                from: (UIApplication.shared.delegate?.window??.rootViewController)!, //TODO: safely check this
                 props: request as! [String : Any],
                 completion: { result2 in
                     switch result2 {

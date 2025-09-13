@@ -5,8 +5,9 @@
 //  Created by Harshit Srivastava on 20/06/24.
 //
 
-import PassKit
 import UIKit
+import PassKit
+import React
 
 @objc(ApplePayViewManager)
 internal class ApplePayViewManager: RCTViewManager {

@@ -20,7 +20,6 @@ Pod::Spec.new do |s|
     core.vendored_frameworks = 'frameworkgen/Frameworks/Core/*.xcframework'
     core.dependency 'hyperswitch-sdk-ios/common'
     core.dependency 'hyperswitch-ios-hermes', '0.79.1'
-    core.dependency 'KlarnaMobileSDK'
     core.dependency 'HyperOTA', '0.0.8'
   end
 
