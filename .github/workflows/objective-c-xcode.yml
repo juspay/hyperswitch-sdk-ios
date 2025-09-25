@@ -23,7 +23,7 @@ jobs:
             const actor = context.actor;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            
+
             try {
               const { data: permission } = await github.rest.repos.getCollaboratorPermissionLevel({
                 owner,
@@ -88,3 +88,4 @@ jobs:
         run: |
           # pod spec lint --allow-warnings
           pod trunk push hyperswitch-sdk-ios.podspec --allow-warnings
+          pod trunk push hyperswitch-sdk-ios-lite.podspec --allow-warnings
