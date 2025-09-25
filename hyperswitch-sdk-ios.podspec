@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.author                    = 'Harshit S'
   s.license                   = { type: 'Apache-2.0', file: 'LICENSE' }
   s.platform                  = :ios
-  s.ios.deployment_target     = '13.4'
+  s.ios.deployment_target     = '15.1'
   s.swift_version             = '5.0'
   s.source                    = { :git => 'https://github.com/juspay/hyperswitch-sdk-ios.git', :tag => "v#{s.version}"}
   s.module_name               = 'Hyperswitch'
@@ -38,16 +38,6 @@ Pod::Spec.new do |s|
     netcetera3ds.source_files = 'frameworkgen/3ds/Source/**/*.{m,swift,h}'
     netcetera3ds.vendored_frameworks = 'frameworkgen/3ds/Frameworks/*.xcframework'
     netcetera3ds.dependency 'hyperswitch-sdk-ios/core'
-  end
-
-  s.subspec 'lite' do |lite|
-    lite.source_files = 'hyperswitchSDK/CoreLite/*.{m,swift,h}'
-    lite.dependency 'hyperswitch-sdk-ios/common'
-  end
-
-  s.subspec 'lite+scancard' do |lite_scancard|
-    lite_scancard.vendored_frameworks = 'frameworkgen/scanCard/Frameworks/*.xcframework'
-    lite_scancard.dependency 'hyperswitch-sdk-ios/lite'
   end
 
   s.subspec 'common' do |common|
