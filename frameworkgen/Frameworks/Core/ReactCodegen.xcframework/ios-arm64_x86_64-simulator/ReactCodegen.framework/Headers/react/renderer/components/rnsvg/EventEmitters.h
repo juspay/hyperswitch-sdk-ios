@@ -24,15 +24,33 @@ class RNSVGCircleEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;
 
-  
-  
+  struct OnSvgLayoutLayout {
+      int x;
+    int y;
+    int width;
+    int height;
+    };
+
+  struct OnSvgLayout {
+      OnSvgLayoutLayout layout;
+    };
+  void onSvgLayout(OnSvgLayout value) const;
 };
 class RNSVGClipPathEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;
 
-  
-  
+  struct OnSvgLayoutLayout {
+      int x;
+    int y;
+    int width;
+    int height;
+    };
+
+  struct OnSvgLayout {
+      OnSvgLayoutLayout layout;
+    };
+  void onSvgLayout(OnSvgLayout value) const;
 };
 class RNSVGDefsEventEmitter : public ViewEventEmitter {
  public:
@@ -45,8 +63,17 @@ class RNSVGEllipseEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;
 
-  
-  
+  struct OnSvgLayoutLayout {
+      int x;
+    int y;
+    int width;
+    int height;
+    };
+
+  struct OnSvgLayout {
+      OnSvgLayoutLayout layout;
+    };
+  void onSvgLayout(OnSvgLayout value) const;
 };
 class RNSVGFeBlendEventEmitter : public ViewEventEmitter {
  public:
@@ -108,15 +135,33 @@ class RNSVGForeignObjectEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;
 
-  
-  
+  struct OnSvgLayoutLayout {
+      int x;
+    int y;
+    int width;
+    int height;
+    };
+
+  struct OnSvgLayout {
+      OnSvgLayoutLayout layout;
+    };
+  void onSvgLayout(OnSvgLayout value) const;
 };
 class RNSVGGroupEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;
 
-  
-  
+  struct OnSvgLayoutLayout {
+      int x;
+    int y;
+    int width;
+    int height;
+    };
+
+  struct OnSvgLayout {
+      OnSvgLayoutLayout layout;
+    };
+  void onSvgLayout(OnSvgLayout value) const;
 };
 class RNSVGImageEventEmitter : public ViewEventEmitter {
  public:
@@ -131,7 +176,20 @@ class RNSVGImageEventEmitter : public ViewEventEmitter {
   struct OnLoad {
       OnLoadSource source;
     };
+
+  struct OnSvgLayoutLayout {
+      int x;
+    int y;
+    int width;
+    int height;
+    };
+
+  struct OnSvgLayout {
+      OnSvgLayoutLayout layout;
+    };
   void onLoad(OnLoad value) const;
+
+  void onSvgLayout(OnSvgLayout value) const;
 };
 class RNSVGSvgViewEventEmitter : public ViewEventEmitter {
  public:
@@ -151,8 +209,17 @@ class RNSVGLineEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;
 
-  
-  
+  struct OnSvgLayoutLayout {
+      int x;
+    int y;
+    int width;
+    int height;
+    };
+
+  struct OnSvgLayout {
+      OnSvgLayoutLayout layout;
+    };
+  void onSvgLayout(OnSvgLayout value) const;
 };
 class RNSVGMarkerEventEmitter : public ViewEventEmitter {
  public:
@@ -165,15 +232,33 @@ class RNSVGMaskEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;
 
-  
-  
+  struct OnSvgLayoutLayout {
+      int x;
+    int y;
+    int width;
+    int height;
+    };
+
+  struct OnSvgLayout {
+      OnSvgLayoutLayout layout;
+    };
+  void onSvgLayout(OnSvgLayout value) const;
 };
 class RNSVGPathEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;
 
-  
-  
+  struct OnSvgLayoutLayout {
+      int x;
+    int y;
+    int width;
+    int height;
+    };
+
+  struct OnSvgLayout {
+      OnSvgLayoutLayout layout;
+    };
+  void onSvgLayout(OnSvgLayout value) const;
 };
 class RNSVGPatternEventEmitter : public ViewEventEmitter {
  public:
@@ -193,8 +278,17 @@ class RNSVGRectEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;
 
-  
-  
+  struct OnSvgLayoutLayout {
+      int x;
+    int y;
+    int width;
+    int height;
+    };
+
+  struct OnSvgLayout {
+      OnSvgLayoutLayout layout;
+    };
+  void onSvgLayout(OnSvgLayout value) const;
 };
 class RNSVGSymbolEventEmitter : public ViewEventEmitter {
  public:
@@ -207,28 +301,64 @@ class RNSVGTextEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;
 
-  
-  
+  struct OnSvgLayoutLayout {
+      int x;
+    int y;
+    int width;
+    int height;
+    };
+
+  struct OnSvgLayout {
+      OnSvgLayoutLayout layout;
+    };
+  void onSvgLayout(OnSvgLayout value) const;
 };
 class RNSVGTextPathEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;
 
-  
-  
+  struct OnSvgLayoutLayout {
+      int x;
+    int y;
+    int width;
+    int height;
+    };
+
+  struct OnSvgLayout {
+      OnSvgLayoutLayout layout;
+    };
+  void onSvgLayout(OnSvgLayout value) const;
 };
 class RNSVGTSpanEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;
 
-  
-  
+  struct OnSvgLayoutLayout {
+      int x;
+    int y;
+    int width;
+    int height;
+    };
+
+  struct OnSvgLayout {
+      OnSvgLayoutLayout layout;
+    };
+  void onSvgLayout(OnSvgLayout value) const;
 };
 class RNSVGUseEventEmitter : public ViewEventEmitter {
  public:
   using ViewEventEmitter::ViewEventEmitter;
 
-  
-  
+  struct OnSvgLayoutLayout {
+      int x;
+    int y;
+    int width;
+    int height;
+    };
+
+  struct OnSvgLayout {
+      OnSvgLayoutLayout layout;
+    };
+  void onSvgLayout(OnSvgLayout value) const;
 };
 } // namespace facebook::react
