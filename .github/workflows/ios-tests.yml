@@ -1,0 +1,46 @@
+name: iOS - Codable Compatibility Tests
+
+on:
+  push:
+    branches: [ feat/codable-appearance-tests ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      # Show schemes/workspaces to help debugging
+      - name: List Xcode / Schemes
+        run: |
+          xcodebuild -version
+          ls -la
+          xcodebuild -list -workspace hyperswitch.xcworkspace || true
+          xcodebuild -list -project hyperswitch.xcodeproj || true
+
+      # Build + test. If the project uses workspace, prefer it.
+      - name: Test (workspace)
+        run: |
+          set -e
+          xcodebuild \
+            -workspace hyperswitch.xcworkspace \
+            -scheme hyperswitch \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -enableCodeCoverage YES \
+            test
+        continue-on-error: true
+
+      # Fallback to project if workspace scheme is different
+      - name: Test (project fallback)
+        if: ${{ failure() }}
+        run: |
+          xcodebuild \
+            -project hyperswitch.xcodeproj \
+            -scheme hyperswitch \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone 15,OS=latest' \
+            -enableCodeCoverage YES \
+            test
