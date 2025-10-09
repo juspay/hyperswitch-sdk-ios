@@ -1,8 +1,15 @@
+//
+//  Codable+UIKit.swift
+//  hyperswitch
+//
+//  Created by Harshit Srivastava on 09/10/25.
+//
+
 import UIKit
 
 // MARK: - CodableColor Wrapper
 public struct CodableColor: Codable, Equatable {
-    private let wrapped: UIColor   // internal storage
+    private let wrapped: UIColor
 
     public init(_ color: UIColor) {
         self.wrapped = color
@@ -94,7 +101,7 @@ extension UIColor {
 
 // MARK: - CodableFont Wrapper
 public struct CodableFont: Codable, Equatable {
-    private let wrapped: UIFont   // internal storage
+    private let wrapped: UIFont
 
     public init(_ font: UIFont) {
         self.wrapped = font
