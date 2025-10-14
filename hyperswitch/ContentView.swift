@@ -16,15 +16,20 @@ struct ContentView: View {
                 Text("UIKit View").tag(0)
                 Text("SwiftUI View").tag(1)
                 Text("Headless View").tag(2)
+                Text("3DS").tag(3)
             }.pickerStyle(SegmentedPickerStyle())
-            if selectedSegment == 0 {
-                UIKitView()
-            }
-            else if selectedSegment == 1{
-                SwiftUIView()
-            }
-            else {
-                HeadlessView()
+            
+            switch selectedSegment {
+                case 0:
+                    UIKitView()
+                case 1:
+                    SwiftUIView()
+                case 2:
+                    HeadlessView()
+                case 3:
+                    ThreeDsView()
+                default:
+                    UIKitView()
             }
         }
     }
@@ -48,5 +53,16 @@ struct UIKitView: UIViewControllerRepresentable {
     }
     
     func updateUIViewController(_ uiViewController: ViewController, context: Context) {
+    }
+}
+
+struct ThreeDsView: UIViewControllerRepresentable {
+    typealias UIViewControllerType = AuthenticationViewController
+    
+    func makeUIViewController(context: Context) -> AuthenticationViewController {
+        return AuthenticationViewController()
+    }
+    
+    func updateUIViewController(_ uiViewController: AuthenticationViewController, context: Context) {
     }
 }
