@@ -7,74 +7,107 @@
 
 import Foundation
 
-public struct Card: PaymentMethod {
-    public let isDefaultPaymentMethod: Bool
-    public let paymentToken: String
-    public let cardScheme: String
-    public let name: String
-    public let expiryDate: String
-    public let cardNumber: String
-    public let nickName: String
+/// Represents card payment method details
+public struct Card {
+    public let scheme: String
+    public let issuerCountry: String
+    public let last4Digits: String
+    public let expiryMonth: String
+    public let expiryYear: String
+    public let cardToken: String?
     public let cardHolderName: String
-    public let requiresCVV: Bool
-    public let created: String
-    public let lastUsedAt: String
+    public let cardFingerprint: String?
+    public let nickName: String
+    public let cardNetwork: String
+    public let cardIsin: String
+    public let cardIssuer: String
+    public let cardType: String
+    public let savedToLocker: Bool
     
-    public func toHashMap() -> [String: Any] {
+    public func toHashMap() -> [String: Any?] {
         return [
-            "isDefaultPaymentMethod": isDefaultPaymentMethod,
-            "paymentToken": paymentToken,
-            "cardScheme": cardScheme,
-            "name": name,
-            "expiryDate": expiryDate,
-            "cardNumber": cardNumber,
-            "nickName": nickName,
-            "cardHolderName": cardHolderName,
-            "requiresCVV": requiresCVV,
-            "created": created,
-            "lastUsedAt": lastUsedAt
+            "scheme": scheme,
+            "issuer_country": issuerCountry,
+            "last4_digits": last4Digits,
+            "expiry_month": expiryMonth,
+            "expiry_year": expiryYear,
+            "card_token": cardToken,
+            "card_holder_name": cardHolderName,
+            "card_fingerprint": cardFingerprint,
+            "nick_name": nickName,
+            "card_network": cardNetwork,
+            "card_isin": cardIsin,
+            "card_issuer": cardIssuer,
+            "card_type": cardType,
+            "saved_to_locker": savedToLocker
         ]
     }
 }
 
-public struct Wallet: PaymentMethod {
-    public let isDefaultPaymentMethod: Bool
+/// Protocol defining payment method behavior
+public protocol PaymentMethod {
+    func toHashMap() -> [String: Any?]
+}
+
+/// Represents a valid payment method with all details
+public struct PaymentMethodType: PaymentMethod {
     public let paymentToken: String
-    public let walletType: String
+    public let paymentMethodId: String
+    public let customerId: String
+    public let paymentMethod: String
+    public let paymentMethodType: String
+    public let paymentMethodIssuer: String
+    public let paymentMethodIssuerCode: String?
+    public let recurringEnabled: Bool
+    public let installmentPaymentEnabled: Bool
+    public let paymentExperience: [String]
+    public let card: Card?
+    public let metadata: String?
     public let created: String
+    public let bank: String?
+    public let surchargeDetails: String?
+    public let requiresCvv: Bool
     public let lastUsedAt: String
+    public let defaultPaymentMethodSet: Bool
     
-    public func toHashMap() -> [String: Any] {
+    public func toHashMap() -> [String: Any?] {
         return [
-            "isDefaultPaymentMethod": isDefaultPaymentMethod,
-            "paymentToken": paymentToken,
-            "walletType": walletType,
+            "payment_token": paymentToken,
+            "payment_method_id": paymentMethodId,
+            "customer_id": customerId,
+            "payment_method": paymentMethod,
+            "payment_method_type": paymentMethodType,
+            "payment_method_issuer": paymentMethodIssuer,
+            "payment_method_issuer_code": paymentMethodIssuerCode,
+            "recurring_enabled": recurringEnabled,
+            "installment_payment_enabled": installmentPaymentEnabled,
+            "payment_experience": paymentExperience,
+            "card": card?.toHashMap(),
+            "metadata": metadata,
             "created": created,
-            "lastUsedAt": lastUsedAt
+            "bank": bank,
+            "surcharge_details": surchargeDetails,
+            "requires_cvv": requiresCvv,
+            "last_used_at": lastUsedAt,
+            "default_payment_method_set": defaultPaymentMethodSet
         ]
     }
 }
 
+/// Represents an error state in payment method retrieval
 public struct PMError: PaymentMethod {
-    public let isDefaultPaymentMethod: Bool = false
-    public let paymentToken: String = ""
-    public let created: String = ""
-    public let lastUsedAt: String = ""
     public let code: String
     public let message: String
     
-    public func toHashMap() -> [String: Any] {
+    public func toHashMap() -> [String: Any?] {
         return [
             "code": code,
-            "message": message,
-            "isDefaultPaymentMethod": isDefaultPaymentMethod,
-            "paymentToken": paymentToken,
-            "created": created,
-            "lastUsedAt": lastUsedAt
+            "message": message
         ]
     }
 }
 
+/// Handler for payment session operations
 public struct PaymentSessionHandler {
     public let getCustomerDefaultSavedPaymentMethodData: () -> PaymentMethod
     public let getCustomerLastUsedPaymentMethodData: () -> PaymentMethod
@@ -83,7 +116,7 @@ public struct PaymentSessionHandler {
     private let confirmWithCustomerLastUsedPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
     private let confirmWithCustomerPaymentToken: (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
     
-    init(
+    public init(
         getCustomerDefaultSavedPaymentMethodData: @escaping () -> PaymentMethod,
         getCustomerLastUsedPaymentMethodData: @escaping () -> PaymentMethod,
         getCustomerSavedPaymentMethodData: @escaping () -> [PaymentMethod],
@@ -110,12 +143,4 @@ public struct PaymentSessionHandler {
     public func confirmWithCustomerPaymentToken(paymentToken: String, resultHandler: @escaping (PaymentResult) -> Void) {
         confirmWithCustomerPaymentToken(paymentToken, nil, resultHandler)
     }
-}
-
-public protocol PaymentMethod {
-    var isDefaultPaymentMethod: Bool { get }
-    var paymentToken: String { get }
-    var created: String { get }
-    var lastUsedAt: String { get }
-    func toHashMap() -> [String: Any]
 }
