@@ -46,7 +46,16 @@ extension PaymentSession {
         PaymentSession.isPresented = false
         PaymentSession.headlessCompletion = func_
         RNHeadlessManager.sharedInstance.reinvalidateBridge()
-        let _ = RNHeadlessManager.sharedInstance.viewForModule("dummy", initialProperties: [:])
+        let hyperParams = HyperParams.getHyperParams()   
+        let props: [String: Any] = [
+            "clientSecret": PaymentSession.paymentIntentClientSecret as Any,
+            "publishableKey": APIClient.shared.publishableKey as Any,
+            "hyperParams": hyperParams,
+            "customBackendUrl": APIClient.shared.customBackendUrl as Any,
+            "customLogUrl": APIClient.shared.customLogUrl as Any,
+            "customParams": APIClient.shared.customParams as Any
+        ]
+        let _ = RNHeadlessManager.sharedInstance.viewForModule("HyperHeadless", initialProperties: ["props": props])
     }
     
     internal static func getPaymentSession(getPaymentMethodData: NSDictionary, getPaymentMethodData2: NSDictionary, getPaymentMethodDataArray: NSArray, callback: @escaping RCTResponseSenderBlock) {
@@ -69,8 +78,7 @@ extension PaymentSession {
                     return array
                 },
                 confirmWithCustomerDefaultPaymentMethod: { cvc, resultHandler in
-                    if let map = getPaymentMethodData["_0"] as? NSDictionary,
-                       let paymentToken = map["payment_token"] as? String {
+                    if let paymentToken = getPaymentMethodData["payment_token"] as? String {
                         self.completion = resultHandler
                         var map = [String: Any]()
                         map["paymentToken"] = paymentToken
@@ -79,8 +87,7 @@ extension PaymentSession {
                     }
                 },
                 confirmWithCustomerLastUsedPaymentMethod: { cvc, resultHandler in
-                    if let map = getPaymentMethodData2["_0"] as? NSDictionary,
-                       let paymentToken = map["payment_token"] as? String {
+                    if let paymentToken = getPaymentMethodData2["payment_token"] as? String {
                         self.completion = resultHandler
                         var map = [String: Any]()
                         map["paymentToken"] = paymentToken
@@ -138,39 +145,66 @@ extension PaymentSession {
     }
     
     private static func parseGetPaymentMethodData(_ readableMap: NSDictionary) -> PaymentMethod {
-        let tag = readableMap["TAG"] as? String ?? ""
-        let dataObject = readableMap["_0"] as? [String: Any]
+        let paymentMethodStr = readableMap["payment_method_str"] as? String
         
-        switch tag {
-        case "SAVEDLISTCARD":
-            if let it = dataObject {
-                return Card(
-                    isDefaultPaymentMethod: it["isDefaultPaymentMethod"] as? Bool ?? false,
-                    paymentToken: it["payment_token"] as? String ?? "",
-                    cardScheme: it["cardScheme"] as? String ?? "",
-                    name: it["name"] as? String ?? "",
-                    expiryDate: it["expiry_date"] as? String ?? "",
-                    cardNumber: it["cardNumber"] as? String ?? "",
-                    nickName: it["nick_name"] as? String ?? "",
-                    cardHolderName: it["cardHolderName"] as? String ?? "",
-                    requiresCVV: it["requiresCVV"] as? Bool ?? false,
-                    created: it["created"] as? String ?? "",
-                    lastUsedAt: it["lastUsedAt"] as? String ?? ""
+        if paymentMethodStr != nil {
+            let cardMap = readableMap["card"] as? [String: Any]
+            
+            var card: Card? = nil
+            if let cardData = cardMap {
+                card = Card(
+                    scheme: cardData["scheme"] as? String ?? "",
+                    issuerCountry: cardData["issuer_country"] as? String ?? "",
+                    last4Digits: cardData["last4_digits"] as? String ?? "",
+                    expiryMonth: cardData["expiry_month"] as? String ?? "",
+                    expiryYear: cardData["expiry_year"] as? String ?? "",
+                    cardToken: cardData["card_token"] as? String,
+                    cardHolderName: cardData["card_holder_name"] as? String ?? "",
+                    cardFingerprint: cardData["card_fingerprint"] as? String,
+                    nickName: cardData["nick_name"] as? String ?? "",
+                    cardNetwork: cardData["card_network"] as? String ?? "",
+                    cardIsin: cardData["card_isin"] as? String ?? "",
+                    cardIssuer: cardData["card_issuer"] as? String ?? "",
+                    cardType: cardData["card_type"] as? String ?? "",
+                    savedToLocker: cardData["saved_to_locker"] as? Bool ?? false
                 )
             }
-        case "SAVEDLISTWALLET":
-            if let it = dataObject {
-                return Wallet(
-                    isDefaultPaymentMethod: it["isDefaultPaymentMethod"] as? Bool ?? false,
-                    paymentToken: it["payment_token"] as? String ?? "",
-                    walletType: it["walletType"] as? String ?? "",
-                    created: it["created"] as? String ?? "",
-                    lastUsedAt: it["lastUsedAt"] as? String ?? ""
-                )
+            
+            let paymentExperienceArray = readableMap["payment_experience"] as? NSArray
+            var paymentExperienceList: [String] = []
+            if let array = paymentExperienceArray {
+                for i in 0..<array.count {
+                    if let item = array[i] as? String {
+                        paymentExperienceList.append(item)
+                    }
+                }
             }
-        default:
-            return PMError(code: readableMap["code"] as? String ?? "",message: readableMap["message"] as? String ?? "No default type found")
+            
+            return PaymentMethodType(
+                paymentToken: readableMap["payment_token"] as? String ?? "",
+                paymentMethodId: readableMap["payment_method_id"] as? String ?? "",
+                customerId: readableMap["customer_id"] as? String ?? "",
+                paymentMethod: readableMap["payment_method_str"] as? String ?? "",
+                paymentMethodType: readableMap["payment_method_type"] as? String ?? "",
+                paymentMethodIssuer: readableMap["payment_method_issuer"] as? String ?? "",
+                paymentMethodIssuerCode: readableMap["payment_method_issuer_code"] as? String,
+                recurringEnabled: readableMap["recurring_enabled"] as? Bool ?? false,
+                installmentPaymentEnabled: readableMap["installment_payment_enabled"] as? Bool ?? false,
+                paymentExperience: paymentExperienceList,
+                card: card,
+                metadata: readableMap["metadata"] as? String,
+                created: readableMap["created"] as? String ?? "",
+                bank: readableMap["bank"] as? String,
+                surchargeDetails: readableMap["surcharge_details"] as? String,
+                requiresCvv: readableMap["requires_cvv"] as? Bool ?? false,
+                lastUsedAt: readableMap["last_used_at"] as? String ?? "",
+                defaultPaymentMethodSet: readableMap["default_payment_method_set"] as? Bool ?? false
+            )
+        } else {
+            return PMError(
+                code: readableMap["code"] as? String ?? "",
+                message: readableMap["message"] as? String ?? ""
+            )
         }
-        return PMError(code: "01", message: "No default type found")
     }
 }

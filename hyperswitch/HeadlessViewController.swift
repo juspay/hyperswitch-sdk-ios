@@ -91,13 +91,9 @@ class HeadlessViewController: UIViewController {
     @objc func getCustomerDefaultSavedPaymentMethodData(_ sender: Any) {
         let paymentMethod = self.handler?.getCustomerDefaultSavedPaymentMethodData()
         switch paymentMethod {
-        case let card as Card:
-            print(["type": "card", "message": card.toHashMap()])
-            self.statusLabel.text = "card → \(card.toHashMap())"
-            confirmDefault.isEnabled = true
-        case let wallet as Wallet:
-            print(["type": "wallet", "message": wallet.toHashMap()])
-            self.statusLabel.text = "wallet → \(wallet.toHashMap())"
+        case let paymentMethodType as PaymentMethodType:
+            print(["type": paymentMethodType.paymentMethod, "message": paymentMethodType.toHashMap()])
+            self.statusLabel.text = "\(paymentMethodType.paymentMethod) → \(paymentMethodType.toHashMap())"
             confirmDefault.isEnabled = true
         case let error as PMError:
             print(["type": "error", "message": error.toHashMap()])
@@ -111,13 +107,9 @@ class HeadlessViewController: UIViewController {
     @objc func getCustomerLastUsedPaymentMethodData(_ sender: Any) {
         let paymentMethod = self.handler?.getCustomerLastUsedPaymentMethodData()
         switch paymentMethod {
-        case let card as Card:
-            print(["type": "card", "message": card.toHashMap()])
-            self.statusLabel.text = "card → \(card.toHashMap())"
-            confirmLast.isEnabled = true
-        case let wallet as Wallet:
-            print(["type": "wallet", "message": wallet.toHashMap()])
-            self.statusLabel.text = "wallet → \(wallet.toHashMap())"
+        case let paymentMethodType as PaymentMethodType:
+            print(["type": paymentMethodType.paymentMethod, "message": paymentMethodType.toHashMap()])
+            self.statusLabel.text = "\(paymentMethodType.paymentMethod) → \(paymentMethodType.toHashMap())"
             confirmLast.isEnabled = true
         case let error as PMError:
             print(["type": "error", "message": error.toHashMap()])
@@ -138,13 +130,9 @@ class HeadlessViewController: UIViewController {
         }
         for paymentMethods in pm{
             switch paymentMethods {
-            case let card as Card:
-                print(["type": "card", "message": card.toHashMap()])
-                self.statusLabel.text = "card → \(card.toHashMap())"
-                confirm.isEnabled = true
-            case let wallet as Wallet:
-                print(["type": "wallet", "message": wallet.toHashMap()])
-                self.statusLabel.text = "wallet → \(wallet.toHashMap())"
+            case let paymentMethodType as PaymentMethodType:
+                print(["type": paymentMethodType.paymentMethod, "message": paymentMethodType.toHashMap()])
+                self.statusLabel.text = "\(paymentMethodType.paymentMethod) → \(paymentMethodType.toHashMap())"
                 confirm.isEnabled = true
             case let error as PMError:
                 print(["type": "error", "message": error.toHashMap()])
