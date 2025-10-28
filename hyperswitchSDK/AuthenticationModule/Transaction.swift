@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-public class Transaction {
+public final class Transaction {
     private let messageVersion: String
     private let directoryServerId: String?
     private let cardNetwork: String?
@@ -21,8 +21,8 @@ public class Transaction {
         self.transactionProvider = transactionProvider
     }
     
-    public func getAuthenticationRequestParameters() throws -> AuthenticationRequestParameters {
-        return try transactionProvider.getAuthenticationRequestParameters()
+    public func getAuthenticationRequestParameters() async throws -> AuthenticationRequestParameters {
+        return try await transactionProvider.getAuthenticationRequestParameters()
     }
     
     public func doChallenge(
@@ -56,20 +56,22 @@ public class ProgressDialog {
 }
 
 public class AuthenticationRequestParameters {
-    final public let sdkTransactionID: String
-    final public let deviceData: String
-    final public let sdkEphemeralPublicKey: String
-    final public let sdkAppID: String
-    final public let sdkReferenceNumber: String
-    final public let messageVersion: String
+    final public let sdkTransactionID: String?
+    final public let deviceData: String?
+    final public let sdkEphemeralPublicKey: String?
+    final public let sdkAppID: String?
+    final public let sdkReferenceNumber: String?
+    final public let messageVersion: String?
+    final public let sdkEncryptedData: String?
     
     init(
-        sdkTransactionID: String,
-        deviceData: String,
-        sdkEphemeralPublicKey: String,
-        sdkAppID: String,
-        sdkReferenceNumber: String,
-        messageVersion: String
+        sdkTransactionID: String?,
+        deviceData: String?,
+        sdkEphemeralPublicKey: String?,
+        sdkAppID: String?,
+        sdkReferenceNumber: String?,
+        messageVersion: String?,
+        sdkEncryptedData: String?
     ) {
         self.deviceData = deviceData
         self.sdkTransactionID = sdkTransactionID
@@ -77,6 +79,7 @@ public class AuthenticationRequestParameters {
         self.sdkAppID = sdkAppID
         self.sdkReferenceNumber = sdkReferenceNumber
         self.messageVersion = messageVersion
+        self.sdkEncryptedData = sdkEncryptedData
     }
 }
 

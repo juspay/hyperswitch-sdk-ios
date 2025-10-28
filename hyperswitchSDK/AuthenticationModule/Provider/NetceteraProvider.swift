@@ -13,7 +13,7 @@ import ThreeDS_SDK
 class NetceteraProvider: ThreeDSProvider {
     private let threeDS2Service: ThreeDS2Service = ThreeDS2ServiceSDK()
     
-    func initialize(configuration: AuthenticationConfiguration?) throws {
+    func initialize(configuration: AuthenticationConfiguration?) async throws {
         let configBuilder = ConfigurationBuilder()
         
         if let apiKey = configuration?.apiKey {
@@ -46,7 +46,7 @@ class NetceteraSessionProvider: ThreeDSSessionProvider {
         self.service = service
     }
     
-    func createTransaction(messageVersion: String, directoryServerId: String?, cardNetwork: String?) throws -> ThreeDSTransactionProvider {
+    func createTransaction(messageVersion: String, directoryServerId: String?, cardNetwork: String?) async throws -> ThreeDSTransactionProvider {
         let transaction = try service.createTransaction(
             directoryServerId: directoryServerId ?? "",
             messageVersion: messageVersion
@@ -63,7 +63,7 @@ class NetceteraTransactionProvider: ThreeDSTransactionProvider {
         self.transaction = transaction
     }
     
-    func getAuthenticationRequestParameters() throws -> AuthenticationRequestParameters {
+    func getAuthenticationRequestParameters() async throws -> AuthenticationRequestParameters {
         let netceteraParams = try transaction.getAuthenticationRequestParameters()
         
         return AuthenticationRequestParameters(
@@ -72,7 +72,8 @@ class NetceteraTransactionProvider: ThreeDSTransactionProvider {
             sdkEphemeralPublicKey: netceteraParams.getSDKEphemeralPublicKey(),
             sdkAppID: netceteraParams.getSDKAppID(),
             sdkReferenceNumber: netceteraParams.getSDKReferenceNumber(),
-            messageVersion: netceteraParams.getMessageVersion()
+            messageVersion: netceteraParams.getMessageVersion(),
+            sdkEncryptedData: nil
         )
     }
     

@@ -191,29 +191,32 @@ class AuthenticationViewController: UIViewController {
             return
         }
         
-        // Create AuthenticationSession with publishable key from ViewModel
         authSession = AuthenticationSession(
             publishableKey: publishableKey
         )
         
-        do {
-            // Create configuration with preferred provider
-            let configuration = AuthenticationConfiguration(
-                preferredProvider: .trident
-            )
-            
-            // Initialize the 3DS session with clientSecret from ViewModel
-            try authSession?.initThreeDsSession(
-                authIntentClientSecret: viewModel.clientSecret ?? "",
-                configuration: configuration
-            )
-            
-            statusLabel.text = "-- 3DS SDK Session initialized successfully!\nReady to create transaction."
-            updateButtonStates()
-        } catch {
-            statusLabel.text = "-- Failed to initialize 3DS SDK session:\n\(error.localizedDescription)"
-            authSession = nil
-            updateButtonStates()
+        Task {
+            do {
+                let configuration = AuthenticationConfiguration(
+                    preferredProvider: .trident
+                )
+                
+                try await authSession?.initThreeDsSession(
+                    authIntentClientSecret: viewModel.clientSecret ?? "",
+                    configuration: configuration
+                )
+                
+                await MainActor.run {
+                    statusLabel.text = "-- 3DS SDK Session initialized successfully!\nReady to create transaction."
+                    updateButtonStates()
+                }
+            } catch {
+                await MainActor.run {
+                    statusLabel.text = "-- Failed to initialize 3DS SDK session:\n\(error.localizedDescription)"
+                    authSession = nil
+                    updateButtonStates()
+                }
+            }
         }
     }
     
@@ -226,19 +229,25 @@ class AuthenticationViewController: UIViewController {
         
         statusLabel.text = "-- Creating transaction..."
         
-        do {
-            let transaction = try authSession.createTransaction(
-                messageVersion: "2.2.0",
-                directoryServerId: "A000000004",
-                cardNetwork: "VISA"
-            )
-            
-            authTransaction = transaction
-            statusLabel.text = "-- Transaction created successfully!\nReady for authentication flow."
-            updateButtonStates()
-        } catch {
-            statusLabel.text = "-- Failed to create transaction:\n\(error.localizedDescription)"
-            updateButtonStates()
+        Task {
+            do {
+                let transaction = try await authSession.createTransaction(
+                    messageVersion: "2.2.0",
+                    directoryServerId: "A000000004",
+                    cardNetwork: "VISA"
+                )
+                
+                await MainActor.run {
+                    authTransaction = transaction
+                    statusLabel.text = "-- Transaction created successfully!\nReady for authentication flow."
+                    updateButtonStates()
+                }
+            } catch {
+                await MainActor.run {
+                    statusLabel.text = "-- Failed to create transaction:\n\(error.localizedDescription)"
+                    updateButtonStates()
+                }
+            }
         }
     }
     
@@ -251,27 +260,31 @@ class AuthenticationViewController: UIViewController {
         
         statusLabel.text = "Getting authentication request parameters..."
         
-        do {
-            self.aReqParams = try transaction.getAuthenticationRequestParameters()
-            
-            guard let aReqParams else {
-                statusLabel.text = "-- Failed to get authentication parameters"
-                return
+        Task {
+            do {
+                let aReqParams = try await transaction.getAuthenticationRequestParameters()
+                
+                await MainActor.run {
+                    self.aReqParams = aReqParams
+                    
+                    statusLabel.text = """
+                    -- Authentication Request Parameters Retrieved:
+                    
+                    SDK Encrypted data: \(String(describing: aReqParams.sdkEncryptedData?.prefix(10)))...
+                    SDK Transaction ID: \(String(describing: aReqParams.sdkTransactionID))
+                    Message Version: \(String(describing: aReqParams.messageVersion))
+                    SDK App ID: \(String(describing: aReqParams.sdkAppID))
+                    SDK Reference Number: \(String(describing: aReqParams.sdkReferenceNumber?.prefix(10)))...
+                    Device Data: \(String(describing: aReqParams.deviceData?.prefix(6)))...
+                    SDK Ephemeral Public Key: \(String(describing: aReqParams.sdkEphemeralPublicKey).prefix(6))...
+                    
+                    """
+                }
+            } catch {
+                await MainActor.run {
+                    statusLabel.text = "-- Failed to get authentication parameters:\n\(error.localizedDescription)"
+                }
             }
-            
-            statusLabel.text = """
-            -- Authentication Request Parameters Retrieved:
-            
-            SDK Transaction ID: \(aReqParams.sdkTransactionID)
-            Message Version: \(aReqParams.messageVersion)
-            SDK App ID: \(aReqParams.sdkAppID)
-            SDK Reference Number: \(String(aReqParams.sdkReferenceNumber.prefix(10)))...
-            Device Data: \(String(aReqParams.deviceData.prefix(6)))...
-            SDK Ephemeral Public Key: \(String(describing: aReqParams.sdkEphemeralPublicKey).prefix(6))...
-            
-            """
-        } catch {
-            statusLabel.text = "-- Failed to get authentication parameters:\n\(error.localizedDescription)"
         }
     }
     
@@ -363,14 +376,13 @@ class AuthenticationViewController: UIViewController {
         createTransactionButton.isEnabled = authSession != nil
         getAuthParamsButton.isEnabled = authTransaction != nil
         doChallengeButton.isEnabled = authTransaction != nil && !challengeInProgress
-        resetSessionButton.isEnabled = authSession != nil
+        resetSessionButton.isEnabled = true
         
-        // Update button enabled/ disabled state
         initSessionButton.alpha = initSessionButton.isEnabled ? 1.0 : 0.5
         createTransactionButton.alpha = createTransactionButton.isEnabled ? 1.0 : 0.5
         getAuthParamsButton.alpha = getAuthParamsButton.isEnabled ? 1.0 : 0.5
         doChallengeButton.alpha = doChallengeButton.isEnabled ? 1.0 : 0.5
-        resetSessionButton.alpha = resetSessionButton.isEnabled ? 1.0 : 0.5
+        resetSessionButton.alpha = 1.0
     }
 }
 

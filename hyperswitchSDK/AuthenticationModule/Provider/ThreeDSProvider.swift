@@ -9,17 +9,17 @@ import Foundation
 import UIKit
 
 public protocol ThreeDSProvider {
-    func initialize(configuration: AuthenticationConfiguration?) throws
+    func initialize(configuration: AuthenticationConfiguration?) async throws
     func createSession() throws -> ThreeDSSessionProvider
     func cleanup()
 }
 
 public protocol ThreeDSSessionProvider {
-    func createTransaction(messageVersion: String, directoryServerId: String?, cardNetwork: String?) throws -> ThreeDSTransactionProvider
+    func createTransaction(messageVersion: String, directoryServerId: String?, cardNetwork: String?) async throws -> ThreeDSTransactionProvider
 }
 
 public protocol ThreeDSTransactionProvider {
-    func getAuthenticationRequestParameters() throws -> AuthenticationRequestParameters
+    func getAuthenticationRequestParameters() async throws -> AuthenticationRequestParameters
     func doChallenge(
         viewController: UIViewController,
         challengeParameters: ChallengeParameters,
