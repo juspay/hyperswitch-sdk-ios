@@ -14,6 +14,7 @@ class AuthenticationViewController: UIViewController {
     
     // 3DS Authentication Session properties
     private var authSession: AuthenticationSession?
+    private var threeDSSession: ThreeDSSession?
     private var authTransaction: Transaction?
     private var aReqParams: AuthenticationRequestParameters?
     private var challengeInProgress = false
@@ -201,7 +202,7 @@ class AuthenticationViewController: UIViewController {
                     preferredProvider: .trident
                 )
                 
-                try await authSession?.initThreeDsSession(
+                self.threeDSSession = try await authSession?.initThreeDSSession(
                     authIntentClientSecret: viewModel.clientSecret ?? "",
                     configuration: configuration
                 )
@@ -222,7 +223,7 @@ class AuthenticationViewController: UIViewController {
     
     @objc
     func createTransaction(_ sender: Any) {
-        guard let authSession = authSession else {
+        guard let threeDSSession = threeDSSession else {
             statusLabel.text = "-- No active session. Please initialize first."
             return
         }
@@ -231,7 +232,7 @@ class AuthenticationViewController: UIViewController {
         
         Task {
             do {
-                let transaction = try await authSession.createTransaction(
+                let transaction = try await threeDSSession.createTransaction(
                     messageVersion: "2.2.0",
                     directoryServerId: "A000000004",
                     cardNetwork: "VISA"

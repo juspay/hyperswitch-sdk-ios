@@ -9,7 +9,7 @@ import Foundation
 
 public class ThreeDSProviderFactory {
     
-    public static func createProvider(preferredProvider: ProviderType? = nil) throws -> ThreeDSProvider {
+    public static func createProvider(preferredProvider: ThreeDSProviderType? = nil) throws -> ThreeDSProvider {
         
         let availableProviders = getAvailableProviders()
         
@@ -48,7 +48,7 @@ public class ThreeDSProviderFactory {
         }
     }
     
-    private static func tryCreateProvider(type: ProviderType) -> ThreeDSProvider? {
+    private static func tryCreateProvider(type: ThreeDSProviderType) -> ThreeDSProvider? {
         switch type {
         case .netcetera:
 #if canImport(ThreeDS_SDK)
@@ -73,7 +73,7 @@ public class ThreeDSProviderFactory {
         }
     }
     
-    public static func getAvailableProviders() -> [ProviderType] {
-        return ProviderType.allCases.filter { tryCreateProvider(type: $0) != nil }
+    public static func getAvailableProviders() -> [ThreeDSProviderType] {
+        return ThreeDSProviderType.allCases.filter { tryCreateProvider(type: $0) != nil }
     }
 }

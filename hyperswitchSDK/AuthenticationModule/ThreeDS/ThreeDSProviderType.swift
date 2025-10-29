@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum ProviderType: String, CaseIterable {
+public enum ThreeDSProviderType: String, CaseIterable {
     case netcetera = "Netcetera"
     case cardinal = "Cardinal"
     case trident = "Trident"

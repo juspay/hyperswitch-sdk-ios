@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		192F175E42A8AC4EC54D289E /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		192F175E42A8AC4EC54D289E /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		4365207C2C8768B90006C856 /* ApplePayHandlerLite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4365207B2C8768B90006C856 /* ApplePayHandlerLite.swift */; };
 		43E668682C084FB70094BD13 /* montserrat_extralight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668552C084FB60094BD13 /* montserrat_extralight.ttf */; };
 		43E668692C084FB70094BD13 /* montserrat_bolditalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668562C084FB70094BD13 /* montserrat_bolditalic.ttf */; };
@@ -37,7 +37,7 @@
 		4E8C83892E98CABF00A61749 /* AuthenticationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8C83882E98CABF00A61749 /* AuthenticationSession.swift */; };
 		4E8C838A2E98CABF00A61749 /* AuthenticationError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8C83862E98CABF00A61749 /* AuthenticationError.swift */; };
 		4E8C838E2E98CAC600A61749 /* Transaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8C838D2E98CAC600A61749 /* Transaction.swift */; };
-		4E8C838F2E98CAC600A61749 /* ProviderType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8C838C2E98CAC600A61749 /* ProviderType.swift */; };
+		4E8C838F2E98CAC600A61749 /* ThreeDSProviderType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8C838C2E98CAC600A61749 /* ThreeDSProviderType.swift */; };
 		4E8C83992E98CAF700A61749 /* NetceteraProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8C83952E98CAF700A61749 /* NetceteraProvider.swift */; };
 		4E8C839A2E98CAF700A61749 /* ThreeDSProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8C83962E98CAF700A61749 /* ThreeDSProvider.swift */; };
 		4E8C839B2E98CAF700A61749 /* ThreeDSProviderFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8C83972E98CAF700A61749 /* ThreeDSProviderFactory.swift */; };
@@ -99,6 +99,10 @@
 		79E528972CCBB57300070AD9 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E528962CCBB56E00070AD9 /* SwiftUIView.swift */; };
 		79E528992CCBB6FE00070AD9 /* SwiftUI+Lite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E528982CCBB6F800070AD9 /* SwiftUI+Lite.swift */; };
 		79E5289A2CCBB71E00070AD9 /* SwiftUIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66486FA02943580F00150E4F /* SwiftUIManager.swift */; };
+		79E8E4B62EB2333D00FA3886 /* ThreeDSSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E8E4B52EB2333100FA3886 /* ThreeDSSession.swift */; };
+		79E8E4BA2EB23AEC00FA3886 /* AuthenticationConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E8E4B92EB23AEC00FA3886 /* AuthenticationConfiguration.swift */; };
+		79E8E4BC2EB2990500FA3886 /* TransactionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E8E4BB2EB2990500FA3886 /* TransactionError.swift */; };
+		79E8E4BE2EB29A6100FA3886 /* C2PSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E8E4BD2EB29A5B00FA3886 /* C2PSession.swift */; };
 		79EAB0132C81CCDA006B40AD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EAB0122C81CCDA006B40AD /* AppDelegate.swift */; };
 		79EAB0172C81CCDA006B40AD /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EAB0162C81CCDA006B40AD /* ViewController.swift */; };
 		79EAB01C2C81CCDC006B40AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 79EAB01B2C81CCDC006B40AD /* Assets.xcassets */; };
@@ -197,7 +201,7 @@
 		4E87FA602CAAE8E300E74113 /* PaymentManagementConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentManagementConfiguration.swift; sourceTree = "<group>"; };
 		4E8C83862E98CABF00A61749 /* AuthenticationError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationError.swift; sourceTree = "<group>"; };
 		4E8C83882E98CABF00A61749 /* AuthenticationSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationSession.swift; sourceTree = "<group>"; };
-		4E8C838C2E98CAC600A61749 /* ProviderType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderType.swift; sourceTree = "<group>"; };
+		4E8C838C2E98CAC600A61749 /* ThreeDSProviderType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeDSProviderType.swift; sourceTree = "<group>"; };
 		4E8C838D2E98CAC600A61749 /* Transaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Transaction.swift; sourceTree = "<group>"; };
 		4E8C83952E98CAF700A61749 /* NetceteraProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetceteraProvider.swift; sourceTree = "<group>"; };
 		4E8C83962E98CAF700A61749 /* ThreeDSProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeDSProvider.swift; sourceTree = "<group>"; };
@@ -254,6 +258,10 @@
 		79E528932CCBB56200070AD9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		79E528962CCBB56E00070AD9 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
 		79E528982CCBB6F800070AD9 /* SwiftUI+Lite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SwiftUI+Lite.swift"; sourceTree = "<group>"; };
+		79E8E4B52EB2333100FA3886 /* ThreeDSSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeDSSession.swift; sourceTree = "<group>"; };
+		79E8E4B92EB23AEC00FA3886 /* AuthenticationConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationConfiguration.swift; sourceTree = "<group>"; };
+		79E8E4BB2EB2990500FA3886 /* TransactionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionError.swift; sourceTree = "<group>"; };
+		79E8E4BD2EB29A5B00FA3886 /* C2PSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = C2PSession.swift; sourceTree = "<group>"; };
 		79EAB00A2C81CC06006B40AD /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		79EAB0102C81CCDA006B40AD /* hyperswitchAppClip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hyperswitchAppClip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		79EAB0122C81CCDA006B40AD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -286,7 +294,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				192F175E42A8AC4EC54D289E /* BuildFile in Frameworks */,
+				192F175E42A8AC4EC54D289E /* (null) in Frameworks */,
 				4C6389A390C2B9D3CE7E3758 /* libPods-hyperswitch.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -351,25 +359,23 @@
 		4E8C83852E98CAAB00A61749 /* AuthenticationModule */ = {
 			isa = PBXGroup;
 			children = (
-				4E8C83902E98CAD200A61749 /* Provider */,
-				4E8C83862E98CABF00A61749 /* AuthenticationError.swift */,
-				4E8C838C2E98CAC600A61749 /* ProviderType.swift */,
-				4E8C838D2E98CAC600A61749 /* Transaction.swift */,
+				79E8E4B72EB23A0500FA3886 /* ThreeDS */,
+				79E8E4B82EB23A1300FA3886 /* C2P */,
 				4E8C83882E98CABF00A61749 /* AuthenticationSession.swift */,
+				79E8E4B92EB23AEC00FA3886 /* AuthenticationConfiguration.swift */,
+				4E8C83862E98CABF00A61749 /* AuthenticationError.swift */,
 			);
 			path = AuthenticationModule;
 			sourceTree = "<group>";
 		};
-		4E8C83902E98CAD200A61749 /* Provider */ = {
+		4E8C83902E98CAD200A61749 /* Providers */ = {
 			isa = PBXGroup;
 			children = (
 				4E34835E2EA643D7007067EA /* CardinalProvider.swift */,
 				4E8C83952E98CAF700A61749 /* NetceteraProvider.swift */,
 				4E8C83982E98CAF700A61749 /* TridentProvider.swift */,
-				4E8C83962E98CAF700A61749 /* ThreeDSProvider.swift */,
-				4E8C83972E98CAF700A61749 /* ThreeDSProviderFactory.swift */,
 			);
-			path = Provider;
+			path = Providers;
 			sourceTree = "<group>";
 		};
 		66486F85294355BD00150E4F = {
@@ -399,14 +405,14 @@
 				79052A492C9057D60011804E /* AppDelegate.swift */,
 				66486F91294355BD00150E4F /* hyperApp.swift */,
 				66486F93294355BD00150E4F /* ContentView.swift */,
-				4E69679A2CB7CF71000DBE0A /* PMMViewController.swift */,
 				DC5D011D294844900017C67A /* ViewController.swift */,
-				4E8C83A32E9904CD00A61749 /* AuthenticationViewModel.swift */,
-				DC5D011F2E968D7000185E87 /* AuthenticationViewController.swift */,
-				79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */,
 				790525792BDA73A600D49FE8 /* SwiftUIView.swift */,
-				790525702BDA66EF00D49FE8 /* HyperViewModel.swift */,
+				79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */,
+				4E69679A2CB7CF71000DBE0A /* PMMViewController.swift */,
+				DC5D011F2E968D7000185E87 /* AuthenticationViewController.swift */,
 				4EEA2BD52E9926040094AA83 /* NetworkUtils.swift */,
+				790525702BDA66EF00D49FE8 /* HyperViewModel.swift */,
+				4E8C83A32E9904CD00A61749 /* AuthenticationViewModel.swift */,
 				799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */,
 				66486F95294355BE00150E4F /* Assets.xcassets */,
 				43E668542C084F440094BD13 /* fonts */,
@@ -480,6 +486,28 @@
 				66C2F89A29444E6700ACD32D /* ApplePayHandler.swift */,
 			);
 			path = ApplePay;
+			sourceTree = "<group>";
+		};
+		79E8E4B72EB23A0500FA3886 /* ThreeDS */ = {
+			isa = PBXGroup;
+			children = (
+				4E8C83902E98CAD200A61749 /* Providers */,
+				79E8E4B52EB2333100FA3886 /* ThreeDSSession.swift */,
+				4E8C83962E98CAF700A61749 /* ThreeDSProvider.swift */,
+				4E8C83972E98CAF700A61749 /* ThreeDSProviderFactory.swift */,
+				4E8C838C2E98CAC600A61749 /* ThreeDSProviderType.swift */,
+				4E8C838D2E98CAC600A61749 /* Transaction.swift */,
+				79E8E4BB2EB2990500FA3886 /* TransactionError.swift */,
+			);
+			path = ThreeDS;
+			sourceTree = "<group>";
+		};
+		79E8E4B82EB23A1300FA3886 /* C2P */ = {
+			isa = PBXGroup;
+			children = (
+				79E8E4BD2EB29A5B00FA3886 /* C2PSession.swift */,
+			);
+			path = C2P;
 			sourceTree = "<group>";
 		};
 		79EAB0112C81CCDA006B40AD /* hyperswitchAppClip */ = {
@@ -561,10 +589,10 @@
 		DC5D010F294731030017C67A /* hyperswitchSDK */ = {
 			isa = PBXGroup;
 			children = (
-				4E8C83852E98CAAB00A61749 /* AuthenticationModule */,
 				79EAB09E2C81F0B9006B40AD /* Core */,
 				79EAB09A2C81EEBC006B40AD /* Shared */,
 				790575ED2C85CF5E0097C6F4 /* CoreLite */,
+				4E8C83852E98CAAB00A61749 /* AuthenticationModule */,
 			);
 			path = hyperswitchSDK;
 			sourceTree = "<group>";
@@ -739,9 +767,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -776,9 +808,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -837,9 +873,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -876,17 +916,19 @@
 				66486FAB2943580F00150E4F /* HyperModule.swift in Sources */,
 				66486FAD2943580F00150E4F /* HyperModule.m in Sources */,
 				4E8C838E2E98CAC600A61749 /* Transaction.swift in Sources */,
-				4E8C838F2E98CAC600A61749 /* ProviderType.swift in Sources */,
+				4E8C838F2E98CAC600A61749 /* ThreeDSProviderType.swift in Sources */,
 				75AA28E02D477FB100CD88A6 /* LogManager.swift in Sources */,
 				790F847F2D8C311900178A09 /* LogBuilder.swift in Sources */,
 				790525712BDA66EF00D49FE8 /* HyperViewModel.swift in Sources */,
 				79052A4A2C9057D60011804E /* AppDelegate.swift in Sources */,
+				79E8E4BA2EB23AEC00FA3886 /* AuthenticationConfiguration.swift in Sources */,
 				4E971A722CC2764F0040EFEB /* PaymentMethodManagementWidget.swift in Sources */,
 				663F68FC29CCC93C006E91BD /* APIClient.swift in Sources */,
 				79EAB0432C81D4AA006B40AD /* PaymentSessionTypes.swift in Sources */,
 				793083ED2A0DA9F100E78310 /* PaymentIntentParams.swift in Sources */,
 				66C2F89B29444E6700ACD32D /* ApplePayHandler.swift in Sources */,
 				75E692FA2D5B28D70077C0F3 /* OTAServices.swift in Sources */,
+				79E8E4BC2EB2990500FA3886 /* TransactionError.swift in Sources */,
 				75AA28E62D477FF200CD88A6 /* HyperNetworking.swift in Sources */,
 				66486F94294355BD00150E4F /* ContentView.swift in Sources */,
 				792D69F62B95E942001598CD /* ExpressCheckoutLauncher.swift in Sources */,
@@ -911,6 +953,8 @@
 				66486FAA2943580F00150E4F /* RNViewManager.swift in Sources */,
 				75AA28DE2D477F9D00CD88A6 /* Debouncer.swift in Sources */,
 				752CF93C2DF6D47A0056F58A /* RNHeadlessManager.swift in Sources */,
+				79E8E4BE2EB29A6100FA3886 /* C2PSession.swift in Sources */,
+				79E8E4B62EB2333D00FA3886 /* ThreeDSSession.swift in Sources */,
 				DC4AC9F5296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift in Sources */,
 				DC5D0127294853A90017C67A /* PaymentSheetView.swift in Sources */,
 				4E34835F2EA643DC007067EA /* CardinalProvider.swift in Sources */,
