@@ -29,6 +29,11 @@ Pod::Spec.new do |s|
     trident.dependency 'Trident3DS', '1.0.5'
   end
 
+  s.subspec 'cardinal' do |cardinal|
+    cardinal.dependency 'hyperswitch-authentication-sdk-ios/core'
+    cardinal.dependency 'CardinalMobile', '3.0.0-2'
+  end
+
   s.subspec 'common' do |common|
     common.source_files = 'hyperswitchSDK/Shared/*.{m,swift,h}'
   end

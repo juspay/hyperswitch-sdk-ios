@@ -20,7 +20,7 @@ import Trident
 class TridentProvider: ThreeDSProvider {
     private lazy var tridentSdk: Trident.TridentSDK = TridentSDK()
     
-    func initialize(configuration: AuthenticationConfiguration?) throws {
+    func initialize(configuration: AuthenticationConfiguration?) async throws {
         // TODO: Implement configuration for trident
         try tridentSdk.initialize(configParameters: ConfigParameters(), locale: nil, uiCustomization: UICustomization(), certificateDelegate: nil)
     }
@@ -40,7 +40,7 @@ class TridentSessionProvider: ThreeDSSessionProvider {
         self.service = service
     }
     
-    func createTransaction(messageVersion: String, directoryServerId: String?, cardNetwork: String?) throws -> ThreeDSTransactionProvider {
+    func createTransaction(messageVersion: String, directoryServerId: String?, cardNetwork: String?) async throws -> ThreeDSTransactionProvider {
         let _directoryServerId = try service.getDirectoryServerId(cardNetwork: cardNetwork?.uppercased(with: .autoupdatingCurrent) ?? "")
         
         let transaction = try service.createTransaction(
@@ -58,10 +58,18 @@ class TridentTransactionProvider: ThreeDSTransactionProvider {
         self.transaction = transaction
     }
     
-    func getAuthenticationRequestParameters() throws -> AuthenticationRequestParameters {
+    func getAuthenticationRequestParameters() async throws -> AuthenticationRequestParameters {
         let aReqParams = try transaction.getAuthenticationRequestParameters()
         
-        return AuthenticationRequestParameters(sdkTransactionID: aReqParams.sdkTransactionID, deviceData: aReqParams.deviceData, sdkEphemeralPublicKey: aReqParams.sdkEphemeralPublicKey, sdkAppID: aReqParams.sdkAppID, sdkReferenceNumber: aReqParams.sdkReferenceNumber, messageVersion: aReqParams.messageVersion)
+        return AuthenticationRequestParameters(
+            sdkTransactionID: aReqParams.sdkTransactionID,
+            deviceData: aReqParams.deviceData,
+            sdkEphemeralPublicKey: aReqParams.sdkEphemeralPublicKey,
+            sdkAppID: aReqParams.sdkAppID,
+            sdkReferenceNumber: aReqParams.sdkReferenceNumber,
+            messageVersion: aReqParams.messageVersion,
+            sdkEncryptedData: nil
+        )
     }
     
     func doChallenge(viewController: UIViewController, challengeParameters: ChallengeParameters, challengeStatusReceiver: ChallengeStatusReceiver, timeOut: Int) throws {

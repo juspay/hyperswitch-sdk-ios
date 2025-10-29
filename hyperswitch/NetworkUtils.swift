@@ -52,7 +52,7 @@ class NetworkUtility {
             throw NSError(domain: "Serialization Error", code: 400, userInfo: [NSLocalizedDescriptionKey: "Unable to serialize request body"])
         }
         
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (data, _) = try await URLSession.shared.data(for: request)
         
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw NSError(domain: "Serialization Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Unable to decode response"])
