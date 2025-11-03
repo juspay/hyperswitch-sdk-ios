@@ -29,7 +29,6 @@
 		43E668792C084FB70094BD13 /* montserrat_semibolditalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668662C084FB70094BD13 /* montserrat_semibolditalic.ttf */; };
 		43E6687A2C084FB70094BD13 /* montserrat_blackitalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668672C084FB70094BD13 /* montserrat_blackitalic.ttf */; };
 		43F6051E2B45FA3300BAA90E /* PaymentSheetAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43F6051D2B45FA3300BAA90E /* PaymentSheetAppearance.swift */; };
-		4C6389A390C2B9D3CE7E3758 /* libPods-hyperswitch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2702C4D21F48240395DE5AB2 /* libPods-hyperswitch.a */; };
 		4E0A93DE2CA2F29500E3A767 /* HyperUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A93DC2CA2F29500E3A767 /* HyperUIViewController.swift */; };
 		4E34835F2EA643DC007067EA /* CardinalProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E34835E2EA643D7007067EA /* CardinalProvider.swift */; };
 		4E69679B2CB7CF71000DBE0A /* PMMViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E69679A2CB7CF71000DBE0A /* PMMViewController.swift */; };
@@ -48,6 +47,8 @@
 		4E97AA1F2E992D6A0029501E /* NetworkUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA2BD52E9926040094AA83 /* NetworkUtils.swift */; };
 		4EEA67032D37B493000D4DC5 /* HyperParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA67022D37B487000D4DC5 /* HyperParams.swift */; };
 		4EEA67042D37B493000D4DC5 /* HyperParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA67022D37B487000D4DC5 /* HyperParams.swift */; };
+		570D085C0EE0B792AD674EC7 /* libPods-hyperswitch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 326F2B616140E767CA0149B9 /* libPods-hyperswitch.a */; };
+		60931E98C132E4509C70F829 /* Pods_hyperswitchAppClip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAED38BB9AD107A31AB764F5 /* Pods_hyperswitchAppClip.framework */; };
 		663F68FC29CCC93C006E91BD /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663F68FB29CCC93C006E91BD /* APIClient.swift */; };
 		66486F92294355BD00150E4F /* hyperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66486F91294355BD00150E4F /* hyperApp.swift */; };
 		66486F94294355BD00150E4F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66486F93294355BD00150E4F /* ContentView.swift */; };
@@ -68,6 +69,10 @@
 		75AA28EB2D48F61800CD88A6 /* HyperNetworking.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28E52D477FF200CD88A6 /* HyperNetworking.swift */; };
 		75E692FA2D5B28D70077C0F3 /* OTAServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75E692F92D5B28D70077C0F3 /* OTAServices.swift */; };
 		75E692FC2D5B2AB90077C0F3 /* HyperOTA.plist in Resources */ = {isa = PBXBuildFile; fileRef = 75E692FB2D5B2AB90077C0F3 /* HyperOTA.plist */; };
+		7901E1C72EB4DBA6002A9EEE /* ClickToPayModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7901E1C32EB4DBA6002A9EEE /* ClickToPayModels.swift */; };
+		7901E1C82EB4DBA6002A9EEE /* ClickToPaySession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7901E1C52EB4DBA6002A9EEE /* ClickToPaySession.swift */; };
+		7901E1CB2EB4DCE2002A9EEE /* ClickToPayViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7901E1CA2EB4DCE2002A9EEE /* ClickToPayViewModel.swift */; };
+		7901E1CC2EB4DCE2002A9EEE /* ClickToPayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7901E1C92EB4DCE2002A9EEE /* ClickToPayViewController.swift */; };
 		790525712BDA66EF00D49FE8 /* HyperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790525702BDA66EF00D49FE8 /* HyperViewModel.swift */; };
 		7905257A2BDA73A600D49FE8 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790525792BDA73A600D49FE8 /* SwiftUIView.swift */; };
 		79052A242C8922E90011804E /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A232C8922E90011804E /* Version.swift */; };
@@ -102,7 +107,6 @@
 		79E8E4B62EB2333D00FA3886 /* ThreeDSSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E8E4B52EB2333100FA3886 /* ThreeDSSession.swift */; };
 		79E8E4BA2EB23AEC00FA3886 /* AuthenticationConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E8E4B92EB23AEC00FA3886 /* AuthenticationConfiguration.swift */; };
 		79E8E4BC2EB2990500FA3886 /* TransactionError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E8E4BB2EB2990500FA3886 /* TransactionError.swift */; };
-		79E8E4BE2EB29A6100FA3886 /* C2PSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E8E4BD2EB29A5B00FA3886 /* C2PSession.swift */; };
 		79EAB0132C81CCDA006B40AD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EAB0122C81CCDA006B40AD /* AppDelegate.swift */; };
 		79EAB0172C81CCDA006B40AD /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EAB0162C81CCDA006B40AD /* ViewController.swift */; };
 		79EAB01C2C81CCDC006B40AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 79EAB01B2C81CCDC006B40AD /* Assets.xcassets */; };
@@ -123,7 +127,6 @@
 		79FE014E2E97C18F00C5D94A /* Codable+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE014C2E97C18F00C5D94A /* Codable+UIKit.swift */; };
 		79FE01502E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE014F2E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift */; };
 		79FE01512E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE014F2E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift */; };
-		DBC951798B0954928C8CDA5B /* Pods_hyperswitchAppClip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AAB83A9C9B665AB81A1BBDD6 /* Pods_hyperswitchAppClip.framework */; };
 		DC4AC9F2296D6D6C00E0D2A6 /* PaymentCardTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4AC9F1296D6D6C00E0D2A6 /* PaymentCardTextField.swift */; };
 		DC4AC9F5296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4AC9F4296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift */; };
 		DC5D0114294731480017C67A /* PaymentSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D0111294731480017C67A /* PaymentSheet.swift */; };
@@ -171,9 +174,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		24DA4383983CB1F6B58F3E98 /* Pods-hyperswitchAppClip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitchAppClip.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip.debug.xcconfig"; sourceTree = "<group>"; };
-		2702C4D21F48240395DE5AB2 /* libPods-hyperswitch.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-hyperswitch.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		303E7F43B96A12ECB2734979 /* Pods-hyperswitch.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitch.release.xcconfig"; path = "Target Support Files/Pods-hyperswitch/Pods-hyperswitch.release.xcconfig"; sourceTree = "<group>"; };
+		1D706293B54A788CD61F876E /* Pods-hyperswitchAppClip.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitchAppClip.release.xcconfig"; path = "Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip.release.xcconfig"; sourceTree = "<group>"; };
+		326F2B616140E767CA0149B9 /* libPods-hyperswitch.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-hyperswitch.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4365207B2C8768B90006C856 /* ApplePayHandlerLite.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplePayHandlerLite.swift; sourceTree = "<group>"; };
 		43E668552C084FB60094BD13 /* montserrat_extralight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_extralight.ttf; sourceTree = "<group>"; };
 		43E668562C084FB70094BD13 /* montserrat_bolditalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = montserrat_bolditalic.ttf; sourceTree = "<group>"; };
@@ -211,7 +213,7 @@
 		4E971A712CC2764F0040EFEB /* PaymentMethodManagementWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodManagementWidget.swift; sourceTree = "<group>"; };
 		4EEA2BD52E9926040094AA83 /* NetworkUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkUtils.swift; sourceTree = "<group>"; };
 		4EEA67022D37B487000D4DC5 /* HyperParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperParams.swift; sourceTree = "<group>"; };
-		639EA3639EC42BF7316F091B /* Pods-hyperswitch.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitch.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitch/Pods-hyperswitch.debug.xcconfig"; sourceTree = "<group>"; };
+		652884677D31EE32A61ADD6C /* Pods-hyperswitch.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitch.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitch/Pods-hyperswitch.debug.xcconfig"; sourceTree = "<group>"; };
 		663F68FB29CCC93C006E91BD /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		66486F8E294355BD00150E4F /* hyperswitch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hyperswitch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		66486F91294355BD00150E4F /* hyperApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = hyperApp.swift; sourceTree = "<group>"; };
@@ -232,6 +234,10 @@
 		75AA28E82D47805800CD88A6 /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		75E692F92D5B28D70077C0F3 /* OTAServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTAServices.swift; sourceTree = "<group>"; };
 		75E692FB2D5B2AB90077C0F3 /* HyperOTA.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = HyperOTA.plist; sourceTree = "<group>"; };
+		7901E1C32EB4DBA6002A9EEE /* ClickToPayModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayModels.swift; sourceTree = "<group>"; };
+		7901E1C52EB4DBA6002A9EEE /* ClickToPaySession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPaySession.swift; sourceTree = "<group>"; };
+		7901E1C92EB4DCE2002A9EEE /* ClickToPayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayViewController.swift; sourceTree = "<group>"; };
+		7901E1CA2EB4DCE2002A9EEE /* ClickToPayViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayViewModel.swift; sourceTree = "<group>"; };
 		790525702BDA66EF00D49FE8 /* HyperViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperViewModel.swift; sourceTree = "<group>"; };
 		790525792BDA73A600D49FE8 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
 		79052A232C8922E90011804E /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
@@ -261,7 +267,6 @@
 		79E8E4B52EB2333100FA3886 /* ThreeDSSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeDSSession.swift; sourceTree = "<group>"; };
 		79E8E4B92EB23AEC00FA3886 /* AuthenticationConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationConfiguration.swift; sourceTree = "<group>"; };
 		79E8E4BB2EB2990500FA3886 /* TransactionError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransactionError.swift; sourceTree = "<group>"; };
-		79E8E4BD2EB29A5B00FA3886 /* C2PSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = C2PSession.swift; sourceTree = "<group>"; };
 		79EAB00A2C81CC06006B40AD /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		79EAB0102C81CCDA006B40AD /* hyperswitchAppClip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hyperswitchAppClip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		79EAB0122C81CCDA006B40AD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -275,8 +280,7 @@
 		79EAB0442C81D5AC006B40AD /* PaymentSession+Lite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSession+Lite.swift"; sourceTree = "<group>"; };
 		79FE014C2E97C18F00C5D94A /* Codable+UIKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Codable+UIKit.swift"; sourceTree = "<group>"; };
 		79FE014F2E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSheetAppearance+Codable.swift"; sourceTree = "<group>"; };
-		AAB83A9C9B665AB81A1BBDD6 /* Pods_hyperswitchAppClip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hyperswitchAppClip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		AD209BEE3D4E9F9F43D9D30D /* Pods-hyperswitchAppClip.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitchAppClip.release.xcconfig"; path = "Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip.release.xcconfig"; sourceTree = "<group>"; };
+		8DE1DB5CD7CD39ED0932F0FA /* Pods-hyperswitchAppClip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitchAppClip.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip.debug.xcconfig"; sourceTree = "<group>"; };
 		DC4AC9F1296D6D6C00E0D2A6 /* PaymentCardTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCardTextField.swift; sourceTree = "<group>"; };
 		DC4AC9F4296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentCardTextField+SwiftUI.swift"; sourceTree = "<group>"; };
 		DC5D0111294731480017C67A /* PaymentSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentSheet.swift; sourceTree = "<group>"; };
@@ -287,6 +291,8 @@
 		DC5D0124294847E90017C67A /* PaymentSheetView+UIKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSheetView+UIKit.swift"; sourceTree = "<group>"; };
 		DC5D0126294853A90017C67A /* PaymentSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSheetView.swift; sourceTree = "<group>"; };
 		DCF9778F29517BBB00596F78 /* DictionaryConverter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictionaryConverter.swift; sourceTree = "<group>"; };
+		E0013FD24B5D86680871D58F /* Pods-hyperswitch.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitch.release.xcconfig"; path = "Target Support Files/Pods-hyperswitch/Pods-hyperswitch.release.xcconfig"; sourceTree = "<group>"; };
+		EAED38BB9AD107A31AB764F5 /* Pods_hyperswitchAppClip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hyperswitchAppClip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -295,7 +301,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				192F175E42A8AC4EC54D289E /* (null) in Frameworks */,
-				4C6389A390C2B9D3CE7E3758 /* libPods-hyperswitch.a in Frameworks */,
+				570D085C0EE0B792AD674EC7 /* libPods-hyperswitch.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -303,7 +309,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DBC951798B0954928C8CDA5B /* Pods_hyperswitchAppClip.framework in Frameworks */,
+				60931E98C132E4509C70F829 /* Pods_hyperswitchAppClip.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -313,10 +319,10 @@
 		255968CC569349C97C21931C /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				639EA3639EC42BF7316F091B /* Pods-hyperswitch.debug.xcconfig */,
-				303E7F43B96A12ECB2734979 /* Pods-hyperswitch.release.xcconfig */,
-				24DA4383983CB1F6B58F3E98 /* Pods-hyperswitchAppClip.debug.xcconfig */,
-				AD209BEE3D4E9F9F43D9D30D /* Pods-hyperswitchAppClip.release.xcconfig */,
+				652884677D31EE32A61ADD6C /* Pods-hyperswitch.debug.xcconfig */,
+				E0013FD24B5D86680871D58F /* Pods-hyperswitch.release.xcconfig */,
+				8DE1DB5CD7CD39ED0932F0FA /* Pods-hyperswitchAppClip.debug.xcconfig */,
+				1D706293B54A788CD61F876E /* Pods-hyperswitchAppClip.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -360,7 +366,7 @@
 			isa = PBXGroup;
 			children = (
 				79E8E4B72EB23A0500FA3886 /* ThreeDS */,
-				79E8E4B82EB23A1300FA3886 /* C2P */,
+				79E8E4B82EB23A1300FA3886 /* ClickToPay */,
 				4E8C83882E98CABF00A61749 /* AuthenticationSession.swift */,
 				79E8E4B92EB23AEC00FA3886 /* AuthenticationConfiguration.swift */,
 				4E8C83862E98CABF00A61749 /* AuthenticationError.swift */,
@@ -386,7 +392,7 @@
 				79EAB0112C81CCDA006B40AD /* hyperswitchAppClip */,
 				66486F8F294355BD00150E4F /* Products */,
 				255968CC569349C97C21931C /* Pods */,
-				82FC2AF03D3702E1A4483C8B /* Frameworks */,
+				D5E7F82111B2BDFA1E8F48E7 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -405,6 +411,8 @@
 				79052A492C9057D60011804E /* AppDelegate.swift */,
 				66486F91294355BD00150E4F /* hyperApp.swift */,
 				66486F93294355BD00150E4F /* ContentView.swift */,
+				7901E1C92EB4DCE2002A9EEE /* ClickToPayViewController.swift */,
+				7901E1CA2EB4DCE2002A9EEE /* ClickToPayViewModel.swift */,
 				DC5D011D294844900017C67A /* ViewController.swift */,
 				790525792BDA73A600D49FE8 /* SwiftUIView.swift */,
 				79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */,
@@ -502,12 +510,13 @@
 			path = ThreeDS;
 			sourceTree = "<group>";
 		};
-		79E8E4B82EB23A1300FA3886 /* C2P */ = {
+		79E8E4B82EB23A1300FA3886 /* ClickToPay */ = {
 			isa = PBXGroup;
 			children = (
-				79E8E4BD2EB29A5B00FA3886 /* C2PSession.swift */,
+				7901E1C32EB4DBA6002A9EEE /* ClickToPayModels.swift */,
+				7901E1C52EB4DBA6002A9EEE /* ClickToPaySession.swift */,
 			);
-			path = C2P;
+			path = ClickToPay;
 			sourceTree = "<group>";
 		};
 		79EAB0112C81CCDA006B40AD /* hyperswitchAppClip */ = {
@@ -565,11 +574,11 @@
 			path = Core;
 			sourceTree = "<group>";
 		};
-		82FC2AF03D3702E1A4483C8B /* Frameworks */ = {
+		D5E7F82111B2BDFA1E8F48E7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				2702C4D21F48240395DE5AB2 /* libPods-hyperswitch.a */,
-				AAB83A9C9B665AB81A1BBDD6 /* Pods_hyperswitchAppClip.framework */,
+				326F2B616140E767CA0149B9 /* libPods-hyperswitch.a */,
+				EAED38BB9AD107A31AB764F5 /* Pods_hyperswitchAppClip.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -639,15 +648,15 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 66486F9C294355BE00150E4F /* Build configuration list for PBXNativeTarget "hyperswitch" */;
 			buildPhases = (
-				C32A09B39F8C8EF3C208B7FE /* [CP] Check Pods Manifest.lock */,
+				5BB9AEB0C39FEB31EB495C32 /* [CP] Check Pods Manifest.lock */,
 				66486F8A294355BD00150E4F /* Sources */,
 				66486F8B294355BD00150E4F /* Frameworks */,
 				66486F8C294355BD00150E4F /* Resources */,
 				79FAC1072A5D5FB0004479E4 /* Embed Frameworks */,
 				4365207D2C8CE0690006C856 /* Bundle React Native code and images */,
 				79EAB0282C81CCDC006B40AD /* Embed App Clips */,
-				FE392A2D7B6613B8CBBCFD5B /* [CP] Embed Pods Frameworks */,
-				091A82A2DC541A755E786AE2 /* [CP] Copy Pods Resources */,
+				0EF131D589296104756894E9 /* [CP] Embed Pods Frameworks */,
+				0B43AA32981F31BB4A7726E6 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -663,11 +672,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 79EAB0252C81CCDC006B40AD /* Build configuration list for PBXNativeTarget "hyperswitchAppClip" */;
 			buildPhases = (
-				C427C48E1713E2F3C62CD8DD /* [CP] Check Pods Manifest.lock */,
+				164055B9AF7A1149B6C4401E /* [CP] Check Pods Manifest.lock */,
 				79EAB00C2C81CCDA006B40AD /* Sources */,
 				79EAB00D2C81CCDA006B40AD /* Frameworks */,
 				79EAB00E2C81CCDA006B40AD /* Resources */,
-				4E88B6FF476F684ED26A1EE7 /* [CP] Embed Pods Frameworks */,
+				8AC8207C339EBCAF627E916D /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -759,7 +768,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		091A82A2DC541A755E786AE2 /* [CP] Copy Pods Resources */ = {
+		0B43AA32981F31BB4A7726E6 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -778,6 +787,49 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		0EF131D589296104756894E9 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		164055B9AF7A1149B6C4401E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-hyperswitchAppClip-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		4365207D2C8CE0690006C856 /* Bundle React Native code and images */ = {
@@ -800,28 +852,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		4E88B6FF476F684ED26A1EE7 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C32A09B39F8C8EF3C208B7FE /* [CP] Check Pods Manifest.lock */ = {
+		5BB9AEB0C39FEB31EB495C32 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -843,47 +874,25 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C427C48E1713E2F3C62CD8DD /* [CP] Check Pods Manifest.lock */ = {
+		8AC8207C339EBCAF627E916D /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-hyperswitchAppClip-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		FE392A2D7B6613B8CBBCFD5B /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			inputPaths = (
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -904,6 +913,8 @@
 				4E87FA612CAAE8E300E74113 /* PaymentManagementConfiguration.swift in Sources */,
 				DC5D0115294731480017C67A /* PaymentSheetView+SwiftUI.swift in Sources */,
 				7954A44A2C23A49A00FEC02D /* ApplePayViewManager.swift in Sources */,
+				7901E1C72EB4DBA6002A9EEE /* ClickToPayModels.swift in Sources */,
+				7901E1C82EB4DBA6002A9EEE /* ClickToPaySession.swift in Sources */,
 				75AA28E92D47805800CD88A6 /* Environment.swift in Sources */,
 				792D6A082B99C215001598CD /* HyperHeadless.swift in Sources */,
 				79FE01502E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift in Sources */,
@@ -924,6 +935,8 @@
 				79E8E4BA2EB23AEC00FA3886 /* AuthenticationConfiguration.swift in Sources */,
 				4E971A722CC2764F0040EFEB /* PaymentMethodManagementWidget.swift in Sources */,
 				663F68FC29CCC93C006E91BD /* APIClient.swift in Sources */,
+				7901E1CB2EB4DCE2002A9EEE /* ClickToPayViewModel.swift in Sources */,
+				7901E1CC2EB4DCE2002A9EEE /* ClickToPayViewController.swift in Sources */,
 				79EAB0432C81D4AA006B40AD /* PaymentSessionTypes.swift in Sources */,
 				793083ED2A0DA9F100E78310 /* PaymentIntentParams.swift in Sources */,
 				66C2F89B29444E6700ACD32D /* ApplePayHandler.swift in Sources */,
@@ -953,7 +966,6 @@
 				66486FAA2943580F00150E4F /* RNViewManager.swift in Sources */,
 				75AA28DE2D477F9D00CD88A6 /* Debouncer.swift in Sources */,
 				752CF93C2DF6D47A0056F58A /* RNHeadlessManager.swift in Sources */,
-				79E8E4BE2EB29A6100FA3886 /* C2PSession.swift in Sources */,
 				79E8E4B62EB2333D00FA3886 /* ThreeDSSession.swift in Sources */,
 				DC4AC9F5296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift in Sources */,
 				DC5D0127294853A90017C67A /* PaymentSheetView.swift in Sources */,
@@ -1175,7 +1187,7 @@
 		};
 		66486F9D294355BE00150E4F /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 639EA3639EC42BF7316F091B /* Pods-hyperswitch.debug.xcconfig */;
+			baseConfigurationReference = 652884677D31EE32A61ADD6C /* Pods-hyperswitch.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -1214,7 +1226,7 @@
 		};
 		66486F9E294355BE00150E4F /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 303E7F43B96A12ECB2734979 /* Pods-hyperswitch.release.xcconfig */;
+			baseConfigurationReference = E0013FD24B5D86680871D58F /* Pods-hyperswitch.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -1253,7 +1265,7 @@
 		};
 		79EAB0262C81CCDC006B40AD /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 24DA4383983CB1F6B58F3E98 /* Pods-hyperswitchAppClip.debug.xcconfig */;
+			baseConfigurationReference = 8DE1DB5CD7CD39ED0932F0FA /* Pods-hyperswitchAppClip.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -1296,7 +1308,7 @@
 		};
 		79EAB0272C81CCDC006B40AD /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = AD209BEE3D4E9F9F43D9D30D /* Pods-hyperswitchAppClip.release.xcconfig */;
+			baseConfigurationReference = 1D706293B54A788CD61F876E /* Pods-hyperswitchAppClip.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;

@@ -1,7 +1,7 @@
 version = "0.1.0"
 
 Pod::Spec.new do |s|
-  s.name                      = 'hyperswitch-authentication-sdk-ios'
+  s.name                      = 'hyperswitch-sdk-ios-authentication'
   s.version                   =  version
   s.summary                   = 'Hyperswitch Authentication SDK'
   s.description               = 'Authentication module for Hyperswitch SDK - handles 3DS authentication flows'
@@ -16,21 +16,21 @@ Pod::Spec.new do |s|
 
   s.subspec 'core' do |core|
     core.source_files = 'hyperswitchSDK/AuthenticationModule/**/*.{m,swift,h}'
-    core.dependency 'hyperswitch-authentication-sdk-ios/common'
+    core.dependency 'hyperswitch-sdk-ios-authentication/common'
   end
 
   s.subspec 'netcetera3ds' do |netcetera3ds|
     netcetera3ds.vendored_frameworks = 'frameworkgen/3ds/Frameworks/Netcetera/*.xcframework'
-    netcetera3ds.dependency 'hyperswitch-authentication-sdk-ios/core'
+    netcetera3ds.dependency 'hyperswitch-sdk-ios-authentication/core'
   end
 
   s.subspec 'trident' do |trident|
-    trident.dependency 'hyperswitch-authentication-sdk-ios/core'
+    trident.dependency 'hyperswitch-sdk-ios-authentication/core'
     trident.dependency 'Trident3DS', '1.0.5'
   end
 
   s.subspec 'cardinal' do |cardinal|
-    cardinal.dependency 'hyperswitch-authentication-sdk-ios/core'
+    cardinal.dependency 'hyperswitch-sdk-ios-authentication/core'
     cardinal.dependency 'CardinalMobile', '3.0.0-2'
   end
 

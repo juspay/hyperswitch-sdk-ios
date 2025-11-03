@@ -17,6 +17,7 @@ struct ContentView: View {
                 Text("SwiftUI View").tag(1)
                 Text("Headless View").tag(2)
                 Text("3DS").tag(3)
+                Text("C2P").tag(4)
             }.pickerStyle(SegmentedPickerStyle())
 
             switch selectedSegment {
@@ -28,6 +29,8 @@ struct ContentView: View {
                 HeadlessView()
             case 3:
                 ThreeDSView()
+            case 4:
+                ClickToPayView()
             default:
                 UIKitView()
             }
@@ -64,5 +67,16 @@ struct ThreeDSView: UIViewControllerRepresentable {
     }
     
     func updateUIViewController(_ uiViewController: AuthenticationViewController, context: Context) {
+    }
+}
+
+struct ClickToPayView: UIViewControllerRepresentable {
+    typealias UIViewControllerType = ClickToPayViewController
+
+    func makeUIViewController(context: Context) -> ClickToPayViewController {
+        return ClickToPayViewController()
+    }
+
+    func updateUIViewController(_ uiViewController: ClickToPayViewController, context: Context) {
     }
 }
