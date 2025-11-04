@@ -62,27 +62,27 @@ public struct CardsStatusResponse: Codable {
 
 /// Represents a recognized card in Click to Pay
 public struct RecognizedCard : Codable {
-    let countryCode: String
-    let dateOfCardCreated: String
+    let countryCode: String?
+    let dateOfCardCreated: String?
     let dateOfCardLastUsed: String?
-    let dcf: DCF
-    let digitalCardData: DigitalCardData
-    let digitalCardFeatures: DigitalCardFeatures
-    let maskedBillingAddress: MaskedBillingAddress
-    let panBin: String
-    let panExpirationMonth: String
-    let panExpirationYear: String
-    let panLastFour: String
-    let paymentCardDescriptor: String
-    let paymentCardType: String
+    let dcf: DCF?
+    let digitalCardData: DigitalCardData?
+    let digitalCardFeatures: DigitalCardFeatures?
+    let maskedBillingAddress: MaskedBillingAddress?
+    let panBin: String?
+    let panExpirationMonth: String?
+    let panExpirationYear: String?
+    let panLastFour: String?
+    let paymentCardDescriptor: String?
+    let paymentCardType: String?
     let srcDigitalCardId: String
     let tokenLastFour: String?
 }
 
 struct DCF: Codable {
-    let logoUri: String
-    let name: String
-    let uri: String
+    let logoUri: String?
+    let name: String?
+    let uri: String?
 }
 
 struct DigitalCardFeatures: Codable {
@@ -91,11 +91,11 @@ struct DigitalCardFeatures: Codable {
 
 /// Digital card metadata
 public struct DigitalCardData: Codable {
-    public let status: String
+    public let status: String?
     public let presentationName: String?
-    public let descriptorName: String
-    public let artUri: String
-    
+    public let descriptorName: String?
+    public let artUri: String?
+
     enum CodingKeys: String, CodingKey {
         case status
         case presentationName
@@ -128,8 +128,8 @@ public struct MaskedBillingAddress: Codable {
 /// Request to checkout with a selected card
 public struct CheckoutRequest {
     public let srcDigitalCardId: String
-    public let rememberMe: Bool
-    
+    public let rememberMe: Bool?
+
     public init(srcDigitalCardId: String, rememberMe: Bool = false) {
         self.srcDigitalCardId = srcDigitalCardId
         self.rememberMe = rememberMe
@@ -138,17 +138,17 @@ public struct CheckoutRequest {
 
 /// Response from checkout operation
 public struct CheckoutResponse: Codable {
-    public let authenticationId: String
-    public let merchantId: String
-    public let status: String
-    public let clientSecret: String
-    public let amount: Int
-    public let currency: String
-    public let authenticationConnector: String
-    public let force3dsChallenge: Bool
+    public let authenticationId: String?
+    public let merchantId: String?
+    public let status: String?
+    public let clientSecret: String?
+    public let amount: Int?
+    public let currency: String?
+    public let authenticationConnector: String?
+    public let force3dsChallenge: Bool?
     public let returnUrl: String?
-    public let createdAt: String
-    public let profileId: String
+    public let createdAt: String?
+    public let profileId: String?
     public let psd2ScaExemptionType: String?
     public let acquirerDetails: AcquirerDetails?
     public let threedsServerTransactionId: String?
@@ -164,7 +164,7 @@ public struct CheckoutResponse: Codable {
     public let shipping: String?
     public let browserInformation: String?
     public let email: String?
-    public let transStatus: String
+    public let transStatus: String?
     public let acsUrl: String?
     public let challengeRequest: String?
     public let acsReferenceNumber: String?
@@ -234,11 +234,11 @@ public struct AcquirerDetails: Codable {
 
 /// Token data returned after successful checkout
 public struct TokenData: Codable {
-    public let paymentToken: String
-    public let tokenCryptogram: String
-    public let tokenExpirationMonth: String
-    public let tokenExpirationYear: String
-    
+    public let paymentToken: String?
+    public let tokenCryptogram: String?
+    public let tokenExpirationMonth: String?
+    public let tokenExpirationYear: String?
+
     enum CodingKeys: String, CodingKey {
         case paymentToken = "payment_token"
         case tokenCryptogram = "token_cryptogram"

@@ -116,8 +116,7 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
               <body></body>
             </html>
         """
-        webView?.perform(Selector(("setInspectable:")), with: true)
-        webView?.loadHTMLString(baseHtml, baseURL: URL(string: "https://secure.checkout.visa.com"))
+        webView?.loadHTMLString(baseHtml, baseURL: URL(string: "https://sandbox.src.mastercard.com"))
     }
 
 
