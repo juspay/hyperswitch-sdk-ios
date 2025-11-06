@@ -75,10 +75,16 @@ extension PaymentSession {
                             switch decodePaymentMethodData(map) {
                             case .success(let paymentMethod):
                                 array.append(paymentMethod)
-                            case .failure(let error):
+                            case .failure(_):
                                 continue
                             }
                         }
+                    }
+                    if array.isEmpty {
+                        return .failure(PMError(
+                            code: "01",
+                            message: "No default type found"
+                        ))
                     }
                     return .success(array)
 
