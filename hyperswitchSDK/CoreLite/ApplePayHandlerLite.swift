@@ -11,73 +11,72 @@ import PassKit
 typealias ApplePayCallback = ([[String: Any]])->()
 
 internal class ApplePayHandlerLite: NSObject {
-    
+
     var paymentStatus: PKPaymentAuthorizationStatus? = .failure
     var callback: ApplePayCallback?
-    
-    
+
+
     internal func startPayment(rnMessage: String, rnCallback: @escaping ApplePayCallback) {
-        
+
         callback = rnCallback
-        
-        var requiredBillingContactFields:Set<PKContactField>?
-        var requiredShippingContactFields:Set<PKContactField>?
-        
+        var requiredBillingContactFields: Set<PKContactField>?
+        var requiredShippingContactFields: Set<PKContactField>?
+
         guard let dict = rnMessage.toJSON() as? [String: AnyObject] else {
-            callback?([["status": "Error", "message": "01"]])
+            callback?([["status": "Failed", "message": "ApplePay: missing field payment_request_data"]])
             callback = nil
             return
         }
-        
+
         guard let payment_request_data = dict["payment_request_data"] else {
-            callback?([["status": "Error", "message": "02"]])
+            callback?([["status": "Failed", "message": "ApplePay: missing field payment_request_data"]])
             callback = nil
             return
         }
-        
+
         guard let countryCode = payment_request_data["country_code"] as? String else {
-            callback?([["status": "Error", "message": "03"]])
+            callback?([["status": "Failed", "message": "ApplePay: missing field country_code"]])
             callback = nil
             return
         }
-        
+
         guard let currencyCode = payment_request_data["currency_code"] as? String else {
-            callback?([["status": "Error", "message": "04"]])
+            callback?([["status": "Failed", "message": "ApplePay: missing field currency_code"]])
             callback = nil
             return
         }
         guard let total = payment_request_data["total"] as? [String: AnyObject] else {
-            callback?([["status": "Error", "message": "05"]])
+            callback?([["status": "Failed", "message": "ApplePay: missing field total"]])
             callback = nil
             return
         }
-        
+
         guard let amount = total["amount"] as? String,
               let label = total["label"] as? String,
               let type = total["type"] as? String else {
-            callback?([["status": "Error", "message": "06"]])
+            callback?([["status": "Failed", "message": "ApplePay: missing fields amount, label, type"]])
             callback = nil
             return
         }
-        
+
         guard let merchant_capabilities_array = payment_request_data["merchant_capabilities"] as? Array<String> else {
-            callback?([["status": "Error", "message": "07"]])
+            callback?([["status": "Failed", "message": "ApplePay: missing field merchant_capabilities"]])
             callback = nil
             return
         }
-        
-        guard let merchantIdentifier = payment_request_data["merchant_identifier"] as? String else{
-            callback?([["status": "Error", "message": "08"]])
+
+        guard let merchantIdentifier = payment_request_data["merchant_identifier"] as? String else {
+            callback?([["status": "Failed", "message": "ApplePay: missing field merchant_identifier"]])
             callback = nil
             return
         }
-        
-        guard let supported_networks_array = payment_request_data["supported_networks"] as? Array<String> else{
-            callback?([["status": "Error", "message": "09"]])
+
+        guard let supported_networks_array = payment_request_data["supported_networks"] as? Array<String> else {
+            callback?([["status": "Failed", "message": "ApplePay: missing field supported_networks"]])
             callback = nil
             return
         }
-        
+
         let supportedNetworks = supported_networks_array.compactMap { (string) -> PKPaymentNetwork? in
             switch string {
             case "visa":
@@ -94,15 +93,15 @@ internal class ApplePayHandlerLite: NSObject {
                 return nil
             }
         }
-        
+
         if let required_billing_contact_fields = payment_request_data["required_billing_contact_fields"] as? Array<String> {
             requiredBillingContactFields = Set(required_billing_contact_fields.compactMap(mapToPKContactField))
         }
-        
+
         if let required_shipping_contact_fields = payment_request_data["required_shipping_contact_fields"] as? Array<String> {
             requiredShippingContactFields = Set(required_shipping_contact_fields.compactMap(mapToPKContactField))
         }
-        
+
         let paymentSummaryItems = PKPaymentSummaryItem(label: label, amount: NSDecimalNumber(string: amount), type: (type == "final") ? .final : .pending)
         let paymentRequest = PKPaymentRequest()
         paymentRequest.paymentSummaryItems = [paymentSummaryItems]
@@ -115,14 +114,14 @@ internal class ApplePayHandlerLite: NSObject {
         for val in merchant_capabilities_array {
             paymentRequest.merchantCapabilities = (val == "supports3DS") ? .threeDSecure : .debit
         }
-        
+
         /// Create and present the PKPaymentAuthorizationController
         guard
             PKPaymentAuthorizationController.canMakePayments(),
             !paymentRequest.merchantIdentifier.isEmpty,
             PKPaymentAuthorizationViewController(paymentRequest: paymentRequest) != nil
         else {
-            callback?([["status": "Error", "message": "10"]])
+            callback?([["status": "Failed", "message": "ApplePay: cannot make payments"]])
             callback = nil
             return
         }
@@ -132,7 +131,7 @@ internal class ApplePayHandlerLite: NSObject {
             if presented {
                 self.paymentStatus = nil
             } else {
-                self.callback?([["status": "Error", "message": "11"]])
+                self.callback?([["status": "Failed", "message": "ApplePay: unable to present"]])
                 self.callback = nil
             }
         })
@@ -141,16 +140,16 @@ internal class ApplePayHandlerLite: NSObject {
 
 /// Extension to conform to PKPaymentAuthorizationControllerDelegate
 extension ApplePayHandlerLite: PKPaymentAuthorizationControllerDelegate {
-    
+
     /// Handle successful payment authorization
     internal func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController, didAuthorizePayment payment: PKPayment, handler completion: @escaping (PKPaymentAuthorizationResult) -> Void) {
-        
+
         let errors = [Error]()
         let status = PKPaymentAuthorizationStatus.success
         self.paymentStatus = status
-        
+
         let dataString = payment.token.paymentData.base64EncodedString()
-        
+
         var paymentType = "debit"
         switch payment.token.paymentMethod.type {
         case .debit: paymentType = "debit"
@@ -160,7 +159,7 @@ extension ApplePayHandlerLite: PKPaymentAuthorizationControllerDelegate {
         case .eMoney: paymentType = "eMoney"
         default: paymentType = "unknown"
         }
-        
+
         self.callback?(
             [[
                 "status": "Success",
@@ -182,14 +181,14 @@ extension ApplePayHandlerLite: PKPaymentAuthorizationControllerDelegate {
         controller.dismiss {
             DispatchQueue.main.async {
                 if self.paymentStatus == .failure {
-                    self.callback?([["status": "Failed"]])
+                    self.callback?([["status": "Failed", "message": "ApplePay: payment failed"]])
                 } else if self.paymentStatus == nil {
                     self.callback?([["status": "Cancelled"]])
                 }
             }
         }
     }
-    
+
     private func mapToPKContactField(_ string: String) -> PKContactField? {
         switch string {
         case "postalAddress": return .postalAddress
@@ -200,10 +199,10 @@ extension ApplePayHandlerLite: PKPaymentAuthorizationControllerDelegate {
         default: return nil
         }
     }
-    
+
     private func convertPKContactToDictionary(_ contact: PKContact?) -> [String: Any] {
         var contactDict = [String: Any]()
-        
+
         if let name = contact?.name {
             var nameDict = [String: Any]()
             nameDict["givenName"] = name.givenName
@@ -215,7 +214,7 @@ extension ApplePayHandlerLite: PKPaymentAuthorizationControllerDelegate {
             //            nameDict["phoneticRepresentation"] = name.phoneticRepresentation
             contactDict["name"] = nameDict
         }
-        
+
         if let postalAddress = contact?.postalAddress {
             var addressDict = [String: Any]()
             addressDict["street"] = postalAddress.street
@@ -228,15 +227,15 @@ extension ApplePayHandlerLite: PKPaymentAuthorizationControllerDelegate {
             addressDict["isoCountryCode"] = postalAddress.isoCountryCode
             contactDict["postalAddress"] = addressDict
         }
-        
+
         if let phoneNumber = contact?.phoneNumber {
             contactDict["phoneNumber"] = phoneNumber.stringValue
         }
-        
+
         if let emailAddress = contact?.emailAddress {
             contactDict["emailAddress"] = emailAddress
         }
-        
+
         return contactDict
     }
 }
