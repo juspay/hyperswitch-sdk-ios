@@ -15,7 +15,7 @@ internal class WebViewController: HyperUIViewController {
     
     private let applePayPaymentHandler = ApplePayHandlerLite()
     
-    private let baseUrl = URL(string: "https://beta.hyperswitch.io/mobile/1.7.3/index.html")
+    private let baseUrl = URL(string: "https://beta.hyperswitch.io/mobile/1.7.4/index.html")
     private var webView: WKWebView = WKWebView()
     private var popupWebView: WKWebView?
     private var props: [String: Any]?
