@@ -91,10 +91,8 @@ class ClickToPayViewController: UIViewController {
                 let request = CustomerPresenceRequest(email: email)
                 let response = try await session.isCustomerPresent(request: request)
                 DispatchQueue.main.async {
-                    if let present = response?.customerPresent {
-                        self.updateStatus("Customer Check Complete")
-                        self.updateCardsStatus("Customer \(present ? "exists" : "doesn't exist")")
-                    }
+                    self.updateStatus("Customer Check Complete")
+                    self.updateCardsStatus("Customer \(response.customerPresent  ? "exists" : "doesn't exist")")
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -117,10 +115,8 @@ class ClickToPayViewController: UIViewController {
                 updateStatus("Getting user type...")
                 let response = try await session.getUserType()
                 DispatchQueue.main.async {
-                    if let statusCode = response?.statusCode {
-                        self.updateStatus("User Type Retrieved")
-                        self.updateCardsStatus(statusCode.rawValue)
-                    }
+                    self.updateStatus("User Type Retrieved")
+                    self.updateCardsStatus(response.statusCode.rawValue)
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -141,11 +137,9 @@ class ClickToPayViewController: UIViewController {
                 updateStatus("Getting recognized cards...")
                 let cards = try await session.getRecognizedCards()
                 DispatchQueue.main.async {
-                    if let cards = cards {
-                        self.recognizedCards = cards
-                        self.updateStatus("Cards Retrieved")
-                        self.updateCardsStatus("Found \(cards.count) card(s)")
-                    }
+                    self.recognizedCards = cards
+                    self.updateStatus("Cards Retrieved")
+                    self.updateCardsStatus("Found \(cards.count) card(s)")
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -166,11 +160,9 @@ class ClickToPayViewController: UIViewController {
                 updateStatus("Validating OTP...")
                 let cards = try await session.validateCustomerAuthentication(otpValue: otp)
                 DispatchQueue.main.async {
-                    if let cards = cards {
-                        self.recognizedCards = cards
-                        self.updateStatus("OTP Validated")
-                        self.updateCardsStatus("Found \(cards.count) card(s)")
-                    }
+                    self.recognizedCards = cards
+                    self.updateStatus("OTP Validated")
+                    self.updateCardsStatus("Found \(cards.count) card(s)")
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -192,11 +184,25 @@ class ClickToPayViewController: UIViewController {
                 let request = CheckoutRequest(srcDigitalCardId: srcDigitalCardId, rememberMe: rememberMe)
                 let response = try await session.checkoutWithCard(request: request)
                 DispatchQueue.main.async {
-                    self.updateStatus("Checkout Complete")
-                    self.updateCardsStatus("Status: \(response?.status ?? "unknown")")
+                    switch response.status {
+
+                    case .success:
+
+                        self.updateStatus("Checkout Complete")
+                        self.updateCardsStatus("Status: success")
+                    case .pending:
+                        self.updateStatus("Checkout Complete")
+                        self.updateCardsStatus("Status: pending")
+                    case .failed:
+                        self.updateStatus("Checkout Complete")
+                        self.updateCardsStatus("Status: failure")
+                    default:
+                        print()
+                    }
                 }
             } catch {
                 DispatchQueue.main.async {
+                    print(error)
                     self.updateStatus("Checkout failed: \(error.localizedDescription)")
                 }
             }

@@ -13,7 +13,7 @@ import Foundation
 public struct CustomerPresenceRequest {
     public let email: String?
     public let mobileNumber: MobileNumber?
-    
+
     public init(email: String? = nil, mobileNumber: MobileNumber? = nil) {
         self.email = email
         self.mobileNumber = mobileNumber
@@ -24,7 +24,7 @@ public struct CustomerPresenceRequest {
 public struct MobileNumber {
     public let countryCode: String
     public let phoneNumber: String
-    
+
     public init(countryCode: String, phoneNumber: String) {
         self.countryCode = countryCode
         self.phoneNumber = phoneNumber
@@ -34,10 +34,6 @@ public struct MobileNumber {
 /// Response indicating if customer has a Click to Pay profile
 public struct CustomerPresenceResponse: Codable {
     public let customerPresent: Bool
-    
-    enum CodingKeys: String, CodingKey {
-        case customerPresent
-    }
 }
 
 // MARK: - Cards Status Models
@@ -52,7 +48,7 @@ public enum StatusCode: String, Codable, CaseIterable {
 /// Response containing the status of card retrieval
 public struct CardsStatusResponse: Codable {
     public let statusCode: StatusCode
-    
+
     enum CodingKeys: String, CodingKey {
         case statusCode
     }
@@ -73,60 +69,64 @@ public struct RecognizedCard : Codable {
     let panExpirationMonth: String?
     let panExpirationYear: String?
     let panLastFour: String?
+    let paymentAccountReference: String?
     let paymentCardDescriptor: String?
     let paymentCardType: String?
     let srcDigitalCardId: String
+    let tokenBinRange: String?
     let tokenLastFour: String?
 }
 
-struct DCF: Codable {
+public struct DCF: Codable {
     let logoUri: String?
     let name: String?
     let uri: String?
 }
 
-struct DigitalCardFeatures: Codable {
+public struct DigitalCardFeatures: Codable {
     // Empty object in the JSON, but keeping as struct for future extensibility
 }
 
 /// Digital card metadata
 public struct DigitalCardData: Codable {
-    public let status: String?
-    public let presentationName: String?
-    public let descriptorName: String?
-    public let artUri: String?
+    let status: String?
+    let presentationName: String?
+    let descriptorName: String?
+    let artUri: String?
+    let artHeight: Int?
+    let artWidth: Int?
+    let authenticationMethods: [AuthenticationMethod]?
+    let pendingEvents: [String]?
+}
 
-    enum CodingKeys: String, CodingKey {
-        case status
-        case presentationName
-        case descriptorName
-        case artUri
-    }
+public struct AuthenticationMethod: Codable {
+    let authenticationMethodType: String
 }
 
 /// Masked billing address for a card
 public struct MaskedBillingAddress: Codable {
+    public let addressId: String?
     public let name: String?
     public let line1: String?
+    public let line2: String?
+    public let line3: String?
     public let city: String?
     public let state: String?
     public let countryCode: String?
     public let zip: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case name
-        case line1
-        case city
-        case state
-        case countryCode
-        case zip
-    }
 }
 
 // MARK: - Checkout Models
 
+/// Authentication status enum
+public enum AuthenticationStatus: String, Codable {
+    case success
+    case failed
+    case pending
+}
+
 /// Request to checkout with a selected card
-public struct CheckoutRequest {
+public struct CheckoutRequest: Codable {
     public let srcDigitalCardId: String
     public let rememberMe: Bool?
 
@@ -140,7 +140,7 @@ public struct CheckoutRequest {
 public struct CheckoutResponse: Codable {
     public let authenticationId: String?
     public let merchantId: String?
-    public let status: String?
+    public let status: AuthenticationStatus?
     public let clientSecret: String?
     public let amount: Int?
     public let currency: String?
@@ -159,7 +159,7 @@ public struct CheckoutResponse: Codable {
     public let messageVersion: String?
     public let connectorMetadata: String?
     public let directoryServerId: String?
-    public let tokenData: TokenData?
+    public let vaultTokenData: TokenData?
     public let billing: String?
     public let shipping: String?
     public let browserInformation: String?
@@ -176,47 +176,7 @@ public struct CheckoutResponse: Codable {
     public let errorMessage: String?
     public let errorCode: String?
     public let profileAcquirerId: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case authenticationId = "authentication_id"
-        case merchantId = "merchant_id"
-        case status
-        case clientSecret = "client_secret"
-        case amount
-        case currency
-        case authenticationConnector = "authentication_connector"
-        case force3dsChallenge = "force_3ds_challenge"
-        case returnUrl = "return_url"
-        case createdAt = "created_at"
-        case profileId = "profile_id"
-        case psd2ScaExemptionType = "psd2_sca_exemption_type"
-        case acquirerDetails = "acquirer_details"
-        case threedsServerTransactionId = "threeds_server_transaction_id"
-        case maximumSupported3dsVersion = "maximum_supported_3ds_version"
-        case connectorAuthenticationId = "connector_authentication_id"
-        case threeDsMethodData = "three_ds_method_data"
-        case threeDsMethodUrl = "three_ds_method_url"
-        case messageVersion = "message_version"
-        case connectorMetadata = "connector_metadata"
-        case directoryServerId = "directory_server_id"
-        case tokenData = "token_data"
-        case billing
-        case shipping
-        case browserInformation = "browser_information"
-        case email
-        case transStatus = "trans_status"
-        case acsUrl = "acs_url"
-        case challengeRequest = "challenge_request"
-        case acsReferenceNumber = "acs_reference_number"
-        case acsTransId = "acs_trans_id"
-        case acsSignedContent = "acs_signed_content"
-        case threeDsRequestorUrl = "three_ds_requestor_url"
-        case threeDsRequestorAppUrl = "three_ds_requestor_app_url"
-        case eci
-        case errorMessage = "error_message"
-        case errorCode = "error_code"
-        case profileAcquirerId = "profile_acquirer_id"
-    }
+
 }
 
 /// Acquirer details for the transaction
@@ -224,27 +184,82 @@ public struct AcquirerDetails: Codable {
     public let acquirerBin: String?
     public let acquirerMerchantId: String?
     public let merchantCountryCode: String?
-    
-    enum CodingKeys: String, CodingKey {
-        case acquirerBin = "acquirer_bin"
-        case acquirerMerchantId = "acquirer_merchant_id"
-        case merchantCountryCode = "merchant_country_code"
-    }
 }
 
-/// Token data returned after successful checkout
+
+/// Vault token data returned after successful checkout
 public struct TokenData: Codable {
+    public let type: VaultTokenType?
+    public let cardNumber: String?
+    public let cardCvc: String?
+    public let cardExpiryMonth: String?
+    public let cardExpiryYear: String?
     public let paymentToken: String?
     public let tokenCryptogram: String?
     public let tokenExpirationMonth: String?
     public let tokenExpirationYear: String?
-
-    enum CodingKeys: String, CodingKey {
-        case paymentToken = "payment_token"
-        case tokenCryptogram = "token_cryptogram"
-        case tokenExpirationMonth = "token_expiration_month"
-        case tokenExpirationYear = "token_expiration_year"
-    }
+}
+/// Vault token data type enum
+public enum VaultTokenType: String, Codable {
+    case cardToken = "card_token"
+    case networkToken = "network_token"
 }
 
 
+// MARK: - Error Model
+
+/// Error types for Click to Pay operations
+public enum ClickToPayErrorType: String, Codable {
+    // getUserType errors
+    case authInvalid = "AUTH_INVALID"
+    case acctInaccessible = "ACCT_INACCESSIBLE"
+    case acctFraud = "ACCT_FRAUD"
+    case consumerIdMissing = "CONSUMER_ID_MISSING"
+    case consumerIdFormatUnsupported = "CONSUMER_ID_FORMAT_UNSUPPORTED"
+    case consumerIdFormatInvalid = "CONSUMER_ID_FORMAT_INVALID"
+
+    // validateCustomerAuthentication errors
+    case otpSendFailed = "OTP_SEND_FAILED"
+    case validationDataMissing = "VALIDATION_DATA_MISSING"
+    case validationDataExpired = "VALIDATION_DATA_EXPIRED"
+    case validationDataInvalid = "VALIDATION_DATA_INVALID"
+    case retriesExceeded = "RETRIES_EXCEEDED"
+
+    // Standard errors
+    case unknownError = "UNKNOWN_ERROR"
+    case requestTimeout = "REQUEST_TIMEOUT"
+    case serverError = "SERVER_ERROR"
+    case invalidParameter = "INVALID_PARAMETER"
+    case invalidRequest = "INVALID_REQUEST"
+    case authError = "AUTH_ERROR"
+    case notFound = "NOT_FOUND"
+    case rateLimitExceeded = "RATE_LIMIT_EXCEEDED"
+    case serviceError = "SERVICE_ERROR"
+
+    // SDK errors
+    case scriptLoadError = "SCRIPT_LOAD_ERROR"
+    case hyperUndefinedError = "HYPER_UNDEFINED_ERROR"
+    case hyperInitializationError = "HYPER_INITIALIZATION_ERROR"
+    case initClickToPaySessionError = "INIT_CLICK_TO_PAY_SESSION_ERROR"
+    case isCustomerPresentError = "IS_CUSTOMER_PRESENT_ERROR"
+    case getRecognizedCardsError = "GET_RECOGNIZED_CARDS_ERROR"
+    case checkoutWithCardError = "CHECKOUT_WITH_CARD_ERROR"
+
+    // Fallback
+    case error = "ERROR"
+}
+
+/// Click to Pay exception with error details
+public class ClickToPayException: Error, LocalizedError {
+    public let message: String
+    public let type: ClickToPayErrorType
+
+    public init(message: String, type: ClickToPayErrorType) {
+        self.message = message
+        self.type = type
+    }
+
+    public var errorDescription: String? {
+        return message
+    }
+}
