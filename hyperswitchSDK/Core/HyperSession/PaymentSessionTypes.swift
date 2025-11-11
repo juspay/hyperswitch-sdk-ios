@@ -30,7 +30,7 @@ public struct PaymentMethod: Codable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        paymentToken = try container.decodeIfPresent(String.self, forKey: .paymentToken) ?? ""
+        paymentToken = try container.decode(String.self, forKey: .paymentToken)
         paymentMethodId = try container.decodeIfPresent(String.self, forKey: .paymentMethodId) ?? ""
         customerId = try container.decodeIfPresent(String.self, forKey: .customerId) ?? ""
         paymentMethod = try container.decodeIfPresent(String.self, forKey: .paymentMethod) ?? ""
@@ -126,7 +126,7 @@ public struct Card: Codable {
 }
 
 /// Represents an error state in payment method retrieval
-public struct PMError: Error {
+public struct PMError: Codable, Error {
     public let code: String
     public let message: String
 }
