@@ -58,29 +58,29 @@ public struct CardsStatusResponse: Codable {
 
 /// Represents a recognized card in Click to Pay
 public struct RecognizedCard : Codable {
-    let countryCode: String?
-    let dateOfCardCreated: String?
-    let dateOfCardLastUsed: String?
-    let dcf: DCF?
-    let digitalCardData: DigitalCardData?
-    let digitalCardFeatures: DigitalCardFeatures?
-    let maskedBillingAddress: MaskedBillingAddress?
-    let panBin: String?
-    let panExpirationMonth: String?
-    let panExpirationYear: String?
-    let panLastFour: String?
-    let paymentAccountReference: String?
-    let paymentCardDescriptor: String?
-    let paymentCardType: String?
-    let srcDigitalCardId: String
-    let tokenBinRange: String?
-    let tokenLastFour: String?
+    public let countryCode: String?
+    public let dateOfCardCreated: String?
+    public let dateOfCardLastUsed: String?
+    public let dcf: DCF?
+    public let digitalCardData: DigitalCardData?
+    public let digitalCardFeatures: DigitalCardFeatures?
+    public let maskedBillingAddress: MaskedBillingAddress?
+    public let panBin: String?
+    public let panExpirationMonth: String?
+    public let panExpirationYear: String?
+    public let panLastFour: String?
+    public let paymentAccountReference: String?
+    public let paymentCardDescriptor: String?
+    public let paymentCardType: String?
+    public let srcDigitalCardId: String
+    public let tokenBinRange: String?
+    public let tokenLastFour: String?
 }
 
 public struct DCF: Codable {
-    let logoUri: String?
-    let name: String?
-    let uri: String?
+    public let logoUri: String?
+    public let name: String?
+    public let uri: String?
 }
 
 public struct DigitalCardFeatures: Codable {
@@ -89,18 +89,18 @@ public struct DigitalCardFeatures: Codable {
 
 /// Digital card metadata
 public struct DigitalCardData: Codable {
-    let status: String?
-    let presentationName: String?
-    let descriptorName: String?
-    let artUri: String?
-    let artHeight: Int?
-    let artWidth: Int?
-    let authenticationMethods: [AuthenticationMethod]?
-    let pendingEvents: [String]?
+    public let status: String?
+    public let presentationName: String?
+    public let descriptorName: String?
+    public let artUri: String?
+    public let artHeight: Int?
+    public let artWidth: Int?
+    public let authenticationMethods: [AuthenticationMethod]?
+    public let pendingEvents: [String]?
 }
 
 public struct AuthenticationMethod: Codable {
-    let authenticationMethodType: String
+    public let authenticationMethodType: String
 }
 
 /// Masked billing address for a card
