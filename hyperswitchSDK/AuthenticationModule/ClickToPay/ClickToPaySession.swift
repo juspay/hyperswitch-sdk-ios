@@ -38,6 +38,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     private let customParams: [String: Any]?
 
     private var webView: WKWebView?
+    private var popupWebView: WKWebView?
+    private let popupWebViewController: UIViewController = UIViewController()
 
     private var pendingRequests: [String: CheckedContinuation<String, Error>] = [:]
     private var sdkInitContinuation: CheckedContinuation<Void, Error>?
@@ -150,42 +152,44 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
         if navigationAction.targetFrame == nil {
 
-            configuration.userContentController.removeScriptMessageHandler(forName: "closePopupWebView")
-            configuration.userContentController.add(self, name: "closePopupWebView")
-            configuration.defaultWebpagePreferences.allowsContentJavaScript = true
-            configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
+            self.popupWebView = WKWebView(frame: .zero, configuration: configuration)
 
-            let webView = WKWebView(frame: .zero, configuration: configuration)
+            popupWebView?.navigationDelegate = self
+            popupWebView?.uiDelegate = self
+            popupWebView?.translatesAutoresizingMaskIntoConstraints = false
+            popupWebView?.isOpaque = true
+            popupWebView?.scrollView.isScrollEnabled = false
+            popupWebView?.scrollView.bounces = false
+            popupWebView?.scrollView.contentInsetAdjustmentBehavior = .never
 
-            webView.navigationDelegate = self
-            webView.uiDelegate = self
-            webView.translatesAutoresizingMaskIntoConstraints = false
-            webView.backgroundColor = .clear
-            webView.isOpaque = true
-            webView.scrollView.isScrollEnabled = false
-            webView.scrollView.bounces = false
-            webView.scrollView.contentInsetAdjustmentBehavior = .never
+            if let topViewController = getTopViewController(),
+               let popupWebView = popupWebView {
 
-            webView.translatesAutoresizingMaskIntoConstraints = false
+                popupWebViewController.modalPresentationStyle = .fullScreen
+                popupWebViewController.view.backgroundColor = .clear
 
-            if let topVC = getTopViewController(),
-               let view = topVC.view {
-                view.addSubview(webView)
+                popupWebView.translatesAutoresizingMaskIntoConstraints = false
+                popupWebViewController.view.addSubview(popupWebView)
                 NSLayoutConstraint.activate([
-                    webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                    webView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-                    webView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-                    webView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+                    popupWebView.topAnchor.constraint(equalTo: popupWebViewController.view.safeAreaLayoutGuide.topAnchor),
+                    popupWebView.leadingAnchor.constraint(equalTo: popupWebViewController.view.safeAreaLayoutGuide.leadingAnchor),
+                    popupWebView.trailingAnchor.constraint(equalTo: popupWebViewController.view.safeAreaLayoutGuide.trailingAnchor),
+                    popupWebView.bottomAnchor.constraint(equalTo: popupWebViewController.view.safeAreaLayoutGuide.bottomAnchor)
                 ])
-            }
 
-            return webView
+                topViewController.present(popupWebViewController, animated: true)
+            }
+            return popupWebView
         }
         return nil
     }
 
     internal func webViewDidClose(_ webView: WKWebView) {
-        webView.removeFromSuperview()
+        popupWebView?.stopLoading()
+        popupWebView?.removeFromSuperview()
+        popupWebView?.navigationDelegate = nil
+        popupWebView?.uiDelegate = nil
+        popupWebViewController.dismiss(animated: true, completion: nil)
     }
 
     internal func initClickToPaySession(
@@ -549,12 +553,38 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         return checkoutResponse
     }
 
+
+    public func getKeyWindow() -> UIWindow? {
+
+        var foregroundActiveScene: UIScene?
+        var foregroundInactiveScene: UIScene?
+
+        for scene in UIApplication.shared.connectedScenes {
+            guard scene is UIWindowScene else {
+                continue
+            }
+            if scene.activationState == .foregroundActive {
+                foregroundActiveScene = scene
+                break
+            }
+            if foregroundInactiveScene == nil && scene.activationState == .foregroundInactive {
+                foregroundInactiveScene = scene
+                // Don't break, we can have the active scene later in the set
+            }
+        }
+        let sceneToUse = foregroundActiveScene ?? foregroundInactiveScene
+
+        if let windowScene = sceneToUse as? UIWindowScene {
+            return windowScene.keyWindow
+        }
+        return nil
+    }
+
     private func getTopViewController() -> UIViewController? {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let rootViewController = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController else {
+        guard let window = getKeyWindow(),
+              let rootViewController = window.rootViewController else {
             return nil
         }
-
         return getTopViewController(from: rootViewController)
     }
 
@@ -570,11 +600,15 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
            let selected = tabController.selectedViewController {
             return getTopViewController(from: selected)
         }
-        return viewController
+        return viewController // Could be UIViewController OR UIHostingController
     }
     deinit {
         DispatchQueue.main.async { [weak webView] in
+            webView?.stopLoading()
+            webView?.subviews.forEach { $0.removeFromSuperview() }
             webView?.removeFromSuperview()
+            webView?.navigationDelegate = nil
+            webView?.uiDelegate = nil
         }
     }
 }
