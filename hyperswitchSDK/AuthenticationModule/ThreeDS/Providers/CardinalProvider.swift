@@ -115,12 +115,11 @@ class CardinalTransactionProvider: ThreeDSTransactionProvider {
         } else {
             return AuthenticationRequestParameters(
                 sdkTransactionID: nil,
-                deviceData: nil,
+                deviceData: cardinalEncryptedData,
                 sdkEphemeralPublicKey: nil,
                 sdkAppID: nil,
                 sdkReferenceNumber: nil,
-                messageVersion: nil,
-                sdkEncryptedData: cardinalEncryptedData
+                messageVersion: nil
             )
         }
     }
