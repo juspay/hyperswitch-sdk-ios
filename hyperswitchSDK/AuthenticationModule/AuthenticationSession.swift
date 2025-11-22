@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 public class AuthenticationSession {
     private var authIntentClientSecret: String?
