@@ -21,6 +21,7 @@ class ClickToPayViewController: UIViewController {
     private var getUserTypeButton = UIButton()
     private var getCardsButton = UIButton()
     private var validateOTPButton = UIButton()
+    private var signOutButton = UIButton()
     private var checkoutButton = UIButton()
     private var statusLabel = UILabel()
     private var cardsStatusLabel = UILabel()
@@ -66,7 +67,7 @@ class ClickToPayViewController: UIViewController {
         Task {
             do {
                 updateStatus("Initializing Click to Pay...")
-                let clickToPaySession = try await session.initClickToPaySession(request3DSAuthentication: false)
+                let clickToPaySession = try await session.initClickToPaySession(request3DSAuthentication: false, viewController: self)
                 DispatchQueue.main.async {
                     self.clickToPaySession = clickToPaySession
                     self.updateStatus("Click to Pay Initialized")
@@ -167,6 +168,28 @@ class ClickToPayViewController: UIViewController {
             } catch {
                 DispatchQueue.main.async {
                     self.updateStatus("OTP validation failed: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+    private func signOut() {
+        guard let session = clickToPaySession else {
+            updateStatus("Click to Pay session not initialized")
+            return
+        }
+
+        Task {
+            do {
+                updateStatus("Signing Out...")
+                let signOutResponse = try await session.signOut()
+                DispatchQueue.main.async {
+                    self.updateStatus("Signed Out")
+                    self.updateCardsStatus("recognized: \(signOutResponse.recognized)")
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.updateStatus("Failed to sign Out: \(error.localizedDescription)")
                 }
             }
         }
@@ -286,6 +309,11 @@ class ClickToPayViewController: UIViewController {
     }
 
     @objc
+    func signOut(_ sender: Any) {
+        signOut()
+    }
+
+    @objc
     func checkout(_ sender: Any) {
         guard !recognizedCards.isEmpty else {
             let alert = UIAlertController(title: "No Cards", message: "Please get recognized cards first", preferredStyle: .alert)
@@ -296,10 +324,12 @@ class ClickToPayViewController: UIViewController {
 
         let alert = UIAlertController(title: "Select Card", message: "Choose a card for checkout", preferredStyle: .actionSheet)
         for card in recognizedCards {
-            let cardLabel = "**** \(card.panLastFour) - \(card.paymentCardDescriptor)"
-            alert.addAction(UIAlertAction(title: cardLabel, style: .default) { [weak self] _ in
-                self?.checkoutWithCard(srcDigitalCardId: card.srcDigitalCardId, rememberMe: true)
-            })
+            if let pan = card.panLastFour, let brand = card.paymentCardDescriptor  {
+                let cardLabel = "**** \(pan) - \(brand)"
+                alert.addAction(UIAlertAction(title: cardLabel, style: .default) { [weak self] _ in
+                    self?.checkoutWithCard(srcDigitalCardId: card.srcDigitalCardId, rememberMe: true)
+                })
+            }
         }
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(alert, animated: true)
@@ -352,8 +382,10 @@ extension ClickToPayViewController {
         // Validate OTP Button
         setupButton(validateOTPButton, title: "Validate OTP", target: #selector(validateOTP(_:)), on: contentView, topAnchor: getCardsButton.bottomAnchor, constant: 15)
 
+        setupButton(signOutButton, title: "Sign Out", target: #selector(signOut(_:)), on: contentView, topAnchor: validateOTPButton.bottomAnchor, constant: 15)
+
         // Checkout Button
-        setupButton(checkoutButton, title: "Checkout with Card", target: #selector(checkout(_:)), on: contentView, topAnchor: validateOTPButton.bottomAnchor, constant: 15)
+        setupButton(checkoutButton, title: "Checkout with Card", target: #selector(checkout(_:)), on: contentView, topAnchor: signOutButton.bottomAnchor, constant: 15)
 
         // Status Label
         statusLabel.textAlignment = .center

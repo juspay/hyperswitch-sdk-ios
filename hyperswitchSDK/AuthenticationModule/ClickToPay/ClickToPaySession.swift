@@ -24,6 +24,9 @@ public protocol ClickToPaySession {
     /// Validate customer authentication with OTP
     func validateCustomerAuthentication(otpValue: String) async throws -> [RecognizedCard]
 
+    /// Sign out of Click to Pay Session
+    func signOut() async throws -> SignOutResponse
+
     /// Checkout with a selected card
     func checkoutWithCard(request: CheckoutRequest) async throws -> CheckoutResponse
 }
@@ -38,6 +41,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     private let customParams: [String: Any]?
 
     private var webView: WKWebView?
+    private var viewController: UIViewController?
+
     private var popupWebView: WKWebView?
     private let popupWebViewController: UIViewController = UIViewController()
 
@@ -50,13 +55,14 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         publishableKey: String,
         customBackendUrl: String? = nil,
         customLogUrl: String? = nil,
-        customParams: [String: Any]? = nil
+        customParams: [String: Any]? = nil,
+        viewController: UIViewController?
     ) async throws {
         self.publishableKey = publishableKey
         self.customBackendUrl = customBackendUrl
         self.customLogUrl = customLogUrl
         self.customParams = customParams
-
+        self.viewController = viewController
         super.init()
 
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
@@ -85,10 +91,15 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         webView?.uiDelegate = self
 
         if let webView = webView {
-            let scenes = UIApplication.shared.connectedScenes // TODO: Tightly Coupled to UIApplication, accept a Controller or View
-            let windowScene = scenes.first as? UIWindowScene
-            windowScene?.windows.forEach { window in
-                window.addSubview(webView)
+            if let viewController = viewController {
+                viewController.view.addSubview(webView)
+            }
+            else {
+                let scenes = UIApplication.shared.connectedScenes // TODO: Tightly Coupled to UIApplication, accept a Controller or View
+                let windowScene = scenes.first as? UIWindowScene
+                windowScene?.windows.forEach { window in
+                    window.addSubview(webView)
+                }
             }
         }
 
@@ -136,7 +147,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                   }
                 </script>
                 <script
-                  src="https://beta.hyperswitch.io/v2/HyperLoader.js"
+                  src="https://beta.hyperswitch.io/web/2025.11.21.01-c2p-headless/v2/HyperLoader.js"
                   onload="initHyper()"
                   onerror="handleScriptError()"
                   async="true"
@@ -162,7 +173,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             popupWebView?.scrollView.bounces = false
             popupWebView?.scrollView.contentInsetAdjustmentBehavior = .never
 
-            if let topViewController = getTopViewController(),
+            if let topViewController = viewController ?? getTopViewController(),
                let popupWebView = popupWebView {
 
                 popupWebViewController.modalPresentationStyle = .fullScreen
@@ -185,11 +196,13 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     internal func webViewDidClose(_ webView: WKWebView) {
-        popupWebView?.stopLoading()
-        popupWebView?.removeFromSuperview()
-        popupWebView?.navigationDelegate = nil
-        popupWebView?.uiDelegate = nil
-        popupWebViewController.dismiss(animated: true, completion: nil)
+        popupWebViewController.dismiss(animated: true) { [weak self] in
+            self?.popupWebView?.stopLoading()
+            self?.popupWebView?.removeFromSuperview()
+            self?.popupWebView?.navigationDelegate = nil
+            self?.popupWebView?.uiDelegate = nil
+            self?.popupWebView = nil
+        }
     }
 
     internal func initClickToPaySession(
@@ -492,6 +505,60 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         return cards
     }
 
+    internal func signOut() async throws -> SignOutResponse {
+        let requestId = UUID().uuidString
+
+        let responseJson: String = try await withCheckedThrowingContinuation { continuation in
+            pendingRequestsQueue.async { [weak self] in
+                self?.pendingRequests[requestId] = continuation
+            }
+
+            let jsCode = """
+            (async function() {
+                try {
+                    const signOutResponse = await window.ClickToPaySession.signOut()
+                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                        requestId: "\(requestId)",
+                        data: signOutResponse
+                    }));
+                } catch (error) {
+                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                        requestId: "\(requestId)",
+                        data: {
+                            error: {
+                                type: error.type || 'SignOutError',
+                                message: error.message
+                            }
+                        }
+                    }))
+                }
+            })();
+            """
+
+            DispatchQueue.main.async { [weak self] in
+                self?.webView?.evaluateJavaScript(jsCode, completionHandler: nil)
+            }
+        }
+
+        guard let jsonData = responseJson.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+              let data = json["data"] as? [String: Any] else {
+            throw ClickToPayException(message: "Failed to parse response", type: .error)
+        }
+
+        if let error = data["error"] as? [String: Any] {
+            let typeString = error["type"] as? String ?? "ERROR"
+            let errorMessage = error["message"] as? String ?? "Unknown error"
+            let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            throw ClickToPayException(message: errorMessage, type: errorType)
+        }
+
+        if let recognized = data["recognized"] as? Bool {
+            return SignOutResponse(recognized: recognized)
+        }
+        throw ClickToPayException(message: "Failed to parse response", type: .error)
+    }
+
     internal func checkoutWithCard(request: CheckoutRequest) async throws -> CheckoutResponse {
         let requestId = UUID().uuidString
 
@@ -546,9 +613,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         }
 
         let responseData = try JSONSerialization.data(withJSONObject: data)
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
-        let checkoutResponse = try decoder.decode(CheckoutResponse.self, from: responseData)
+        let checkoutResponse = try JSONDecoder().decode(CheckoutResponse.self, from: responseData)
 
         return checkoutResponse
     }
@@ -604,6 +669,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
     deinit {
         DispatchQueue.main.async { [weak webView] in
+            webView?.configuration.userContentController.removeScriptMessageHandler(forName: "HSInterface")
             webView?.stopLoading()
             webView?.subviews.forEach { $0.removeFromSuperview() }
             webView?.removeFromSuperview()

@@ -7,7 +7,7 @@
 
 import Foundation
 
-// MARK: - Customer Presence Models
+// MARK: - Customer Presence Request
 
 /// Request to check if a customer has an existing Click to Pay profile
 public struct CustomerPresenceRequest {
@@ -31,19 +31,14 @@ public struct MobileNumber {
     }
 }
 
+// MARK: - Customer Presence Response
+
 /// Response indicating if customer has a Click to Pay profile
 public struct CustomerPresenceResponse: Codable {
     public let customerPresent: Bool
 }
 
-// MARK: - Cards Status Models
-
-/// Status codes for card retrieval
-public enum StatusCode: String, Codable, CaseIterable {
-    case triggeredCustomerAuthentication = "TRIGGERED_CUSTOMER_AUTHENTICATION"
-    case noCardsPresent = "NO_CARDS_PRESENT"
-    case recognizedCardsPresent = "RECOGNIZED_CARDS_PRESENT"
-}
+// MARK: - Cards Status Response
 
 /// Response containing the status of card retrieval
 public struct CardsStatusResponse: Codable {
@@ -52,6 +47,13 @@ public struct CardsStatusResponse: Codable {
     enum CodingKeys: String, CodingKey {
         case statusCode
     }
+}
+
+/// Status codes for card retrieval
+public enum StatusCode: String, Codable, CaseIterable {
+    case triggeredCustomerAuthentication = "TRIGGERED_CUSTOMER_AUTHENTICATION"
+    case noCardsPresent = "NO_CARDS_PRESENT"
+    case recognizedCardsPresent = "RECOGNIZED_CARDS_PRESENT"
 }
 
 // MARK: - Recognized Card Models
@@ -70,7 +72,7 @@ public struct RecognizedCard : Codable {
     public let panExpirationYear: String?
     public let panLastFour: String?
     public let paymentAccountReference: String?
-    public let paymentCardDescriptor: String?
+    public let paymentCardDescriptor: CardType?
     public let paymentCardType: String?
     public let srcDigitalCardId: String
     public let tokenBinRange: String?
@@ -116,14 +118,19 @@ public struct MaskedBillingAddress: Codable {
     public let zip: String?
 }
 
-// MARK: - Checkout Models
-
-/// Authentication status enum
-public enum AuthenticationStatus: String, Codable {
-    case success
-    case failed
-    case pending
+public enum CardType: String, Codable, CaseIterable {
+    case visa = "VISA"
+    case mastercard = "MASTERCARD"
+    case unknown = "UNKNOWN"
 }
+
+// MARK: - Sign Out Response
+
+public struct SignOutResponse {
+    var recognized : Bool?
+}
+
+// MARK: - Checkout Request
 
 /// Request to checkout with a selected card
 public struct CheckoutRequest: Codable {
@@ -135,6 +142,8 @@ public struct CheckoutRequest: Codable {
         self.rememberMe = rememberMe
     }
 }
+
+// MARK: - Checkout Response
 
 /// Response from checkout operation
 public struct CheckoutResponse: Codable {
@@ -159,7 +168,8 @@ public struct CheckoutResponse: Codable {
     public let messageVersion: String?
     public let connectorMetadata: String?
     public let directoryServerId: String?
-    public let vaultTokenData: TokenData?
+    public let vaultTokenData: PaymentData?
+    public let paymentMethodData: PaymentData?
     public let billing: String?
     public let shipping: String?
     public let browserInformation: String?
@@ -176,7 +186,13 @@ public struct CheckoutResponse: Codable {
     public let errorMessage: String?
     public let errorCode: String?
     public let profileAcquirerId: String?
+}
 
+/// Authentication status enum
+public enum AuthenticationStatus: String, Codable {
+    case success
+    case failed
+    case pending
 }
 
 /// Acquirer details for the transaction
@@ -186,31 +202,65 @@ public struct AcquirerDetails: Codable {
     public let merchantCountryCode: String?
 }
 
-
-/// Vault token data returned after successful checkout
-public struct TokenData: Codable {
-    public let type: VaultTokenType?
+/// Card Data
+public struct CardData: Codable {
     public let cardNumber: String?
     public let cardCvc: String?
     public let cardExpiryMonth: String?
     public let cardExpiryYear: String?
-    public let paymentToken: String?
-    public let tokenCryptogram: String?
-    public let tokenExpirationMonth: String?
-    public let tokenExpirationYear: String?
-}
-/// Vault token data type enum
-public enum VaultTokenType: String, Codable {
-    case cardToken = "card_token"
-    case networkToken = "network_token"
+    public let type: String
 }
 
+/// Network Token Data
+public struct NetworkTokenData: Codable {
+    public let networkToken: String?
+    public let networkTokenCryptogram: String?
+    public let networkTokenExpiryMonth: String?
+    public let networkTokenExpiryYear: String?
+    public let type: String
+}
+
+/// Payment Data
+public enum PaymentData: Codable {
+    case cardData(CardData)
+    case networkTokenData(NetworkTokenData)
+
+    enum CodingKeys: String, CodingKey {
+        case type
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(String.self, forKey: .type)
+
+        switch type {
+        case "card_data":
+            self = .cardData(try CardData(from: decoder))
+        case "network_token_data":
+            self = .networkTokenData(try NetworkTokenData(from: decoder))
+        default:
+            throw DecodingError.dataCorruptedError(
+                forKey: .type,
+                in: container,
+                debugDescription: "Unknown type: \(type)"
+            )
+        }
+    }
+    public func encode(to encoder: Encoder) throws {
+        switch self {
+        case .cardData(let data):
+            try data.encode(to: encoder)
+        case .networkTokenData(let data):
+            try data.encode(to: encoder)
+        }
+    }
+}
 
 // MARK: - Error Model
 
 /// Error types for Click to Pay operations
 public enum ClickToPayErrorType: String, Codable {
-    // getUserType errors
+    // Get User Type errors
     case authInvalid = "AUTH_INVALID"
     case acctInaccessible = "ACCT_INACCESSIBLE"
     case acctFraud = "ACCT_FRAUD"
@@ -218,7 +268,7 @@ public enum ClickToPayErrorType: String, Codable {
     case consumerIdFormatUnsupported = "CONSUMER_ID_FORMAT_UNSUPPORTED"
     case consumerIdFormatInvalid = "CONSUMER_ID_FORMAT_INVALID"
 
-    // validateCustomerAuthentication errors
+    // Validate Customer Authentication errors
     case otpSendFailed = "OTP_SEND_FAILED"
     case validationDataMissing = "VALIDATION_DATA_MISSING"
     case validationDataExpired = "VALIDATION_DATA_EXPIRED"
@@ -247,6 +297,10 @@ public enum ClickToPayErrorType: String, Codable {
 
     // Fallback
     case error = "ERROR"
+
+    // Checkout errors
+    case changeCard = "CHANGE_CARD"
+    case switchUser = "SWITCH_USER"
 }
 
 /// Click to Pay exception with error details

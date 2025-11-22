@@ -63,7 +63,7 @@ public class AuthenticationSession {
         }
     }
 
-    public func initClickToPaySession(request3DSAuthentication: Bool? = true) async throws -> ClickToPaySession {
+    public func initClickToPaySession(request3DSAuthentication: Bool? = true, viewController: UIViewController? = nil) async throws -> ClickToPaySession {
         guard let clientSecret = clientSecret,
               let profileId = profileId,
               let authenticationId = authenticationId,
@@ -76,7 +76,8 @@ public class AuthenticationSession {
                 publishableKey: publishableKey,
                 customBackendUrl: customBackendUrl,
                 customLogUrl: customLogUrl,
-                customParams: customParams
+                customParams: customParams,
+                viewController: viewController
             )
 
             try await impl.initClickToPaySession(
