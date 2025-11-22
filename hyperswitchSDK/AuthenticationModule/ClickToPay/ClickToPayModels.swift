@@ -127,7 +127,7 @@ public enum CardType: String, Codable, CaseIterable {
 // MARK: - Sign Out Response
 
 public struct SignOutResponse {
-    var recognized : Bool?
+    public let recognized : Bool?
 }
 
 // MARK: - Checkout Request
