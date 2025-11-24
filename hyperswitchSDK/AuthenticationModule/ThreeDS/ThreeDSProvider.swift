@@ -25,7 +25,6 @@ public protocol ThreeDSTransactionProvider {
         challengeParameters: ChallengeParameters,
         challengeStatusReceiver: ChallengeStatusReceiver,
         timeOut: Int) throws
-    // TODO: Implementation
-    //    func getProgressView() throws -> ProgressDialog
+    func getProgressView() throws -> ProgressDialog
     func close()
 }
