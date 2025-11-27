@@ -176,7 +176,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             if let topViewController = viewController ?? getTopViewController(),
                let popupWebView = popupWebView {
 
-                popupWebViewController.modalPresentationStyle = .fullScreen
+                popupWebViewController.modalPresentationStyle = .overFullScreen
                 popupWebViewController.view.backgroundColor = .clear
 
                 popupWebView.translatesAutoresizingMaskIntoConstraints = false
