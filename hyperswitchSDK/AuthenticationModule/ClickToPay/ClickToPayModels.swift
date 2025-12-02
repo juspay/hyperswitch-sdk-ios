@@ -294,13 +294,13 @@ public enum ClickToPayErrorType: String, Codable {
     case isCustomerPresentError = "IS_CUSTOMER_PRESENT_ERROR"
     case getRecognizedCardsError = "GET_RECOGNIZED_CARDS_ERROR"
     case checkoutWithCardError = "CHECKOUT_WITH_CARD_ERROR"
-
+    
     // Fallback
     case error = "ERROR"
 
     // Checkout errors
     case changeCard = "CHANGE_CARD"
-    case switchUser = "SWITCH_USER"
+    case switchConsumer = "SWITCH_CONSUMER"
 }
 
 /// Click to Pay exception with error details

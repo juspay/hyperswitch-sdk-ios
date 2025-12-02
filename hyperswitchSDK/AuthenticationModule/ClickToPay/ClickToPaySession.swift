@@ -87,6 +87,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         webView = WKWebView(frame: .zero, configuration: configuration)
         webView?.isHidden = false  // Keep visible to prevent freezing
         webView?.alpha = 0.01
+        webView?.accessibilityElementsHidden = true // Hide this element AND all its subviews from VoiceOver
+
         webView?.navigationDelegate = self
         webView?.uiDelegate = self
 
@@ -95,7 +97,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                 viewController.view.addSubview(webView)
             }
             else {
-                let scenes = UIApplication.shared.connectedScenes // TODO: Tightly Coupled to UIApplication, accept a Controller or View
+                let scenes = UIApplication.shared.connectedScenes
                 let windowScene = scenes.first as? UIWindowScene
                 windowScene?.windows.forEach { window in
                     window.addSubview(webView)
@@ -147,7 +149,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                   }
                 </script>
                 <script
-                  src="https://beta.hyperswitch.io/web/2025.11.21.01-c2p-headless/v2/HyperLoader.js"
+                  src="https://beta.hyperswitch.io/web/2025.11.28.00/v1/HyperLoader.js"
                   onload="initHyper()"
                   onerror="handleScriptError()"
                   async="true"
