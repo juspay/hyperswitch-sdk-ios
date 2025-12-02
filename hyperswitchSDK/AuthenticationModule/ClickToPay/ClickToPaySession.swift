@@ -8,7 +8,32 @@
 import Foundation
 @preconcurrency import WebKit
 
-public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
+// MARK: - Public Protocol
+
+/// Public protocol defining the Click to Pay session interface
+public protocol ClickToPaySession {
+    /// Check if a customer has an existing Click to Pay profile
+    func isCustomerPresent(request: CustomerPresenceRequest) async throws -> CustomerPresenceResponse
+
+    /// Get the user type and card status
+    func getUserType() async throws -> CardsStatusResponse
+
+    /// Get list of recognized cards for the user
+    func getRecognizedCards() async throws -> [RecognizedCard]
+
+    /// Validate customer authentication with OTP
+    func validateCustomerAuthentication(otpValue: String) async throws -> [RecognizedCard]
+
+    /// Sign out of Click to Pay Session
+    func signOut() async throws -> SignOutResponse
+
+    /// Checkout with a selected card
+    func checkoutWithCard(request: CheckoutRequest) async throws -> CheckoutResponse
+}
+
+// MARK: - Internal Implementation
+
+internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationDelegate, WKUIDelegate {
 
     private let publishableKey: String
     private let customBackendUrl: String?
@@ -16,27 +41,37 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
     private let customParams: [String: Any]?
 
     private var webView: WKWebView?
-    private var pendingRequests: [String: CheckedContinuation<String, Error>] = [:]
-    private var pendingVoidRequests: [String: CheckedContinuation<Void, Error>] = [:]
-    private let pendingRequestsQueue = DispatchQueue(label: "com.hyperswitch.c2p.pendingRequests")
-    private var isSDKInitialized = false
-    private var sdkInitContinuation: CheckedContinuation<Void, Never>?
+    private var viewController: UIViewController?
 
-    public init(
+    private var popupWebView: WKWebView?
+    private let popupWebViewController: UIViewController = UIViewController()
+
+    private var pendingRequests: [String: CheckedContinuation<String, Error>] = [:]
+    private var sdkInitContinuation: CheckedContinuation<Void, Error>?
+
+    private let pendingRequestsQueue = DispatchQueue(label: "com.hyperswitch.c2p.pendingRequests")
+
+    internal init(
         publishableKey: String,
         customBackendUrl: String? = nil,
         customLogUrl: String? = nil,
-        customParams: [String: Any]? = nil
-    ) {
+        customParams: [String: Any]? = nil,
+        viewController: UIViewController?
+    ) async throws {
         self.publishableKey = publishableKey
         self.customBackendUrl = customBackendUrl
         self.customLogUrl = customLogUrl
         self.customParams = customParams
-
+        self.viewController = viewController
         super.init()
 
-        DispatchQueue.main.async { [weak self] in
-            self?.setupWebView()
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            pendingRequestsQueue.async { [weak self] in
+                self?.sdkInitContinuation = continuation
+            }
+            DispatchQueue.main.async { [weak self] in
+                self?.setupWebView()
+            }
         }
     }
 
@@ -52,14 +87,21 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
         webView = WKWebView(frame: .zero, configuration: configuration)
         webView?.isHidden = false  // Keep visible to prevent freezing
         webView?.alpha = 0.01
+        webView?.accessibilityElementsHidden = true // Hide this element AND all its subviews from VoiceOver
+
         webView?.navigationDelegate = self
         webView?.uiDelegate = self
 
         if let webView = webView {
-            let scenes = UIApplication.shared.connectedScenes
-            let windowScene = scenes.first as? UIWindowScene
-            windowScene?.windows.forEach { window in
-                window.addSubview(webView)
+            if let viewController = viewController {
+                viewController.view.addSubview(webView)
+            }
+            else {
+                let scenes = UIApplication.shared.connectedScenes
+                let windowScene = scenes.first as? UIWindowScene
+                windowScene?.windows.forEach { window in
+                    window.addSubview(webView)
+                }
             }
         }
 
@@ -107,7 +149,7 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
                   }
                 </script>
                 <script
-                  src="https://beta.hyperswitch.io/v2/HyperLoader.js"
+                  src="https://beta.hyperswitch.io/web/2025.11.28.00/v1/HyperLoader.js"
                   onload="initHyper()"
                   onerror="handleScriptError()"
                   async="true"
@@ -116,83 +158,73 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
               <body></body>
             </html>
         """
-        webView?.perform(Selector(("setInspectable:")), with: true)
-        webView?.loadHTMLString(baseHtml, baseURL: URL(string: "https://secure.checkout.visa.com"))
+        webView?.loadHTMLString(baseHtml, baseURL: URL(string: "https://sandbox.src.mastercard.com"))
     }
 
-
-    public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+    internal func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
 
         if navigationAction.targetFrame == nil {
 
-            configuration.userContentController.removeScriptMessageHandler(forName: "closePopupWebView")
-            configuration.userContentController.add(self, name: "closePopupWebView")
-            configuration.defaultWebpagePreferences.allowsContentJavaScript = true
-            configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
+            self.popupWebView = WKWebView(frame: .zero, configuration: configuration)
 
-            let webView = WKWebView(frame: .zero, configuration: configuration)
+            popupWebView?.navigationDelegate = self
+            popupWebView?.uiDelegate = self
+            popupWebView?.translatesAutoresizingMaskIntoConstraints = false
+            popupWebView?.isOpaque = true
+            popupWebView?.scrollView.isScrollEnabled = false
+            popupWebView?.scrollView.bounces = false
+            popupWebView?.scrollView.contentInsetAdjustmentBehavior = .never
 
-            webView.navigationDelegate = self
-            webView.uiDelegate = self
-            webView.translatesAutoresizingMaskIntoConstraints = false
-            webView.backgroundColor = .clear
-            webView.isOpaque = true
-            webView.scrollView.isScrollEnabled = false
-            webView.scrollView.bounces = false
-            webView.scrollView.contentInsetAdjustmentBehavior = .never
+            if let topViewController = viewController ?? getTopViewController(),
+               let popupWebView = popupWebView {
 
-            webView.translatesAutoresizingMaskIntoConstraints = false
+                popupWebViewController.modalPresentationStyle = .overFullScreen
+                popupWebViewController.view.backgroundColor = .clear
 
-            if let topVC = getTopViewController(),
-               let view = topVC.view {
-                view.addSubview(webView)
+                popupWebView.translatesAutoresizingMaskIntoConstraints = false
+                popupWebViewController.view.addSubview(popupWebView)
                 NSLayoutConstraint.activate([
-                    webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                    webView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-                    webView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-                    webView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+                    popupWebView.topAnchor.constraint(equalTo: popupWebViewController.view.safeAreaLayoutGuide.topAnchor),
+                    popupWebView.leadingAnchor.constraint(equalTo: popupWebViewController.view.safeAreaLayoutGuide.leadingAnchor),
+                    popupWebView.trailingAnchor.constraint(equalTo: popupWebViewController.view.safeAreaLayoutGuide.trailingAnchor),
+                    popupWebView.bottomAnchor.constraint(equalTo: popupWebViewController.view.safeAreaLayoutGuide.bottomAnchor)
                 ])
-            }
 
-            return webView
+                topViewController.present(popupWebViewController, animated: true)
+            }
+            return popupWebView
         }
         return nil
     }
 
-    public func webViewDidClose(_ webView: WKWebView) {
-        webView.removeFromSuperview()
+    internal func webViewDidClose(_ webView: WKWebView) {
+        popupWebViewController.dismiss(animated: true) { [weak self] in
+            self?.popupWebView?.stopLoading()
+            self?.popupWebView?.removeFromSuperview()
+            self?.popupWebView?.navigationDelegate = nil
+            self?.popupWebView?.uiDelegate = nil
+            self?.popupWebView = nil
+        }
     }
 
-    public func initClickToPaySession(
+    internal func initClickToPaySession(
         clientSecret: String,
         profileId: String,
         authenticationId: String,
         merchantId: String,
         request3DSAuthentication: Bool
     ) async throws {
-        if !isSDKInitialized {
-            await withCheckedContinuation { continuation in
-                pendingRequestsQueue.async { [weak self] in
-                    if self?.isSDKInitialized == true {
-                        continuation.resume()
-                    } else {
-                        self?.sdkInitContinuation = continuation
-                    }
-                }
-            }
-        }
 
         let requestId = UUID().uuidString
 
-        return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+        let responseJson: String = try await withCheckedThrowingContinuation { continuation in
             pendingRequestsQueue.async { [weak self] in
-                self?.pendingVoidRequests[requestId] = continuation
+                self?.pendingRequests[requestId] = continuation
             }
 
             let jsCode = """
                 (async function() {
                     try {
-            
                         const authenticationSession = window.hyperInstance.initAuthenticationSession({
                               clientSecret: "\(clientSecret)",
                               profileId: "\(profileId)",
@@ -213,7 +245,7 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
                         window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
                             requestId: "\(requestId)",
                             data: { error: {
-                                    type: "InitClickToPaySessionError",
+                                    type: error.type || "InitClickToPaySessionError",
                                     message: error.message
                                 }}
                         }));
@@ -221,22 +253,27 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
                 })();
             """
 
-            // Execute immediately since SDK is already initialized
             DispatchQueue.main.async { [weak self] in
-                self?.webView?.evaluateJavaScript(jsCode) { result, error in
-                    if let error = error {
-
-                    } else {
-                        // handle
-                    }
-                }
+                self?.webView?.evaluateJavaScript(jsCode, completionHandler: nil)
             }
+        }
+
+        guard let jsonData = responseJson.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+              let data = json["data"] as? [String: Any] else {
+            throw ClickToPayException(message: "Failed to parse response", type: .error)
+        }
+
+        if let error = data["error"] as? [String: Any] {
+            let typeString = error["type"] as? String ?? "ERROR"
+            let errorMessage = error["message"] as? String ?? "Unknown error"
+            let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            throw ClickToPayException(message: errorMessage, type: errorType)
         }
     }
 
-    public func isCustomerPresent(request: CustomerPresenceRequest) async throws -> CustomerPresenceResponse? {
+    internal func isCustomerPresent(request: CustomerPresenceRequest) async throws -> CustomerPresenceResponse {
         let requestId = UUID().uuidString
-
         let responseJson: String = try await withCheckedThrowingContinuation { continuation in
             pendingRequestsQueue.async { [weak self] in
                 self?.pendingRequests[requestId] = continuation
@@ -259,7 +296,7 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
                                         requestId: "\(requestId)",
                                         data: {
                                             error: {
-                                                type: "IsCustomerPresentError",
+                                                type: error.type || "IsCustomerPresentError",
                                                 message: error.message
                                             }
                                         }
@@ -276,16 +313,24 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
         guard let jsonData = responseJson.data(using: .utf8),
               let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
               let data = json["data"] as? [String: Any] else {
-            throw NSError(domain: "ClickToPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse response"])
+            throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
 
-        if let customerPresent = data["customerPresent"] as? Bool { // needs improvement
+        if let error = data["error"] as? [String: Any] {
+            let typeString = error["type"] as? String ?? "ERROR"
+            let errorMessage = error["message"] as? String ?? "Unknown error"
+
+            let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            throw ClickToPayException(message: errorMessage, type: errorType)
+        }
+
+        if let customerPresent = data["customerPresent"] as? Bool {
             return CustomerPresenceResponse(customerPresent: customerPresent)
         }
-        throw NSError(domain: "ClickToPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse response"])
+        throw ClickToPayException(message: "Failed to parse response", type: .error)
     }
 
-    public func getUserType() async throws -> CardsStatusResponse? {
+    internal func getUserType() async throws -> CardsStatusResponse {
         let requestId = UUID().uuidString
 
         let responseJson: String = try await withCheckedThrowingContinuation { continuation in
@@ -306,7 +351,7 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
                                         requestId: "\(requestId)",
                                         data: {
                                             error: {
-                                                type: "GetUserTypeError",
+                                                type: error.type || 'ERROR',
                                                 message: error.message
                                             }
                                         }
@@ -322,16 +367,27 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
 
         guard let jsonData = responseJson.data(using: .utf8),
               let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
-              let data = json["data"] as? [String: Any],
-              let statusCodeStr = data["statusCode"] as? String,
+              let data = json["data"] as? [String: Any] else {
+            throw ClickToPayException(message: "Failed to parse response", type: .error)
+        }
+
+        if let error = data["error"] as? [String: Any] {
+            let typeString = error["type"] as? String ?? "ERROR"
+            let errorMessage = error["message"] as? String ?? "Unknown error"
+
+            let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            throw ClickToPayException(message: errorMessage, type: errorType)
+        }
+
+        guard let statusCodeStr = data["statusCode"] as? String,
               let statusCode = StatusCode(rawValue: statusCodeStr) else {
-            throw NSError(domain: "ClickToPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse response"])
+            throw ClickToPayException(message: "Failed to parse status code", type: .error)
         }
 
         return CardsStatusResponse(statusCode: statusCode)
     }
 
-    public func getRecognizedCards() async throws -> [RecognizedCard]? {
+    internal func getRecognizedCards() async throws -> [RecognizedCard] {
         let requestId = UUID().uuidString
 
         let responseJson: String = try await withCheckedThrowingContinuation { continuation in
@@ -352,7 +408,7 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
                                         requestId: "\(requestId)",
                                         data: {
                                             error: {
-                                                type: "GetRecognizedCardsError",
+                                                type: error.type || "GetRecognizedCardsError",
                                                 message: error.message
                                             }
                                         }
@@ -368,8 +424,20 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
 
         guard let jsonData = responseJson.data(using: .utf8),
               let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
-              let cardsData = json["data"] as? [[String: Any]] else {
-            throw NSError(domain: "ClickToPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse response"])
+              let data = json["data"] else {
+            throw ClickToPayException(message: "Failed to parse response", type: .error)
+        }
+
+        if let errorData = data as? [String: Any], let error = errorData["error"] as? [String: Any] {
+            let typeString = error["type"] as? String ?? "ERROR"
+            let errorMessage = error["message"] as? String ?? "Unknown error"
+
+            let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            throw ClickToPayException(message: errorMessage, type: errorType)
+        }
+
+        guard let cardsData = data as? [[String: Any]] else {
+            throw ClickToPayException(message: "Invalid response format", type: .error)
         }
 
         let cardsJsonData = try JSONSerialization.data(withJSONObject: cardsData)
@@ -378,7 +446,7 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
         return cards
     }
 
-    public func validateCustomerAuthentication(otpValue: String) async throws -> [RecognizedCard]? {
+    internal func validateCustomerAuthentication(otpValue: String) async throws -> [RecognizedCard] {
         let requestId = UUID().uuidString
 
         let responseJson: String = try await withCheckedThrowingContinuation { continuation in
@@ -401,7 +469,7 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
                                         requestId: "\(requestId)",
                                         data: {
                                             error: {
-                                                type: "ValidateCustomerAuthenticationError",
+                                                type: error.type || 'ERROR',
                                                 message: error.message
                                             }
                                         }
@@ -417,18 +485,83 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
 
         guard let jsonData = responseJson.data(using: .utf8),
               let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
-              let cardsData = json["data"] as? [[String: Any]] else {
-            throw NSError(domain: "ClickToPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse response"])
+              let data = json["data"] else {
+            throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
 
-        print(json)
+        if let errorData = data as? [String: Any], let error = errorData["error"] as? [String: Any] {
+            let typeString = error["type"] as? String ?? "ERROR"
+            let errorMessage = error["message"] as? String ?? "Unknown error"
+
+            let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            throw ClickToPayException(message: errorMessage, type: errorType)
+        }
+
+        guard let cardsData = data as? [[String: Any]] else {
+            throw ClickToPayException(message: "Invalid response format", type: .error)
+        }
+
         let cardsJsonData = try JSONSerialization.data(withJSONObject: cardsData)
         let cards = try JSONDecoder().decode([RecognizedCard].self, from: cardsJsonData)
 
         return cards
     }
 
-    public func checkoutWithCard(request: CheckoutRequest) async throws -> CheckoutResponse? {
+    internal func signOut() async throws -> SignOutResponse {
+        let requestId = UUID().uuidString
+
+        let responseJson: String = try await withCheckedThrowingContinuation { continuation in
+            pendingRequestsQueue.async { [weak self] in
+                self?.pendingRequests[requestId] = continuation
+            }
+
+            let jsCode = """
+            (async function() {
+                try {
+                    const signOutResponse = await window.ClickToPaySession.signOut()
+                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                        requestId: "\(requestId)",
+                        data: signOutResponse
+                    }));
+                } catch (error) {
+                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                        requestId: "\(requestId)",
+                        data: {
+                            error: {
+                                type: error.type || 'SignOutError',
+                                message: error.message
+                            }
+                        }
+                    }))
+                }
+            })();
+            """
+
+            DispatchQueue.main.async { [weak self] in
+                self?.webView?.evaluateJavaScript(jsCode, completionHandler: nil)
+            }
+        }
+
+        guard let jsonData = responseJson.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+              let data = json["data"] as? [String: Any] else {
+            throw ClickToPayException(message: "Failed to parse response", type: .error)
+        }
+
+        if let error = data["error"] as? [String: Any] {
+            let typeString = error["type"] as? String ?? "ERROR"
+            let errorMessage = error["message"] as? String ?? "Unknown error"
+            let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            throw ClickToPayException(message: errorMessage, type: errorType)
+        }
+
+        if let recognized = data["recognized"] as? Bool {
+            return SignOutResponse(recognized: recognized)
+        }
+        throw ClickToPayException(message: "Failed to parse response", type: .error)
+    }
+
+    internal func checkoutWithCard(request: CheckoutRequest) async throws -> CheckoutResponse {
         let requestId = UUID().uuidString
 
         let responseJson: String = try await withCheckedThrowingContinuation { continuation in
@@ -442,7 +575,7 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
                                 try {
                                     const checkoutResponse = await window.ClickToPaySession.checkoutWithCard({
                                         srcDigitalCardId: "\(request.srcDigitalCardId)",
-                                        rememberMe: \(request.rememberMe)
+                                        rememberMe: \(request.rememberMe ?? false)
                                     });
                                     window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
                                         requestId: "\(requestId)",
@@ -453,7 +586,7 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
                                         requestId: "\(requestId)",
                                         data: {
                                             error: {
-                                                type: "CheckoutWithCardError",
+                                                type: error.type || "CheckoutWithCardError",
                                                 message: error.message
                                             }
                                         }
@@ -470,50 +603,88 @@ public class ClickToPaySession: NSObject, WKNavigationDelegate, WKUIDelegate {
         guard let jsonData = responseJson.data(using: .utf8),
               let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
               let data = json["data"] as? [String: Any] else {
-            throw NSError(domain: "ClickToPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to parse response"])
+            throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
+
+        if let error = data["error"] as? [String: Any] {
+            let typeString = error["type"] as? String ?? "ERROR"
+            let errorMessage = error["message"] as? String ?? "Unknown error"
+
+            let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            throw ClickToPayException(message: errorMessage, type: errorType)
+        }
+
         let responseData = try JSONSerialization.data(withJSONObject: data)
         let checkoutResponse = try JSONDecoder().decode(CheckoutResponse.self, from: responseData)
 
         return checkoutResponse
     }
 
-    func getTopViewController() -> UIViewController? {
-        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-              let rootViewController = windowScene.windows.first(where: { $0.isKeyWindow })?.rootViewController else {
+
+    public func getKeyWindow() -> UIWindow? {
+
+        var foregroundActiveScene: UIScene?
+        var foregroundInactiveScene: UIScene?
+
+        for scene in UIApplication.shared.connectedScenes {
+            guard scene is UIWindowScene else {
+                continue
+            }
+            if scene.activationState == .foregroundActive {
+                foregroundActiveScene = scene
+                break
+            }
+            if foregroundInactiveScene == nil && scene.activationState == .foregroundInactive {
+                foregroundInactiveScene = scene
+                // Don't break, we can have the active scene later in the set
+            }
+        }
+        let sceneToUse = foregroundActiveScene ?? foregroundInactiveScene
+
+        if let windowScene = sceneToUse as? UIWindowScene {
+            return windowScene.keyWindow
+        }
+        return nil
+    }
+
+    private func getTopViewController() -> UIViewController? {
+        guard let window = getKeyWindow(),
+              let rootViewController = window.rootViewController else {
             return nil
         }
-
         return getTopViewController(from: rootViewController)
     }
 
-    func getTopViewController(from viewController: UIViewController) -> UIViewController {
-        // If it's presenting another VC, get that one
+    private func getTopViewController(from viewController: UIViewController) -> UIViewController {
         if let presented = viewController.presentedViewController {
             return getTopViewController(from: presented)
         }
-
-        // If it's a navigation controller, get the visible VC
         if let navController = viewController as? UINavigationController,
            let visible = navController.visibleViewController {
             return getTopViewController(from: visible)
         }
-
-        // If it's a tab bar controller, get the selected VC
         if let tabController = viewController as? UITabBarController,
            let selected = tabController.selectedViewController {
             return getTopViewController(from: selected)
         }
-
-        // Otherwise, return this VC
-        return viewController
+        return viewController // Could be UIViewController OR UIHostingController
+    }
+    deinit {
+        DispatchQueue.main.async { [weak webView] in
+            webView?.configuration.userContentController.removeScriptMessageHandler(forName: "HSInterface")
+            webView?.stopLoading()
+            webView?.subviews.forEach { $0.removeFromSuperview() }
+            webView?.removeFromSuperview()
+            webView?.navigationDelegate = nil
+            webView?.uiDelegate = nil
+        }
     }
 }
 
 // MARK: - WKScriptMessageHandler
 
-extension ClickToPaySession: WKScriptMessageHandler {
-    public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+extension ClickToPaySessionImpl: WKScriptMessageHandler {
+    internal func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
 
         guard message.name == "HSInterface" else {
             return
@@ -529,58 +700,43 @@ extension ClickToPaySession: WKScriptMessageHandler {
             return
         }
 
-        // Handle SDK initialization messages
         if let sdkInitialised = json["sdkInitialised"] as? Bool {
-            if sdkInitialised {
-                pendingRequestsQueue.async { [weak self] in
-                    self?.isSDKInitialized = true
-                    if let continuation = self?.sdkInitContinuation {
-                        self?.sdkInitContinuation = nil
+            pendingRequestsQueue.async { [weak self] in
+                guard let self = self else { return }
+
+                if sdkInitialised {
+                    if let continuation = self.sdkInitContinuation {
+                        self.sdkInitContinuation = nil
                         continuation.resume()
                     }
+                } else {
+                    let errorMessage = json["error"] as? String ?? "Unknown SDK initialization error"
+                    if let continuation = self.sdkInitContinuation {
+                        self.sdkInitContinuation = nil
+                        continuation.resume(throwing: ClickToPayException(
+                            message: "SDK initialization failed: \(errorMessage)",
+                            type: .hyperInitializationError
+                        ))
+                    }
                 }
-            } else if let error = json["error"] as? String {
             }
             return
         }
 
-        // Handle request responses
         if let requestId = json["requestId"] as? String {
-
             pendingRequestsQueue.async { [weak self] in
-                // Check for void continuations first
-                if let voidContinuation = self?.pendingVoidRequests.removeValue(forKey: requestId) {
-                    // Check if the response contains an error
+                if let continuation = self?.pendingRequests.removeValue(forKey: requestId) {
                     if let data = json["data"] as? [String: Any],
-                       let success = data["success"] as? Bool,
-                       !success,
-                       let errorMessage = data["error"] as? String {
-                        voidContinuation.resume(throwing: NSError(
-                            domain: "ClickToPay",
-                            code: -1,
-                            userInfo: [NSLocalizedDescriptionKey: errorMessage]
-                        ))
-                    } else {
-                        voidContinuation.resume()
-                    }
-                } else if let continuation = self?.pendingRequests.removeValue(forKey: requestId) {
-                    // Check if the response contains an error
-                    if let data = json["data"] as? [String: Any],
-                       let success = data["success"] as? Bool,
-                       !success,
-                       let errorMessage = data["error"] as? String {
-                        continuation.resume(throwing: NSError(
-                            domain: "ClickToPay",
-                            code: -1,
-                            userInfo: [NSLocalizedDescriptionKey: errorMessage]
-                        ))
+                       let error = data["error"] as? [String: Any] {
+                        let typeString = error["type"] as? String ?? "ERROR"
+                        let errorMessage = error["message"] as? String ?? "Unknown error"
+                        let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+                        continuation.resume(throwing: ClickToPayException(message: errorMessage, type: errorType))
                     } else {
                         continuation.resume(returning: body)
                     }
-                } else {
                 }
             }
-        } else {
         }
     }
 }
