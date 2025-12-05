@@ -670,6 +670,24 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         return viewController // Could be UIViewController OR UIHostingController
     }
     deinit {
+        pendingRequestsQueue.sync {
+            if let sdkInit = sdkInitContinuation {
+                sdkInit.resume(throwing: ClickToPayException(
+                    message: "Session was deallocated during initialization",
+                    type: .error
+                ))
+                sdkInitContinuation = nil
+            }
+            
+            for (requestId, continuation) in pendingRequests {
+                continuation.resume(throwing: ClickToPayException(
+                    message: "Session cleanup - operation cancelled",
+                    type: .error
+                ))
+            }
+            pendingRequests.removeAll()
+        }
+        
         DispatchQueue.main.async { [weak webView] in
             webView?.configuration.userContentController.removeScriptMessageHandler(forName: "HSInterface")
             webView?.stopLoading()
