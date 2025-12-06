@@ -29,6 +29,25 @@ public protocol ClickToPaySession {
 
     /// Checkout with a selected card
     func checkoutWithCard(request: CheckoutRequest) async throws -> CheckoutResponse
+
+    /// Close the Click to Pay session and release all resources.
+    /// This method should be called when the session is no longer needed,
+    /// After calling close(), the session cannot be used again.
+    func close()
+}
+
+/// A weak wrapper for WKScriptMessageHandler to break the retain cycle
+private class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
+    weak var delegate: WKScriptMessageHandler?
+
+    init(delegate: WKScriptMessageHandler) {
+        self.delegate = delegate
+        super.init()
+    }
+
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        delegate?.userContentController(userContentController, didReceive: message)
+    }
 }
 
 // MARK: - Internal Implementation
@@ -50,6 +69,16 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     private var sdkInitContinuation: CheckedContinuation<Void, Error>?
 
     private let pendingRequestsQueue = DispatchQueue(label: "com.hyperswitch.c2p.pendingRequests")
+
+    private var isClosed = false
+
+    private func checkSessionClosed() throws {
+        try pendingRequestsQueue.sync {
+            if isClosed {
+                throw ClickToPayException(message: "Session is closed", type: .error)
+            }
+        }
+    }
 
     internal init(
         publishableKey: String,
@@ -77,7 +106,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     private func setupWebView() {
         let contentController = WKUserContentController()
-        contentController.add(self, name: "HSInterface")
+        let weakHandler = WeakScriptMessageHandler(delegate: self)
+        contentController.add(weakHandler, name: "HSInterface")
 
         let configuration = WKWebViewConfiguration()
         configuration.userContentController = contentController
@@ -214,6 +244,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         merchantId: String,
         request3DSAuthentication: Bool
     ) async throws {
+        try checkSessionClosed()
 
         let requestId = UUID().uuidString
 
@@ -273,6 +304,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     internal func isCustomerPresent(request: CustomerPresenceRequest) async throws -> CustomerPresenceResponse {
+        try checkSessionClosed()
+
         let requestId = UUID().uuidString
         let responseJson: String = try await withCheckedThrowingContinuation { continuation in
             pendingRequestsQueue.async { [weak self] in
@@ -331,6 +364,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     internal func getUserType() async throws -> CardsStatusResponse {
+        try checkSessionClosed()
+
         let requestId = UUID().uuidString
 
         let responseJson: String = try await withCheckedThrowingContinuation { continuation in
@@ -388,6 +423,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     internal func getRecognizedCards() async throws -> [RecognizedCard] {
+        try checkSessionClosed()
+
         let requestId = UUID().uuidString
 
         let responseJson: String = try await withCheckedThrowingContinuation { continuation in
@@ -447,6 +484,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     internal func validateCustomerAuthentication(otpValue: String) async throws -> [RecognizedCard] {
+        try checkSessionClosed()
+
         let requestId = UUID().uuidString
 
         let responseJson: String = try await withCheckedThrowingContinuation { continuation in
@@ -508,6 +547,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     internal func signOut() async throws -> SignOutResponse {
+        try checkSessionClosed()
+
         let requestId = UUID().uuidString
 
         let responseJson: String = try await withCheckedThrowingContinuation { continuation in
@@ -562,6 +603,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     internal func checkoutWithCard(request: CheckoutRequest) async throws -> CheckoutResponse {
+        try checkSessionClosed()
+
         let requestId = UUID().uuidString
 
         let responseJson: String = try await withCheckedThrowingContinuation { continuation in
@@ -620,6 +663,63 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         return checkoutResponse
     }
 
+    public func close() {
+        pendingRequestsQueue.async { [weak self] in
+            guard let self = self else { return }
+            guard !self.isClosed else { return }
+            self.isClosed = true
+
+            let pendingRequestsCopy = self.pendingRequests
+            self.pendingRequests.removeAll()
+
+            for (_, continuation) in pendingRequestsCopy {
+                continuation.resume(throwing: ClickToPayException(
+                    message: "Session was closed",
+                    type: .error
+                ))
+            }
+
+            if let initContinuation = self.sdkInitContinuation {
+                self.sdkInitContinuation = nil
+                initContinuation.resume(throwing: ClickToPayException(
+                    message: "Session was closed during initialization",
+                    type: .error
+                ))
+            }
+        }
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+
+            if self.popupWebViewController.presentingViewController != nil {
+                self.popupWebViewController.dismiss(animated: false) { [weak self] in
+                    self?.cleanupPopupWebView()
+                }
+            } else {
+                self.cleanupPopupWebView()
+            }
+            self.cleanupMainWebView()
+        }
+    }
+
+    /// Cleans up the popup WebView resources
+    private func cleanupPopupWebView() {
+        popupWebView?.stopLoading()
+        popupWebView?.removeFromSuperview()
+        popupWebView?.navigationDelegate = nil
+        popupWebView?.uiDelegate = nil
+        popupWebView = nil
+    }
+
+    /// Cleans up the main WebView resources
+    private func cleanupMainWebView() {
+        webView?.configuration.userContentController.removeScriptMessageHandler(forName: "HSInterface")
+        webView?.stopLoading()
+        webView?.removeFromSuperview()
+        webView?.navigationDelegate = nil
+        webView?.uiDelegate = nil
+        webView = nil
+    }
 
     public func getKeyWindow() -> UIWindow? {
 
@@ -670,13 +770,27 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         return viewController // Could be UIViewController OR UIHostingController
     }
     deinit {
-        DispatchQueue.main.async { [weak webView] in
-            webView?.configuration.userContentController.removeScriptMessageHandler(forName: "HSInterface")
-            webView?.stopLoading()
-            webView?.subviews.forEach { $0.removeFromSuperview() }
-            webView?.removeFromSuperview()
-            webView?.navigationDelegate = nil
-            webView?.uiDelegate = nil
+        // Capture references before self is deallocated
+        let mainWebView = webView
+        let popup = popupWebView
+        let popupVC = popupWebViewController
+
+        DispatchQueue.main.async {
+            // Clean up main webView
+            mainWebView?.configuration.userContentController.removeScriptMessageHandler(forName: "HSInterface")
+            mainWebView?.stopLoading()
+            mainWebView?.removeFromSuperview()
+            mainWebView?.navigationDelegate = nil
+            mainWebView?.uiDelegate = nil
+
+            // Clean up popup webView
+            if popupVC.presentingViewController != nil {
+                popupVC.dismiss(animated: false)
+            }
+            popup?.stopLoading()
+            popup?.removeFromSuperview()
+            popup?.navigationDelegate = nil
+            popup?.uiDelegate = nil
         }
     }
 }

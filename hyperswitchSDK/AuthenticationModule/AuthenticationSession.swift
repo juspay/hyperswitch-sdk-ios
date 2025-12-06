@@ -23,6 +23,7 @@ public class AuthenticationSession {
     private var authenticationId: String?
     private var merchantId: String?
 
+    private var currentClickToPaySession: ClickToPaySession?
 
     public init(publishableKey: String, customBackendUrl: String? = nil, customParams: [String : Any]? = nil, customLogUrl: String? = nil) {
         self.publishableKey = publishableKey
@@ -72,6 +73,9 @@ public class AuthenticationSession {
             throw NSError(domain: "ClickToPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Missing required authentication parameters"])
         }
 
+        currentClickToPaySession?.close()
+        currentClickToPaySession = nil
+
         do {
             let impl = try await ClickToPaySessionImpl(
                 publishableKey: publishableKey,
@@ -89,6 +93,7 @@ public class AuthenticationSession {
                 request3DSAuthentication: request3DSAuthentication ?? true
             )
 
+            currentClickToPaySession = impl
             return impl
         } catch {
             throw NSError(domain: "ClickToPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to initialize Click to Pay session: \(error.localizedDescription)"])
