@@ -1,7 +1,7 @@
 // swift-interface-format-version: 1.0
-// swift-compiler-version: Apple Swift version 6.1.2 effective-5.10 (swiftlang-6.1.2.1.2 clang-1700.0.13.5)
+// swift-compiler-version: Apple Swift version 6.2.1 effective-5.10 (swiftlang-6.2.1.4.8 clang-1700.4.4.1)
 // swift-module-flags: -target x86_64-apple-ios15.1-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -module-name Sentry
-// swift-module-flags-ignorable: -no-verify-emitted-module-interface -interface-compiler-version 6.1.2
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -formal-cxx-interoperability-mode=off -interface-compiler-version 6.2.1
 import AVFoundation
 import CoreGraphics
 import CoreMedia
@@ -33,7 +33,9 @@ extension Foundation.Data {
   @_spi(Private) @objc deinit
 }
 extension Foundation.FileManager {
+  #if compiler(>=5.3) && $NonescapableTypes
   public func createFileWithSentryTracing(atPath path: Swift.String, contents data: Foundation.Data?, attributes attr: [Foundation.FileAttributeKey : Any]? = nil) -> Swift.Bool
+  #endif
   public func removeItemWithSentryTracing(at url: Foundation.URL) throws
   public func removeItemWithSentryTracing(atPath path: Swift.String) throws
   public func copyItemWithSentryTracing(at srcURL: Foundation.URL, to dstURL: Foundation.URL) throws
@@ -65,7 +67,9 @@ extension Swift.FixedWidthInteger {
 }
 @_spi(Private) @objc public protocol SentryANRTrackerDelegate {
   @_spi(Private) @objc func anrDetected(type: Sentry.SentryANRType)
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc func anrStopped(result: Sentry.SentryANRStoppedResult?)
+  #endif
 }
 @_spi(Private) @objc @objcMembers public class SentryANRStoppedResult : ObjectiveC.NSObject {
   @_spi(Private) @objc final public let minDuration: Foundation.TimeInterval
@@ -79,7 +83,9 @@ extension Swift.FixedWidthInteger {
   @_spi(Private) case fullyBlocking
   @_spi(Private) case nonFullyBlocking
   @_spi(Private) case unknown
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) public init?(rawValue: Swift.Int)
+  #endif
   @_spi(Private) public typealias RawValue = Swift.Int
   @_spi(Private) public var rawValue: Swift.Int {
     @_spi(Private) get
@@ -95,19 +101,29 @@ extension Swift.FixedWidthInteger {
 @_spi(Private) @objc public protocol SentryApplication {
   @_spi(Private) @objc var mainThread_isActive: Swift.Bool { get }
   @_spi(Private) @objc var unsafeApplicationState: UIKit.UIApplication.State { get }
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc func getWindows() -> [UIKit.UIWindow]?
+  #endif
   @_spi(Private) @objc @available(iOS 13.0, tvOS 13.0, *)
   var connectedScenes: Swift.Set<UIKit.UIScene> { get }
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc var delegate: (any UIKit.UIApplicationDelegate)? { get }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc func relevantViewControllersNames() -> [Swift.String]?
+  #endif
 }
 @_spi(Private) @_inheritsConvenienceInitializers @objc final public class PlaceholderSentryApplication : ObjectiveC.NSObject {
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @objc extension UIKit.UIApplication : Sentry.SentryApplication {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @_Concurrency.MainActor @preconcurrency @objc dynamic public func getWindows() -> [UIKit.UIWindow]?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @_Concurrency.MainActor @preconcurrency @objc dynamic public func relevantViewControllersNames() -> [Swift.String]?
+  #endif
   @_spi(Private) @_Concurrency.MainActor @preconcurrency @objc dynamic public var unsafeApplicationState: UIKit.UIApplication.State {
     @_spi(Private) @objc get
   }
@@ -116,8 +132,12 @@ extension Swift.FixedWidthInteger {
   }
 }
 @_spi(Private) extension Sentry.SentryApplication {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) public func internal_getWindows() -> [UIKit.UIWindow]?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) public func internal_relevantViewControllersNames() -> [Swift.String]?
+  #endif
 }
 @_spi(Private) @objc @objcMembers public class SentryAppState : ObjectiveC.NSObject, Sentry.SentrySerializable {
   @_spi(Private) @objc public var releaseName: Swift.String? {
@@ -139,8 +159,12 @@ extension Swift.FixedWidthInteger {
   @_spi(Private) @objc public var wasTerminated: Swift.Bool
   @_spi(Private) @objc public var isANROngoing: Swift.Bool
   @_spi(Private) @objc public var isSDKRunning: Swift.Bool
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public init(releaseName: Swift.String?, osVersion: Swift.String, vendorId: Swift.String, isDebugging: Swift.Bool, systemBootTimestamp: Foundation.Date)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc(initWithJSONObject:) public init?(jsonObject: [Swift.String : Any])
+  #endif
   @_spi(Private) @objc public func serialize() -> [Swift.String : Any]
   @_spi(Private) @objc deinit
 }
@@ -156,7 +180,9 @@ extension Swift.FixedWidthInteger {
   @_spi(Private) @objc final public var vmAddress: Swift.UInt64
   @_spi(Private) @objc final public var address: Swift.UInt64
   @_spi(Private) @objc final public var size: Swift.UInt64
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public init(name: Swift.String, uuid: Swift.String?, vmAddress: Swift.UInt64, address: Swift.UInt64, size: Swift.UInt64)
+  #endif
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @_inheritsConvenienceInitializers @objc(SentryBinaryImageCache) final public class SentryBinaryImageCache : ObjectiveC.NSObject {
@@ -165,10 +191,16 @@ extension Swift.FixedWidthInteger {
   }
   @_spi(Private) @objc final public func start(_ isDebug: Swift.Bool)
   @_spi(Private) @objc final public func stop()
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc(binaryImageAdded:vmAddress:address:size:uuid:) final public func binaryImageAdded(imageName: Swift.UnsafePointer<Swift.CChar>?, vmAddress: Swift.UInt64, address: Swift.UInt64, size: Swift.UInt64, uuid: Swift.UnsafePointer<Swift.UInt8>?)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public static func convertUUID(_ value: Swift.UnsafePointer<Swift.UInt8>?) -> Swift.String?
+  #endif
   @_spi(Private) @objc final public func binaryImageRemoved(_ imageAddress: Swift.UInt64)
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc final public func imageByAddress(_ address: Swift.UInt64) -> Sentry.SentryBinaryImageInfo?
+  #endif
   @_spi(Private) @objc(imagePathsForInAppInclude:) final public func imagePathsFor(inAppInclude: Swift.String) -> Swift.Set<Swift.String>
   @_spi(Private) @objc final public func getAllBinaryImages() -> [Sentry.SentryBinaryImageInfo]
   @_spi(Private) @objc override dynamic public init()
@@ -237,8 +269,12 @@ extension Sentry.DebugMeta : Swift.Decodable {
   required convenience public init(from decoder: any Swift.Decoder) throws
 }
 @_spi(Private) @_inheritsConvenienceInitializers @objc final public class SentryDefaultObjCRuntimeWrapper : ObjectiveC.NSObject, Sentry.SentryObjCRuntimeWrapper {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc final public func copyClassNamesForImage(_ image: Swift.UnsafePointer<Swift.CChar>, _ outCount: Swift.UnsafeMutablePointer<Swift.UInt32>?) -> Swift.UnsafeMutablePointer<Swift.UnsafePointer<Swift.CChar>>?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc final public func classGetImageName(_ cls: Swift.AnyClass) -> Swift.UnsafePointer<Swift.CChar>?
+  #endif
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
 }
@@ -255,7 +291,9 @@ extension Sentry.DebugMeta : Swift.Decodable {
 }
 @_spi(Private) @objc @_inheritsConvenienceInitializers @objcMembers public class SentryDispatchQueueWrapper : ObjectiveC.NSObject {
   @_spi(Private) @objc override dynamic public init()
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public init(name: Swift.UnsafePointer<Swift.CChar>, attributes: Dispatch.__OS_dispatch_queue_attr?)
+  #endif
   @_spi(Private) @objc public var queue: Dispatch.DispatchQueue {
     @_spi(Private) @objc get
   }
@@ -280,28 +318,40 @@ extension Sentry.DebugMeta : Swift.Decodable {
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @objc @_inheritsConvenienceInitializers @objcMembers public class SentryEnabledFeaturesBuilder : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc @available(*, deprecated, message: "This is only marked as deprecated because enableAppLaunchProfiling is marked as deprecated. Once that is removed this can be removed.")
   public static func getEnabledFeatures(options: Sentry.Options?) -> [Swift.String]
+  #endif
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @objc final public class SentryEnvelope : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @available(*, deprecated, message: "This is only marked as deprecated because enableAppLaunchProfiling is marked as deprecated. Once that is removed this can be removed.")
   @objc(initWithId:singleItem:) convenience public init(id: Sentry.SentryId?, singleItem item: Sentry.SentryEnvelopeItem)
+  #endif
   @_spi(Private) @objc(initWithHeader:singleItem:) convenience public init(header: Sentry.SentryEnvelopeHeader, singleItem item: Sentry.SentryEnvelopeItem)
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @available(*, deprecated, message: "This is only marked as deprecated because enableAppLaunchProfiling is marked as deprecated. Once that is removed this can be removed.")
   @objc(initWithId:items:) convenience public init(id: Sentry.SentryId?, items: [Sentry.SentryEnvelopeItem])
+  #endif
   @_spi(Private) @objc(initWithHeader:items:) public init(header: Sentry.SentryEnvelopeHeader, items: [Sentry.SentryEnvelopeItem])
   @_spi(Private) @objc final public let header: Sentry.SentryEnvelopeHeader
   @_spi(Private) @objc final public let items: [Sentry.SentryEnvelopeItem]
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @objc final public class SentryEnvelopeHeader : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @available(*, deprecated, message: "This is only marked as deprecated because enableAppLaunchProfiling is marked as deprecated. Once that is removed this can be removed.")
   @objc convenience public init(id eventId: Sentry.SentryId?)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @available(*, deprecated, message: "This is only marked as deprecated because enableAppLaunchProfiling is marked as deprecated. Once that is removed this can be removed.")
   @objc convenience public init(id eventId: Sentry.SentryId?, traceContext: Sentry.TraceContext?)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public init(id eventId: Sentry.SentryId?, sdkInfo: Sentry.SentrySdkInfo?, traceContext: Sentry.TraceContext?)
+  #endif
   @_spi(Private) @available(*, deprecated, message: "This is only marked as deprecated because enableAppLaunchProfiling is marked as deprecated. Once that is removed this can be removed.")
   @objc public static func empty() -> Self
   @_spi(Private) @objc final public var eventId: Sentry.SentryId?
@@ -313,14 +363,20 @@ extension Sentry.DebugMeta : Swift.Decodable {
 @_spi(Private) @objc final public class SentryEnvelopeItem : ObjectiveC.NSObject {
   @_spi(Private) @objc final public let header: Sentry.SentryEnvelopeItemHeader
   @_spi(Private) @objc final public let data: Foundation.Data?
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public init(header: Sentry.SentryEnvelopeItemHeader, data: Foundation.Data?)
+  #endif
   @_spi(Private) @objc convenience public init(event: Sentry.Event)
   @_spi(Private) @objc convenience public init(session: Sentry.SentrySession)
   @_spi(Private) @available(*, deprecated, message: "Building the envelopes for the new SentryFeedback type is done directly in -[SentryClient captureFeedback:withScope:] so there will be no analog to this initializer for SentryFeedback at this time.")
   @objc convenience public init(userFeedback: Sentry.UserFeedback)
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc convenience public init?(attachment: Sentry.Attachment, maxAttachmentSize: Swift.UInt)
+  #endif
   @_spi(Private) @objc convenience public init(clientReport: Sentry.SentryClientReport)
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc convenience public init?(replayEvent: Sentry.SentryReplayEvent, replayRecording: Sentry.SentryReplayRecording, video: Foundation.URL)
+  #endif
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @objc @_inheritsConvenienceInitializers @objcMembers final public class SentryEnvelopeItemTypes : ObjectiveC.NSObject {
@@ -345,7 +401,9 @@ extension Sentry.DebugMeta : Swift.Decodable {
   @objc deinit
 }
 @objc @_inheritsConvenienceInitializers @objcMembers public class SentryEventDecoder : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public static func decodeEvent(jsonData: Foundation.Data) -> Sentry.Event?
+  #endif
   @objc override dynamic public init()
   @objc deinit
 }
@@ -357,7 +415,9 @@ extension Sentry.Exception : Swift.Decodable {
   @objc public var enableFileManagerSwizzling: Swift.Bool
   @objc public var enableUnhandledCPPExceptionsV2: Swift.Bool
   @objc public var enableLogs: Swift.Bool
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func validateOptions(_ options: [Swift.String : Any]?)
+  #endif
   @objc override dynamic public init()
   @objc deinit
 }
@@ -367,7 +427,9 @@ extension Sentry.Exception : Swift.Decodable {
   }
 }
 @_spi(Private) @_inheritsConvenienceInitializers @objc final public class SentryExtraPackages : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public static func addPackageName(_ name: Swift.String?, version: Swift.String?)
+  #endif
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
 }
@@ -378,14 +440,18 @@ extension Sentry.Exception : Swift.Decodable {
     }
     case widget
     case custom
+    #if compiler(>=5.3) && $NonescapableTypes
     public init?(rawValue: Swift.Int)
+    #endif
     public typealias RawValue = Swift.Int
     public var rawValue: Swift.Int {
       get
     }
   }
   @_spi(Private) @objc final public let eventId: Sentry.SentryId
+  #if compiler(>=5.3) && $NonescapableTypes
   @objc public init(message: Swift.String, name: Swift.String?, email: Swift.String?, source: Sentry.SentryFeedback.SentryFeedbackSource = .widget, associatedEventId: Sentry.SentryId? = nil, attachments: [Foundation.Data]? = nil)
+  #endif
   @objc deinit
 }
 extension Sentry.SentryFeedback : Sentry.SentrySerializable {
@@ -430,8 +496,10 @@ extension Sentry.Geo : Swift.Decodable {
 @_spi(Private) public typealias SentryEventProcessor = (Sentry.Event) -> Sentry.Event?
 @_spi(Private) @_inheritsConvenienceInitializers @objc final public class SentryGlobalEventProcessor : ObjectiveC.NSObject {
   @_spi(Private) @objc(addEventProcessor:) final public func add(_ newProcessor: @escaping Sentry.SentryEventProcessor)
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @discardableResult
   @objc final public func reportAll(_ event: Sentry.Event) -> Sentry.Event?
+  #endif
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
 }
@@ -443,7 +511,9 @@ extension Sentry.Geo : Swift.Decodable {
   @objc override dynamic public init()
   @objc public init(uuid: Foundation.UUID)
   @objc(initWithUUIDString:) public init(uuidString: Swift.String)
+  #if compiler(>=5.3) && $NonescapableTypes
   @objc override final public func isEqual(_ object: Any?) -> Swift.Bool
+  #endif
   @objc override final public var description: Swift.String {
     @objc get
   }
@@ -455,7 +525,9 @@ extension Sentry.Geo : Swift.Decodable {
 @_spi(Private) @objc public class SentryInAppLogic : ObjectiveC.NSObject {
   @_spi(Private) @objc final public let inAppIncludes: [Swift.String]
   @_spi(Private) @objc(initWithInAppIncludes:inAppExcludes:) public init(inAppIncludes: [Swift.String], inAppExcludes: [Swift.String])
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func `is`(inApp imagePath: Swift.String?) -> Swift.Bool
+  #endif
   @_spi(Private) @objc public func isClassInApp(_ targetClass: Swift.AnyClass) -> Swift.Bool
   @_spi(Private) @objc public static func isImageNameInApp(_ imageName: Swift.String, inAppInclude: Swift.String) -> Swift.Bool
   @_spi(Private) @objc deinit
@@ -467,7 +539,9 @@ extension Sentry.Geo : Swift.Decodable {
   @objc(kSentryLevelWarning) case warning = 3
   @objc(kSentryLevelError) case error = 4
   @objc(kSentryLevelFatal) case fatal = 5
+  #if compiler(>=5.3) && $NonescapableTypes
   public init?(rawValue: Swift.UInt)
+  #endif
   public typealias RawValue = Swift.UInt
   public var rawValue: Swift.UInt {
     get
@@ -480,7 +554,9 @@ extension Sentry.SentryLevel : Swift.CustomStringConvertible {
 }
 @_spi(Private) @objc @_inheritsConvenienceInitializers @objcMembers public class SentryLevelHelper : ObjectiveC.NSObject {
   @_spi(Private) @objc public static func nameForLevel(_ level: Sentry.SentryLevel) -> Swift.String
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public static func levelForName(_ name: Swift.String?) -> Sentry.SentryLevel
+  #endif
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
 }
@@ -519,7 +595,9 @@ extension Sentry.SentryLog {
   @_spi(Private) @objc deinit
 }
 @objc final public class SentryLogger : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) public init(hub: Sentry.SentryHub, dateProvider: any Sentry.SentryCurrentDateProvider, batcher: Sentry.SentryLogBatcher?)
+  #endif
   final public func trace(_ message: Sentry.SentryLogMessage, attributes: [Swift.String : Any] = [:])
   @objc(trace:) final public func trace(_ body: Swift.String)
   @objc(trace:attributes:) final public func trace(_ body: Swift.String, attributes: [Swift.String : Any])
@@ -553,7 +631,9 @@ extension Sentry.SentryLog {
       get
     }
     public func toSeverityNumber() -> Swift.Int
+    #if compiler(>=5.3) && $NonescapableTypes
     public init?(rawValue: Swift.Int)
+    #endif
     public typealias RawValue = Swift.Int
     public var rawValue: Swift.Int {
       get
@@ -612,8 +692,10 @@ extension Sentry.SentryMessage : Swift.Decodable {
   required convenience public init(from decoder: any Swift.Decoder) throws
 }
 @_spi(Private) @_inheritsConvenienceInitializers @objc final public class SentryMigrateSessionInit : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @discardableResult
   @objc(migrateSessionInit:envelopesDirPath:envelopeFilePaths:) public static func migrateSessionInit(envelope: Sentry.SentryEnvelope?, envelopesDirPath: Swift.String, envelopeFilePaths: [Swift.String]) -> Swift.Bool
+  #endif
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
 }
@@ -622,7 +704,9 @@ extension Sentry.SentryMessage : Swift.Decodable {
     @_spi(Private) @objc get
   }
   @_spi(Private) @objc convenience override dynamic public init()
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) public init(_ path: Swift.String?)
+  #endif
   @_spi(Private) @objc public func hasEmbeddedMobileProvisionProfile() -> Swift.Bool
   @_spi(Private) @objc deinit
 }
@@ -678,9 +762,15 @@ extension Sentry.SentryNSError : Swift.Decodable {
   required convenience public init(from decoder: any Swift.Decoder) throws
 }
 @_spi(Private) @objc public protocol SentryNSNotificationCenterWrapper {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc func addObserver(_ observer: Any, selector aSelector: ObjectiveC.Selector, name aName: Foundation.NSNotification.Name?, object anObject: Any?)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc(addObserverForName:object:queue:usingBlock:) func addObserver(forName name: Foundation.NSNotification.Name?, object obj: Any?, queue: Foundation.OperationQueue?, using block: @escaping @Sendable (Foundation.Notification) -> Swift.Void) -> any ObjectiveC.NSObjectProtocol
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc func removeObserver(_ observer: Any, name aName: Foundation.NSNotification.Name?, object anObject: Any?)
+  #endif
   @_spi(Private) @objc(postNotification:) func post(_ notification: Foundation.Notification)
 }
 @_spi(Private) @objc extension Foundation.NotificationCenter : Sentry.SentryNSNotificationCenterWrapper {
@@ -688,14 +778,20 @@ extension Sentry.SentryNSError : Swift.Decodable {
 @_spi(Private) @_inheritsConvenienceInitializers @objc public class SentryNSTimerFactory : ObjectiveC.NSObject {
   @_spi(Private) @discardableResult
   @objc public func scheduledTimer(withTimeInterval interval: Foundation.TimeInterval, repeats: Swift.Bool, block: @escaping (Foundation.Timer) -> Swift.Void) -> Foundation.Timer
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @discardableResult
   @objc public func scheduledTimer(withTimeInterval ti: Foundation.TimeInterval, target aTarget: Any, selector aSelector: ObjectiveC.Selector, userInfo: Any?, repeats yesOrNo: Swift.Bool) -> Foundation.Timer
+  #endif
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @objc public protocol SentryObjCRuntimeWrapper {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc(copyClassNamesForImage:amount:) func copyClassNamesForImage(_ image: Swift.UnsafePointer<Swift.CChar>, _ outCount: Swift.UnsafeMutablePointer<Swift.UInt32>?) -> Swift.UnsafeMutablePointer<Swift.UnsafePointer<Swift.CChar>>?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc(class_getImageName:) func classGetImageName(_ cls: Swift.AnyClass) -> Swift.UnsafePointer<Swift.CChar>?
+  #endif
 }
 @_spi(Private) @objc @objcMembers public class SentryOnDemandReplay : ObjectiveC.NSObject, Sentry.SentryReplayVideoMaker {
   @_spi(Private) @objc public var videoScale: Swift.Float
@@ -704,18 +800,24 @@ extension Sentry.SentryNSError : Swift.Decodable {
   @_spi(Private) @objc public var cacheMaxSize: Swift.UInt
   @_spi(Private) @objc public init(outputPath: Swift.String, processingQueue: Sentry.SentryDispatchQueueWrapper, assetWorkerQueue: Sentry.SentryDispatchQueueWrapper)
   @_spi(Private) @objc convenience public init(withContentFrom outputPath: Swift.String, processingQueue: Sentry.SentryDispatchQueueWrapper, assetWorkerQueue: Sentry.SentryDispatchQueueWrapper)
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func addFrameAsync(timestamp: Foundation.Date, maskedViewImage: UIKit.UIImage, forScreen screen: Swift.String?)
+  #endif
   @_spi(Private) @objc public func releaseFramesUntil(_ date: Foundation.Date)
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public var oldestFrameDate: Foundation.Date? {
     @_spi(Private) @objc get
   }
+  #endif
   @_spi(Private) @objc public func createVideoInBackgroundWith(beginning: Foundation.Date, end: Foundation.Date, completion: @escaping ([Sentry.SentryVideoInfo]) -> Swift.Void)
   @_spi(Private) @objc public func createVideoWith(beginning: Foundation.Date, end: Foundation.Date) -> [Sentry.SentryVideoInfo]
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @objc public protocol SentryProcessInfoSource {
   @_spi(Private) @objc var processDirectoryPath: Swift.String { get }
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc var processPath: Swift.String? { get }
+  #endif
   @_spi(Private) @objc var processorCount: Swift.Int { get }
   @_spi(Private) @objc var thermalState: Foundation.ProcessInfo.ThermalState { get }
   @_spi(Private) @objc var environment: [Swift.String : Swift.String] { get }
@@ -732,15 +834,19 @@ extension Sentry.SentryNSError : Swift.Decodable {
   @_spi(Private) @objc dynamic public var processDirectoryPath: Swift.String {
     @_spi(Private) @objc get
   }
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc dynamic public var processPath: Swift.String? {
     @_spi(Private) @objc get
   }
+  #endif
 }
 @objc @_inheritsConvenienceInitializers @objcMembers public class SentryProfileOptions : ObjectiveC.NSObject {
   @objc public enum SentryProfileLifecycle : Swift.Int {
     case manual
     case trace
+    #if compiler(>=5.3) && $NonescapableTypes
     public init?(rawValue: Swift.Int)
+    #endif
     public typealias RawValue = Swift.Int
     public var rawValue: Swift.Int {
       get
@@ -780,7 +886,9 @@ public enum SentryRedactRegionType : Swift.String, Swift.Codable {
   case clipBegin
   case clipEnd
   case redactSwiftUI
+  #if compiler(>=5.3) && $NonescapableTypes
   public init?(rawValue: Swift.String)
+  #endif
   public typealias RawValue = Swift.String
   public var rawValue: Swift.String {
     get
@@ -821,7 +929,9 @@ public enum SentryRedactRegionType : Swift.String, Swift.Codable {
     public var description: Swift.String {
       get
     }
+    #if compiler(>=5.3) && $NonescapableTypes
     public init?(rawValue: Swift.Int)
+    #endif
     public typealias RawValue = Swift.Int
     public var rawValue: Swift.Int {
       get
@@ -866,7 +976,9 @@ public enum SentryRedactRegionType : Swift.String, Swift.Codable {
 @_spi(Private) @objc public enum SentryReplayType : Swift.Int {
   @_spi(Private) case session
   @_spi(Private) case buffer
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) public init?(rawValue: Swift.Int)
+  #endif
   @_spi(Private) public typealias RawValue = Swift.Int
   @_spi(Private) public var rawValue: Swift.Int {
     @_spi(Private) get
@@ -878,7 +990,9 @@ public enum SentryRedactRegionType : Swift.String, Swift.Codable {
   }
 }
 @_spi(Private) @objc public protocol SentryReplayVideoMaker : ObjectiveC.NSObjectProtocol {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc func addFrameAsync(timestamp: Foundation.Date, maskedViewImage: UIKit.UIImage, forScreen: Swift.String?)
+  #endif
   @_spi(Private) @objc func releaseFramesUntil(_ date: Foundation.Date)
   @_spi(Private) @objc func createVideoInBackgroundWith(beginning: Foundation.Date, end: Foundation.Date, completion: @escaping ([Sentry.SentryVideoInfo]) -> Swift.Void)
   @_spi(Private) @objc func createVideoWith(beginning: Foundation.Date, end: Foundation.Date) -> [Sentry.SentryVideoInfo]
@@ -887,7 +1001,9 @@ extension Sentry.SentryRequest : Swift.Decodable {
   required convenience public init(from decoder: any Swift.Decoder) throws
 }
 @_spi(Private) @objc @_hasMissingDesignatedInitializers final public class SentryRRWebBreadcrumbEvent : Sentry.SentryRRWebCustomEvent {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public init(timestamp: Foundation.Date, category: Swift.String, message: Swift.String? = nil, level: Sentry.SentryLevel = .none, data: [Swift.String : Any]? = nil)
+  #endif
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @objc @_hasMissingDesignatedInitializers @objcMembers public class SentryRRWebCustomEvent : Sentry.SentryRRWebEvent {
@@ -905,15 +1021,31 @@ extension Sentry.SentryRequest : Swift.Decodable {
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @objc public class SentryScopePersistentStore : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public init?(fileManager: (any Sentry.SentryFileManagerProtocol)?)
+  #endif
   @_spi(Private) @objc public func moveAllCurrentStateToPreviousState()
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func readPreviousContextFromDisk() -> [Swift.String : [Swift.String : Any]]?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func readPreviousUserFromDisk() -> Sentry.User?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func readPreviousDistFromDisk() -> Swift.String?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func readPreviousEnvironmentFromDisk() -> Swift.String?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func readPreviousTagsFromDisk() -> [Swift.String : Swift.String]?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func readPreviousExtrasFromDisk() -> [Swift.String : Any]?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func readPreviousFingerprintFromDisk() -> [Swift.String]?
+  #endif
   @_spi(Private) @objc deinit
 }
 @objc @_inheritsConvenienceInitializers @objcMembers public class SentryViewScreenshotOptions : ObjectiveC.NSObject, Sentry.SentryRedactOptions {
@@ -950,9 +1082,11 @@ extension Sentry.SentryRequest : Swift.Decodable {
   @_spi(Private) @objc deinit
 }
 @_inheritsConvenienceInitializers @objc open class SentrySDK : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @objc public static var span: (any Sentry.Span)? {
     @objc get
   }
+  #endif
   @objc public static var isEnabled: Swift.Bool {
     @objc get
   }
@@ -1013,7 +1147,9 @@ extension Sentry.SentryRequest : Swift.Decodable {
   @objc public static var detectedStartUpCrash: Swift.Bool {
     @objc get
   }
+  #if compiler(>=5.3) && $NonescapableTypes
   @objc public static func setUser(_ user: Sentry.User?)
+  #endif
   @objc public static func startSession()
   @objc public static func endSession()
   @objc public static func crash()
@@ -1037,9 +1173,13 @@ extension Sentry.SentryRequest : Swift.Decodable {
   @_spi(Private) @objc final public let features: [Swift.String]
   @_spi(Private) @objc final public let packages: [[Swift.String : Swift.String]]
   @_spi(Private) @objc final public let settings: Sentry.SentrySDKSettings
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @available(*, deprecated, message: "This is only marked as deprecated because enableAppLaunchProfiling is marked as deprecated. Once that is removed this can be removed.")
   @objc convenience public init(withOptions options: Sentry.Options?)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public init(name: Swift.String?, version: Swift.String?, integrations: [Swift.String]?, features: [Swift.String]?, packages: [[Swift.String : Swift.String]]?, settings: Sentry.SentrySDKSettings)
+  #endif
   @_spi(Private) @objc convenience public init(dict: [Swift.AnyHashable : Any])
   @_spi(Private) @objc final public func serialize() -> [Swift.String : Any]
   @_spi(Private) @objc deinit
@@ -1056,25 +1196,41 @@ extension Sentry.SentryRequest : Swift.Decodable {
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @_inheritsConvenienceInitializers @objc final public class SentrySdkPackage : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public static func global() -> [Swift.String : Swift.String]?
+  #endif
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @_inheritsConvenienceInitializers @objc final public class SentrySDKSettings : ObjectiveC.NSObject {
   @_spi(Private) @objc override dynamic public init()
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public init(options: Sentry.Options?)
+  #endif
   @_spi(Private) @objc public init(dict: Foundation.NSDictionary)
   @_spi(Private) @objc final public var autoInferIP: Swift.Bool
   @_spi(Private) @objc final public func serialize() -> Foundation.NSDictionary
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @_inheritsConvenienceInitializers @objc final public class SentrySerializationSwift : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc(sessionWithData:) public static func session(with data: Foundation.Data) -> Sentry.SentrySession?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc(appStateWithData:) public static func appState(with data: Foundation.Data) -> Sentry.SentryAppState?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc(dataWithJSONObject:) public static func data(withJSONObject jsonObject: Any) -> Foundation.Data?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc(dataWithEnvelope:) public static func data(with envelope: Sentry.SentryEnvelope) -> Foundation.Data?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc(dataWithSession:) public static func data(with session: Sentry.SentrySession) -> Foundation.Data?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc(envelopeWithData:) public static func envelope(with data: Foundation.Data) -> Sentry.SentryEnvelope?
+  #endif
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
 }
@@ -1083,7 +1239,9 @@ extension Sentry.SentryRequest : Swift.Decodable {
   @_spi(Private) case exited = 1
   @_spi(Private) case crashed = 2
   @_spi(Private) case abnormal = 3
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) public init?(rawValue: Swift.UInt)
+  #endif
   @_spi(Private) public typealias RawValue = Swift.UInt
   @_spi(Private) public var rawValue: Swift.UInt {
     @_spi(Private) get
@@ -1091,7 +1249,9 @@ extension Sentry.SentryRequest : Swift.Decodable {
 }
 @_spi(Private) @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @objc public class SentrySession : ObjectiveC.NSObject, Foundation.NSCopying {
   @_spi(Private) @objc public init(releaseName: Swift.String, distinctId: Swift.String)
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc(initWithJSONObject:) public init?(jsonObject: [Swift.String : Any])
+  #endif
   @_spi(Private) @objc(endSessionExitedWithTimestamp:) public func endExited(withTimestamp timestamp: Foundation.Date)
   @_spi(Private) @objc(endSessionCrashedWithTimestamp:) public func endCrashed(withTimestamp timestamp: Foundation.Date)
   @_spi(Private) @objc(endSessionAbnormalWithTimestamp:) public func endAbnormal(withTimestamp timestamp: Foundation.Date)
@@ -1115,33 +1275,49 @@ extension Sentry.SentryRequest : Swift.Decodable {
   @_spi(Private) @objc public var distinctId: Swift.String {
     @_spi(Private) @objc get
   }
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public var flagInit: Foundation.NSNumber? {
     @_spi(Private) @objc get
   }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public var timestamp: Foundation.Date? {
     @_spi(Private) @objc get
   }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public var duration: Foundation.NSNumber? {
     @_spi(Private) @objc get
   }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public var releaseName: Swift.String? {
     @_spi(Private) @objc get
   }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public var environment: Swift.String? {
     @_spi(Private) @objc get
     @_spi(Private) @objc set
   }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public var user: Sentry.User? {
     @_spi(Private) @objc get
     @_spi(Private) @objc set
   }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public var abnormalMechanism: Swift.String? {
     @_spi(Private) @objc get
     @_spi(Private) @objc set
   }
+  #endif
   @_spi(Private) @objc public func serialize() -> [Swift.String : Any]
   @_spi(Private) @objc public func setFlagInit()
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func copy(with zone: ObjectiveC.NSZone? = nil) -> Any
+  #endif
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @objc public protocol SentryReplayDisplayLinkWrapper {
@@ -1159,7 +1335,9 @@ extension Sentry.SentryRequest : Swift.Decodable {
   @_spi(Private) @objc public var replayTags: [Swift.String : Any]?
   @_spi(Private) @objc public var screenshotProvider: any Sentry.SentryViewScreenshotProvider
   @_spi(Private) @objc public var breadcrumbConverter: any Sentry.SentryReplayBreadcrumbConverter
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public init(replayOptions: Sentry.SentryReplayOptions, replayFolderPath: Foundation.URL, screenshotProvider: any Sentry.SentryViewScreenshotProvider, replayMaker: any Sentry.SentryReplayVideoMaker, breadcrumbConverter: any Sentry.SentryReplayBreadcrumbConverter, touchTracker: Sentry.SentryTouchTracker?, dateProvider: any Sentry.SentryCurrentDateProvider, delegate: any Sentry.SentrySessionReplayDelegate, displayLinkWrapper: any Sentry.SentryReplayDisplayLinkWrapper)
+  #endif
   @_spi(Private) @objc deinit
   @_spi(Private) @objc public func start(rootView: UIKit.UIView, fullSession: Swift.Bool)
   @_spi(Private) @objc public func pauseSessionMode()
@@ -1174,13 +1352,19 @@ extension Sentry.SentryRequest : Swift.Decodable {
   @_spi(Private) @objc func sessionReplayNewSegment(replayEvent: Sentry.SentryReplayEvent, replayRecording: Sentry.SentryReplayRecording, videoUrl: Foundation.URL)
   @_spi(Private) @objc func sessionReplayStarted(replayId: Sentry.SentryId)
   @_spi(Private) @objc func breadcrumbsForSessionReplay() -> [Sentry.Breadcrumb]
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc func currentScreenNameForSessionReplay() -> Swift.String?
+  #endif
 }
 @_spi(Private) @objc public protocol SentryReplayBreadcrumbConverter : ObjectiveC.NSObjectProtocol {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc func convert(from breadcrumb: Sentry.Breadcrumb) -> (any Sentry.SentryRRWebEventProtocol)?
+  #endif
 }
 @_spi(Private) @objc @_inheritsConvenienceInitializers @objcMembers public class SentrySRDefaultBreadcrumbConverter : ObjectiveC.NSObject, Sentry.SentryReplayBreadcrumbConverter {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func convert(from breadcrumb: Sentry.Breadcrumb) -> (any Sentry.SentryRRWebEventProtocol)?
+  #endif
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
 }
@@ -1229,7 +1413,9 @@ extension Sentry.SentryThread : Swift.Decodable {
   @objc(kSentryTransactionNameSourceView) case view
   @objc(kSentryTransactionNameSourceComponent) case component
   @objc(kSentryTransactionNameSourceTask) case sourceTask
+  #if compiler(>=5.3) && $NonescapableTypes
   public init?(rawValue: Swift.Int)
+  #endif
   public typealias RawValue = Swift.Int
   public var rawValue: Swift.Int {
     get
@@ -1265,7 +1451,9 @@ extension Sentry.SentryThread : Swift.Decodable {
 }
 @_spi(Private) @_inheritsConvenienceInitializers @objc final public class SentryURLRequestFactory : ObjectiveC.NSObject {
   @_spi(Private) @objc public static func envelopeRequest(with dsn: Sentry.SentryDsn, data: Foundation.Data) throws -> Foundation.URLRequest
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public static func envelopeRequest(with url: Foundation.URL, data: Foundation.Data, authHeader: Swift.String?) throws -> Foundation.URLRequest
+  #endif
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
 }
@@ -1372,10 +1560,12 @@ extension Sentry.SentryUserFeedbackIntegrationDriver : UIKit.UIAdaptivePresentat
 }
 @objc @_inheritsConvenienceInitializers @available(iOS 13.0, *)
 @objcMembers public class SentryUserFeedbackThemeConfiguration : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @objc public var fontFamily: Swift.String? {
     @objc get
     @objc set
   }
+  #endif
   @objc public var foreground: UIKit.UIColor
   @objc public var background: UIKit.UIColor
   @objc public var submitForeground: UIKit.UIColor
@@ -1405,15 +1595,19 @@ extension Sentry.SentryUserFeedbackIntegrationDriver : UIKit.UIAdaptivePresentat
 @objc @_inheritsConvenienceInitializers @available(iOS 13.0, *)
 @objcMembers public class SentryUserFeedbackWidgetConfiguration : ObjectiveC.NSObject {
   @objc public var autoInject: Swift.Bool
+  #if compiler(>=5.3) && $NonescapableTypes
   @objc public var labelText: Swift.String? {
     @objc get
     @objc set
   }
+  #endif
   @objc public var showIcon: Swift.Bool
+  #if compiler(>=5.3) && $NonescapableTypes
   @objc public var widgetAccessibilityLabel: Swift.String? {
     @objc get
     @objc set
   }
+  #endif
   @objc public var windowLevel: UIKit.UIWindow.Level
   @objc public var location: UIKit.NSDirectionalRectEdge
   @objc public var layoutUIOffset: UIKit.UIOffset
@@ -1430,10 +1624,16 @@ extension Sentry.SentryUserFeedbackIntegrationDriver : UIKit.UIAdaptivePresentat
   @objc var sentryName: Swift.String { get }
 }
 @_spi(Private) @objc public class SentryViewHierarchyProvider : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public init(dispatchQueueWrapper: Sentry.SentryDispatchQueueWrapper, applicationProvider: @escaping () -> (any Sentry.SentryApplication)?)
+  #endif
   @_spi(Private) @objc public var reportAccessibilityIdentifier: Swift.Bool
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func appViewHierarchyFromMainThread() -> Foundation.Data?
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func appViewHierarchy() -> Foundation.Data?
+  #endif
   @_spi(Private) @discardableResult
   @objc(saveViewHierarchy:) public func saveViewHierarchy(_ filePath: Swift.String) -> Swift.Bool
   @_spi(Private) @objc deinit
@@ -1463,19 +1663,35 @@ extension Sentry.SentryUserFeedbackIntegrationDriver : UIKit.UIAdaptivePresentat
 @_spi(Private) @objc @objcMembers public class SentryWatchdogTerminationAttributesProcessor : ObjectiveC.NSObject {
   @_spi(Private) @objc public init(withDispatchQueueWrapper dispatchQueueWrapper: Sentry.SentryDispatchQueueWrapper, scopePersistentStore: Sentry.SentryScopePersistentStore)
   @_spi(Private) @objc public func clear()
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func setContext(_ context: [Swift.String : [Swift.String : Any]]?)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func setUser(_ user: Sentry.User?)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func setDist(_ dist: Swift.String?)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func setEnvironment(_ environment: Swift.String?)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func setTags(_ tags: [Swift.String : Swift.String]?)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func setExtras(_ extras: [Swift.String : Any]?)
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public func setFingerprint(_ fingerprint: [Swift.String]?)
+  #endif
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @_inheritsConvenienceInitializers @objc public class SwiftDescriptor : ObjectiveC.NSObject {
   @_spi(Private) @objc public static func getObjectClassName(_ object: Swift.AnyObject) -> Swift.String
   @_spi(Private) @objc public static func getViewControllerClassName(_ object: UIKit.UIViewController) -> Swift.String
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public static func getSwiftErrorDescription(_ error: any Swift.Error) -> Swift.String?
+  #endif
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
 }
@@ -1485,7 +1701,9 @@ extension Sentry.SentryUserFeedbackIntegrationDriver : UIKit.UIAdaptivePresentat
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @objc final public class SentryThreadsafeApplication : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public init(applicationProvider: () -> (any Sentry.SentryApplication)?, notificationCenter: any Sentry.SentryNSNotificationCenterWrapper)
+  #endif
   @_spi(Private) @objc deinit
   @_spi(Private) @objc final public var applicationState: UIKit.UIApplication.State {
     @_spi(Private) @objc get
@@ -1499,23 +1717,33 @@ extension UIKit.UIView {
   @_Concurrency.MainActor @preconcurrency public func sentryReplayUnmask()
 }
 @_spi(Private) @objc @objcMembers public class UrlSanitized : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public var query: Swift.String? {
     @_spi(Private) @objc get
   }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public var queryItems: [Foundation.URLQueryItem]? {
     @_spi(Private) @objc get
   }
+  #endif
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public var fragment: Swift.String? {
     @_spi(Private) @objc get
   }
+  #endif
   @_spi(Private) @objc public init(URL url: Foundation.URL)
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public var sanitizedUrl: Swift.String? {
     @_spi(Private) @objc get
   }
+  #endif
   @_spi(Private) @objc deinit
 }
 @_spi(Private) @objc @_inheritsConvenienceInitializers @objcMembers public class URLSessionTaskHelper : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
   @_spi(Private) @objc public static func getGraphQLOperationName(from task: Foundation.URLSessionTask?) -> Swift.String?
+  #endif
   @_spi(Private) @objc override dynamic public init()
   @_spi(Private) @objc deinit
 }
