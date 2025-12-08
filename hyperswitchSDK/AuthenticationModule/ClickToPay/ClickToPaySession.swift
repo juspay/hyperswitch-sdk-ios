@@ -60,10 +60,10 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     private let customParams: [String: Any]?
 
     private var webView: WKWebView?
-    private var viewController: UIViewController?
+    private weak var viewController: UIViewController?
 
     private var popupWebView: WKWebView?
-    private let popupWebViewController: UIViewController = UIViewController()
+    private weak var popupWebViewController: UIViewController?
 
     private var pendingRequests: [String: CheckedContinuation<String, Error>] = [:]
     private var sdkInitContinuation: CheckedContinuation<Void, Error>?
@@ -206,7 +206,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             popupWebView?.scrollView.contentInsetAdjustmentBehavior = .never
 
             if let topViewController = viewController ?? getTopViewController(),
-               let popupWebView = popupWebView {
+               let popupWebView = popupWebView,
+               let popupWebViewController = popupWebViewController {
 
                 popupWebViewController.modalPresentationStyle = .overFullScreen
                 popupWebViewController.view.backgroundColor = .clear
@@ -228,7 +229,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     internal func webViewDidClose(_ webView: WKWebView) {
-        popupWebViewController.dismiss(animated: true) { [weak self] in
+        popupWebViewController?.dismiss(animated: true) { [weak self] in
             self?.popupWebView?.stopLoading()
             self?.popupWebView?.removeFromSuperview()
             self?.popupWebView?.navigationDelegate = nil
@@ -691,8 +692,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
 
-            if self.popupWebViewController.presentingViewController != nil {
-                self.popupWebViewController.dismiss(animated: false) { [weak self] in
+            if self.popupWebViewController?.presentingViewController != nil {
+                self.popupWebViewController?.dismiss(animated: false) { [weak self] in
                     self?.cleanupPopupWebView()
                 }
             } else {
@@ -784,8 +785,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             mainWebView?.uiDelegate = nil
 
             // Clean up popup webView
-            if popupVC.presentingViewController != nil {
-                popupVC.dismiss(animated: false)
+            if popupVC?.presentingViewController != nil {
+                popupVC?.dismiss(animated: false)
             }
             popup?.stopLoading()
             popup?.removeFromSuperview()
