@@ -29,7 +29,7 @@ struct LogPayload: Codable {
     let payment_method: String?
     let payment_experience: String?
     let source: String
-    
+
     func toJson() -> String? {
         do {
             let jsonData = try JSONEncoder().encode(self)
@@ -49,5 +49,5 @@ enum LogCategory: String, Codable {
 }
 
 enum EventName: String, Codable {
-    case HYPER_OTA_INIT, HYPER_OTA_FINISH , HYPER_OTA_EVENT
+    case HYPER_OTA_INIT, HYPER_OTA_FINISH , HYPER_OTA_EVENT, CLICK_TO_PAY_FLOW
 }

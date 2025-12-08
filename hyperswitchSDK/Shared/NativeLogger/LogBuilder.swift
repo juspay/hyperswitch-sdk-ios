@@ -62,6 +62,11 @@ internal class LogBuilder {
         return self
     }
     
+    func setCategory(_ category: LogCategory) -> LogBuilder {
+        self.category = category
+        return self
+    }
+    
     func build() -> LogPayload {
         self.timestamp = String(Int(Date().timeIntervalSince1970 * 1000))
         return LogPayload(

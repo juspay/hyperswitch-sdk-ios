@@ -25,7 +25,7 @@ Pod::Spec.new do |s|
   end
 
   s.subspec 'common' do |common|
-    common.source_files = 'hyperswitchSDK/Shared/*.{m,swift,h}'
+    common.source_files = 'hyperswitchSDK/Shared/**/*.{m,swift,h}'
   end
 
   s.default_subspec = 'core', 'common'

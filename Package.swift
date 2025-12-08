@@ -15,7 +15,9 @@ let package = Package(
     targets: [
         .target(
             name: "HyperswitchAuthentication",
-            path: "hyperswitchSDK/AuthenticationModule",
+            path: "hyperswitchSDK",
+            exclude: ["Core", "CoreLite"],
+            sources: ["AuthenticationModule", "Shared"]
         )
     ]
 )

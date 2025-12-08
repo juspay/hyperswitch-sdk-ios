@@ -30,7 +30,7 @@ final class Debouncer {
     func cancel() {
         lock.lock()
         defer { lock.unlock() }
-        
+
         workItem?.cancel()
         workItem = nil
     }

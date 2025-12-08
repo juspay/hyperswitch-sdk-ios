@@ -8,48 +8,6 @@
 import Foundation
 @preconcurrency import WebKit
 
-// MARK: - Public Protocol
-
-/// Public protocol defining the Click to Pay session interface
-public protocol ClickToPaySession {
-    /// Check if a customer has an existing Click to Pay profile
-    func isCustomerPresent(request: CustomerPresenceRequest) async throws -> CustomerPresenceResponse
-
-    /// Get the user type and card status
-    func getUserType() async throws -> CardsStatusResponse
-
-    /// Get list of recognized cards for the user
-    func getRecognizedCards() async throws -> [RecognizedCard]
-
-    /// Validate customer authentication with OTP
-    func validateCustomerAuthentication(otpValue: String) async throws -> [RecognizedCard]
-
-    /// Sign out of Click to Pay Session
-    func signOut() async throws -> SignOutResponse
-
-    /// Checkout with a selected card
-    func checkoutWithCard(request: CheckoutRequest) async throws -> CheckoutResponse
-
-    /// Close the Click to Pay session and release all resources.
-    /// This method should be called when the session is no longer needed,
-    /// After calling close(), the session cannot be used again.
-    func close()
-}
-
-/// A weak wrapper for WKScriptMessageHandler to break the retain cycle
-private class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
-    weak var delegate: WKScriptMessageHandler?
-
-    init(delegate: WKScriptMessageHandler) {
-        self.delegate = delegate
-        super.init()
-    }
-
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        delegate?.userContentController(userContentController, didReceive: message)
-    }
-}
-
 // MARK: - Internal Implementation
 
 internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationDelegate, WKUIDelegate {
@@ -63,7 +21,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     private weak var viewController: UIViewController?
 
     private var popupWebView: WKWebView?
-    private weak var popupWebViewController: UIViewController?
+    private var popupWebViewController: UIViewController?
 
     private var pendingRequests: [String: CheckedContinuation<String, Error>] = [:]
     private var sdkInitContinuation: CheckedContinuation<Void, Error>?
@@ -71,6 +29,38 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     private let pendingRequestsQueue = DispatchQueue(label: "com.hyperswitch.c2p.pendingRequests")
 
     private var isClosed = false
+
+    private func getHyperLoaderURL() -> String {
+        return SDKEnvironment.getEnvironment(publishableKey) == .PROD
+        ? "https://checkout.hyperswitch.io/web/2025.11.28.00/v1/HyperLoader.js"
+        : "https://beta.hyperswitch.io/web/2025.11.28.00/v1/HyperLoader.js"
+    }
+
+    private func getBaseURL() -> String {
+        return SDKEnvironment.getEnvironment(publishableKey) == .PROD
+        ? "https://secure.checkout.visa.com"
+        : "https://sandbox.secure.checkout.visa.com"
+    }
+
+    private func logInfo(_ value: String) {
+        let log = LogBuilder()
+            .setLogType("INFO")
+            .setCategory(.USER_EVENT)
+            .setEventName(.CLICK_TO_PAY_FLOW)
+            .setValue(value)
+            .build()
+        LogManager.addLog(log)
+    }
+
+    private func logError(_ value: String) {
+        let log = LogBuilder()
+            .setLogType("ERROR")
+            .setCategory(.USER_ERROR)
+            .setEventName(.CLICK_TO_PAY_FLOW)
+            .setValue(value)
+            .build()
+        LogManager.addLog(log)
+    }
 
     private func checkSessionClosed() throws {
         try pendingRequestsQueue.sync {
@@ -94,6 +84,9 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         self.viewController = viewController
         super.init()
 
+        LogManager.initialize(publishableKey: publishableKey)
+        logInfo("Initializing WebView")
+
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             pendingRequestsQueue.async { [weak self] in
                 self?.sdkInitContinuation = continuation
@@ -102,12 +95,23 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                 self?.setupWebView()
             }
         }
+
+        logInfo("WebView initialized successfully")
     }
 
     private func setupWebView() {
+        // zoom disable script
+        let source: String = "var meta = document.createElement('meta');" +
+        "meta.name = 'viewport';" +
+        "meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';" +
+        "var head = document.getElementsByTagName('head')[0];" +
+        "head.appendChild(meta);"
+        let script: WKUserScript = WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+
         let contentController = WKUserContentController()
         let weakHandler = WeakScriptMessageHandler(delegate: self)
         contentController.add(weakHandler, name: "HSInterface")
+        contentController.addUserScript(script)
 
         let configuration = WKWebViewConfiguration()
         configuration.userContentController = contentController
@@ -137,6 +141,10 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
         let backendUrlParam = customBackendUrl.map { "customBackendUrl: \"\($0)\"," } ?? ""
         let logUrlParam = customLogUrl.map { "customLogUrl: \"\($0)\"," } ?? ""
+        let hyperLoaderUrl = getHyperLoaderURL()
+        let baseUrl = getBaseURL()
+
+        logInfo("Loading url from \(hyperLoaderUrl) with \(baseUrl)")
 
         let baseHtml = """
             <!DOCTYPE html>
@@ -179,7 +187,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                   }
                 </script>
                 <script
-                  src="https://beta.hyperswitch.io/web/2025.11.28.00/v1/HyperLoader.js"
+                  src="\(hyperLoaderUrl)"
                   onload="initHyper()"
                   onerror="handleScriptError()"
                   async="true"
@@ -188,7 +196,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
               <body></body>
             </html>
         """
-        webView?.loadHTMLString(baseHtml, baseURL: URL(string: "https://sandbox.src.mastercard.com"))
+        webView?.loadHTMLString(baseHtml, baseURL: URL(string: baseUrl))
     }
 
     internal func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
@@ -196,6 +204,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         if navigationAction.targetFrame == nil {
 
             self.popupWebView = WKWebView(frame: .zero, configuration: configuration)
+            self.popupWebViewController = UIViewController()
 
             popupWebView?.navigationDelegate = self
             popupWebView?.uiDelegate = self
@@ -246,6 +255,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         request3DSAuthentication: Bool
     ) async throws {
         try checkSessionClosed()
+        logInfo("Initializing Click to Pay session")
 
         let requestId = UUID().uuidString
 
@@ -300,12 +310,16 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let typeString = error["type"] as? String ?? "ERROR"
             let errorMessage = error["message"] as? String ?? "Unknown error"
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            logError("Failed to initialize Click to Pay session - Type: \(typeString), Message: \(errorMessage)")
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
+
+        logInfo("Click to Pay session initialized successfully")
     }
 
     internal func isCustomerPresent(request: CustomerPresenceRequest) async throws -> CustomerPresenceResponse {
         try checkSessionClosed()
+        logInfo("Checking Customer Presence")
 
         let requestId = UUID().uuidString
         let responseJson: String = try await withCheckedThrowingContinuation { continuation in
@@ -355,9 +369,11 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let errorMessage = error["message"] as? String ?? "Unknown error"
 
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            logError("Failed to check customer presence - Type: \(typeString), Message: \(errorMessage)")
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
+        logInfo("Customer presence retrieved successfully")
         if let customerPresent = data["customerPresent"] as? Bool {
             return CustomerPresenceResponse(customerPresent: customerPresent)
         }
@@ -366,6 +382,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     internal func getUserType() async throws -> CardsStatusResponse {
         try checkSessionClosed()
+        logInfo("Getting User Type")
 
         let requestId = UUID().uuidString
 
@@ -412,9 +429,11 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let errorMessage = error["message"] as? String ?? "Unknown error"
 
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            logError("Failed to get user type - Type: \(typeString), Message: \(errorMessage)")
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
+        logInfo("User type retrieved successfully")
         guard let statusCodeStr = data["statusCode"] as? String,
               let statusCode = StatusCode(rawValue: statusCodeStr) else {
             throw ClickToPayException(message: "Failed to parse status code", type: .error)
@@ -425,6 +444,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     internal func getRecognizedCards() async throws -> [RecognizedCard] {
         try checkSessionClosed()
+        logInfo("Getting User cards")
 
         let requestId = UUID().uuidString
 
@@ -471,6 +491,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let errorMessage = error["message"] as? String ?? "Unknown error"
 
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            logError("Failed to get recognized cards - Type: \(typeString), Message: \(errorMessage)")
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
@@ -481,11 +502,13 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         let cardsJsonData = try JSONSerialization.data(withJSONObject: cardsData)
         let cards = try JSONDecoder().decode([RecognizedCard].self, from: cardsJsonData)
 
+        logInfo("Recognized cards retrieved successfully")
         return cards
     }
 
     internal func validateCustomerAuthentication(otpValue: String) async throws -> [RecognizedCard] {
         try checkSessionClosed()
+        logInfo("Validating Customer Authentication")
 
         let requestId = UUID().uuidString
 
@@ -534,6 +557,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let errorMessage = error["message"] as? String ?? "Unknown error"
 
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            logError("Failed to validate customer authentication - Type: \(typeString), Message: \(errorMessage)")
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
@@ -544,11 +568,13 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         let cardsJsonData = try JSONSerialization.data(withJSONObject: cardsData)
         let cards = try JSONDecoder().decode([RecognizedCard].self, from: cardsJsonData)
 
+        logInfo("Customer authentication validated successfully")
         return cards
     }
 
     internal func signOut() async throws -> SignOutResponse {
         try checkSessionClosed()
+        logInfo("Signing out from device")
 
         let requestId = UUID().uuidString
 
@@ -594,9 +620,11 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let typeString = error["type"] as? String ?? "ERROR"
             let errorMessage = error["message"] as? String ?? "Unknown error"
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            logError("Failed to sign out - Type: \(typeString), Message: \(errorMessage)")
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
+        logInfo("Device signed out successfully")
         if let recognized = data["recognized"] as? Bool {
             return SignOutResponse(recognized: recognized)
         }
@@ -605,6 +633,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     internal func checkoutWithCard(request: CheckoutRequest) async throws -> CheckoutResponse {
         try checkSessionClosed()
+        logInfo("Checkout payment with card with rememberMe as \(request.rememberMe ?? false)")
 
         let requestId = UUID().uuidString
 
@@ -655,16 +684,20 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let errorMessage = error["message"] as? String ?? "Unknown error"
 
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            logError("Failed to checkout - Type: \(typeString), Message: \(errorMessage)")
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
         let responseData = try JSONSerialization.data(withJSONObject: data)
         let checkoutResponse = try JSONDecoder().decode(CheckoutResponse.self, from: responseData)
 
+        logInfo("Checkout completed successfully")
         return checkoutResponse
     }
 
     public func close() {
+        logInfo("Closing Click to Pay session")
+
         pendingRequestsQueue.async { [weak self] in
             guard let self = self else { return }
             guard !self.isClosed else { return }
@@ -700,6 +733,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                 self.cleanupPopupWebView()
             }
             self.cleanupMainWebView()
+            self.logInfo("WebView destroyed successfully")
         }
     }
 
@@ -715,11 +749,26 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     /// Cleans up the main WebView resources
     private func cleanupMainWebView() {
         webView?.configuration.userContentController.removeScriptMessageHandler(forName: "HSInterface")
+        webView?.configuration.userContentController.removeAllUserScripts()
         webView?.stopLoading()
         webView?.removeFromSuperview()
         webView?.navigationDelegate = nil
         webView?.uiDelegate = nil
         webView = nil
+    }
+
+    /// A weak wrapper for WKScriptMessageHandler to break the retain cycle
+    private class WeakScriptMessageHandler: NSObject, WKScriptMessageHandler {
+        weak var delegate: WKScriptMessageHandler?
+
+        init(delegate: WKScriptMessageHandler) {
+            self.delegate = delegate
+            super.init()
+        }
+
+        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+            delegate?.userContentController(userContentController, didReceive: message)
+        }
     }
 
     public func getKeyWindow() -> UIWindow? {
@@ -779,6 +828,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         DispatchQueue.main.async {
             // Clean up main webView
             mainWebView?.configuration.userContentController.removeScriptMessageHandler(forName: "HSInterface")
+            mainWebView?.configuration.userContentController.removeAllUserScripts()
             mainWebView?.stopLoading()
             mainWebView?.removeFromSuperview()
             mainWebView?.navigationDelegate = nil
@@ -820,12 +870,14 @@ extension ClickToPaySessionImpl: WKScriptMessageHandler {
                 guard let self = self else { return }
 
                 if sdkInitialised {
+                    self.logInfo("Script loaded successfully")
                     if let continuation = self.sdkInitContinuation {
                         self.sdkInitContinuation = nil
                         continuation.resume()
                     }
                 } else {
                     let errorMessage = json["error"] as? String ?? "Unknown SDK initialization error"
+                    self.logError("Failed to load URL - Message: \(errorMessage)")
                     if let continuation = self.sdkInitContinuation {
                         self.sdkInitContinuation = nil
                         continuation.resume(throwing: ClickToPayException(
