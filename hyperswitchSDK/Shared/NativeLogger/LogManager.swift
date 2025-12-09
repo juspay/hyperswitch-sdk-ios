@@ -17,8 +17,7 @@ final class LogManager {
     
     private static func formatPayload(logs: [String]) -> String {
         return "[" + logs.joined(separator: ",")
-            .replacingOccurrences(of: " ", with: "")
-            .replacingOccurrences(of: "\n", with: "") + "]"
+            .replacingOccurrences(of: "\n", with: " ") + "]"
     }
     
     private static func getStringifiedLogs(_ logBatch: [LogPayload]) -> [String] {
