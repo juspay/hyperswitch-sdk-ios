@@ -73,7 +73,9 @@ public class AuthenticationSession {
             throw NSError(domain: "ClickToPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Missing required authentication parameters"])
         }
 
-        currentClickToPaySession?.close()
+        if let currentClickToPaySession = currentClickToPaySession {
+            await currentClickToPaySession.close()
+        }
         currentClickToPaySession = nil
 
         do {

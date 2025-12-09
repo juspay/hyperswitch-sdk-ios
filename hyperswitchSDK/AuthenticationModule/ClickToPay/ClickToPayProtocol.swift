@@ -30,7 +30,7 @@ public protocol ClickToPaySession {
     func checkoutWithCard(request: CheckoutRequest) async throws -> CheckoutResponse
 
     /// Close the Click to Pay session and release all resources.
-    /// This method should be called when the session is no longer needed,
+    /// This method should be called when the session is no longer needed.
     /// After calling close(), the session cannot be used again.
-    func close()
+    func close() async
 }

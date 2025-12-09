@@ -695,16 +695,20 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         return checkoutResponse
     }
 
-    public func close() {
+    public func close() async {
         logInfo("Closing Click to Pay session")
 
-        pendingRequestsQueue.async { [weak self] in
-            guard let self = self else { return }
-            guard !self.isClosed else { return }
-            self.isClosed = true
+        let alreadyClosed = pendingRequestsQueue.sync { () -> Bool in
+            if isClosed { return true }
+            isClosed = true
+            return false
+        }
 
-            let pendingRequestsCopy = self.pendingRequests
-            self.pendingRequests.removeAll()
+        guard !alreadyClosed else { return }
+
+        pendingRequestsQueue.sync {
+            let pendingRequestsCopy = pendingRequests
+            pendingRequests.removeAll()
 
             for (_, continuation) in pendingRequestsCopy {
                 continuation.resume(throwing: ClickToPayException(
@@ -713,8 +717,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                 ))
             }
 
-            if let initContinuation = self.sdkInitContinuation {
-                self.sdkInitContinuation = nil
+            if let initContinuation = sdkInitContinuation {
+                sdkInitContinuation = nil
                 initContinuation.resume(throwing: ClickToPayException(
                     message: "Session was closed during initialization",
                     type: .error
@@ -722,18 +726,20 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             }
         }
 
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-
-            if self.popupWebViewController?.presentingViewController != nil {
-                self.popupWebViewController?.dismiss(animated: false) { [weak self] in
-                    self?.cleanupPopupWebView()
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else {
+                    continuation.resume()
+                    return
                 }
-            } else {
+                if self.popupWebViewController?.presentingViewController != nil {
+                    self.popupWebViewController?.dismiss(animated: false)
+                }
                 self.cleanupPopupWebView()
+                self.cleanupMainWebView()
+                self.logInfo("WebView destroyed successfully")
+                continuation.resume()
             }
-            self.cleanupMainWebView()
-            self.logInfo("WebView destroyed successfully")
         }
     }
 
@@ -820,6 +826,9 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         return viewController // Could be UIViewController OR UIHostingController
     }
     deinit {
+        let wasClosed = pendingRequestsQueue.sync { isClosed }
+        guard !wasClosed else { return }
+
         // Capture references before self is deallocated
         let mainWebView = webView
         let popup = popupWebView

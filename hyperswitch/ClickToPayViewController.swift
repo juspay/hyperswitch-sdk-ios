@@ -304,9 +304,11 @@ class ClickToPayViewController: UIViewController {
             updateStatus("Click to Pay session not initialized")
             return
         }
-        session.close()
-        self.updateStatus("Session Closed")
-        self.updateCardsStatus("")
+        Task {
+            await session.close()
+            self.updateStatus("Session Closed")
+        }
+
     }
 
     // MARK: - UI Helper Methods
