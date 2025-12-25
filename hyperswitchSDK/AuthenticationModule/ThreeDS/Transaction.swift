@@ -40,9 +40,7 @@ public final class Transaction {
     }
     
     public func getProgressView() throws -> ProgressDialog {
-        // Return a default ProgressDialog since getProgressView is not available in the provider protocol
-        // TODO: implementation
-        return ProgressDialog()
+        return try transactionProvider.getProgressView()
     }
     
     public func close() {
@@ -51,8 +49,16 @@ public final class Transaction {
 }
 
 public class ProgressDialog {
-    public func start() {}
-    public func stop() {}
+    internal var onStart: (() -> Void) = {}
+    internal var onStop: (() -> Void) = {}
+    
+    public func start() {
+        onStart()
+    }
+    
+    public func stop() {
+        onStop()
+    }
 }
 
 public class AuthenticationRequestParameters {
