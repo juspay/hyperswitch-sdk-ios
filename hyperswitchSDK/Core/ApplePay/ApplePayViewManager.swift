@@ -97,7 +97,11 @@ internal class ApplePayView : UIView {
             style = .black
         }
         
-        button = PKPaymentButton(paymentButtonType: type, paymentButtonStyle: style)
+        if #available(iOS 26.0, *) {  // TODO: temp fix need to clamp corner-radius to be < height/2
+            button = PKPaymentButton(type: type, style: style, disableCardArt: true)
+        } else {
+            button = PKPaymentButton(paymentButtonType: type, paymentButtonStyle: style)
+        }
         button?.addTarget(self, action: #selector(touchUpInside(_:)), for: .touchUpInside)
         if let cornerRadius = cornerRadius {
             button?.cornerRadius = cornerRadius
