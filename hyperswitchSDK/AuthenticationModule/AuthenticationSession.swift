@@ -80,6 +80,8 @@ public class AuthenticationSession {
 
         do {
             let impl = try await ClickToPaySessionImpl(
+                clientSecret: clientSecret,
+                authenticationId: authenticationId,
                 publishableKey: publishableKey,
                 customBackendUrl: customBackendUrl,
                 customLogUrl: customLogUrl,

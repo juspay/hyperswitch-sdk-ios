@@ -66,7 +66,17 @@ internal class LogBuilder {
         self.category = category
         return self
     }
-    
+
+    func setPaymentId(_ paymentId: String) -> LogBuilder {
+        self.paymentId = paymentId
+        return self
+    }
+
+    func setSessionId(_ sessionId: String) -> LogBuilder {
+        self.sessionId = sessionId
+        return self
+    }
+
     func build() -> LogPayload {
         self.timestamp = String(Int(Date().timeIntervalSince1970 * 1000))
         return LogPayload(

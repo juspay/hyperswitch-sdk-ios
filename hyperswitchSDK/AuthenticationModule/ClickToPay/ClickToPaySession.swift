@@ -12,6 +12,8 @@ import Foundation
 
 internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationDelegate, WKUIDelegate {
 
+    private let clientSecret: String
+    private let authenticationId: String
     private let publishableKey: String
     private let customBackendUrl: String?
     private let customLogUrl: String?
@@ -47,6 +49,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             .setLogType("INFO")
             .setCategory(.USER_EVENT)
             .setEventName(.CLICK_TO_PAY_FLOW)
+            .setPaymentId(authenticationId)
+            .setSessionId(clientSecret)
             .setValue(value)
             .build()
         LogManager.addLog(log)
@@ -57,6 +61,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             .setLogType("ERROR")
             .setCategory(.USER_ERROR)
             .setEventName(.CLICK_TO_PAY_FLOW)
+            .setPaymentId(authenticationId)
+            .setSessionId(clientSecret)
             .setValue(value)
             .build()
         LogManager.addLog(log)
@@ -71,12 +77,16 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     internal init(
+        clientSecret: String,
+        authenticationId: String,
         publishableKey: String,
         customBackendUrl: String? = nil,
         customLogUrl: String? = nil,
         customParams: [String: Any]? = nil,
         viewController: UIViewController?
     ) async throws {
+        self.clientSecret = clientSecret
+        self.authenticationId = authenticationId
         self.publishableKey = publishableKey
         self.customBackendUrl = customBackendUrl
         self.customLogUrl = customLogUrl
@@ -85,7 +95,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         super.init()
 
         LogManager.initialize(publishableKey: publishableKey)
-        logInfo("Initializing WebView")
+        logInfo("WEBVIEW | INIT")
 
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             pendingRequestsQueue.async { [weak self] in
@@ -96,7 +106,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             }
         }
 
-        logInfo("WebView initialized successfully")
+        logInfo("WEBVIEW | INIT | SUCCESS")
     }
 
     private func setupWebView() {
@@ -144,7 +154,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         let hyperLoaderUrl = getHyperLoaderURL()
         let baseUrl = getBaseURL()
 
-        logInfo("Loading url from \(hyperLoaderUrl) with \(baseUrl)")
+        logInfo("WEBVIEW | LOADING | \(hyperLoaderUrl) | \(baseUrl)")
 
         let baseHtml = """
             <!DOCTYPE html>
@@ -255,7 +265,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         request3DSAuthentication: Bool
     ) async throws {
         try checkSessionClosed()
-        logInfo("Initializing Click to Pay session")
+        logInfo("C2P_INIT | INIT")
 
         let requestId = UUID().uuidString
 
@@ -310,16 +320,16 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let typeString = error["type"] as? String ?? "ERROR"
             let errorMessage = error["message"] as? String ?? "Unknown error"
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
-            logError("Failed to initialize Click to Pay session - Type: \(typeString), Message: \(errorMessage)")
+            logError("C2P_INIT | FAILURE | TYPE: \(typeString), MESSAGE: \(errorMessage)")
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
-        logInfo("Click to Pay session initialized successfully")
+        logInfo("C2P_INIT | SUCCESS")
     }
 
     internal func isCustomerPresent(request: CustomerPresenceRequest) async throws -> CustomerPresenceResponse {
         try checkSessionClosed()
-        logInfo("Checking Customer Presence")
+        logInfo("CUSTOMER_CHECK | INIT")
 
         let requestId = UUID().uuidString
         let responseJson: String = try await withCheckedThrowingContinuation { continuation in
@@ -369,11 +379,11 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let errorMessage = error["message"] as? String ?? "Unknown error"
 
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
-            logError("Failed to check customer presence - Type: \(typeString), Message: \(errorMessage)")
+            logError("CUSTOMER_CHECK | FAILURE | TYPE: \(typeString), MESSAGE: \(errorMessage)")
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
-        logInfo("Customer presence retrieved successfully")
+        logInfo("CUSTOMER_CHECK | SUCCESS")
         if let customerPresent = data["customerPresent"] as? Bool {
             return CustomerPresenceResponse(customerPresent: customerPresent)
         }
@@ -382,7 +392,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     internal func getUserType() async throws -> CardsStatusResponse {
         try checkSessionClosed()
-        logInfo("Getting User Type")
+        logInfo("GET_USER_TYPE | INIT")
 
         let requestId = UUID().uuidString
 
@@ -429,11 +439,11 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let errorMessage = error["message"] as? String ?? "Unknown error"
 
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
-            logError("Failed to get user type - Type: \(typeString), Message: \(errorMessage)")
+            logError("GET_USER_TYPE | FAILURE | TYPE: \(typeString), MESSAGE: \(errorMessage)")
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
-        logInfo("User type retrieved successfully")
+        logInfo("GET_USER_TYPE | SUCCESS")
         guard let statusCodeStr = data["statusCode"] as? String,
               let statusCode = StatusCode(rawValue: statusCodeStr) else {
             throw ClickToPayException(message: "Failed to parse status code", type: .error)
@@ -444,7 +454,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     internal func getRecognizedCards() async throws -> [RecognizedCard] {
         try checkSessionClosed()
-        logInfo("Getting User cards")
+        logInfo("GET_CARDS | INIT")
 
         let requestId = UUID().uuidString
 
@@ -491,7 +501,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let errorMessage = error["message"] as? String ?? "Unknown error"
 
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
-            logError("Failed to get recognized cards - Type: \(typeString), Message: \(errorMessage)")
+            logError("GET_CARDS | FAILURE | TYPE: \(typeString), MESSAGE: \(errorMessage)")
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
@@ -502,13 +512,17 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         let cardsJsonData = try JSONSerialization.data(withJSONObject: cardsData)
         let cards = try JSONDecoder().decode([RecognizedCard].self, from: cardsJsonData)
 
-        logInfo("Recognized cards retrieved successfully")
+        let visaCount = cards.count{$0.paymentCardDescriptor == .visa}
+        let masterCardCount = cards.count{$0.paymentCardDescriptor == .mastercard}
+
+        logInfo("GET_CARDS | SUCCESS | VISA: \(visaCount) | MASTERCARD: \(masterCardCount)")
+
         return cards
     }
 
     internal func validateCustomerAuthentication(otpValue: String) async throws -> [RecognizedCard] {
         try checkSessionClosed()
-        logInfo("Validating Customer Authentication")
+        logInfo("AUTH_VALIDATION | INIT")
 
         let requestId = UUID().uuidString
 
@@ -557,7 +571,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let errorMessage = error["message"] as? String ?? "Unknown error"
 
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
-            logError("Failed to validate customer authentication - Type: \(typeString), Message: \(errorMessage)")
+            logError("AUTH_VALIDATION | FAILURE | TYPE: \(typeString), MESSAGE: \(errorMessage)")
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
@@ -568,13 +582,13 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         let cardsJsonData = try JSONSerialization.data(withJSONObject: cardsData)
         let cards = try JSONDecoder().decode([RecognizedCard].self, from: cardsJsonData)
 
-        logInfo("Customer authentication validated successfully")
+        logInfo("AUTH_VALIDATION | SUCCESS")
         return cards
     }
 
     internal func signOut() async throws -> SignOutResponse {
         try checkSessionClosed()
-        logInfo("Signing out from device")
+        logInfo("SIGN_OUT | INIT")
 
         let requestId = UUID().uuidString
 
@@ -620,11 +634,11 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let typeString = error["type"] as? String ?? "ERROR"
             let errorMessage = error["message"] as? String ?? "Unknown error"
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
-            logError("Failed to sign out - Type: \(typeString), Message: \(errorMessage)")
+            logError("SIGN_OUT | FAILURE | TYPE: \(typeString), MESSAGE: \(errorMessage)")
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
-        logInfo("Device signed out successfully")
+        logInfo("SIGN_OUT | SUCCESS")
         if let recognized = data["recognized"] as? Bool {
             return SignOutResponse(recognized: recognized)
         }
@@ -633,7 +647,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     internal func checkoutWithCard(request: CheckoutRequest) async throws -> CheckoutResponse {
         try checkSessionClosed()
-        logInfo("Checkout payment with card with rememberMe as \(request.rememberMe ?? false)")
+        logInfo("CHECKOUT | INIT | REMEMBER_ME: \(request.rememberMe ?? false)")
 
         let requestId = UUID().uuidString
 
@@ -684,19 +698,19 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let errorMessage = error["message"] as? String ?? "Unknown error"
 
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
-            logError("Failed to checkout - Type: \(typeString), Message: \(errorMessage)")
+            logError("CHECKOUT | FAILURE | TYPE: \(typeString), MESSAGE: \(errorMessage)")
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
         let responseData = try JSONSerialization.data(withJSONObject: data)
         let checkoutResponse = try JSONDecoder().decode(CheckoutResponse.self, from: responseData)
 
-        logInfo("Checkout completed successfully")
+        logInfo("CHECKOUT | SUCCESS")
         return checkoutResponse
     }
 
     public func close() async {
-        logInfo("Closing Click to Pay session")
+        logInfo("CLOSE | INIT")
 
         let alreadyClosed = pendingRequestsQueue.sync { () -> Bool in
             if isClosed { return true }
@@ -737,7 +751,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                 }
                 self.cleanupPopupWebView()
                 self.cleanupMainWebView()
-                self.logInfo("WebView destroyed successfully")
+                self.logInfo("CLOSE | SUCCESS")
                 continuation.resume()
             }
         }
@@ -879,14 +893,14 @@ extension ClickToPaySessionImpl: WKScriptMessageHandler {
                 guard let self = self else { return }
 
                 if sdkInitialised {
-                    self.logInfo("Script loaded successfully")
+                    self.logInfo("WEBVIEW | SCRIPT_LOADED")
                     if let continuation = self.sdkInitContinuation {
                         self.sdkInitContinuation = nil
                         continuation.resume()
                     }
                 } else {
                     let errorMessage = json["error"] as? String ?? "Unknown SDK initialization error"
-                    self.logError("Failed to load URL - Message: \(errorMessage)")
+                    self.logError("WEBVIEW | FAILURE | MESSAGE: \(errorMessage)")
                     if let continuation = self.sdkInitContinuation {
                         self.sdkInitContinuation = nil
                         continuation.resume(throwing: ClickToPayException(
