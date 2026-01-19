@@ -34,8 +34,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     private func getHyperLoaderURL() -> String {
         return SDKEnvironment.getEnvironment(publishableKey) == .PROD
-        ? "https://checkout.hyperswitch.io/web/2025.11.28.00/v1/HyperLoader.js"
-        : "https://beta.hyperswitch.io/web/2025.11.28.00/v1/HyperLoader.js"
+        ? "https://checkout.hyperswitch.io/web/2025.11.28.01/v1/HyperLoader.js"
+        : "https://beta.hyperswitch.io/web/2025.11.28.01/v1/HyperLoader.js"
     }
 
     private func getBaseURL() -> String {
@@ -327,6 +327,71 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         logInfo("C2P_INIT | SUCCESS")
     }
 
+    internal func getActiveClickToPaySession(clientSecret: String,
+                                             profileId: String,
+                                             authenticationId: String,
+                                             merchantId: String) async throws {
+        try checkSessionClosed()
+        logInfo("GET_ACTIVE_C2P | INIT")
+
+        let requestId = UUID().uuidString
+
+        let responseJson: String = try await withCheckedThrowingContinuation { continuation in
+            pendingRequestsQueue.async { [weak self] in
+                self?.pendingRequests[requestId] = continuation
+            }
+
+            let jsCode = """
+                (async function() {
+                    try {
+                        const authenticationSession = window.hyperInstance.initAuthenticationSession({
+                              clientSecret: "\(clientSecret)",
+                              profileId: "\(profileId)",
+                              authenticationId: "\(authenticationId)",
+                              merchantId: "\(merchantId)",
+                        });
+            
+                        window.ClickToPaySession = await authenticationSession.getActiveClickToPaySession();
+            
+                        const data = window.ClickToPaySession.error ? window.ClickToPaySession : { success: true }
+                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                            requestId: "\(requestId)",
+                            data: data
+                        }));
+                    } catch (error) {
+                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                            requestId: "\(requestId)",
+                            data: { error: {
+                                    type: error.type || "getActiveClickToPaySessionError",
+                                    message: error.message
+                                }}
+                        }));
+                    }
+                })();
+            """
+
+            DispatchQueue.main.async { [weak self] in
+                self?.webView?.evaluateJavaScript(jsCode, completionHandler: nil)
+            }
+        }
+
+        guard let jsonData = responseJson.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+              let data = json["data"] as? [String: Any] else {
+            throw ClickToPayException(message: "Failed to parse response", type: .error)
+        }
+
+        if let error = data["error"] as? [String: Any] {
+            let typeString = error["type"] as? String ?? "ERROR"
+            let errorMessage = error["message"] as? String ?? "Unknown error"
+            let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
+            logError("GET_ACTIVE_C2P | FAILURE | TYPE: \(typeString), MESSAGE: \(errorMessage)")
+            throw ClickToPayException(message: errorMessage, type: errorType)
+        }
+
+        logInfo("GET_ACTIVE_C2P | SUCCESS")
+    }
+
     internal func isCustomerPresent(request: CustomerPresenceRequest) async throws -> CustomerPresenceResponse {
         try checkSessionClosed()
         logInfo("CUSTOMER_CHECK | INIT")
@@ -513,9 +578,9 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         let cards = try JSONDecoder().decode([RecognizedCard].self, from: cardsJsonData)
 
         let visaCount = cards.count{$0.paymentCardDescriptor == .visa}
-        let masterCardCount = cards.count{$0.paymentCardDescriptor == .mastercard}
+        let mastercardCount = cards.count{$0.paymentCardDescriptor == .mastercard}
 
-        logInfo("GET_CARDS | SUCCESS | VISA: \(visaCount) | MASTERCARD: \(masterCardCount)")
+        logInfo("GET_CARDS | SUCCESS | VISA: \(visaCount) | MASTERCARD: \(mastercardCount)")
 
         return cards
     }
@@ -582,7 +647,10 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         let cardsJsonData = try JSONSerialization.data(withJSONObject: cardsData)
         let cards = try JSONDecoder().decode([RecognizedCard].self, from: cardsJsonData)
 
-        logInfo("AUTH_VALIDATION | SUCCESS")
+        let visaCount = cards.count{$0.paymentCardDescriptor == .visa}
+        let mastercardCount = cards.count{$0.paymentCardDescriptor == .mastercard}
+
+        logInfo("AUTH_VALIDATION | SUCCESS | VISA: \(visaCount) | MASTERCARD: \(mastercardCount)")
         return cards
     }
 

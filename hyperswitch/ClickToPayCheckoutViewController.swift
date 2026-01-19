@@ -1,22 +1,22 @@
 //
-//  ClickToPayViewController.swift
+//  ClickToPayCheckoutViewController.swift
 //  hyperswitch
 //
-//  Created by Harshit Srivastava on 31/10/25.
+//  Created by Harshit Srivastava on 19/01/26.
 //
 
 import UIKit
 import SwiftUI
 import Combine
 
-class ClickToPayViewController: UIViewController {
+class ClickToPayCheckoutViewController: UIViewController {
 
     @ObservedObject var clickToPayViewModel = ClickToPayViewModel()
     private var clickToPaySession: ClickToPaySession?
     private var recognizedCards: [RecognizedCard] = []
 
     private var reloadButton = UIButton()
-    private var initC2PButton = UIButton()
+    private var getActiveClickToPayButton = UIButton()
     private var checkCustomerButton = UIButton()
     private var getUserTypeButton = UIButton()
     private var getCardsButton = UIButton()
@@ -35,21 +35,8 @@ class ClickToPayViewController: UIViewController {
         super.viewDidLoad()
         clickToPayViewModel.prepareAuthenticationSession()
         asyncBind()
-
-        let nextButton = UIBarButtonItem(image: .init(systemName: "chevron.right"),
-                                         style: .plain,
-                                         target: self,
-                                         action: #selector(nextButtonTapped))
-
-            navigationItem.rightBarButtonItem = nextButton
     }
-
-    @objc func nextButtonTapped() {
-        let nextVC = ClickToPayCheckoutViewController()
-        nextVC.clickToPayViewModel = self.clickToPayViewModel
-        navigationController?.pushViewController(nextVC, animated: true)
-    }
-
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         viewFrame()
@@ -86,7 +73,7 @@ class ClickToPayViewController: UIViewController {
     // MARK: - Click to Pay Functions
 
     @objc
-    private func initClickToPaySession(  _ sender: Any) {
+    private func getActiveClickToPaySession(  _ sender: Any) {
         guard let session = clickToPayViewModel.authenticationSession else {
             updateStatus("Authentication session not initialized")
             return
@@ -94,14 +81,14 @@ class ClickToPayViewController: UIViewController {
         Task {
             do {
                 updateStatus("Initializing Click to Pay...")
-                let clickToPaySession = try await session.initClickToPaySession(request3DSAuthentication: false, viewController: self)
+                let clickToPaySession = try await session.getActiveClickToPaySession(viewController: self)
                 DispatchQueue.main.async {
                     self.clickToPaySession = clickToPaySession
                     self.updateStatus("Click to Pay Initialized")
                 }
             } catch {
                 DispatchQueue.main.async {
-                    self.updateStatus("Init C2P failed: \(error.localizedDescription)")
+                    self.updateStatus("Get Active C2P failed: \(error.localizedDescription)")
                 }
             }
         }
@@ -342,7 +329,7 @@ class ClickToPayViewController: UIViewController {
 
 // MARK: - UI Setup
 
-extension ClickToPayViewController {
+extension ClickToPayCheckoutViewController {
 
     func viewFrame() {
         let scrollView = UIScrollView()
@@ -372,10 +359,10 @@ extension ClickToPayViewController {
         setupButton(reloadButton, title: "Reload Client Secret", target: #selector(reload(_:)), on: contentView, topAnchor: contentView.topAnchor, constant: 20)
 
         // Init C2P Button
-        setupButton(initC2PButton, title: "Init Click to Pay", target: #selector(initClickToPaySession(_:)), on: contentView, topAnchor: reloadButton.bottomAnchor, constant: 15)
+        setupButton(getActiveClickToPayButton, title: "Get Active Click to Pay", target: #selector(getActiveClickToPaySession(_:)), on: contentView, topAnchor: reloadButton.bottomAnchor, constant: 15)
 
         // Check Customer Button
-        setupButton(checkCustomerButton, title: "Check Customer Presence", target: #selector(checkCustomer(_:)), on: contentView, topAnchor: initC2PButton.bottomAnchor, constant: 15)
+        setupButton(checkCustomerButton, title: "Check Customer Presence", target: #selector(checkCustomer(_:)), on: contentView, topAnchor: getActiveClickToPayButton.bottomAnchor, constant: 15)
 
         // Get User Type Button
         setupButton(getUserTypeButton, title: "Get User Type", target: #selector(getUserType(_:)), on: contentView, topAnchor: checkCustomerButton.bottomAnchor, constant: 15)

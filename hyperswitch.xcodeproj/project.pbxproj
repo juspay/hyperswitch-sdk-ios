@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		192F175E42A8AC4EC54D289E /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		192F175E42A8AC4EC54D289E /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		4365207C2C8768B90006C856 /* ApplePayHandlerLite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4365207B2C8768B90006C856 /* ApplePayHandlerLite.swift */; };
 		43E668682C084FB70094BD13 /* montserrat_extralight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668552C084FB60094BD13 /* montserrat_extralight.ttf */; };
 		43E668692C084FB70094BD13 /* montserrat_bolditalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668562C084FB70094BD13 /* montserrat_bolditalic.ttf */; };
@@ -129,6 +129,7 @@
 		79EAB0412C81D330006B40AD /* PaymentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790BA8262B99DB5E006678FD /* PaymentSession.swift */; };
 		79EAB0432C81D4AA006B40AD /* PaymentSessionTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EAB0422C81D4AA006B40AD /* PaymentSessionTypes.swift */; };
 		79EAB0462C81D5C9006B40AD /* PaymentSession+Lite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EAB0442C81D5AC006B40AD /* PaymentSession+Lite.swift */; };
+		79FA101E2F1E93B6006B33CF /* ClickToPayCheckoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FA101D2F1E93A1006B33CF /* ClickToPayCheckoutViewController.swift */; };
 		79FE014D2E97C18F00C5D94A /* Codable+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE014C2E97C18F00C5D94A /* Codable+UIKit.swift */; };
 		79FE014E2E97C18F00C5D94A /* Codable+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE014C2E97C18F00C5D94A /* Codable+UIKit.swift */; };
 		79FE01502E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE014F2E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift */; };
@@ -285,6 +286,7 @@
 		79EAB03D2C81D283006B40AD /* PaymentSheetView+Lite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSheetView+Lite.swift"; sourceTree = "<group>"; };
 		79EAB0422C81D4AA006B40AD /* PaymentSessionTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSessionTypes.swift; sourceTree = "<group>"; };
 		79EAB0442C81D5AC006B40AD /* PaymentSession+Lite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSession+Lite.swift"; sourceTree = "<group>"; };
+		79FA101D2F1E93A1006B33CF /* ClickToPayCheckoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayCheckoutViewController.swift; sourceTree = "<group>"; };
 		79FE014C2E97C18F00C5D94A /* Codable+UIKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Codable+UIKit.swift"; sourceTree = "<group>"; };
 		79FE014F2E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSheetAppearance+Codable.swift"; sourceTree = "<group>"; };
 		8DE1DB5CD7CD39ED0932F0FA /* Pods-hyperswitchAppClip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitchAppClip.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip.debug.xcconfig"; sourceTree = "<group>"; };
@@ -307,7 +309,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				192F175E42A8AC4EC54D289E /* BuildFile in Frameworks */,
+				192F175E42A8AC4EC54D289E /* (null) in Frameworks */,
 				570D085C0EE0B792AD674EC7 /* libPods-hyperswitch.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -419,6 +421,7 @@
 				66486F91294355BD00150E4F /* hyperApp.swift */,
 				66486F93294355BD00150E4F /* ContentView.swift */,
 				7901E1C92EB4DCE2002A9EEE /* ClickToPayViewController.swift */,
+				79FA101D2F1E93A1006B33CF /* ClickToPayCheckoutViewController.swift */,
 				7901E1CA2EB4DCE2002A9EEE /* ClickToPayViewModel.swift */,
 				DC5D011D294844900017C67A /* ViewController.swift */,
 				790525792BDA73A600D49FE8 /* SwiftUIView.swift */,
@@ -776,9 +779,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -793,9 +800,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -874,9 +885,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -907,6 +922,7 @@
 				792D6A082B99C215001598CD /* HyperHeadless.swift in Sources */,
 				79727F952EE74F7400D60AB4 /* ClickToPayProtocol.swift in Sources */,
 				79FE01502E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift in Sources */,
+				79FA101E2F1E93B6006B33CF /* ClickToPayCheckoutViewController.swift in Sources */,
 				79052A242C8922E90011804E /* Version.swift in Sources */,
 				4E0A93DE2CA2F29500E3A767 /* HyperUIViewController.swift in Sources */,
 				4E8C83992E98CAF700A61749 /* NetceteraProvider.swift in Sources */,
