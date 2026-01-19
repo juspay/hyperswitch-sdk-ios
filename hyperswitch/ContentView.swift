@@ -71,12 +71,13 @@ struct ThreeDSView: UIViewControllerRepresentable {
 }
 
 struct ClickToPayView: UIViewControllerRepresentable {
-    typealias UIViewControllerType = ClickToPayViewController
+    typealias UIViewControllerType = UINavigationController
 
-    func makeUIViewController(context: Context) -> ClickToPayViewController {
-        return ClickToPayViewController()
+    func makeUIViewController(context: Context) -> UINavigationController {
+        let navigationController = UINavigationController(rootViewController: ClickToPayViewController())
+        return navigationController
     }
 
-    func updateUIViewController(_ uiViewController: ClickToPayViewController, context: Context) {
+    func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {
     }
 }
