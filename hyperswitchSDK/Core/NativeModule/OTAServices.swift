@@ -6,7 +6,8 @@
 //
 
 import Foundation
-import HyperOTA
+#if canImport(HyperOTA)
+    import HyperOTA
 
 private func getHyperOTAPlist(_ key: String) -> String? {
     guard let path = Bundle(for: RNViewManager.self).path(forResource: "HyperOTA", ofType: "plist"),
@@ -111,3 +112,4 @@ public final class OTAServices {
         return otaServices?.bundleURL() ?? Bundle(for: OTAServices.self).url(forResource: "hyperswitch", withExtension: "bundle")
     }
 }
+#endif

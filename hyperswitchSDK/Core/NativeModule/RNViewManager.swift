@@ -38,7 +38,11 @@ extension RNViewManager: RCTBridgeDelegate {
         case "LocalBundle":
             return Bundle.main.url(forResource: "hyperswitch", withExtension: "bundle")
         default:
+            #if canImport(HyperOTA)
             return OTAServices.shared.getBundleURL()
+            #else
+            return Bundle.main.url(forResource: "hyperswitch", withExtension: "bundle")
+            #endif
         }
     }
 }
