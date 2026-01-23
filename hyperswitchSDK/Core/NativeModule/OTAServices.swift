@@ -5,9 +5,9 @@
 //  Created by Kuntimaddi Manideep on 24/01/25.
 //
 
-import Foundation
 #if canImport(HyperOTA)
 import HyperOTA
+import Foundation
 
 private func getHyperOTAPlist(_ key: String) -> String? {
     guard let path = Bundle(for: RNViewManager.self).path(forResource: "HyperOTA", ofType: "plist"),

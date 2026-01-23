@@ -40,7 +40,8 @@ Pod::Spec.new do |s|
   end
 
   s.subspec 'airborne' do |airborne|
-    s.dependency 'HyperOTA', '0.0.8'
+    airborne.dependency 'HyperOTA', '0.0.8'
+    airborne.dependency 'hyperswitch-sdk-ios/core'
   end
 
   s.subspec 'common' do |common|
