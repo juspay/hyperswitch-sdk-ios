@@ -6,6 +6,7 @@
 //
 
 import Foundation
+#if canImport(HyperOTA)
 import HyperOTA
 
 private func getHyperOTAPlist(_ key: String) -> String? {
@@ -111,3 +112,4 @@ public final class OTAServices {
         return otaServices?.bundleURL() ?? Bundle(for: OTAServices.self).url(forResource: "hyperswitch", withExtension: "bundle")
     }
 }
+#endif

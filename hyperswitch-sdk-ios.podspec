@@ -20,7 +20,6 @@ Pod::Spec.new do |s|
     core.vendored_frameworks = 'frameworkgen/Frameworks/Core/*.xcframework'
     core.dependency 'hyperswitch-sdk-ios/common'
     core.dependency 'hyperswitch-ios-hermes', '0.79.1'
-    core.dependency 'HyperOTA', '0.0.8'
   end
 
   s.subspec 'sentry' do |sentry|
@@ -38,6 +37,10 @@ Pod::Spec.new do |s|
     netcetera3ds.source_files = 'frameworkgen/3ds/Source/**/*.{m,swift,h}'
     netcetera3ds.vendored_frameworks = 'frameworkgen/3ds/Frameworks/*.xcframework'
     netcetera3ds.dependency 'hyperswitch-sdk-ios/core'
+  end
+
+  s.subspec 'airborne' do |airborne|
+    s.dependency 'HyperOTA', '0.0.8'
   end
 
   s.subspec 'common' do |common|
