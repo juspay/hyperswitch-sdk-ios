@@ -11,13 +11,12 @@ import Combine
 
 class ClickToPayCheckoutViewController: UIViewController {
 
-    @ObservedObject var clickToPayViewModel = ClickToPayViewModel()
+    @ObservedObject var clickToPayViewModel: ClickToPayViewModel
     private var clickToPaySession: ClickToPaySession?
     private var recognizedCards: [RecognizedCard] = []
 
     private var reloadButton = UIButton()
     private var getActiveClickToPayButton = UIButton()
-    private var checkCustomerButton = UIButton()
     private var getUserTypeButton = UIButton()
     private var getCardsButton = UIButton()
     private var validateOTPButton = UIButton()
@@ -29,6 +28,15 @@ class ClickToPayCheckoutViewController: UIViewController {
     private var navigateButton = UIButton()
 
     private var cancellables = Set<AnyCancellable>()
+
+    init(clickToPayViewModel: ClickToPayViewModel) {
+        self.clickToPayViewModel = clickToPayViewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         self.view.backgroundColor = UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 0.2)
@@ -89,46 +97,6 @@ class ClickToPayCheckoutViewController: UIViewController {
             } catch {
                 DispatchQueue.main.async {
                     self.updateStatus("Get Active C2P failed: \(error.localizedDescription)")
-                }
-            }
-        }
-    }
-
-    @objc
-    func checkCustomer(_ sender: Any) {
-        let alert = UIAlertController(title: "Enter Email", message: "Enter customer email to check presence", preferredStyle: .alert)
-        alert.addTextField { textField in
-            textField.placeholder = "email@example.com"
-            textField.keyboardType = .emailAddress
-            textField.text = ""
-        }
-        alert.addAction(UIAlertAction(title: "Check", style: .default) { [weak self, weak alert] _ in
-            if let email = alert?.textFields?.first?.text, !email.isEmpty {
-                self?.checkCustomerPresence(email: email)
-            }
-        })
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        present(alert, animated: true)
-    }
-
-    private func checkCustomerPresence(email: String) {
-        guard let session = clickToPaySession else {
-            updateStatus("Click to Pay session not initialized")
-            return
-        }
-
-        Task {
-            do {
-                updateStatus("Checking customer presence...")
-                let request = CustomerPresenceRequest(email: email)
-                let response = try await session.isCustomerPresent(request: request)
-                DispatchQueue.main.async {
-                    self.updateStatus("Customer Check Complete")
-                    self.updateCardsStatus("Customer \(response.customerPresent  ? "exists" : "doesn't exist")")
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    self.updateStatus("Check failed: \(error.localizedDescription)")
                 }
             }
         }
@@ -361,11 +329,9 @@ extension ClickToPayCheckoutViewController {
         // Init C2P Button
         setupButton(getActiveClickToPayButton, title: "Get Active Click to Pay", target: #selector(getActiveClickToPaySession(_:)), on: contentView, topAnchor: reloadButton.bottomAnchor, constant: 15)
 
-        // Check Customer Button
-        setupButton(checkCustomerButton, title: "Check Customer Presence", target: #selector(checkCustomer(_:)), on: contentView, topAnchor: getActiveClickToPayButton.bottomAnchor, constant: 15)
 
         // Get User Type Button
-        setupButton(getUserTypeButton, title: "Get User Type", target: #selector(getUserType(_:)), on: contentView, topAnchor: checkCustomerButton.bottomAnchor, constant: 15)
+        setupButton(getUserTypeButton, title: "Get User Type", target: #selector(getUserType(_:)), on: contentView, topAnchor: getActiveClickToPayButton.bottomAnchor, constant: 15)
 
         // Get Cards Button
         setupButton(getCardsButton, title: "Get Recognized Cards", target: #selector(getRecognizedCards(_:)), on: contentView, topAnchor: getUserTypeButton.bottomAnchor, constant: 15)

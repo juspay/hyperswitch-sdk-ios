@@ -45,7 +45,7 @@ class ClickToPayViewController: UIViewController {
     }
 
     @objc func nextButtonTapped() {
-        let nextVC = ClickToPayCheckoutViewController()
+        let nextVC = ClickToPayCheckoutViewController(clickToPayViewModel: clickToPayViewModel)
         nextVC.clickToPayViewModel = self.clickToPayViewModel
         navigationController?.pushViewController(nextVC, animated: true)
     }
