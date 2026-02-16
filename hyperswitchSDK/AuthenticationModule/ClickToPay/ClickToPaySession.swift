@@ -12,8 +12,8 @@ import Foundation
 
 internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationDelegate, WKUIDelegate {
 
-    private let clientSecret: String
-    private let authenticationId: String
+    private var clientSecret: String
+    private var authenticationId: String
     private let publishableKey: String
     private let customBackendUrl: String?
     private let customLogUrl: String?
@@ -72,6 +72,21 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         try pendingRequestsQueue.sync {
             if isClosed {
                 throw ClickToPayException(message: "Session is closed", type: .error)
+            }
+        }
+    }
+
+    private func attachWebView() {
+        if let webView = webView {
+            if let viewController = viewController {
+                viewController.view.addSubview(webView)
+            }
+            else {
+                let scenes = UIApplication.shared.connectedScenes
+                let windowScene = scenes.first as? UIWindowScene
+                windowScene?.windows.forEach { window in
+                    window.addSubview(webView)
+                }
             }
         }
     }
@@ -136,18 +151,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         webView?.navigationDelegate = self
         webView?.uiDelegate = self
 
-        if let webView = webView {
-            if let viewController = viewController {
-                viewController.view.addSubview(webView)
-            }
-            else {
-                let scenes = UIApplication.shared.connectedScenes
-                let windowScene = scenes.first as? UIWindowScene
-                windowScene?.windows.forEach { window in
-                    window.addSubview(webView)
-                }
-            }
-        }
+        attachWebView()
 
         let backendUrlParam = customBackendUrl.map { "customBackendUrl: \"\($0)\"," } ?? ""
         let logUrlParam = customLogUrl.map { "customLogUrl: \"\($0)\"," } ?? ""
@@ -264,8 +268,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         merchantId: String,
         request3DSAuthentication: Bool
     ) async throws {
-        try checkSessionClosed()
         logInfo("C2P_INIT | INIT")
+        try checkSessionClosed()
 
         let requestId = UUID().uuidString
 
@@ -330,9 +334,16 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     internal func getActiveClickToPaySession(clientSecret: String,
                                              profileId: String,
                                              authenticationId: String,
-                                             merchantId: String) async throws {
-        try checkSessionClosed()
+                                             merchantId: String,
+                                             viewController: UIViewController?) async throws {
+        self.clientSecret = clientSecret
+        self.authenticationId = authenticationId
+        self.viewController = viewController
+        self.attachWebView()
+        // INFO: always set before logging
+
         logInfo("GET_ACTIVE_C2P | INIT")
+        try checkSessionClosed()
 
         let requestId = UUID().uuidString
 
@@ -393,8 +404,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     internal func isCustomerPresent(request: CustomerPresenceRequest) async throws -> CustomerPresenceResponse {
-        try checkSessionClosed()
         logInfo("CUSTOMER_CHECK | INIT")
+        try checkSessionClosed()
 
         let requestId = UUID().uuidString
         let responseJson: String = try await withCheckedThrowingContinuation { continuation in
@@ -456,8 +467,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     internal func getUserType() async throws -> CardsStatusResponse {
-        try checkSessionClosed()
         logInfo("GET_USER_TYPE | INIT")
+        try checkSessionClosed()
 
         let requestId = UUID().uuidString
 
@@ -518,8 +529,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     internal func getRecognizedCards() async throws -> [RecognizedCard] {
-        try checkSessionClosed()
         logInfo("GET_CARDS | INIT")
+        try checkSessionClosed()
 
         let requestId = UUID().uuidString
 
@@ -586,8 +597,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     internal func validateCustomerAuthentication(otpValue: String) async throws -> [RecognizedCard] {
-        try checkSessionClosed()
         logInfo("AUTH_VALIDATION | INIT")
+        try checkSessionClosed()
 
         let requestId = UUID().uuidString
 
@@ -655,8 +666,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     internal func signOut() async throws -> SignOutResponse {
-        try checkSessionClosed()
         logInfo("SIGN_OUT | INIT")
+        try checkSessionClosed()
 
         let requestId = UUID().uuidString
 
@@ -714,8 +725,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     internal func checkoutWithCard(request: CheckoutRequest) async throws -> CheckoutResponse {
-        try checkSessionClosed()
         logInfo("CHECKOUT | INIT | REMEMBER_ME: \(request.rememberMe ?? false)")
+        try checkSessionClosed()
 
         let requestId = UUID().uuidString
 

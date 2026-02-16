@@ -33,9 +33,4 @@ public protocol ClickToPaySession {
     /// This method should be called when the session is no longer needed.
     /// After calling close(), the session cannot be used again.
     func close() async
-
-    func getActiveClickToPaySession(clientSecret: String,
-                                    profileId: String,
-                                    authenticationId: String,
-                                    merchantId: String) async throws
 }

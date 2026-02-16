@@ -23,7 +23,7 @@ public class AuthenticationSession {
     private var authenticationId: String?
     private var merchantId: String?
 
-    private static var currentClickToPaySession: ClickToPaySession?
+    private var currentClickToPaySession: ClickToPaySessionImpl? // INFO: using concrete type instead of protocol
 
     public init(publishableKey: String, customBackendUrl: String? = nil, customParams: [String : Any]? = nil, customLogUrl: String? = nil) {
         self.publishableKey = publishableKey
@@ -70,13 +70,13 @@ public class AuthenticationSession {
               let profileId = profileId,
               let authenticationId = authenticationId,
               let merchantId = merchantId else {
-            throw NSError(domain: "ClickToPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Missing required authentication parameters"])
+            throw ClickToPayException(message: "Missing required authentication parameters", type: .error)
         }
 
-        if let currentClickToPaySession = AuthenticationSession.currentClickToPaySession {
+        if let currentClickToPaySession = currentClickToPaySession {
             await currentClickToPaySession.close()
         }
-        AuthenticationSession.currentClickToPaySession = nil
+        currentClickToPaySession = nil
 
         do {
             let impl = try await ClickToPaySessionImpl(
@@ -97,10 +97,10 @@ public class AuthenticationSession {
                 request3DSAuthentication: request3DSAuthentication ?? true
             )
 
-            AuthenticationSession.currentClickToPaySession = impl
+            currentClickToPaySession = impl
             return impl
         } catch {
-            throw NSError(domain: "ClickToPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to initialize Click to Pay session: \(error.localizedDescription)"])
+            throw ClickToPayException(message: "Failed to initialize Click to Pay session", type: .error)
         }
     }
 
@@ -109,19 +109,23 @@ public class AuthenticationSession {
               let profileId = profileId,
               let authenticationId = authenticationId,
               let merchantId = merchantId else {
-            throw NSError(domain: "ClickToPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Missing required authentication parameters"])
+            throw ClickToPayException(message: "Missing required authentication parameters", type: .error)
         }
 
-        guard let currentClickToPaySession = AuthenticationSession.currentClickToPaySession else {
-            throw NSError(domain: "ClickToPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Click to Pay session not initialized"])
+        guard let currentClickToPaySession = currentClickToPaySession else {
+            throw ClickToPayException(message: "Click to Pay session not initialized", type: .error)
         }
 
         do {
-            try await currentClickToPaySession.getActiveClickToPaySession(clientSecret: clientSecret, profileId: profileId, authenticationId: authenticationId, merchantId: merchantId)
-                return currentClickToPaySession
+            try await currentClickToPaySession.getActiveClickToPaySession(clientSecret: clientSecret,
+                                                                          profileId: profileId,
+                                                                          authenticationId: authenticationId,
+                                                                          merchantId: merchantId,
+                                                                          viewController: viewController)
+            return currentClickToPaySession
         }
         catch {
-            throw NSError(domain: "ClickToPay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to initialize Click to Pay session: \(error.localizedDescription)"])
+            throw ClickToPayException(message: "Failed to initialize Click to Pay session", type: .error)
         }
     }
 }
