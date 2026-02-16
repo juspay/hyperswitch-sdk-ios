@@ -38,7 +38,9 @@ class ClickToPayViewModel: ObservableObject {
 
                 DispatchQueue.main.async {
                     self.status = .success
-                    self.authenticationSession = AuthenticationSession(publishableKey: publishableKey)
+                    if self.authenticationSession == nil {
+                        self.authenticationSession = AuthenticationSession(publishableKey: publishableKey)
+                    }
                     self.authenticationSession?.initAuthenticationSession(clientSecret: paymentIntentClientSecret, profileId: profileId, authenticationId: authenticationId, merchantId: merchantId)
 
                 }
