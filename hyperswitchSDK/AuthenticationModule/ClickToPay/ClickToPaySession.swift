@@ -34,8 +34,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     private func getHyperLoaderURL() -> String {
         return SDKEnvironment.getEnvironment(publishableKey) == .PROD
-        ? "https://checkout.hyperswitch.io/web/2025.11.28.04/v1/HyperLoader.js"
-        : "https://beta.hyperswitch.io/web/2025.11.28.04/v1/HyperLoader.js"
+        ? "https://checkout.hyperswitch.io/web/2025.11.28.06/v1/HyperLoader.js"
+        : "https://beta.hyperswitch.io/web/2025.11.28.06/v1/HyperLoader.js"
     }
 
     private func getBaseURL() -> String {
