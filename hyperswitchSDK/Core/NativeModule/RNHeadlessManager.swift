@@ -36,7 +36,7 @@ internal class RNHeadlessManager: NSObject {
 
 extension RNHeadlessManager: RCTBridgeDelegate {
     func sourceURL(for bridge: RCTBridge) -> URL? {
-        switch getInfoPlist("HyperswitchSource") {
+        switch Helper.getInfoPlist("HyperswitchSource") {
         case "LocalHosted":
             return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
         default:

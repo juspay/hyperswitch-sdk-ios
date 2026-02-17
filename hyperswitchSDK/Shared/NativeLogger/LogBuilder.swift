@@ -20,16 +20,17 @@ internal class LogBuilder {
     private var sessionId: String = ""
     private var merchantId: String = ""
     private var paymentId: String = ""
+    private var authenticationId: String = ""
     private var appId: String? = nil
     private var platform: String = "IOS"
     private var userAgent: String = ""
-    private var eventName: EventName = .HYPER_OTA_INIT
+    private var eventName: EventName = .hyperOTAInit
     private var latency: String? = nil
     private var firstEvent: Bool = false
     private var paymentMethod: String? = nil
     private var paymentExperience: String? = nil
     private var source: String = ""
-    
+
     func setLogType(_ logType: String) -> LogBuilder {
         switch logType.uppercased() {
         case "ERROR":
@@ -46,22 +47,22 @@ internal class LogBuilder {
         }
         return self
     }
-    
+
     func setClientCoreVersion(_ clientCoreVersion: String) -> LogBuilder {
         self.clientCoreVersion = clientCoreVersion
         return self
     }
-    
+
     func setValue(_ value: String) -> LogBuilder {
         self.value = value
         return self
     }
-    
+
     func setEventName(_ eventName: EventName) -> LogBuilder {
         self.eventName = eventName
         return self
     }
-    
+
     func setCategory(_ category: LogCategory) -> LogBuilder {
         self.category = category
         return self
@@ -69,6 +70,11 @@ internal class LogBuilder {
 
     func setPaymentId(_ paymentId: String) -> LogBuilder {
         self.paymentId = paymentId
+        return self
+    }
+
+    func setAuthenticationId(_ authenticationId: String) -> LogBuilder {
+        self.authenticationId = authenticationId
         return self
     }
 

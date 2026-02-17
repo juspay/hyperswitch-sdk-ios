@@ -32,24 +32,24 @@ internal class EventLogger: NSObject, HPJPLoggerDelegate {
             var log = LogBuilder()
                 .setLogType(logLevel)
                 .setValue(jsonString)
-            
+
             switch key {
             case "init_with_local_config_versions":
-                log = log.setEventName(.HYPER_OTA_INIT)
+                log = log.setEventName(.hyperOTAInit)
                 break
             case "init":
-                log = log.setEventName(.HYPER_OTA_INIT)
+                log = log.setEventName(.hyperOTAInit)
                 break
             case "update_end":
-                log = log.setEventName(.HYPER_OTA_FINISH)
+                log = log.setEventName(.hyperOTAFinish)
             case "end":
-                log = log.setEventName(.HYPER_OTA_FINISH)
+                log = log.setEventName(.hyperOTAFinish)
                 break
             default:
-                log = log.setEventName(.HYPER_OTA_EVENT)
+                log = log.setEventName(.hyperOTAEvent)
             }
             LogManager.addLog(log.build())
-            
+
         } catch {
             print("Error serializing event data: \(error.localizedDescription)")
         }
@@ -85,7 +85,7 @@ internal class EventLogger: NSObject, HPJPLoggerDelegate {
             "subcategory": eventSubcategory
         ]
         addLog(eventData: eventData, logLevel: logLevel, key : eventLabel)
-        
+
     }
 }
 
@@ -96,7 +96,7 @@ public final class OTAServices {
     public func initialize(publishableKey : String) {
         if(self.otaServices == nil) {
             let environment = SDKEnvironment.getEnvironment(publishableKey)
-            let configKey = (environment == .SANDBOX) ? "sandBoxReleaseConfigURL" : "releaseConfigURL" 
+            let configKey = (environment == .SANDBOX) ? "sandBoxReleaseConfigURL" : "releaseConfigURL"
             let payload = [
                 "clientId": getHyperOTAPlist("clientId") ?? "" ,
                 "namespace": getHyperOTAPlist("namespace") ?? "",
