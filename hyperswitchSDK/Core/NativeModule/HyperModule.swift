@@ -132,6 +132,82 @@ internal class HyperModule: RCTEventEmitter {
         }
     }
     
+    @objc(getInstalledUpiApps:resolver:rejecter:)
+    private func getInstalledUpiApps(_ knownAppsJson: String,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+     rejecter reject: @escaping RCTPromiseRejectBlock) {
+        
+        var installedApps: [[String: String]] = []
+        
+        print("[UPI] Received JSON:", knownAppsJson)
+        
+        guard let jsonData = knownAppsJson.data(using: .utf8),
+              let knownApps = try? JSONSerialization.jsonObject(with: jsonData) as? [[String: String]] else {
+            print("[UPI] Failed to parse JSON")
+            resolve(installedApps)
+            return
+        }
+        
+        print("[UPI] Successfully parsed \(knownApps.count) apps")
+        
+        for app in knownApps {
+            guard let appName = app["appName"],
+                  let urlScheme = app["urlScheme"] else {
+                print("[UPI] Skipping app - missing appName or urlScheme")
+                continue
+            }
+            
+            // Ensure the URL scheme is properly formatted
+            // If it already contains "://", use it as is, otherwise append "://"
+            let formattedScheme: String
+            if urlScheme.contains("://") {
+                formattedScheme = urlScheme
+            } else {
+                formattedScheme = "\(urlScheme)://"
+            }
+            
+            guard let url = URL(string: formattedScheme) else {
+                print("[UPI] Invalid URL for \(appName): \(formattedScheme)")
+                continue
+            }
+            
+            print("[UPI] Checking \(appName) with URL: \(url)")
+            
+            if UIApplication.shared.canOpenURL(url) {
+                print("[UPI] ✓ Found installed app: \(appName)")
+                installedApps.append([
+//                    "packageName": "",
+                    "appName": appName
+                ])
+            } else {
+                print("[UPI] ✗ App not installed: \(appName)")
+            }
+        }
+         
+        print("[UPI] Total installed apps found: \(installedApps.count)")
+        resolve(installedApps)
+    }
+    
+    @objc(openUpiApp:upiUri:resolver:rejecter:)
+    private func openUpiApp(_ packageName: String?, _ upiUri: String, _ resolve: @escaping RCTPromiseResolveBlock, _ reject: @escaping RCTPromiseRejectBlock) {
+//        print("[UPI] Opening UPI app with URI: \(upiUri)")
+//        if let pkg = packageName {
+//            print("[UPI] Package name (ignored on iOS): \(pkg)")
+//        }
+        
+        guard let url = URL(string: upiUri) else {
+            print("[UPI] Invalid URI: \(upiUri)")
+            reject("INVALID_URI", "The provided UPI URI is invalid", nil)
+            return
+        }
+        
+        print("[UPI] Opening URL: \(url)")
+        UIApplication.shared.open(url, options: [:]) { success in
+            print("[UPI] Open result: \(success)")
+            resolve(success)
+        }
+    }
+    
     @objc
     private func exitSheet(_ rnMessage: String) {
         var response: String?

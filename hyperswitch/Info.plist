@@ -43,5 +43,21 @@
 		<key>UIColorName</key>
 		<string>AccentColor</string>
 	</dict>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tez</string>
+		<string>phonepe</string>
+		<string>paytmmp</string>
+		<string>bhim</string>
+		<string>amazonpay</string>
+		<string>whatsapp</string>
+		<string>credpay</string>
+		<string>mobikwik</string>
+		<string>freecharge</string>
+		<string>airtel</string>
+		<string>jiomoney</string>
+		<string>navipay</string>
+		<string>kiwi</string>
+	</array>
 </dict>
 </plist>

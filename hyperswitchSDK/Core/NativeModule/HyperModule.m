@@ -13,6 +13,8 @@ RCT_EXTERN_METHOD(exitWidgetPaymentsheet: (nonnull NSNumber *)reactTag :(NSStrin
 RCT_EXTERN_METHOD(launchApplePay: (NSString)rnMessage :(RCTResponseSenderBlock)rnCallback)
 RCT_EXTERN_METHOD(startApplePay: (NSString)rnMessage :(RCTResponseSenderBlock)startCallback)
 RCT_EXTERN_METHOD(presentApplePay: (NSString)rnMessage :(RCTResponseSenderBlock)presentCallback)
+RCT_EXTERN_METHOD(getInstalledUpiApps: (NSString *)knownAppsJson resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(openUpiApp: (NSString * _Nullable)packageName upiUri:(NSString *)upiUri resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 
 + (BOOL)requiresMainQueueSetup
 {
