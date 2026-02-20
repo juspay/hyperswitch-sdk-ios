@@ -62,7 +62,6 @@ public class AuthenticationRequestParameters {
     final public let sdkAppID: String?
     final public let sdkReferenceNumber: String?
     final public let messageVersion: String?
-    final public let sdkEncryptedData: String?
     
     init(
         sdkTransactionID: String?,
@@ -70,8 +69,7 @@ public class AuthenticationRequestParameters {
         sdkEphemeralPublicKey: String?,
         sdkAppID: String?,
         sdkReferenceNumber: String?,
-        messageVersion: String?,
-        sdkEncryptedData: String?
+        messageVersion: String?
     ) {
         self.deviceData = deviceData
         self.sdkTransactionID = sdkTransactionID
@@ -79,7 +77,6 @@ public class AuthenticationRequestParameters {
         self.sdkAppID = sdkAppID
         self.sdkReferenceNumber = sdkReferenceNumber
         self.messageVersion = messageVersion
-        self.sdkEncryptedData = sdkEncryptedData
     }
 }
 

@@ -67,8 +67,7 @@ class TridentTransactionProvider: ThreeDSTransactionProvider {
             sdkEphemeralPublicKey: aReqParams.sdkEphemeralPublicKey,
             sdkAppID: aReqParams.sdkAppID,
             sdkReferenceNumber: aReqParams.sdkReferenceNumber,
-            messageVersion: aReqParams.messageVersion,
-            sdkEncryptedData: nil
+            messageVersion: aReqParams.messageVersion
         )
     }
     

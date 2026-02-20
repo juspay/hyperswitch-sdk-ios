@@ -124,8 +124,7 @@ class AuthenticationViewModel: ObservableObject {
                        let ephemeralKeyDict = try? JSONSerialization.jsonObject(with: ephemeralKeyData, options: []) as? [String: Any] {
                         var stringifiedDict: [String: String] = [:]
                         for (key, value) in ephemeralKeyDict {
-                            let _key = key.prefix(1).uppercased() + key.dropFirst()
-                            stringifiedDict[_key] = String(describing: value)
+                            stringifiedDict[key] = String(describing: value)
                         }
                         ephemeralPublicKey = stringifiedDict
                     }

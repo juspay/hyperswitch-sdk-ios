@@ -271,7 +271,6 @@ class AuthenticationViewController: UIViewController {
                     statusLabel.text = """
                     -- Authentication Request Parameters Retrieved:
                     
-                    SDK Encrypted data: \(String(describing: aReqParams.sdkEncryptedData?.prefix(10)))...
                     SDK Transaction ID: \(String(describing: aReqParams.sdkTransactionID))
                     Message Version: \(String(describing: aReqParams.messageVersion))
                     SDK App ID: \(String(describing: aReqParams.sdkAppID))
