@@ -32,10 +32,12 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     private var isClosed = false
 
+    private let sessionId = Helper.persistentUUID(for: "click_to_pay")
+
     private func getHyperLoaderURL() -> String {
         return SDKEnvironment.getEnvironment(publishableKey) == .PROD
-        ? "https://checkout.hyperswitch.io/web/2025.11.28.06/v1/HyperLoader.js"
-        : "https://beta.hyperswitch.io/web/2025.11.28.06/v1/HyperLoader.js"
+        ? "https://checkout.hyperswitch.io/web/2025.11.28.07/v1/HyperLoader.js"
+        : "https://beta.hyperswitch.io/web/2025.11.28.07/v1/HyperLoader.js"
     }
 
     private func getBaseURL() -> String {
@@ -45,7 +47,6 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     private func logger(type: String, eventName: EventName, category: LogCategory, value: String) {
-        let sessionId = Helper.persistentUUID(for: "click_to_pay")
         let log = LogBuilder()
             .setLogType(type)
             .setEventName(eventName)
