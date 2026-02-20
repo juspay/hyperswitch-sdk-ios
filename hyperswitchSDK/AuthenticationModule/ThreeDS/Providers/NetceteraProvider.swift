@@ -99,10 +99,20 @@ class NetceteraTransactionProvider: ThreeDSTransactionProvider {
         )
     }
     
-    // TODO: Implementation
-    //    func getProgressView() throws -> ProgressDialog {
-    //        <#code#>
-    //    }
+    func getProgressView() throws -> ProgressDialog {
+        let progressView = try transaction.getProgressView()
+        let progressDialog = ProgressDialog()
+        
+        progressDialog.onStart = {
+            progressView.start()
+        }
+        
+        progressDialog.onStop = {
+            progressView.stop()
+        }
+        
+        return progressDialog
+    }
     
     func close() {
         try? transaction.close()

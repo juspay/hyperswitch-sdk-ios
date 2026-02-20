@@ -302,6 +302,9 @@ class AuthenticationViewController: UIViewController {
         updateButtonStates()
         
         do {
+            let progressView = try transaction.getProgressView()
+            progressView.start()
+            
             // Fetch challenge parameters from the server
             viewModel.fetchChallengeParams(aReqParams) { [weak self] challengeParams, error in
                 guard let self = self else { return }
@@ -310,6 +313,7 @@ class AuthenticationViewController: UIViewController {
                     self.statusLabel.text = "-- Failed to fetch challenge params:\n\(error.localizedDescription)"
                     self.challengeInProgress = false
                     self.updateButtonStates()
+                    progressView.stop()
                     return
                 }
                 
@@ -317,6 +321,7 @@ class AuthenticationViewController: UIViewController {
                     self.statusLabel.text = "-- No challenge parameters received"
                     self.challengeInProgress = false
                     self.updateButtonStates()
+                    progressView.stop()
                     return
                 }
                 
@@ -325,6 +330,7 @@ class AuthenticationViewController: UIViewController {
                 // Create challenge status receiver
                 let challengeStatusReceiver = DemoChallengeStatusReceiver(transaction: transaction) { [weak self] result in
                     DispatchQueue.main.async {
+                        progressView.stop()
                         self?.challengeInProgress = false
                         self?.statusLabel.text = result
                         self?.updateButtonStates()
@@ -344,6 +350,7 @@ class AuthenticationViewController: UIViewController {
                         self.statusLabel.text = "-- Challenge flow started successfully!\nWaiting for challenge completion..."
                         
                     } catch {
+                        progressView.stop()
                         self.statusLabel.text = "-- Failed to start challenge:\n\(error.localizedDescription)"
                         self.challengeInProgress = false
                         self.updateButtonStates()
