@@ -72,8 +72,7 @@ class NetceteraTransactionProvider: ThreeDSTransactionProvider {
             sdkEphemeralPublicKey: netceteraParams.getSDKEphemeralPublicKey(),
             sdkAppID: netceteraParams.getSDKAppID(),
             sdkReferenceNumber: netceteraParams.getSDKReferenceNumber(),
-            messageVersion: netceteraParams.getMessageVersion(),
-            sdkEncryptedData: nil
+            messageVersion: netceteraParams.getMessageVersion()
         )
     }
     
