@@ -47,6 +47,8 @@
 		4E97AA1F2E992D6A0029501E /* NetworkUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA2BD52E9926040094AA83 /* NetworkUtils.swift */; };
 		4EEA67032D37B493000D4DC5 /* HyperParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA67022D37B487000D4DC5 /* HyperParams.swift */; };
 		4EEA67042D37B493000D4DC5 /* HyperParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA67022D37B487000D4DC5 /* HyperParams.swift */; };
+		AA000002SUPERPOS000002 /* SuperpositionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001SUPERPOS000001 /* SuperpositionManager.swift */; };
+		AA000003SUPERPOS000003 /* SuperpositionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000001SUPERPOS000001 /* SuperpositionManager.swift */; };
 		570D085C0EE0B792AD674EC7 /* libPods-hyperswitch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 326F2B616140E767CA0149B9 /* libPods-hyperswitch.a */; };
 		60931E98C132E4509C70F829 /* Pods_hyperswitchAppClip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAED38BB9AD107A31AB764F5 /* Pods_hyperswitchAppClip.framework */; };
 		663F68FC29CCC93C006E91BD /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663F68FB29CCC93C006E91BD /* APIClient.swift */; };
@@ -220,6 +222,7 @@
 		4E971A712CC2764F0040EFEB /* PaymentMethodManagementWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodManagementWidget.swift; sourceTree = "<group>"; };
 		4EEA2BD52E9926040094AA83 /* NetworkUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkUtils.swift; sourceTree = "<group>"; };
 		4EEA67022D37B487000D4DC5 /* HyperParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperParams.swift; sourceTree = "<group>"; };
+		AA000001SUPERPOS000001 /* SuperpositionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuperpositionManager.swift; sourceTree = "<group>"; };
 		652884677D31EE32A61ADD6C /* Pods-hyperswitch.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitch.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitch/Pods-hyperswitch.debug.xcconfig"; sourceTree = "<group>"; };
 		663F68FB29CCC93C006E91BD /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		66486F8E294355BD00150E4F /* hyperswitch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hyperswitch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -544,6 +547,7 @@
 				75AA28DA2D477F6500CD88A6 /* NativeLogger */,
 				75AA28E52D477FF200CD88A6 /* HyperNetworking.swift */,
 				4EEA67022D37B487000D4DC5 /* HyperParams.swift */,
+				AA000001SUPERPOS000001 /* SuperpositionManager.swift */,
 				66486FA02943580F00150E4F /* SwiftUIManager.swift */,
 				790BA8262B99DB5E006678FD /* PaymentSession.swift */,
 				DC5D0111294731480017C67A /* PaymentSheet.swift */,
@@ -900,6 +904,7 @@
 				4E8C838A2E98CABF00A61749 /* AuthenticationError.swift in Sources */,
 				7905257A2BDA73A600D49FE8 /* SwiftUIView.swift in Sources */,
 				4EEA67042D37B493000D4DC5 /* HyperParams.swift in Sources */,
+				AA000003SUPERPOS000003 /* SuperpositionManager.swift in Sources */,
 				DC5D0114294731480017C67A /* PaymentSheet.swift in Sources */,
 				4E87FA612CAAE8E300E74113 /* PaymentManagementConfiguration.swift in Sources */,
 				DC5D0115294731480017C67A /* PaymentSheetView+SwiftUI.swift in Sources */,
@@ -1008,6 +1013,7 @@
 				79E528972CCBB57300070AD9 /* SwiftUIView.swift in Sources */,
 				79EAB0342C81CF59006B40AD /* APIClient.swift in Sources */,
 				4EEA67032D37B493000D4DC5 /* HyperParams.swift in Sources */,
+				AA000002SUPERPOS000002 /* SuperpositionManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
