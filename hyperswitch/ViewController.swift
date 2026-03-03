@@ -27,10 +27,6 @@ class ViewController: UIViewController {
         hyperViewModel.fetchNetceteraSDKApiKey()
         hyperViewModel.preparePaymentSheet()
         asyncBind()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
         viewFrame()
     }
     

@@ -43,13 +43,9 @@ class ClickToPayCheckoutViewController: UIViewController {
         super.viewDidLoad()
         clickToPayViewModel.prepareAuthenticationSession()
         asyncBind()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
         viewFrame()
     }
-
+    
     private func asyncBind() {
         clickToPayViewModel.$status
             .receive(on: DispatchQueue.main)

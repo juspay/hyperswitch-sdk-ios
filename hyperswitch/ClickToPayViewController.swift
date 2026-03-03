@@ -35,6 +35,7 @@ class ClickToPayViewController: UIViewController {
         super.viewDidLoad()
         clickToPayViewModel.prepareAuthenticationSession()
         asyncBind()
+        viewFrame()
 
         let nextButton = UIBarButtonItem(image: .init(systemName: "chevron.right"),
                                          style: .plain,
@@ -48,11 +49,6 @@ class ClickToPayViewController: UIViewController {
         let nextVC = ClickToPayCheckoutViewController(clickToPayViewModel: clickToPayViewModel)
         nextVC.clickToPayViewModel = self.clickToPayViewModel
         navigationController?.pushViewController(nextVC, animated: true)
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        viewFrame()
     }
 
     private func asyncBind() {
