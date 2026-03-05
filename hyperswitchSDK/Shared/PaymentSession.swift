@@ -28,7 +28,7 @@ public class PaymentSession {
         // Superposition config (fire-and-forget)
         let serverBaseUrl = "http://localhost:5252"
         SuperpositionManager.shared.initialise(
-            configUrl: "\(serverBaseUrl)/v1/sdk/configs/test-id/web/sandbox/sdk_config.json",
+            configUrl: "\(serverBaseUrl)/v1/sdk/configs/pro_test/web/sandbox.json",
             publishableKey: publishableKey
         )
         SuperpositionManager.shared.fetchConfig()
