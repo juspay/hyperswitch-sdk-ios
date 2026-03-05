@@ -38,6 +38,7 @@ class HyperParams {
             "bottomInset":safeAreaInset.bottom,
             "leftInset":safeAreaInset.left,
             "rightInset":safeAreaInset.right,
+            "superpositionConfigRaw": SuperpositionManager.shared.cachedConfig,
         ]
         return params
     }
