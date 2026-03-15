@@ -40,6 +40,8 @@ public extension PaymentSheet {
         
         public var theme: Theme?
         
+        public var layout: Layout = Layout()
+        
         public enum Theme: String, Codable {
             case `default` = "Default"
             case light = "Light"
@@ -49,6 +51,116 @@ public extension PaymentSheet {
 
             var themeLabel: String {
                 return self.rawValue
+            }
+        }
+        
+        /// The type of layout used to display payment methods
+        public enum LayoutType: String, Codable {
+            /// Display payment methods in a tabbed interface
+            case tabs = "tabs"
+            /// Display payment methods in an expandable accordion
+            case accordion = "accordion"
+        }
+        
+        /// The arrangement of payment methods in tabs layout
+        public enum PaymentMethodsArrangement: String, Codable {
+            /// Default list arrangement
+            case `default` = "default"
+            /// Grid arrangement
+            case grid = "grid"
+        }
+        
+        /// The grouping behavior for saved payment methods
+        public enum GroupingBehavior: String, Codable {
+            /// Group saved methods by payment method type
+            case groupByPaymentMethods = "groupByPaymentMethods"
+            /// Default grouping behavior
+            case `default` = "default"
+        }
+        
+        /// Customization options for saved payment methods display
+        public struct SavedMethodCustomization: Equatable, DictionaryConverter, Codable {
+            
+            /// Creates a `SavedMethodCustomization` with default values
+            public init() {}
+            
+            /// The grouping behavior for saved payment methods
+            public var groupingBehavior: GroupingBehavior = .default
+            
+            /// Creates a `SavedMethodCustomization` with the specified grouping behavior
+            /// - Parameter groupingBehavior: The grouping behavior to use
+            public init(groupingBehavior: GroupingBehavior = .default) {
+                self.groupingBehavior = groupingBehavior
+            }
+        }
+        
+        // MARK: Layout
+        
+        /// Describes the layout configuration for PaymentSheet
+        public struct Layout: Equatable, DictionaryConverter, Codable {
+            
+            /// Creates a `PaymentSheet.Appearance.Layout` with default values
+            public init() {}
+            
+            /// The type of layout to display payment methods in
+            /// - Note: Can be `.tabs` or `.accordion`. Default is `.tabs`
+            public var type: LayoutType = .tabs
+            
+            /// Whether to show one-click wallets (like Apple Pay) at the top of the payment sheet
+            /// - Note: Default is `true`
+            public var showOneClickWalletsOnTop: Bool = true
+            
+            /// The arrangement of payment methods when using tabs layout
+            /// - Note: Can be `.default` or `.grid`. Default is `.default`
+            public var paymentMethodsArrangementForTabs: PaymentMethodsArrangement = .default
+            
+            /// Whether the accordion should be collapsed by default
+            /// - Note: Only applies when layout type is `.accordion`. Default is `false`
+            public var defaultCollapsed: Bool = false
+            
+            /// Whether to show radio buttons in accordion view
+            /// - Note: Only applies when layout type is `.accordion`. Default is `false`
+            public var radios: Bool = false
+            
+            /// Whether to show spaced accordion items with margins between them
+            /// - Note: Only applies when layout type is `.accordion`. Default is `false`
+            public var spacedAccordionItems: Bool = false
+            
+            /// Maximum number of accordion items to show before collapsing
+            /// - Note: Only applies when layout type is `.accordion`. Default is `4`
+            public var maxAccordionItems: Int = 4
+            
+            /// Customization options for saved payment methods
+            public var savedMethodCustomization: SavedMethodCustomization = SavedMethodCustomization()
+            
+            /// Creates a `Layout` with the specified parameters
+            /// - Parameters:
+            ///   - type: The layout type (tabs or accordion)
+            ///   - showOneClickWalletsOnTop: Whether to show wallets at the top
+            ///   - paymentMethodsArrangementForTabs: Arrangement for tabs layout
+            ///   - defaultCollapsed: Whether accordion is collapsed by default
+            ///   - radios: Whether to show radio buttons
+            ///   - spacedAccordionItems: Whether to space accordion items
+            ///   - maxAccordionItems: Maximum accordion items to show
+            ///   - savedMethodCustomization: Saved method customization options
+            public init(
+                type: LayoutType = .tabs,
+                showOneClickWalletsOnTop: Bool = true,
+                paymentMethodsArrangementForTabs: PaymentMethodsArrangement = .default,
+                defaultCollapsed: Bool = false,
+                radios: Bool = false,
+                spacedAccordionItems: Bool = false,
+                maxAccordionItems: Int = 4,
+                savedMethodCustomization: SavedMethodCustomization = SavedMethodCustomization()
+            ) {
+                self.type = type
+                self.showOneClickWalletsOnTop = showOneClickWalletsOnTop
+                self.paymentMethodsArrangementForTabs = paymentMethodsArrangementForTabs
+                self.defaultCollapsed = defaultCollapsed
+                self.radios = radios
+                self.spacedAccordionItems = spacedAccordionItems
+                self.maxAccordionItems = maxAccordionItems
+                self.savedMethodCustomization = savedMethodCustomization
             }
         }
 
