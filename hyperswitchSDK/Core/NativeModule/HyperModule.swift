@@ -41,7 +41,17 @@ internal class HyperModule: RCTEventEmitter {
     //    }
     
     @objc
-    private func sendMessageToNative(_ rnMessage: String) {}
+    private func sendMessageToNative(_ rnMessage: String) {
+        guard let data = rnMessage.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return
+        }
+        
+        // Handle ready event from widgets
+        if let isReady = json["isReady"] as? String, isReady == "true" {
+            WidgetLauncher.onPaymentReadyCallback(isReady: true)
+        }
+    }
     
     //React Native Wrapper Function
     @objc

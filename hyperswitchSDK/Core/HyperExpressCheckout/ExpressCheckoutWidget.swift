@@ -9,6 +9,9 @@ import Foundation
 
 public class ExpressCheckout: UIControl {
     
+    /// Callback invoked when the widget is ready for interaction
+    public var onReady: ((Bool) -> Void)?
+    
     required public init?(
         coder aDecoder: NSCoder
     ) {
@@ -29,6 +32,10 @@ public class ExpressCheckout: UIControl {
     }
     
     func commonInit() {
+        // Set up the ready callback before creating the view
+        WidgetLauncher.onCurrentPaymentReady = { [weak self] isReady in
+            self?.onReady?(isReady)
+        }
         
         let cardView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties:
                                                                     ["props":["type": "expressCheckout",]])
