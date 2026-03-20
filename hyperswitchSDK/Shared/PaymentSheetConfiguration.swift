@@ -221,6 +221,20 @@ extension PaymentSheet {
         
         /// Api key used to invoke netcetera sdk for redirection-less 3DS authentication.
         public var netceteraSDKApiKey: String?
+        
+        /// Custom display names for TAB-type payment methods.
+        ///
+        /// Each dictionary must contain `"paymentMethodName"` (the internal method name, e.g. `"klarna"`)
+        /// and `"aliasName"` (the merchant-defined display name shown to the customer).
+        /// Only applies to TAB-type payment methods; wallet buttons are not affected.
+        ///
+        /// Example:
+        /// ```swift
+        /// configuration.customMethodNames = [
+        ///     ["paymentMethodName": "klarna", "aliasName": "Buy Now, Pay Later"]
+        /// ]
+        /// ```
+        public var customMethodNames: [[String: String]]?
     }
     
     /// Configuration related to the Hyperswitch Customer
