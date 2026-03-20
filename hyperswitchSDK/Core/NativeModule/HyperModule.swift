@@ -12,6 +12,7 @@ import React
 internal class HyperModule: RCTEventEmitter {
     
     private let applePayPaymentHandler = ApplePayHandler()
+    private let pazeHandler = PazeHandler()
     private let expressCheckoutHandler = ExpressCheckoutLauncher()
     private var presentCallback: RCTResponseSenderBlock? = nil
     internal static var shared:HyperModule?
@@ -88,6 +89,13 @@ internal class HyperModule: RCTEventEmitter {
     @objc
     private func presentApplePay (_ rnMessage: String, _ rnCallback: @escaping RCTResponseSenderBlock) {
         self.presentCallback = rnCallback
+    }
+    
+    @objc
+    private func launchPaze(_ rnMessage: String, _ rnCallback: @escaping RCTResponseSenderBlock) {
+        pazeHandler.startPayment(rnMessage: rnMessage, rnCallback: { result in
+            rnCallback(result)
+        })
     }
     
     @objc
