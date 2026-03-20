@@ -144,6 +144,7 @@
 		DC5D0125294847E90017C67A /* PaymentSheetView+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D0124294847E90017C67A /* PaymentSheetView+UIKit.swift */; };
 		DC5D0127294853A90017C67A /* PaymentSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D0126294853A90017C67A /* PaymentSheetView.swift */; };
 		DCF9779029517BBB00596F78 /* DictionaryConverter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCF9778F29517BBB00596F78 /* DictionaryConverter.swift */; };
+		DF5E1C9C5BFCBBD941FFE758 /* WidgetLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0D7F7731EAE12D158D4F8FE /* WidgetLauncher.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -290,6 +291,7 @@
 		79FE014C2E97C18F00C5D94A /* Codable+UIKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Codable+UIKit.swift"; sourceTree = "<group>"; };
 		79FE014F2E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSheetAppearance+Codable.swift"; sourceTree = "<group>"; };
 		8DE1DB5CD7CD39ED0932F0FA /* Pods-hyperswitchAppClip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitchAppClip.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip.debug.xcconfig"; sourceTree = "<group>"; };
+		C0D7F7731EAE12D158D4F8FE /* WidgetLauncher.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetLauncher.swift; sourceTree = "<group>"; };
 		DC4AC9F1296D6D6C00E0D2A6 /* PaymentCardTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCardTextField.swift; sourceTree = "<group>"; };
 		DC4AC9F4296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentCardTextField+SwiftUI.swift"; sourceTree = "<group>"; };
 		DC5D0111294731480017C67A /* PaymentSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentSheet.swift; sourceTree = "<group>"; };
@@ -631,6 +633,7 @@
 				66486FA32943580F00150E4F /* RNViewManager.swift */,
 				752CF93B2DF6D47A0056F58A /* RNHeadlessManager.swift */,
 				75E692F92D5B28D70077C0F3 /* OTAServices.swift */,
+				C0D7F7731EAE12D158D4F8FE /* WidgetLauncher.swift */,
 			);
 			path = NativeModule;
 			sourceTree = "<group>";
@@ -968,6 +971,7 @@
 				793083EB2A0DA9E300E78310 /* PaymentHandler.swift in Sources */,
 				43F6051E2B45FA3300BAA90E /* PaymentSheetAppearance.swift in Sources */,
 				DC5D0116294731480017C67A /* PaymentSheetConfiguration.swift in Sources */,
+				DF5E1C9C5BFCBBD941FFE758 /* WidgetLauncher.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
