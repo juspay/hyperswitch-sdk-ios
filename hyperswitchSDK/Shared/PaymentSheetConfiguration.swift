@@ -221,6 +221,9 @@ extension PaymentSheet {
         
         /// Api key used to invoke netcetera sdk for redirection-less 3DS authentication.
         public var netceteraSDKApiKey: String?
+        
+        /// If true, disables all user interactions in the payment sheet. Defaults to false.
+        public var readOnly: Bool = false
     }
     
     /// Configuration related to the Hyperswitch Customer
