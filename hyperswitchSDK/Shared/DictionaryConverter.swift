@@ -76,6 +76,10 @@ extension DictionaryConverter {
                     dictionary[key] = theme.themeLabel
                 }
                 
+                if let layout = element.value as? PaymentSheet.Appearance.Layout {
+                    dictionary[key] = layout.toDictionary()
+                }
+                
                 /// Handle UIColor values
                 if let color = element.value as? UIColor {
                     dictionary[key] = self.hexStringFromColor(color: color)

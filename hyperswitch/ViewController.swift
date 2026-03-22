@@ -63,13 +63,7 @@ class ViewController: UIViewController {
         appearance.colors.primary = UIColor(red: 0.55, green: 0.74, blue: 0.00, alpha: 1.00)
         appearance.primaryButton.cornerRadius = 32
         
-        appearance.layout = PaymentSheet.Appearance.Layout(
-            type: .tabs,
-            showOneClickWalletsOnTop: true,
-            paymentMethodsArrangementForTabs: .default,
-            defaultCollapsed:false,
-            spacedAccordionItems:false
-        )
+       appearance.layout = .tabs()
         
         configuration.appearance = appearance
         if let netceteraApiKey = hyperViewModel.netceteraApiKey {

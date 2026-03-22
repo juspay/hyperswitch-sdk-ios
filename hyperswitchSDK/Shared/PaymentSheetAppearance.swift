@@ -54,14 +54,6 @@ public extension PaymentSheet {
             }
         }
         
-        /// The type of layout used to display payment methods
-        public enum LayoutType: String, Codable {
-            /// Display payment methods in a tabbed interface
-            case tabs = "tabs"
-            /// Display payment methods in an expandable accordion
-            case accordion = "accordion"
-        }
-        
         /// The arrangement of payment methods in tabs layout
         public enum PaymentMethodsArrangement: String, Codable {
             /// Default list arrangement
@@ -94,73 +86,53 @@ public extension PaymentSheet {
             }
         }
         
-        // MARK: Layout
-        
-        /// Describes the layout configuration for PaymentSheet
-        public struct Layout: Equatable, DictionaryConverter, Codable {
-            
-            /// Creates a `PaymentSheet.Appearance.Layout` with default values
-            public init() {}
-            
-            /// The type of layout to display payment methods in
-            /// - Note: Can be `.tabs` or `.accordion`. Default is `.tabs`
-            public var type: LayoutType = .tabs
-            
-            /// Whether to show one-click wallets (like Apple Pay) at the top of the payment sheet
-            /// - Note: Default is `true`
-            public var showOneClickWalletsOnTop: Bool = true
-            
-            /// The arrangement of payment methods when using tabs layout
-            /// - Note: Can be `.default` or `.grid`. Default is `.default`
-            public var paymentMethodsArrangementForTabs: PaymentMethodsArrangement = .default
-            
-            /// Whether the accordion should be collapsed by default
-            /// - Note: Only applies when layout type is `.accordion`. Default is `false`
-            public var defaultCollapsed: Bool = false
-            
-            /// Whether to show radio buttons in accordion view
-            /// - Note: Only applies when layout type is `.accordion`. Default is `false`
-            public var radios: Bool = false
-            
-            /// Whether to show spaced accordion items with margins between them
-            /// - Note: Only applies when layout type is `.accordion`. Default is `false`
-            public var spacedAccordionItems: Bool = false
-            
-            /// Maximum number of accordion items to show before collapsing
-            /// - Note: Only applies when layout type is `.accordion`. Default is `4`
-            public var maxAccordionItems: Int = 4
-            
-            /// Customization options for saved payment methods
-            public var savedMethodCustomization: SavedMethodCustomization = SavedMethodCustomization()
-            
-            /// Creates a `Layout` with the specified parameters
-            /// - Parameters:
-            ///   - type: The layout type (tabs or accordion)
-            ///   - showOneClickWalletsOnTop: Whether to show wallets at the top
-            ///   - paymentMethodsArrangementForTabs: Arrangement for tabs layout
-            ///   - defaultCollapsed: Whether accordion is collapsed by default
-            ///   - radios: Whether to show radio buttons
-            ///   - spacedAccordionItems: Whether to space accordion items
-            ///   - maxAccordionItems: Maximum accordion items to show
-            ///   - savedMethodCustomization: Saved method customization options
-            public init(
-                type: LayoutType = .tabs,
+        public enum Layout: Equatable, DictionaryConverter {
+            case tabs(
                 showOneClickWalletsOnTop: Bool = true,
-                paymentMethodsArrangementForTabs: PaymentMethodsArrangement = .default,
+                paymentMethodsArrangement: PaymentMethodsArrangement = .default,
+                savedMethodCustomization: SavedMethodCustomization = SavedMethodCustomization()
+            )
+            
+            case accordion(
+                showOneClickWalletsOnTop: Bool = true,
                 defaultCollapsed: Bool = false,
                 radios: Bool = false,
                 spacedAccordionItems: Bool = false,
                 maxAccordionItems: Int = 4,
                 savedMethodCustomization: SavedMethodCustomization = SavedMethodCustomization()
-            ) {
-                self.type = type
-                self.showOneClickWalletsOnTop = showOneClickWalletsOnTop
-                self.paymentMethodsArrangementForTabs = paymentMethodsArrangementForTabs
-                self.defaultCollapsed = defaultCollapsed
-                self.radios = radios
-                self.spacedAccordionItems = spacedAccordionItems
-                self.maxAccordionItems = maxAccordionItems
-                self.savedMethodCustomization = savedMethodCustomization
+            )
+            
+            public init() {
+                self = .tabs()
+            }
+            
+            public func toDictionary() -> [String: Any] {
+                switch self {
+                case .tabs(let showOneClickWalletsOnTop, let paymentMethodsArrangement, let savedMethodCustomization):
+                    var dict: [String: Any] = [
+                        "type": "tabs",
+                        "showOneClickWalletsOnTop": showOneClickWalletsOnTop,
+                        "paymentMethodsArrangementForTabs": paymentMethodsArrangement.rawValue,
+                        "defaultCollapsed": false,
+                        "radios": false,
+                        "spacedAccordionItems": false,
+                    ]
+                    dict["savedMethodCustomization"] = savedMethodCustomization.toDictionary()
+                    return dict
+                    
+                case .accordion(let showOneClickWalletsOnTop, let defaultCollapsed, let radios, let spacedAccordionItems, let maxAccordionItems, let savedMethodCustomization):
+                    var dict: [String: Any] = [
+                        "type": "accordion",
+                        "showOneClickWalletsOnTop": showOneClickWalletsOnTop,
+                        "paymentMethodsArrangementForTabs": PaymentMethodsArrangement.default.rawValue,
+                        "defaultCollapsed": defaultCollapsed,
+                        "radios": radios,
+                        "spacedAccordionItems": spacedAccordionItems,
+                        "maxAccordionItems": maxAccordionItems,
+                    ]
+                    dict["savedMethodCustomization"] = savedMethodCustomization.toDictionary()
+                    return dict
+                }
             }
         }
 
