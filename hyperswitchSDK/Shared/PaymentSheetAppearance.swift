@@ -40,7 +40,7 @@ public extension PaymentSheet {
         
         public var theme: Theme?
         
-        public var layout: Layout = Layout()
+        public var layout: Layout?
         
         public enum Theme: String, Codable {
             case `default` = "Default"
@@ -55,7 +55,7 @@ public extension PaymentSheet {
         }
         
         /// The arrangement of payment methods in tabs layout
-        public enum PaymentMethodsArrangement: String, Codable {
+        public enum PaymentMethodsArrangement: String {
             /// Default list arrangement
             case `default` = "default"
             /// Grid arrangement
@@ -63,7 +63,7 @@ public extension PaymentSheet {
         }
         
         /// The grouping behavior for saved payment methods
-        public enum GroupingBehavior: String, Codable {
+        public enum GroupingBehavior: String {
             /// Group saved methods by payment method type
             case groupByPaymentMethods = "groupByPaymentMethods"
             /// Default grouping behavior
@@ -71,19 +71,10 @@ public extension PaymentSheet {
         }
         
         /// Customization options for saved payment methods display
-        public struct SavedMethodCustomization: Equatable, DictionaryConverter, Codable {
-            
-            /// Creates a `SavedMethodCustomization` with default values
+        public struct SavedMethodCustomization: Equatable, DictionaryConverter {
             public init() {}
-            
             /// The grouping behavior for saved payment methods
             public var groupingBehavior: GroupingBehavior = .default
-            
-            /// Creates a `SavedMethodCustomization` with the specified grouping behavior
-            /// - Parameter groupingBehavior: The grouping behavior to use
-            public init(groupingBehavior: GroupingBehavior = .default) {
-                self.groupingBehavior = groupingBehavior
-            }
         }
         
         public enum Layout: Equatable, DictionaryConverter {
@@ -101,10 +92,6 @@ public extension PaymentSheet {
                 maxAccordionItems: Int = 4,
                 savedMethodCustomization: SavedMethodCustomization = SavedMethodCustomization()
             )
-            
-            public init() {
-                self = .tabs()
-            }
             
             public func toDictionary() -> [String: Any] {
                 switch self {
