@@ -26,14 +26,15 @@ class HyperViewModel: ObservableObject {
             do {
                 let json = try await NetworkUtility.fetchData(from: "/create-payment-intent", baseUrl: backendUrl)
                 guard let paymentIntentClientSecret = json["clientSecret"] as? String,
-                      let publishableKey = json["publishableKey"] as? String
+                      let publishableKey = json["publishableKey"] as? String,
+                      let profileId = json["profileId"] as? String
                 else {
                     throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing required fields"])
                 }
                 
                 DispatchQueue.main.async {
                     self.status = .success
-                    self.paymentSession = PaymentSession(publishableKey: publishableKey)
+                    self.paymentSession = PaymentSession(publishableKey: publishableKey, profileId: profileId)
                     self.paymentSession?.initPaymentSession(paymentIntentClientSecret: paymentIntentClientSecret)
                 }
             } catch {
@@ -54,14 +55,15 @@ class HyperViewModel: ObservableObject {
                 
                 let json = try await NetworkUtility.fetchData(from: "/create-payment-intent", baseUrl: backendUrl)
                 guard let paymentIntentClientSecret = json["clientSecret"] as? String,
-                      let publishableKey = json["publishableKey"] as? String
+                      let publishableKey = json["publishableKey"] as? String,
+                      let profileId = json["profileId"] as? String
                 else {
                     throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing required fields"])
                 }
                 
                 DispatchQueue.main.async {
                     self.status = .success
-                    self.paymentSession = PaymentSession(publishableKey: publishableKey)
+                    self.paymentSession = PaymentSession(publishableKey: publishableKey, profileId: profileId)
                     
                     self.paymentSession?.initPaymentManagementSession(ephemeralKey: ephemeralKey, paymentIntentClientSecret: nil)
                     self.paymentSession?.initPaymentSession(paymentIntentClientSecret: paymentIntentClientSecret)

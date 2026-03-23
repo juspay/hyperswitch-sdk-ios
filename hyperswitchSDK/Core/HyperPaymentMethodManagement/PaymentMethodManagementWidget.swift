@@ -50,6 +50,7 @@ internal class PaymentMethodManagementWidget: UIControl {
             "hyperParams": hyperParams,
             "ephemeralKey": PaymentSession.ephemeralKey ?? "",
             "publishableKey": APIClient.shared.publishableKey as Any,
+            "profileId": APIClient.shared.profileId as Any,
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,
             "customParams": APIClient.shared.customParams as Any,

@@ -50,6 +50,7 @@ extension PaymentSession {
         let props: [String: Any] = [
             "clientSecret": PaymentSession.paymentIntentClientSecret as Any,
             "publishableKey": APIClient.shared.publishableKey as Any,
+            "profileId": APIClient.shared.profileId as Any,
             "hyperParams": hyperParams,
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,

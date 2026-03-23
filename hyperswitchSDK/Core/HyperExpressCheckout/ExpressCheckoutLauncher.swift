@@ -36,6 +36,7 @@ public class ExpressCheckoutLauncher {
         
         let props: [String : Any] = [
             "publishableKey": APIClient.shared.publishableKey as Any,
+            "profileId": APIClient.shared.profileId as Any,
             "clientSecret": paymentIntentClientSecret,
             "paymentMethodType": "expressCheckout",
             "paymentMethodData": "",
@@ -57,6 +58,7 @@ public class ExpressCheckoutLauncher {
                 "type":"widgetPayment",
                 "clientSecret": ExpressCheckoutLauncher.intentClientSecret as Any,
                 "publishableKey": APIClient.shared.publishableKey as Any,
+                "profileId": APIClient.shared.profileId as Any,
                 "hyperParams": hyperParams,
                 "customBackendUrl": APIClient.shared.customBackendUrl as Any,
                 "customLogUrl": APIClient.shared.customLogUrl as Any,
@@ -102,6 +104,7 @@ extension ExpressCheckoutLauncher {
         
         var props: [String : Any] = [
             "publishableKey": APIClient.shared.publishableKey as Any,
+            "profileId": APIClient.shared.profileId as Any,
             "clientSecret": ExpressCheckoutLauncher.intentClientSecret as Any,
             "paymentMethodType": "expressCheckout",
             "paymentMethodData": "",
