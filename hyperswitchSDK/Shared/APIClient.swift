@@ -18,4 +18,5 @@ import Foundation
     @objc public var customBackendUrl: String?
     @objc public var customParams: [String : Any]?
     @objc public var customLogUrl: String?
+    @objc public var sdkAuthorization: String?
 }

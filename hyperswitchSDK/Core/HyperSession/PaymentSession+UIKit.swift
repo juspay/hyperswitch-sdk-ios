@@ -53,7 +53,8 @@ extension PaymentSession {
             "hyperParams": hyperParams,
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,
-            "customParams": APIClient.shared.customParams as Any
+            "customParams": APIClient.shared.customParams as Any,
+            "sdkAuthorization": APIClient.shared.sdkAuthorization as Any
         ]
         let _ = RNHeadlessManager.sharedInstance.viewForModule("HyperHeadless", initialProperties: ["props": props])
     }

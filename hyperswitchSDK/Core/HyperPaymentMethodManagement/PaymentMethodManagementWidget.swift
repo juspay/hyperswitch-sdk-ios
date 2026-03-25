@@ -53,6 +53,7 @@ internal class PaymentMethodManagementWidget: UIControl {
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,
             "customParams": APIClient.shared.customParams as Any,
+            "sdkAuthorization": APIClient.shared.sdkAuthorization as Any,
         ]
         
         RNViewManager.sharedInstance.responseHandler = self

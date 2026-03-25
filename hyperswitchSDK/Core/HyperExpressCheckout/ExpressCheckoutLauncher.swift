@@ -60,7 +60,8 @@ public class ExpressCheckoutLauncher {
                 "hyperParams": hyperParams,
                 "customBackendUrl": APIClient.shared.customBackendUrl as Any,
                 "customLogUrl": APIClient.shared.customLogUrl as Any,
-                "customParams": APIClient.shared.customParams as Any
+                "customParams": APIClient.shared.customParams as Any,
+                "sdkAuthorization": APIClient.shared.sdkAuthorization as Any
             ]
             
             let rootView =  RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": props]);
