@@ -62,19 +62,20 @@ public extension PaymentSheet {
             case grid = "grid"
         }
         
-        /// The grouping behavior for saved payment methods
-        public enum GroupingBehavior: String {
-            /// Group saved methods by payment method type
-            case groupByPaymentMethods = "groupByPaymentMethods"
-            /// Default grouping behavior
-            case `default` = "default"
+        /// Customization options for how saved payment methods are grouped/displayed
+        public struct GroupingBehavior: Equatable, DictionaryConverter {
+            public init() {}
+            /// Whether saved payment methods are shown in a separate screen (default: true)
+            public var displayInSeparateScreen: Bool = true
+            /// Whether saved cards are grouped inside the card tab (default: false)
+            public var groupByPaymentMethods: Bool = false
         }
-        
+
         /// Customization options for saved payment methods display
         public struct SavedMethodCustomization: Equatable, DictionaryConverter {
             public init() {}
             /// The grouping behavior for saved payment methods
-            public var groupingBehavior: GroupingBehavior = .default
+            public var groupingBehavior: GroupingBehavior = GroupingBehavior()
         }
         
         public enum Layout: Equatable, DictionaryConverter {
