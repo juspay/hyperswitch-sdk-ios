@@ -25,15 +25,22 @@ class HyperViewModel: ObservableObject {
         Task {
             do {
                 let json = try await NetworkUtility.fetchData(from: "/create-payment-intent", baseUrl: backendUrl)
-                guard let paymentIntentClientSecret = json["clientSecret"] as? String,
-                      let publishableKey = json["publishableKey"] as? String
+                guard let publishableKey = json["publishableKey"] as? String
                 else {
                     throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing required fields"])
                 }
                 
+                let sdkAuthorization = json["sdkAuthorization"] as? String
+                
+                // clientSecret is optional — when sdkAuthorization is present,
+                // the SDK extracts clientSecret internally from the token.
+                // When neither is present, the SDK handles the error internally.
+                let paymentIntentClientSecret = json["clientSecret"] as? String ?? ""
+                
                 DispatchQueue.main.async {
                     self.status = .success
                     self.paymentSession = PaymentSession(publishableKey: publishableKey)
+                    APIClient.shared.sdkAuthorization = sdkAuthorization
                     self.paymentSession?.initPaymentSession(paymentIntentClientSecret: paymentIntentClientSecret)
                 }
             } catch {
@@ -53,15 +60,22 @@ class HyperViewModel: ObservableObject {
                 }
                 
                 let json = try await NetworkUtility.fetchData(from: "/create-payment-intent", baseUrl: backendUrl)
-                guard let paymentIntentClientSecret = json["clientSecret"] as? String,
-                      let publishableKey = json["publishableKey"] as? String
+                guard let publishableKey = json["publishableKey"] as? String
                 else {
                     throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing required fields"])
                 }
                 
+                let sdkAuthorization = json["sdkAuthorization"] as? String
+                
+                // clientSecret is optional — when sdkAuthorization is present,
+                // the SDK extracts clientSecret internally from the token.
+                // When neither is present, the SDK handles the error internally.
+                let paymentIntentClientSecret = json["clientSecret"] as? String ?? ""
+                
                 DispatchQueue.main.async {
                     self.status = .success
                     self.paymentSession = PaymentSession(publishableKey: publishableKey)
+                    APIClient.shared.sdkAuthorization = sdkAuthorization
                     
                     self.paymentSession?.initPaymentManagementSession(ephemeralKey: ephemeralKey, paymentIntentClientSecret: nil)
                     self.paymentSession?.initPaymentSession(paymentIntentClientSecret: paymentIntentClientSecret)

@@ -25,7 +25,7 @@ public class ExpressCheckoutLauncher {
     static var themes: String?
     
     
-    public convenience init(paymentIntentClientSecret: String, configuration: PaymentSheet.Configuration, themes: String? = nil, completion: @escaping ((ExpressCheckoutResult) -> ())) {
+    public convenience init(paymentIntentClientSecret: String = "", configuration: PaymentSheet.Configuration, themes: String? = nil, completion: @escaping ((ExpressCheckoutResult) -> ())) {
         
         self.init()
         

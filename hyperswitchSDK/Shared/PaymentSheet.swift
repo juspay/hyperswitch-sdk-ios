@@ -18,7 +18,7 @@ import Foundation
 public class PaymentSheet {
     
     /// The initializer method that sets up the payment sheet with the required parameters.
-    internal required init(paymentIntentClientSecret: String, configuration: Configuration) {
+    internal required init(paymentIntentClientSecret: String = "", configuration: Configuration) {
         self.intentClientSecret = paymentIntentClientSecret
         self.configuration = configuration
     }

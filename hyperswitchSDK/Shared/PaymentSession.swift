@@ -19,11 +19,13 @@ public class PaymentSession {
     internal static var paymentIntentClientSecret: String?
     internal static var ephemeralKey: String?
     
-    public init(publishableKey: String, customBackendUrl: String? = nil, customParams: [String : Any]? = nil, customLogUrl: String? = nil){
+    public init(publishableKey: String, customBackendUrl: String? = nil, customParams: [String : Any]? = nil, customLogUrl: String? = nil, sdkAuthorization: String? = nil){
+        let existingSdkAuthorization = APIClient.shared.sdkAuthorization
         APIClient.shared.publishableKey = publishableKey
         APIClient.shared.customBackendUrl = customBackendUrl
         APIClient.shared.customLogUrl = customLogUrl
         APIClient.shared.customParams = customParams
+        APIClient.shared.sdkAuthorization = sdkAuthorization ?? existingSdkAuthorization
         
 #if canImport(HyperOTA)
         OTAServices.shared.initialize(publishableKey: publishableKey)
@@ -31,7 +33,7 @@ public class PaymentSession {
 #endif
     }
     
-    public func initPaymentSession(paymentIntentClientSecret: String){
+    public func initPaymentSession(paymentIntentClientSecret: String = ""){
         PaymentSession.paymentIntentClientSecret = paymentIntentClientSecret
     }
     
