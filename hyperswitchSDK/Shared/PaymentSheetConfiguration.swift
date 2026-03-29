@@ -142,6 +142,10 @@ extension PaymentSheet {
         public var displaySavedPaymentMethodsCheckbox: Bool? = true
         
         ///
+        /// toggle to hide Card Nickname Field
+        public var hideCardNicknameField: Bool? = false
+        
+        ///
         /// toggle to disable SavedCard Screen
         public var displaySavedPaymentMethods: Bool? = true
         
