@@ -134,6 +134,8 @@
 		79FE014E2E97C18F00C5D94A /* Codable+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE014C2E97C18F00C5D94A /* Codable+UIKit.swift */; };
 		79FE01502E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE014F2E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift */; };
 		79FE01512E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE014F2E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift */; };
+		CE0000022A0DA9E300E78310 /* CardExpiryLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0000012A0DA9E300E78310 /* CardExpiryLauncher.swift */; };
+		CE0000042A0DA9E300E78310 /* CardExpiryWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0000032A0DA9E300E78310 /* CardExpiryWidget.swift */; };
 		DC4AC9F2296D6D6C00E0D2A6 /* PaymentCardTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4AC9F1296D6D6C00E0D2A6 /* PaymentCardTextField.swift */; };
 		DC4AC9F5296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC4AC9F4296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift */; };
 		DC5D0114294731480017C67A /* PaymentSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D0111294731480017C67A /* PaymentSheet.swift */; };
@@ -290,6 +292,8 @@
 		79FE014C2E97C18F00C5D94A /* Codable+UIKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Codable+UIKit.swift"; sourceTree = "<group>"; };
 		79FE014F2E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSheetAppearance+Codable.swift"; sourceTree = "<group>"; };
 		8DE1DB5CD7CD39ED0932F0FA /* Pods-hyperswitchAppClip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitchAppClip.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip.debug.xcconfig"; sourceTree = "<group>"; };
+		CE0000012A0DA9E300E78310 /* CardExpiryLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExpiryLauncher.swift; sourceTree = "<group>"; };
+		CE0000032A0DA9E300E78310 /* CardExpiryWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExpiryWidget.swift; sourceTree = "<group>"; };
 		DC4AC9F1296D6D6C00E0D2A6 /* PaymentCardTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentCardTextField.swift; sourceTree = "<group>"; };
 		DC4AC9F4296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentCardTextField+SwiftUI.swift"; sourceTree = "<group>"; };
 		DC5D0111294731480017C67A /* PaymentSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentSheet.swift; sourceTree = "<group>"; };
@@ -590,6 +594,8 @@
 			isa = PBXGroup;
 			children = (
 				DC4AC9F1296D6D6C00E0D2A6 /* PaymentCardTextField.swift */,
+				CE0000012A0DA9E300E78310 /* CardExpiryLauncher.swift */,
+				CE0000032A0DA9E300E78310 /* CardExpiryWidget.swift */,
 				DC4AC9F4296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift */,
 				793083EA2A0DA9E300E78310 /* PaymentHandler.swift */,
 				793083EC2A0DA9F100E78310 /* PaymentIntentParams.swift */,
@@ -948,6 +954,8 @@
 				79052A272C89237A0011804E /* Extensions.swift in Sources */,
 				79FE014D2E97C18F00C5D94A /* Codable+UIKit.swift in Sources */,
 				DC4AC9F2296D6D6C00E0D2A6 /* PaymentCardTextField.swift in Sources */,
+				CE0000022A0DA9E300E78310 /* CardExpiryLauncher.swift in Sources */,
+				CE0000042A0DA9E300E78310 /* CardExpiryWidget.swift in Sources */,
 				79D474B42CC6FDC30022C47E /* Helper.swift in Sources */,
 				7938D81B2A4EF45000286CEE /* PaymentMethodParams.swift in Sources */,
 				DC5D0125294847E90017C67A /* PaymentSheetView+UIKit.swift in Sources */,

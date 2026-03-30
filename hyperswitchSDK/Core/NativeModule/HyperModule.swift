@@ -41,7 +41,21 @@ internal class HyperModule: RCTEventEmitter {
     //    }
     
     @objc
-    private func sendMessageToNative(_ rnMessage: String) {}
+    private func sendMessageToNative(_ rnMessage: String) {
+        guard let data = rnMessage.data(using: .utf8),
+              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            return
+        }
+        
+        // Post notification for CardExpiryWidget
+        if json["isValid"] != nil {
+            NotificationCenter.default.post(
+                name: NSNotification.Name("CardExpiryValidation"),
+                object: nil,
+                userInfo: json
+            )
+        }
+    }
     
     //React Native Wrapper Function
     @objc

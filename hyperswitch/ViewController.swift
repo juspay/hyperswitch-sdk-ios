@@ -18,6 +18,8 @@ class ViewController: UIViewController {
     private var paymentSheetButtonConfiguration = UIButton.Configuration.plain()
     private var paymentMethodManagementButton = UIButton()
     private var paymentMethodManagementButtonConfig = UIButton.Configuration.plain()
+    private var cardExpiryWidgetButton = UIButton()
+    private var cardExpiryWidgetButtonConfig = UIButton.Configuration.plain()
     private var statusLabel = UILabel()
     private var cancellables = Set<AnyCancellable>()
     
@@ -97,6 +99,29 @@ class ViewController: UIViewController {
     }
     
     @objc
+    func openCardExpiryWidget(_ sender: Any) {
+        
+        // Create and present the Card Expiry Widget
+        let launcher = CardExpiryLauncher.create(
+            viewController: self,
+            resultCallback: { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .completed(let data):
+                        self.statusLabel.text = "Expiry: \(data.expiryMonth)/\(data.expiryYear)"
+                    case .canceled:
+                        self.statusLabel.text = "Card expiry entry canceled"
+                    case .failed(let error):
+                        self.statusLabel.text = "Error: \(error.localizedDescription)"
+                    }
+                }
+            }
+        )
+        
+        launcher.present()
+    }
+    
+    @objc
     func reload(_ sender: Any) {
         hyperViewModel.fetchNetceteraSDKApiKey()
         hyperViewModel.preparePaymentSheet()
@@ -152,6 +177,19 @@ extension ViewController {
         paymentMethodManagementButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60).isActive = true
         paymentMethodManagementButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
         paymentMethodManagementButton.topAnchor.constraint(equalTo: paymentSheetButton.bottomAnchor, constant: 80).isActive = true
+        
+        cardExpiryWidgetButton.setTitle("Card Expiry Widget", for: .normal)
+        cardExpiryWidgetButton.setTitleColor(.white, for: .normal)
+        cardExpiryWidgetButtonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 10)
+        cardExpiryWidgetButton.configuration = cardExpiryWidgetButtonConfig
+        cardExpiryWidgetButton.backgroundColor = .systemBlue
+        cardExpiryWidgetButton.layer.cornerRadius = 10
+        cardExpiryWidgetButton.addTarget(self, action: #selector(openCardExpiryWidget(_:)), for: .touchUpInside)
+        view.addSubview(cardExpiryWidgetButton)
+        cardExpiryWidgetButton.translatesAutoresizingMaskIntoConstraints = false
+        cardExpiryWidgetButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60).isActive = true
+        cardExpiryWidgetButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
+        cardExpiryWidgetButton.topAnchor.constraint(equalTo: paymentMethodManagementButton.bottomAnchor, constant: 80).isActive = true
         
         statusLabel.textAlignment = .center
         statusLabel.numberOfLines = 7

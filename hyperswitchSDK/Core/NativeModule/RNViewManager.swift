@@ -13,6 +13,10 @@ internal class RNViewManager: NSObject {
     internal var responseHandler: RNResponseHandler?
     internal var rootView: RCTRootView?
     
+    // Card Expiry Widget properties
+    internal var expiryValue: String = ""
+    internal var isExpiryValid: Bool = false
+    
     internal lazy var bridge: RCTBridge = {
         RCTBridge.init(delegate: self, launchOptions: nil)
     }()
