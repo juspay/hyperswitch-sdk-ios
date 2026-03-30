@@ -142,6 +142,10 @@ extension PaymentSheet {
         public var displaySavedPaymentMethodsCheckbox: Bool? = true
         
         ///
+        /// When true, the save card details checkbox will be checked by default
+        public var savedPaymentMethodsCheckboxCheckedByDefault: Bool? = false
+        
+        ///
         /// toggle to disable SavedCard Screen
         public var displaySavedPaymentMethods: Bool? = true
         
