@@ -19,8 +19,9 @@ public class PaymentSession {
     internal static var paymentIntentClientSecret: String?
     internal static var ephemeralKey: String?
     
-    public init(publishableKey: String, customBackendUrl: String? = nil, customParams: [String : Any]? = nil, customLogUrl: String? = nil){
+    public init(publishableKey: String, profileId: String, customBackendUrl: String? = nil, customParams: [String : Any]? = nil, customLogUrl: String? = nil){
         APIClient.shared.publishableKey = publishableKey
+        APIClient.shared.profileId = profileId
         APIClient.shared.customBackendUrl = customBackendUrl
         APIClient.shared.customLogUrl = customLogUrl
         APIClient.shared.customParams = customParams

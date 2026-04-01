@@ -21,6 +21,7 @@ public class PaymentIntentParams: NSObject {
     public func description() -> [String:Any] {
         let props: [String:Any] = [
             "publishableKey": APIClient.shared.publishableKey ?? "",
+            "profileId": APIClient.shared.profileId ?? "",
             "clientSecret": self.clientSecret,
             "paymentMethodType": "Card",
             "paymentMethodData": ""

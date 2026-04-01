@@ -15,6 +15,7 @@ import Foundation
     }()
     
     @objc public var publishableKey: String?
+    @objc public var profileId: String?
     @objc public var customBackendUrl: String?
     @objc public var customParams: [String : Any]?
     @objc public var customLogUrl: String?
