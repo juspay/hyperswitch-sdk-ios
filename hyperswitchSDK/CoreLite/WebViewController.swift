@@ -14,6 +14,7 @@ import HyperswitchScanCard
 internal class WebViewController: HyperUIViewController {
     
     private let applePayPaymentHandler = ApplePayHandlerLite()
+    private let pazeHandler = PazeHandler()
     
     private let baseUrl = URL(string: "https://beta.hyperswitch.io/mobile/1.7.4/index.html")
     private var webView: WKWebView = WKWebView()
@@ -45,6 +46,7 @@ internal class WebViewController: HyperUIViewController {
         contentController.add(self, name: "exitPaymentSheet")
         contentController.add(self, name: "launchScanCard")
         contentController.add(self, name: "launchApplePay")
+        contentController.add(self, name: "launchPaze")
         
         let configuration = WKWebViewConfiguration()
         configuration.userContentController = contentController
@@ -137,6 +139,17 @@ extension WebViewController: WKScriptMessageHandler {
                     "applePayData" : props[0]
                 ]
                 self.sendPropsToJS(props: applePayProps)
+            })
+        }
+        if message.name == "launchPaze" {
+            guard let body = message.body as? String else {
+                return
+            }
+            pazeHandler.startPayment(rnMessage: body, rnCallback: { props in
+                let pazeProps = [
+                    "pazeData" : props[0]
+                ]
+                self.sendPropsToJS(props: pazeProps)
             })
         }
         if message.name == "launchScanCard" {
