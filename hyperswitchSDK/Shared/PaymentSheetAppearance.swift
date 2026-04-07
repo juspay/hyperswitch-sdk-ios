@@ -40,6 +40,8 @@ public extension PaymentSheet {
         
         public var theme: Theme?
         
+        public var layout: Layout?
+        
         public enum Theme: String, Codable {
             case `default` = "Default"
             case light = "Light"
@@ -49,6 +51,76 @@ public extension PaymentSheet {
 
             var themeLabel: String {
                 return self.rawValue
+            }
+        }
+        
+        /// The arrangement of payment methods in tabs layout
+        public enum PaymentMethodsArrangement: String {
+            /// Default list arrangement
+            case `default` = "default"
+            /// Grid arrangement
+            case grid = "grid"
+        }
+        
+        /// Customization options for how saved payment methods are grouped/displayed
+        public struct GroupingBehavior: Equatable, DictionaryConverter {
+            public init() {}
+            /// Whether saved payment methods are shown in a separate screen (default: true)
+            public var displayInSeparateScreen: Bool = true
+            /// Whether saved cards are grouped inside the card tab (default: false)
+            public var groupByPaymentMethods: Bool = false
+        }
+
+        /// Customization options for saved payment methods display
+        public struct SavedMethodCustomization: Equatable, DictionaryConverter {
+            public init() {}
+            /// The grouping behavior for saved payment methods
+            public var groupingBehavior: GroupingBehavior = GroupingBehavior()
+        }
+        
+        public enum Layout: Equatable, DictionaryConverter {
+            case tabs(
+                showOneClickWalletsOnTop: Bool = true,
+                paymentMethodsArrangement: PaymentMethodsArrangement = .default,
+                savedMethodCustomization: SavedMethodCustomization = SavedMethodCustomization()
+            )
+            
+            case accordion(
+                showOneClickWalletsOnTop: Bool = true,
+                defaultCollapsed: Bool = false,
+                radios: Bool = false,
+                spacedAccordionItems: Bool = false,
+                maxAccordionItems: Int = 4,
+                savedMethodCustomization: SavedMethodCustomization = SavedMethodCustomization()
+            )
+            
+            public func toDictionary() -> [String: Any] {
+                switch self {
+                case .tabs(let showOneClickWalletsOnTop, let paymentMethodsArrangement, let savedMethodCustomization):
+                    var dict: [String: Any] = [
+                        "type": "tabs",
+                        "showOneClickWalletsOnTop": showOneClickWalletsOnTop,
+                        "paymentMethodsArrangementForTabs": paymentMethodsArrangement.rawValue,
+                        "defaultCollapsed": false,
+                        "radios": false,
+                        "spacedAccordionItems": false,
+                    ]
+                    dict["savedMethodCustomization"] = savedMethodCustomization.toDictionary()
+                    return dict
+                    
+                case .accordion(let showOneClickWalletsOnTop, let defaultCollapsed, let radios, let spacedAccordionItems, let maxAccordionItems, let savedMethodCustomization):
+                    var dict: [String: Any] = [
+                        "type": "accordion",
+                        "showOneClickWalletsOnTop": showOneClickWalletsOnTop,
+                        "paymentMethodsArrangementForTabs": PaymentMethodsArrangement.default.rawValue,
+                        "defaultCollapsed": defaultCollapsed,
+                        "radios": radios,
+                        "spacedAccordionItems": spacedAccordionItems,
+                        "maxAccordionItems": maxAccordionItems,
+                    ]
+                    dict["savedMethodCustomization"] = savedMethodCustomization.toDictionary()
+                    return dict
+                }
             }
         }
 

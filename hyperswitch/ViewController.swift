@@ -62,6 +62,9 @@ class ViewController: UIViewController {
         appearance.colors.background = UIColor(red: 0.96, green: 0.97, blue: 0.98, alpha: 1.00)
         appearance.colors.primary = UIColor(red: 0.55, green: 0.74, blue: 0.00, alpha: 1.00)
         appearance.primaryButton.cornerRadius = 32
+        
+       appearance.layout = .tabs()
+        
         configuration.appearance = appearance
         if let netceteraApiKey = hyperViewModel.netceteraApiKey {
             configuration.netceteraSDKApiKey = netceteraApiKey
