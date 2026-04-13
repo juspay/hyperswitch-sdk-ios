@@ -54,6 +54,13 @@ If you prefer a more manual approach, you can open the Info.plist file in a text
 <string>LocalHosted</string>
 ```
 
+## Code Formatting
+This project uses [swift-format](https://github.com/swiftlang/swift-format) to enforce consistent code style. Before committing, install and run it with:
+```shell
+brew install swift-format
+swift-format format -i -r .
+```
+
 ## Integration
 
 Get started with our iOS [📚 integration guides](https://docs.hyperswitch.io/hyperswitch-cloud/integration-guide/ios)
