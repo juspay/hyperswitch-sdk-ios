@@ -1,7 +1,7 @@
-import Foundation
-import WebKit
 import Combine
+import Foundation
 import SwiftUI
+import WebKit
 
 class PaymentMethodManagementViewController: UIViewController {
     @ObservedObject var hyperViewModel = HyperViewModel()
@@ -10,10 +10,10 @@ class PaymentMethodManagementViewController: UIViewController {
     private let topBarView = UIView()
     private let textLabel = UILabel()
     private let backButton = UIButton(type: .custom)
-    
+
     private func setupPaymentWidget(onAddPaymentMethod: @escaping () -> Void) {
         guard hyperViewModel.paymentSession != nil else { return }
-        
+
         lazy var paymentWidget = PaymentMethodManagementWidget(
             onAddPaymentMethod: onAddPaymentMethod,
             completion: { result in
@@ -25,7 +25,7 @@ class PaymentMethodManagementViewController: UIViewController {
                 }
             }
         )
-        
+
         view.addSubview(paymentWidget)
         paymentWidget.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -35,7 +35,7 @@ class PaymentMethodManagementViewController: UIViewController {
             paymentWidget.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
     }
-    
+
     private func asyncBindPaymentManagementWidget(onAddPaymentMethod: @escaping () -> Void) {
         hyperViewModel.$status
             .receive(on: DispatchQueue.main)
@@ -51,7 +51,7 @@ class PaymentMethodManagementViewController: UIViewController {
             }
             .store(in: &cancellables)
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .green
@@ -59,34 +59,38 @@ class PaymentMethodManagementViewController: UIViewController {
         hyperViewModel.preparePaymentMethodManagement()
         asyncBindPaymentManagementWidget(onAddPaymentMethod: onAddPaymentMethod)
     }
-    
-    @objc func onAddPaymentMethod() -> Void {
+
+    @objc func onAddPaymentMethod() {
         var configuration = PaymentSheet.Configuration()
         configuration.primaryButtonLabel = "Purchase ($0.00)"
         configuration.paymentSheetHeaderLabel = "Add payment method"
         configuration.displaySavedPaymentMethods = false
-        
+
         var appearance = PaymentSheet.Appearance()
         appearance.colors.background = UIColor(red: 0.96, green: 0.97, blue: 0.98, alpha: 1.00)
         appearance.primaryButton.cornerRadius = 32
         configuration.appearance = appearance
-        
-        self.hyperViewModel.paymentSession?.presentPaymentSheet(viewController: self, configuration: configuration, completion: { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .completed:
-                    self.showAlert(title: "Success", message: "Successfully saved the payment method")
-                    self.hyperViewModel.preparePaymentMethodManagement()
-                case .failed(let error):
-                    self.showAlert(title: "Error", message: "Failure: \(error.localizedDescription)")
-                    self.hyperViewModel.preparePaymentMethodManagement()
-                case .canceled:
-                    break
+
+        self.hyperViewModel.paymentSession?.presentPaymentSheet(
+            viewController: self,
+            configuration: configuration,
+            completion: { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .completed:
+                        self.showAlert(title: "Success", message: "Successfully saved the payment method")
+                        self.hyperViewModel.preparePaymentMethodManagement()
+                    case .failed(let error):
+                        self.showAlert(title: "Error", message: "Failure: \(error.localizedDescription)")
+                        self.hyperViewModel.preparePaymentMethodManagement()
+                    case .canceled:
+                        break
+                    }
                 }
             }
-        })
+        )
     }
-    
+
     @objc func backButtonTapped() {
         self.dismiss(animated: true, completion: nil)
     }
@@ -100,7 +104,7 @@ extension PaymentMethodManagementViewController {
         topBarView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         topBarView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
         topBarView.heightAnchor.constraint(equalToConstant: 65).isActive = true
-        
+
         backButton.setImage(UIImage(systemName: "chevron.left"), for: .normal)
         backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         topBarView.addSubview(backButton)
@@ -109,7 +113,7 @@ extension PaymentMethodManagementViewController {
         backButton.leadingAnchor.constraint(equalTo: topBarView.leadingAnchor, constant: 10).isActive = true
         backButton.widthAnchor.constraint(equalToConstant: 25).isActive = true
         backButton.heightAnchor.constraint(equalToConstant: 25).isActive = true
-        
+
         textLabel.text = "Hyperswitch"
         textLabel.font = .boldSystemFont(ofSize: 16.5)
         topBarView.addSubview(textLabel)
@@ -117,7 +121,7 @@ extension PaymentMethodManagementViewController {
         textLabel.topAnchor.constraint(equalTo: topBarView.topAnchor, constant: 23.5).isActive = true
         textLabel.leadingAnchor.constraint(equalTo: backButton.trailingAnchor, constant: 4).isActive = true
         textLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
-        
+
     }
 }
 

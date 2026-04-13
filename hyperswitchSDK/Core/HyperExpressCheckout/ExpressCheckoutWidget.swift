@@ -8,14 +8,14 @@
 import Foundation
 
 public class ExpressCheckout: UIControl {
-    
+
     required public init?(
         coder aDecoder: NSCoder
     ) {
         super.init(coder: aDecoder)
         commonInit()
     }
-    
+
     public override init(
         frame: CGRect
     ) {
@@ -23,15 +23,14 @@ public class ExpressCheckout: UIControl {
         self.backgroundColor = .clear
         commonInit()
     }
-    
+
     public override var intrinsicContentSize: CGSize {
         return CGSize(width: self.frame.width, height: 52.0)
     }
-    
+
     func commonInit() {
-        
-        let cardView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties:
-                                                                    ["props":["type": "expressCheckout",]])
+
+        let cardView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": ["type": "expressCheckout"]])
         cardView.backgroundColor = UIColor.clear
         addSubview(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false

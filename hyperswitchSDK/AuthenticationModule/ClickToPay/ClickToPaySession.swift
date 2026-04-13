@@ -36,14 +36,14 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     private func getHyperLoaderURL() -> String {
         return SDKEnvironment.getEnvironment(publishableKey) == .PROD
-        ? "https://checkout.hyperswitch.io/web/2025.11.28.07/v1/HyperLoader.js"
-        : "https://beta.hyperswitch.io/web/2025.11.28.07/v1/HyperLoader.js"
+            ? "https://checkout.hyperswitch.io/web/2025.11.28.07/v1/HyperLoader.js"
+            : "https://beta.hyperswitch.io/web/2025.11.28.07/v1/HyperLoader.js"
     }
 
     private func getBaseURL() -> String {
         return SDKEnvironment.getEnvironment(publishableKey) == .PROD
-        ? "https://secure.checkout.visa.com"
-        : "https://sandbox.secure.checkout.visa.com"
+            ? "https://secure.checkout.visa.com"
+            : "https://sandbox.secure.checkout.visa.com"
     }
 
     private func logger(type: String, eventName: EventName, category: LogCategory, value: String) {
@@ -70,8 +70,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         if let webView = webView {
             if let viewController = viewController {
                 viewController.view.addSubview(webView)
-            }
-            else {
+            } else {
                 let scenes = UIApplication.shared.connectedScenes
                 let windowScene = scenes.first as? UIWindowScene
                 windowScene?.windows.forEach { window in
@@ -116,11 +115,10 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     private func setupWebView() {
         // zoom disable script
-        let source: String = "var meta = document.createElement('meta');" +
-        "meta.name = 'viewport';" +
-        "meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';" +
-        "var head = document.getElementsByTagName('head')[0];" +
-        "head.appendChild(meta);"
+        let source: String =
+            "var meta = document.createElement('meta');" + "meta.name = 'viewport';"
+            + "meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';"
+            + "var head = document.getElementsByTagName('head')[0];" + "head.appendChild(meta);"
         let script: WKUserScript = WKUserScript(source: source, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
 
         let contentController = WKUserContentController()
@@ -136,7 +134,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         webView = WKWebView(frame: .zero, configuration: configuration)
         webView?.isHidden = false  // Keep visible to prevent freezing
         webView?.alpha = 0.01
-        webView?.accessibilityElementsHidden = true // Hide this element AND all its subviews from VoiceOver
+        webView?.accessibilityElementsHidden = true  // Hide this element AND all its subviews from VoiceOver
 
         webView?.navigationDelegate = self
         webView?.uiDelegate = self
@@ -148,63 +146,73 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         let hyperLoaderUrl = getHyperLoaderURL()
         let baseUrl = getBaseURL()
 
-        logger(type: "DEBUG", eventName: .initClickToPaySessionWebInit, category: .USER_EVENT, value: "loading \(hyperLoaderUrl) with \(baseUrl)")
+        logger(
+            type: "DEBUG",
+            eventName: .initClickToPaySessionWebInit,
+            category: .USER_EVENT,
+            value: "loading \(hyperLoaderUrl) with \(baseUrl)"
+        )
 
         let baseHtml = """
-            <!DOCTYPE html>
-            <html lang="en">
-              <head>
-                <script>
-                  function handleScriptError() {
-                      console.error('Failed to load HyperLoader.js');
-                      window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                          "sdkInitialised": false,
-                          "error": "Script load failed"
-                      }));
-                  }
-        
-                  async function initHyper() {
-                      try {
-                          if (typeof Hyper === 'undefined') {
-                              window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                                  "sdkInitialised": false,
-                                  "error": "Hyper is not defined"
-                              }));
-                              return;
-                          }
-        
-                          window.hyperInstance = Hyper.init("\(publishableKey)", {
-                              \(backendUrlParam)
-                              \(logUrlParam)
-                          });
-        
-                          window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                              "sdkInitialised": true
-                          }));
-                      } catch (error) {
-                          console.error('Hyper initialization failed:', error);
+                <!DOCTYPE html>
+                <html lang="en">
+                  <head>
+                    <script>
+                      function handleScriptError() {
+                          console.error('Failed to load HyperLoader.js');
                           window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
                               "sdkInitialised": false,
-                              "error": error.message
+                              "error": "Script load failed"
                           }));
                       }
-                  }
-                </script>
-                <script
-                  src="\(hyperLoaderUrl)"
-                  onload="initHyper()"
-                  onerror="handleScriptError()"
-                  async="true"
-                ></script>
-              </head>
-              <body></body>
-            </html>
-        """
+
+                      async function initHyper() {
+                          try {
+                              if (typeof Hyper === 'undefined') {
+                                  window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                      "sdkInitialised": false,
+                                      "error": "Hyper is not defined"
+                                  }));
+                                  return;
+                              }
+
+                              window.hyperInstance = Hyper.init("\(publishableKey)", {
+                                  \(backendUrlParam)
+                                  \(logUrlParam)
+                              });
+
+                              window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                  "sdkInitialised": true
+                              }));
+                          } catch (error) {
+                              console.error('Hyper initialization failed:', error);
+                              window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                  "sdkInitialised": false,
+                                  "error": error.message
+                              }));
+                          }
+                      }
+                    </script>
+                    <script
+                      src="\(hyperLoaderUrl)"
+                      onload="initHyper()"
+                      onerror="handleScriptError()"
+                      async="true"
+                    ></script>
+                  </head>
+                  <body></body>
+                </html>
+            """
         webView?.loadHTMLString(baseHtml, baseURL: URL(string: baseUrl))
         logger(type: "DEBUG", eventName: .initClickToPaySessionWebReturned, category: .USER_EVENT, value: "success")
     }
 
-    internal func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+    internal func webView(
+        _ webView: WKWebView,
+        createWebViewWith configuration: WKWebViewConfiguration,
+        for navigationAction: WKNavigationAction,
+        windowFeatures: WKWindowFeatures
+    ) -> WKWebView? {
 
         if navigationAction.targetFrame == nil {
             logger(type: "DEBUG", eventName: .createNewWebviewInit, category: .USER_EVENT, value: "")
@@ -221,8 +229,9 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             popupWebView?.scrollView.contentInsetAdjustmentBehavior = .never
 
             if let topViewController = viewController ?? getTopViewController(),
-               let popupWebView = popupWebView,
-               let popupWebViewController = popupWebViewController {
+                let popupWebView = popupWebView,
+                let popupWebViewController = popupWebViewController
+            {
 
                 popupWebViewController.modalPresentationStyle = .overFullScreen
                 popupWebViewController.view.backgroundColor = .clear
@@ -233,7 +242,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                     popupWebView.topAnchor.constraint(equalTo: popupWebViewController.view.safeAreaLayoutGuide.topAnchor),
                     popupWebView.leadingAnchor.constraint(equalTo: popupWebViewController.view.safeAreaLayoutGuide.leadingAnchor),
                     popupWebView.trailingAnchor.constraint(equalTo: popupWebViewController.view.safeAreaLayoutGuide.trailingAnchor),
-                    popupWebView.bottomAnchor.constraint(equalTo: popupWebViewController.view.safeAreaLayoutGuide.bottomAnchor)
+                    popupWebView.bottomAnchor.constraint(equalTo: popupWebViewController.view.safeAreaLayoutGuide.bottomAnchor),
                 ])
 
                 topViewController.present(popupWebViewController, animated: true)
@@ -274,35 +283,35 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             }
 
             let jsCode = """
-                (async function() {
-                    try {
-                        const authenticationSession = window.hyperInstance.initAuthenticationSession({
-                              clientSecret: "\(clientSecret)",
-                              profileId: "\(profileId)",
-                              authenticationId: "\(authenticationId)",
-                              merchantId: "\(merchantId)",
-                        });
-            
-                        window.ClickToPaySession = await authenticationSession.initClickToPaySession({
-                            request3DSAuthentication: \(request3DSAuthentication),
-                        });
-            
-                        const data = window.ClickToPaySession.error ? window.ClickToPaySession : { success: true }
-                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                            requestId: "\(requestId)",
-                            data: data
-                        }));
-                    } catch (error) {
-                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                            requestId: "\(requestId)",
-                            data: { error: {
-                                    type: error.type || "InitClickToPaySessionError",
-                                    message: error.message
-                                }}
-                        }));
-                    }
-                })();
-            """
+                    (async function() {
+                        try {
+                            const authenticationSession = window.hyperInstance.initAuthenticationSession({
+                                  clientSecret: "\(clientSecret)",
+                                  profileId: "\(profileId)",
+                                  authenticationId: "\(authenticationId)",
+                                  merchantId: "\(merchantId)",
+                            });
+
+                            window.ClickToPaySession = await authenticationSession.initClickToPaySession({
+                                request3DSAuthentication: \(request3DSAuthentication),
+                            });
+
+                            const data = window.ClickToPaySession.error ? window.ClickToPaySession : { success: true }
+                            window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                requestId: "\(requestId)",
+                                data: data
+                            }));
+                        } catch (error) {
+                            window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                requestId: "\(requestId)",
+                                data: { error: {
+                                        type: error.type || "InitClickToPaySessionError",
+                                        message: error.message
+                                    }}
+                            }));
+                        }
+                    })();
+                """
 
             logger(type: "DEBUG", eventName: .initClickToPaySessionWebInit, category: .USER_EVENT, value: "")
             DispatchQueue.main.async { [weak self] in
@@ -311,8 +320,9 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         }
 
         guard let jsonData = responseJson.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
-              let data = json["data"] as? [String: Any] else {
+            let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+            let data = json["data"] as? [String: Any]
+        else {
             logger(type: "ERROR", eventName: .initClickToPaySessionWebReturned, category: .USER_ERROR, value: "Failed to parse response")
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
@@ -321,18 +331,25 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let typeString = error["type"] as? String ?? "ERROR"
             let errorMessage = error["message"] as? String ?? "Unknown error"
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
-            logger(type: "ERROR", eventName: .initClickToPaySessionWebReturned, category: .USER_ERROR, value: "Type: \(typeString), Message: \(errorMessage)")
+            logger(
+                type: "ERROR",
+                eventName: .initClickToPaySessionWebReturned,
+                category: .USER_ERROR,
+                value: "Type: \(typeString), Message: \(errorMessage)"
+            )
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
         logger(type: "DEBUG", eventName: .initClickToPaySessionReturned, category: .USER_EVENT, value: "success")
     }
 
-    internal func getActiveClickToPaySession(clientSecret: String,
-                                             profileId: String,
-                                             authenticationId: String,
-                                             merchantId: String,
-                                             viewController: UIViewController?) async throws {
+    internal func getActiveClickToPaySession(
+        clientSecret: String,
+        profileId: String,
+        authenticationId: String,
+        merchantId: String,
+        viewController: UIViewController?
+    ) async throws {
         self.clientSecret = clientSecret
         self.authenticationId = authenticationId
         self.viewController = viewController
@@ -353,33 +370,33 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             }
 
             let jsCode = """
-                (async function() {
-                    try {
-                        const authenticationSession = window.hyperInstance.initAuthenticationSession({
-                              clientSecret: "\(clientSecret)",
-                              profileId: "\(profileId)",
-                              authenticationId: "\(authenticationId)",
-                              merchantId: "\(merchantId)",
-                        });
-            
-                        window.ClickToPaySession = await authenticationSession.getActiveClickToPaySession();
-            
-                        const data = window.ClickToPaySession.error ? window.ClickToPaySession : { success: true }
-                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                            requestId: "\(requestId)",
-                            data: data
-                        }));
-                    } catch (error) {
-                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                            requestId: "\(requestId)",
-                            data: { error: {
-                                    type: error.type || "getActiveClickToPaySessionError",
-                                    message: error.message
-                                }}
-                        }));
-                    }
-                })();
-            """
+                    (async function() {
+                        try {
+                            const authenticationSession = window.hyperInstance.initAuthenticationSession({
+                                  clientSecret: "\(clientSecret)",
+                                  profileId: "\(profileId)",
+                                  authenticationId: "\(authenticationId)",
+                                  merchantId: "\(merchantId)",
+                            });
+
+                            window.ClickToPaySession = await authenticationSession.getActiveClickToPaySession();
+
+                            const data = window.ClickToPaySession.error ? window.ClickToPaySession : { success: true }
+                            window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                requestId: "\(requestId)",
+                                data: data
+                            }));
+                        } catch (error) {
+                            window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                requestId: "\(requestId)",
+                                data: { error: {
+                                        type: error.type || "getActiveClickToPaySessionError",
+                                        message: error.message
+                                    }}
+                            }));
+                        }
+                    })();
+                """
 
             logger(type: "DEBUG", eventName: .getActiveClickToPaySessionWebInit, category: .USER_EVENT, value: "")
             DispatchQueue.main.async { [weak self] in
@@ -388,9 +405,15 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         }
 
         guard let jsonData = responseJson.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
-              let data = json["data"] as? [String: Any] else {
-            logger(type: "ERROR", eventName: .getActiveClickToPaySessionWebReturned, category: .USER_ERROR, value: "Failed to parse response")
+            let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+            let data = json["data"] as? [String: Any]
+        else {
+            logger(
+                type: "ERROR",
+                eventName: .getActiveClickToPaySessionWebReturned,
+                category: .USER_ERROR,
+                value: "Failed to parse response"
+            )
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
 
@@ -398,7 +421,12 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let typeString = error["type"] as? String ?? "ERROR"
             let errorMessage = error["message"] as? String ?? "Unknown error"
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
-            logger(type: "ERROR", eventName: .getActiveClickToPaySessionWebReturned, category: .USER_ERROR, value: "Type: \(typeString), Message: \(errorMessage)")
+            logger(
+                type: "ERROR",
+                eventName: .getActiveClickToPaySessionWebReturned,
+                category: .USER_ERROR,
+                value: "Type: \(typeString), Message: \(errorMessage)"
+            )
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
@@ -419,28 +447,28 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let emailParam = request.email.map { "email: \"\($0)\"" } ?? ""
 
             let jsCode = """
-                           (async function() {
-                                try {
-                                    const isCustomerPresent = await window.ClickToPaySession.isCustomerPresent({
-                                        \(emailParam)
-                                    });
-                                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                                        requestId: "\(requestId)",
-                                        data: isCustomerPresent
-                                    }));
-                                } catch (error) {
-                                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                                        requestId: "\(requestId)",
-                                        data: {
-                                            error: {
-                                                type: error.type || "IsCustomerPresentError",
-                                                message: error.message
+                               (async function() {
+                                    try {
+                                        const isCustomerPresent = await window.ClickToPaySession.isCustomerPresent({
+                                            \(emailParam)
+                                        });
+                                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                            requestId: "\(requestId)",
+                                            data: isCustomerPresent
+                                        }));
+                                    } catch (error) {
+                                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                            requestId: "\(requestId)",
+                                            data: {
+                                                error: {
+                                                    type: error.type || "IsCustomerPresentError",
+                                                    message: error.message
+                                                }
                                             }
-                                        }
-                                    }));
-                                }
-                            })();
-            """
+                                        }));
+                                    }
+                                })();
+                """
 
             logger(type: "DEBUG", eventName: .isCustomerPresentWebInit, category: .USER_EVENT, value: "")
             DispatchQueue.main.async { [weak self] in
@@ -449,8 +477,9 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         }
 
         guard let jsonData = responseJson.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
-              let data = json["data"] as? [String: Any] else {
+            let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+            let data = json["data"] as? [String: Any]
+        else {
             logger(type: "ERROR", eventName: .isCustomerPresentWebReturned, category: .USER_ERROR, value: "Failed to parse response")
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
@@ -459,12 +488,22 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let typeString = error["type"] as? String ?? "ERROR"
             let errorMessage = error["message"] as? String ?? "Unknown error"
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
-            logger(type: "ERROR", eventName: .isCustomerPresentWebReturned, category: .USER_ERROR, value: "Type: \(typeString), Message: \(errorMessage)")
+            logger(
+                type: "ERROR",
+                eventName: .isCustomerPresentWebReturned,
+                category: .USER_ERROR,
+                value: "Type: \(typeString), Message: \(errorMessage)"
+            )
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
         if let customerPresent = data["customerPresent"] as? Bool {
-            logger(type: "DEBUG", eventName: .isCustomerPresentReturned, category: .USER_EVENT, value: "customerPresent: \(customerPresent)")
+            logger(
+                type: "DEBUG",
+                eventName: .isCustomerPresentReturned,
+                category: .USER_EVENT,
+                value: "customerPresent: \(customerPresent)"
+            )
             return CustomerPresenceResponse(customerPresent: customerPresent)
         }
         logger(type: "ERROR", eventName: .isCustomerPresentReturned, category: .USER_ERROR, value: "Failed to decode response")
@@ -484,26 +523,26 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             }
 
             let jsCode = """
-                            (async function() {
-                                try {
-                                    const userType = await window.ClickToPaySession.getUserType();
-                                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                                        requestId: "\(requestId)",
-                                        data: userType
-                                    }));
-                                } catch (error) {
-                                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                                        requestId: "\(requestId)",
-                                        data: {
-                                            error: {
-                                                type: error.type || 'ERROR',
-                                                message: error.message
+                                (async function() {
+                                    try {
+                                        const userType = await window.ClickToPaySession.getUserType();
+                                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                            requestId: "\(requestId)",
+                                            data: userType
+                                        }));
+                                    } catch (error) {
+                                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                            requestId: "\(requestId)",
+                                            data: {
+                                                error: {
+                                                    type: error.type || 'ERROR',
+                                                    message: error.message
+                                                }
                                             }
-                                        }
-                                    }));
-                                }
-                            })();
-            """
+                                        }));
+                                    }
+                                })();
+                """
 
             logger(type: "DEBUG", eventName: .getUserTypeWebInit, category: .USER_EVENT, value: "")
             DispatchQueue.main.async { [weak self] in
@@ -512,8 +551,9 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         }
 
         guard let jsonData = responseJson.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
-              let data = json["data"] as? [String: Any] else {
+            let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+            let data = json["data"] as? [String: Any]
+        else {
             logger(type: "ERROR", eventName: .getUserTypeWebReturned, category: .USER_ERROR, value: "Failed to parse response")
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
@@ -522,12 +562,18 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let typeString = error["type"] as? String ?? "ERROR"
             let errorMessage = error["message"] as? String ?? "Unknown error"
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
-            logger(type: "ERROR", eventName: .getUserTypeWebReturned, category: .USER_ERROR, value: "Type: \(typeString), Message: \(errorMessage)")
+            logger(
+                type: "ERROR",
+                eventName: .getUserTypeWebReturned,
+                category: .USER_ERROR,
+                value: "Type: \(typeString), Message: \(errorMessage)"
+            )
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
         guard let statusCodeStr = data["statusCode"] as? String,
-              let statusCode = StatusCode(rawValue: statusCodeStr) else {
+            let statusCode = StatusCode(rawValue: statusCodeStr)
+        else {
             logger(type: "ERROR", eventName: .getUserTypeReturned, category: .USER_ERROR, value: "Failed to parse status code")
             throw ClickToPayException(message: "Failed to parse status code", type: .error)
         }
@@ -548,26 +594,26 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             }
 
             let jsCode = """
-            (async function() {
-                                try {
-                                    const cards = await window.ClickToPaySession.getRecognizedCards();
-                                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                                        requestId: "\(requestId)",
-                                        data: cards
-                                    }));
-                                } catch (error) {
-                                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                                        requestId: "\(requestId)",
-                                        data: {
-                                            error: {
-                                                type: error.type || "GetRecognizedCardsError",
-                                                message: error.message
+                (async function() {
+                                    try {
+                                        const cards = await window.ClickToPaySession.getRecognizedCards();
+                                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                            requestId: "\(requestId)",
+                                            data: cards
+                                        }));
+                                    } catch (error) {
+                                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                            requestId: "\(requestId)",
+                                            data: {
+                                                error: {
+                                                    type: error.type || "GetRecognizedCardsError",
+                                                    message: error.message
+                                                }
                                             }
-                                        }
-                                    }));
-                                }
-                            })();
-            """
+                                        }));
+                                    }
+                                })();
+                """
 
             logger(type: "DEBUG", eventName: .getRecognisedCardsWebInit, category: .USER_EVENT, value: "")
             DispatchQueue.main.async { [weak self] in
@@ -576,8 +622,9 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         }
 
         guard let jsonData = responseJson.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
-              let data = json["data"] else {
+            let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+            let data = json["data"]
+        else {
             logger(type: "ERROR", eventName: .getRecognisedCardsWebReturned, category: .USER_ERROR, value: "Failed to parse response")
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
@@ -586,7 +633,12 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let typeString = error["type"] as? String ?? "ERROR"
             let errorMessage = error["message"] as? String ?? "Unknown error"
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
-            logger(type: "ERROR", eventName: .getRecognisedCardsWebReturned, category: .USER_ERROR, value: "Type: \(typeString), Message: \(errorMessage)")
+            logger(
+                type: "ERROR",
+                eventName: .getRecognisedCardsWebReturned,
+                category: .USER_ERROR,
+                value: "Type: \(typeString), Message: \(errorMessage)"
+            )
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
@@ -596,15 +648,21 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         }
 
         guard let cardsJsonData = try? JSONSerialization.data(withJSONObject: cardsData),
-              let cards = try? JSONDecoder().decode([RecognizedCard].self, from: cardsJsonData) else {
+            let cards = try? JSONDecoder().decode([RecognizedCard].self, from: cardsJsonData)
+        else {
             logger(type: "ERROR", eventName: .getRecognisedCardsReturned, category: .USER_ERROR, value: "Failed to decode response")
             throw ClickToPayException(message: "Failed to decode response", type: .error)
         }
 
-        let visaCount = cards.count{$0.paymentCardDescriptor == .visa}
-        let mastercardCount = cards.count{$0.paymentCardDescriptor == .mastercard}
+        let visaCount = cards.count { $0.paymentCardDescriptor == .visa }
+        let mastercardCount = cards.count { $0.paymentCardDescriptor == .mastercard }
 
-        logger(type: "DEBUG", eventName: .getRecognisedCardsReturned, category: .USER_EVENT, value: "visa: \(visaCount) | mastercard: \(mastercardCount)")
+        logger(
+            type: "DEBUG",
+            eventName: .getRecognisedCardsReturned,
+            category: .USER_EVENT,
+            value: "visa: \(visaCount) | mastercard: \(mastercardCount)"
+        )
 
         return cards
     }
@@ -622,28 +680,28 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             }
 
             let jsCode = """
-            (async function() {
-                                try {
-                                    const cards = await window.ClickToPaySession.validateCustomerAuthentication({
-                                        value: "\(otpValue)"
-                                    });
-                                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                                        requestId: "\(requestId)",
-                                        data: cards
-                                    }));
-                                } catch (error) {
-                                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                                        requestId: "\(requestId)",
-                                        data: {
-                                            error: {
-                                                type: error.type || 'ERROR',
-                                                message: error.message
+                (async function() {
+                                    try {
+                                        const cards = await window.ClickToPaySession.validateCustomerAuthentication({
+                                            value: "\(otpValue)"
+                                        });
+                                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                            requestId: "\(requestId)",
+                                            data: cards
+                                        }));
+                                    } catch (error) {
+                                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                            requestId: "\(requestId)",
+                                            data: {
+                                                error: {
+                                                    type: error.type || 'ERROR',
+                                                    message: error.message
+                                                }
                                             }
-                                        }
-                                    }));
-                                }
-                            })();
-            """
+                                        }));
+                                    }
+                                })();
+                """
             logger(type: "DEBUG", eventName: .validateCustomerAuthenticationWebInit, category: .USER_EVENT, value: "")
             DispatchQueue.main.async { [weak self] in
                 self?.webView?.evaluateJavaScript(jsCode, completionHandler: nil)
@@ -651,9 +709,15 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         }
 
         guard let jsonData = responseJson.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
-              let data = json["data"] else {
-            logger(type: "ERROR", eventName: .validateCustomerAuthenticationWebReturned, category: .USER_ERROR, value: "Failed to parse response")
+            let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+            let data = json["data"]
+        else {
+            logger(
+                type: "ERROR",
+                eventName: .validateCustomerAuthenticationWebReturned,
+                category: .USER_ERROR,
+                value: "Failed to parse response"
+            )
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
 
@@ -661,25 +725,46 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let typeString = error["type"] as? String ?? "ERROR"
             let errorMessage = error["message"] as? String ?? "Unknown error"
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
-            logger(type: "ERROR", eventName: .validateCustomerAuthenticationWebReturned, category: .USER_ERROR, value: "Type: \(typeString), Message: \(errorMessage)")
+            logger(
+                type: "ERROR",
+                eventName: .validateCustomerAuthenticationWebReturned,
+                category: .USER_ERROR,
+                value: "Type: \(typeString), Message: \(errorMessage)"
+            )
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
         guard let cardsData = data as? [[String: Any]] else {
-            logger(type: "ERROR", eventName: .validateCustomerAuthenticationWebReturned, category: .USER_ERROR, value: "Invalid response format")
+            logger(
+                type: "ERROR",
+                eventName: .validateCustomerAuthenticationWebReturned,
+                category: .USER_ERROR,
+                value: "Invalid response format"
+            )
             throw ClickToPayException(message: "Invalid response format", type: .error)
         }
 
         guard let cardsJsonData = try? JSONSerialization.data(withJSONObject: cardsData),
-              let cards = try? JSONDecoder().decode([RecognizedCard].self, from: cardsJsonData) else {
-            logger(type: "ERROR", eventName: .validateCustomerAuthenticationReturned, category: .USER_ERROR, value: "Failed to decode response")
+            let cards = try? JSONDecoder().decode([RecognizedCard].self, from: cardsJsonData)
+        else {
+            logger(
+                type: "ERROR",
+                eventName: .validateCustomerAuthenticationReturned,
+                category: .USER_ERROR,
+                value: "Failed to decode response"
+            )
             throw ClickToPayException(message: "Failed to decode response", type: .error)
         }
 
-        let visaCount = cards.count{$0.paymentCardDescriptor == .visa}
-        let mastercardCount = cards.count{$0.paymentCardDescriptor == .mastercard}
+        let visaCount = cards.count { $0.paymentCardDescriptor == .visa }
+        let mastercardCount = cards.count { $0.paymentCardDescriptor == .mastercard }
 
-        logger(type: "DEBUG", eventName: .validateCustomerAuthenticationReturned, category: .USER_EVENT, value: "visa: \(visaCount) | mastercard: \(mastercardCount)")
+        logger(
+            type: "DEBUG",
+            eventName: .validateCustomerAuthenticationReturned,
+            category: .USER_EVENT,
+            value: "visa: \(visaCount) | mastercard: \(mastercardCount)"
+        )
         return cards
     }
 
@@ -696,26 +781,26 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             }
 
             let jsCode = """
-            (async function() {
-                try {
-                    const signOutResponse = await window.ClickToPaySession.signOut()
-                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                        requestId: "\(requestId)",
-                        data: signOutResponse
-                    }));
-                } catch (error) {
-                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                        requestId: "\(requestId)",
-                        data: {
-                            error: {
-                                type: error.type || 'SignOutError',
-                                message: error.message
+                (async function() {
+                    try {
+                        const signOutResponse = await window.ClickToPaySession.signOut()
+                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                            requestId: "\(requestId)",
+                            data: signOutResponse
+                        }));
+                    } catch (error) {
+                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                            requestId: "\(requestId)",
+                            data: {
+                                error: {
+                                    type: error.type || 'SignOutError',
+                                    message: error.message
+                                }
                             }
-                        }
-                    }))
-                }
-            })();
-            """
+                        }))
+                    }
+                })();
+                """
 
             logger(type: "DEBUG", eventName: .signOutWebInit, category: .USER_EVENT, value: "")
             DispatchQueue.main.async { [weak self] in
@@ -724,8 +809,9 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         }
 
         guard let jsonData = responseJson.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
-              let data = json["data"] as? [String: Any] else {
+            let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+            let data = json["data"] as? [String: Any]
+        else {
             logger(type: "ERROR", eventName: .signOutWebReturned, category: .USER_ERROR, value: "Failed to parse response")
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
@@ -734,7 +820,12 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let typeString = error["type"] as? String ?? "ERROR"
             let errorMessage = error["message"] as? String ?? "Unknown error"
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
-            logger(type: "ERROR", eventName: .signOutWebReturned, category: .USER_ERROR, value: "Type: \(typeString), Message: \(errorMessage)")
+            logger(
+                type: "ERROR",
+                eventName: .signOutWebReturned,
+                category: .USER_ERROR,
+                value: "Type: \(typeString), Message: \(errorMessage)"
+            )
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
@@ -748,7 +839,12 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     internal func checkoutWithCard(request: CheckoutRequest) async throws -> CheckoutResponse {
         logger(type: "INFO", eventName: .checkout, category: .USER_EVENT, value: "checkout with rememberMe: \(request.rememberMe ?? false)")
-        logger(type: "DEBUG", eventName: .checkoutInit, category: .USER_EVENT, value: "checkout with rememberMe: \(request.rememberMe ?? false)")
+        logger(
+            type: "DEBUG",
+            eventName: .checkoutInit,
+            category: .USER_EVENT,
+            value: "checkout with rememberMe: \(request.rememberMe ?? false)"
+        )
         try checkSessionClosed()
 
         let requestId = UUID().uuidString
@@ -759,30 +855,30 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             }
 
             let jsCode = """
-            
-             (async function() {
-                                try {
-                                    const checkoutResponse = await window.ClickToPaySession.checkoutWithCard({
-                                        srcDigitalCardId: "\(request.srcDigitalCardId)",
-                                        rememberMe: \(request.rememberMe ?? false)
-                                    });
-                                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                                        requestId: "\(requestId)",
-                                        data: checkoutResponse
-                                    }));
-                                } catch (error) {
-                                    window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                                        requestId: "\(requestId)",
-                                        data: {
-                                            error: {
-                                                type: error.type || "CheckoutWithCardError",
-                                                message: error.message
+
+                 (async function() {
+                                    try {
+                                        const checkoutResponse = await window.ClickToPaySession.checkoutWithCard({
+                                            srcDigitalCardId: "\(request.srcDigitalCardId)",
+                                            rememberMe: \(request.rememberMe ?? false)
+                                        });
+                                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                            requestId: "\(requestId)",
+                                            data: checkoutResponse
+                                        }));
+                                    } catch (error) {
+                                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                            requestId: "\(requestId)",
+                                            data: {
+                                                error: {
+                                                    type: error.type || "CheckoutWithCardError",
+                                                    message: error.message
+                                                }
                                             }
-                                        }
-                                    }));
-                                }
-                            })();
-            """
+                                        }));
+                                    }
+                                })();
+                """
 
             logger(type: "DEBUG", eventName: .checkoutWebInit, category: .USER_EVENT, value: "")
             DispatchQueue.main.async { [weak self] in
@@ -791,8 +887,9 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         }
 
         guard let jsonData = responseJson.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
-              let data = json["data"] as? [String: Any] else {
+            let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+            let data = json["data"] as? [String: Any]
+        else {
             logger(type: "ERROR", eventName: .checkoutWebReturned, category: .USER_ERROR, value: "Failed to parse response")
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
@@ -802,12 +899,18 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let errorMessage = error["message"] as? String ?? "Unknown error"
 
             let errorType = ClickToPayErrorType(rawValue: typeString) ?? .error
-            logger(type: "ERROR", eventName: .checkoutWebReturned, category: .USER_ERROR, value: "Type: \(typeString), Message: \(errorMessage)")
+            logger(
+                type: "ERROR",
+                eventName: .checkoutWebReturned,
+                category: .USER_ERROR,
+                value: "Type: \(typeString), Message: \(errorMessage)"
+            )
             throw ClickToPayException(message: errorMessage, type: errorType)
         }
 
         guard let responseData = try? JSONSerialization.data(withJSONObject: data),
-              let checkoutResponse = try? JSONDecoder().decode(CheckoutResponse.self, from: responseData) else {
+            let checkoutResponse = try? JSONDecoder().decode(CheckoutResponse.self, from: responseData)
+        else {
             logger(type: "ERROR", eventName: .checkoutReturned, category: .USER_ERROR, value: "Failed to decode response")
             throw ClickToPayException(message: "Failed to decode response", type: .error)
         }
@@ -833,18 +936,22 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             pendingRequests.removeAll()
 
             for (_, continuation) in pendingRequestsCopy {
-                continuation.resume(throwing: ClickToPayException(
-                    message: "Session was closed",
-                    type: .error
-                ))
+                continuation.resume(
+                    throwing: ClickToPayException(
+                        message: "Session was closed",
+                        type: .error
+                    )
+                )
             }
 
             if let initContinuation = sdkInitContinuation {
                 sdkInitContinuation = nil
-                initContinuation.resume(throwing: ClickToPayException(
-                    message: "Session was closed during initialization",
-                    type: .error
-                ))
+                initContinuation.resume(
+                    throwing: ClickToPayException(
+                        message: "Session was closed during initialization",
+                        type: .error
+                    )
+                )
             }
         }
 
@@ -928,7 +1035,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     private func getTopViewController() -> UIViewController? {
         guard let window = getKeyWindow(),
-              let rootViewController = window.rootViewController else {
+            let rootViewController = window.rootViewController
+        else {
             return nil
         }
         return getTopViewController(from: rootViewController)
@@ -939,14 +1047,16 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             return getTopViewController(from: presented)
         }
         if let navController = viewController as? UINavigationController,
-           let visible = navController.visibleViewController {
+            let visible = navController.visibleViewController
+        {
             return getTopViewController(from: visible)
         }
         if let tabController = viewController as? UITabBarController,
-           let selected = tabController.selectedViewController {
+            let selected = tabController.selectedViewController
+        {
             return getTopViewController(from: selected)
         }
-        return viewController // Could be UIViewController OR UIHostingController
+        return viewController  // Could be UIViewController OR UIHostingController
     }
     deinit {
         let wasClosed = pendingRequestsQueue.sync { isClosed }
@@ -991,9 +1101,9 @@ extension ClickToPaySessionImpl: WKScriptMessageHandler {
             return
         }
 
-
         guard let jsonData = body.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any] else {
+            let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any]
+        else {
             return
         }
 
@@ -1012,10 +1122,12 @@ extension ClickToPaySessionImpl: WKScriptMessageHandler {
                     logger(type: "ERROR", eventName: .initClickToPaySessionWebReturned, category: .USER_ERROR, value: "failure")
                     if let continuation = self.sdkInitContinuation {
                         self.sdkInitContinuation = nil
-                        continuation.resume(throwing: ClickToPayException(
-                            message: "SDK initialization failed: \(errorMessage)",
-                            type: .hyperInitializationError
-                        ))
+                        continuation.resume(
+                            throwing: ClickToPayException(
+                                message: "SDK initialization failed: \(errorMessage)",
+                                type: .hyperInitializationError
+                            )
+                        )
                     }
                 }
             }

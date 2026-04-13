@@ -15,7 +15,11 @@ public protocol ThreeDSProvider {
 }
 
 public protocol ThreeDSSessionProvider {
-    func createTransaction(messageVersion: String, directoryServerId: String?, cardNetwork: String?) async throws -> ThreeDSTransactionProvider
+    func createTransaction(
+        messageVersion: String,
+        directoryServerId: String?,
+        cardNetwork: String?
+    ) async throws -> ThreeDSTransactionProvider
 }
 
 public protocol ThreeDSTransactionProvider {
@@ -24,7 +28,8 @@ public protocol ThreeDSTransactionProvider {
         viewController: UIViewController,
         challengeParameters: ChallengeParameters,
         challengeStatusReceiver: ChallengeStatusReceiver,
-        timeOut: Int) throws
+        timeOut: Int
+    ) throws
     // TODO: Implementation
     //    func getProgressView() throws -> ProgressDialog
     func close()

@@ -11,7 +11,8 @@ enum Helper {
 
     static func getInfoPlist(_ key: String) -> String? {
         guard let infoDictionary = Bundle.main.infoDictionary,
-              let value = infoDictionary[key] as? String, !value.isEmpty else {
+            let value = infoDictionary[key] as? String, !value.isEmpty
+        else {
             return nil
         }
         return value

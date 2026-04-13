@@ -23,9 +23,9 @@ public class AuthenticationSession {
     private var authenticationId: String?
     private var merchantId: String?
 
-    private var currentClickToPaySession: ClickToPaySessionImpl? // INFO: using concrete type instead of protocol
+    private var currentClickToPaySession: ClickToPaySessionImpl?  // INFO: using concrete type instead of protocol
 
-    public init(publishableKey: String, customBackendUrl: String? = nil, customParams: [String : Any]? = nil, customLogUrl: String? = nil) {
+    public init(publishableKey: String, customBackendUrl: String? = nil, customParams: [String: Any]? = nil, customLogUrl: String? = nil) {
         self.publishableKey = publishableKey
         self.customBackendUrl = customBackendUrl
         self.customLogUrl = customLogUrl
@@ -44,7 +44,10 @@ public class AuthenticationSession {
         self.merchantId = merchantId
     }
 
-    public func initThreeDSSession(authIntentClientSecret: String, configuration: AuthenticationConfiguration? = nil) async throws -> ThreeDSSession {
+    public func initThreeDSSession(
+        authIntentClientSecret: String,
+        configuration: AuthenticationConfiguration? = nil
+    ) async throws -> ThreeDSSession {
         self.authIntentClientSecret = authIntentClientSecret
         self.authConfiguration = configuration
 
@@ -57,19 +60,22 @@ public class AuthenticationSession {
             }
 
             return ThreeDSSession(sessionProvider: sessionProvider)
-        }
-        catch {
+        } catch {
             self.threeDSProvider = nil
             self.sessionProvider = nil
             throw error
         }
     }
 
-    public func initClickToPaySession(request3DSAuthentication: Bool? = true, viewController: UIViewController? = nil) async throws -> ClickToPaySession {
+    public func initClickToPaySession(
+        request3DSAuthentication: Bool? = true,
+        viewController: UIViewController? = nil
+    ) async throws -> ClickToPaySession {
         guard let clientSecret = clientSecret,
-              let profileId = profileId,
-              let authenticationId = authenticationId,
-              let merchantId = merchantId else {
+            let profileId = profileId,
+            let authenticationId = authenticationId,
+            let merchantId = merchantId
+        else {
             throw ClickToPayException(message: "Missing required authentication parameters", type: .error)
         }
 
@@ -106,9 +112,10 @@ public class AuthenticationSession {
 
     public func getActiveClickToPaySession(viewController: UIViewController? = nil) async throws -> ClickToPaySession {
         guard let clientSecret = clientSecret,
-              let profileId = profileId,
-              let authenticationId = authenticationId,
-              let merchantId = merchantId else {
+            let profileId = profileId,
+            let authenticationId = authenticationId,
+            let merchantId = merchantId
+        else {
             throw ClickToPayException(message: "Missing required authentication parameters", type: .error)
         }
 
@@ -117,17 +124,16 @@ public class AuthenticationSession {
         }
 
         do {
-            try await currentClickToPaySession.getActiveClickToPaySession(clientSecret: clientSecret,
-                                                                          profileId: profileId,
-                                                                          authenticationId: authenticationId,
-                                                                          merchantId: merchantId,
-                                                                          viewController: viewController)
+            try await currentClickToPaySession.getActiveClickToPaySession(
+                clientSecret: clientSecret,
+                profileId: profileId,
+                authenticationId: authenticationId,
+                merchantId: merchantId,
+                viewController: viewController
+            )
             return currentClickToPaySession
-        }
-        catch {
+        } catch {
             throw ClickToPayException(message: "Failed to initialize Click to Pay session", type: .error)
         }
     }
 }
-
-

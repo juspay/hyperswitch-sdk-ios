@@ -65,7 +65,7 @@ struct ThreeDSView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> AuthenticationViewController {
         return AuthenticationViewController()
     }
-    
+
     func updateUIViewController(_ uiViewController: AuthenticationViewController, context: Context) {
     }
 }

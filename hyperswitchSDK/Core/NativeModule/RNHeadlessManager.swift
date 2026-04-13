@@ -9,26 +9,27 @@ import Foundation
 import React
 
 internal class RNHeadlessManager: NSObject {
-    
+
     internal var responseHandler: RNResponseHandler?
     internal var rootView: RCTRootView?
-    
+
     internal lazy var bridgeHeadless: RCTBridge = {
         RCTBridge.init(delegate: self, launchOptions: nil)
     }()
-    
+
     internal static let sharedInstance = RNHeadlessManager()
-    
-    internal func viewForModule(_ moduleName: String, initialProperties: [String : Any]?) -> RCTRootView {
+
+    internal func viewForModule(_ moduleName: String, initialProperties: [String: Any]?) -> RCTRootView {
         let rootView: RCTRootView = RCTRootView(
             bridge: self.bridgeHeadless,
             moduleName: moduleName,
-            initialProperties: initialProperties)
+            initialProperties: initialProperties
+        )
         self.rootView = rootView
         return rootView
     }
-    
-    internal func reinvalidateBridge(){
+
+    internal func reinvalidateBridge() {
         self.bridgeHeadless.invalidate()
         self.bridgeHeadless = RCTBridge.init(delegate: self, launchOptions: nil)
     }

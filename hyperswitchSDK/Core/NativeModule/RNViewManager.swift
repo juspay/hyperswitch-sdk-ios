@@ -9,22 +9,22 @@ import Foundation
 import React
 
 internal class RNViewManager: NSObject {
-    
+
     internal var responseHandler: RNResponseHandler?
     internal var rootView: RCTRootView?
-    
+
     internal lazy var bridge: RCTBridge = {
         RCTBridge.init(delegate: self, launchOptions: nil)
     }()
-    
-    
+
     internal static let sharedInstance = RNViewManager()
-    
-    internal func viewForModule(_ moduleName: String, initialProperties: [String : Any]?) -> RCTRootView {
+
+    internal func viewForModule(_ moduleName: String, initialProperties: [String: Any]?) -> RCTRootView {
         let rootView: RCTRootView = RCTRootView(
             bridge: self.bridge,
             moduleName: moduleName,
-            initialProperties: initialProperties)
+            initialProperties: initialProperties
+        )
         self.rootView = rootView
         return rootView
     }
@@ -38,11 +38,11 @@ extension RNViewManager: RCTBridgeDelegate {
         case "LocalBundle":
             return Bundle.main.url(forResource: "hyperswitch", withExtension: "bundle")
         default:
-#if canImport(HyperOTA)
+            #if canImport(HyperOTA)
             return OTAServices.shared.getBundleURL()
-#else
+            #else
             return Bundle(for: RNViewManager.self).url(forResource: "hyperswitch", withExtension: "bundle")
-#endif
+            #endif
         }
     }
 }

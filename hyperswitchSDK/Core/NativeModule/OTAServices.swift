@@ -11,8 +11,9 @@ import Foundation
 
 private func getHyperOTAPlist(_ key: String) -> String? {
     guard let path = Bundle(for: RNViewManager.self).path(forResource: "HyperOTA", ofType: "plist"),
-          let dict = NSDictionary(contentsOfFile: path),
-          let value = dict[key] as? String, !value.isEmpty else {
+        let dict = NSDictionary(contentsOfFile: path),
+        let value = dict[key] as? String, !value.isEmpty
+    else {
         return nil
     }
     return value
@@ -22,7 +23,7 @@ internal class EventLogger: NSObject, HPJPLoggerDelegate {
     private func isJSONSerializable(_ value: Any) -> Bool {
         return JSONSerialization.isValidJSONObject(["key": value])
     }
-    internal func addLog(eventData: [String: Any], logLevel : String, key: String?){
+    internal func addLog(eventData: [String: Any], logLevel: String, key: String?) {
         do {
             let jsonData = try JSONSerialization.data(withJSONObject: eventData, options: [])
             guard let jsonString = String(data: jsonData, encoding: .utf8) else {
@@ -65,11 +66,11 @@ internal class EventLogger: NSObject, HPJPLoggerDelegate {
         let eventData: [String: Any] = [
             "label": eventLabel,
             "value": isJSONSerializable(eventValue) ? eventValue : String(describing: eventValue),
-            "key" : eventKey ?? "",
+            "key": eventKey ?? "",
             "category": eventCategory,
-            "subcategory": eventSubcategory
+            "subcategory": eventSubcategory,
         ]
-        addLog(eventData: eventData, logLevel: logLevel, key : eventKey)
+        addLog(eventData: eventData, logLevel: logLevel, key: eventKey)
     }
     func trackEvent(
         withLevel logLevel: String,
@@ -82,33 +83,34 @@ internal class EventLogger: NSObject, HPJPLoggerDelegate {
             "label": eventLabel,
             "value": isJSONSerializable(eventValue) ? eventValue : String(describing: eventValue),
             "category": eventCategory,
-            "subcategory": eventSubcategory
+            "subcategory": eventSubcategory,
         ]
-        addLog(eventData: eventData, logLevel: logLevel, key : eventLabel)
+        addLog(eventData: eventData, logLevel: logLevel, key: eventLabel)
 
     }
 }
 
 public final class OTAServices {
     public static var shared = OTAServices()
-    public var otaServices : HyperOTAServices? = nil
+    public var otaServices: HyperOTAServices? = nil
     let logger = EventLogger()
-    public func initialize(publishableKey : String) {
-        if(self.otaServices == nil) {
+    public func initialize(publishableKey: String) {
+        if self.otaServices == nil {
             let environment = SDKEnvironment.getEnvironment(publishableKey)
             let configKey = (environment == .SANDBOX) ? "sandBoxReleaseConfigURL" : "releaseConfigURL"
-            let payload = [
-                "clientId": getHyperOTAPlist("clientId") ?? "" ,
-                "namespace": getHyperOTAPlist("namespace") ?? "",
-                "forceUpdate": true,
-                "localAssets": (getHyperOTAPlist(configKey) ?? "releaseConfigURL") == "releaseConfigURL",
-                "fileName": getHyperOTAPlist("fileName") ?? "" ,
-                "releaseConfigURL": (getHyperOTAPlist(configKey) ?? "") +  "/mobile-ota/ios/" + SDKVersion.current + "/config.json",
-            ] as [String: Any]
+            let payload =
+                [
+                    "clientId": getHyperOTAPlist("clientId") ?? "",
+                    "namespace": getHyperOTAPlist("namespace") ?? "",
+                    "forceUpdate": true,
+                    "localAssets": (getHyperOTAPlist(configKey) ?? "releaseConfigURL") == "releaseConfigURL",
+                    "fileName": getHyperOTAPlist("fileName") ?? "",
+                    "releaseConfigURL": (getHyperOTAPlist(configKey) ?? "") + "/mobile-ota/ios/" + SDKVersion.current + "/config.json",
+                ] as [String: Any]
             self.otaServices = HyperOTAServices(payload: payload, loggerDelegate: logger, baseBundle: Bundle(for: OTAServices.self))
         }
     }
-    public  func getBundleURL() -> URL? {
+    public func getBundleURL() -> URL? {
         return otaServices?.bundleURL() ?? Bundle(for: OTAServices.self).url(forResource: "hyperswitch", withExtension: "bundle")
     }
 }

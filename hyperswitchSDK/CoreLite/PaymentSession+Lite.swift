@@ -9,10 +9,17 @@ import Foundation
 import UIKit
 
 extension PaymentSession {
-    
-    public func presentPaymentSheetLite(viewController: UIViewController, configuration: PaymentSheet.Configuration, completion: @escaping (PaymentSheetResult) -> ()){
+
+    public func presentPaymentSheetLite(
+        viewController: UIViewController,
+        configuration: PaymentSheet.Configuration,
+        completion: @escaping (PaymentSheetResult) -> Void
+    ) {
         PaymentSession.isPresented = true
-        let paymentSheet = PaymentSheet(paymentIntentClientSecret: PaymentSession.paymentIntentClientSecret ?? "", configuration: configuration)
+        let paymentSheet = PaymentSheet(
+            paymentIntentClientSecret: PaymentSession.paymentIntentClientSecret ?? "",
+            configuration: configuration
+        )
         paymentSheet.presentLite(from: viewController, completion: completion)
     }
 }

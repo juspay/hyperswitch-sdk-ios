@@ -18,23 +18,25 @@ class CardinalProvider: ThreeDSProvider {
         self.cardinalService = CardinalService()
         self.cardinalConfig = CardinalSessionConfiguration()
 
-        let _env: CardinalSessionEnvironment = switch configuration?.environment {
-        case .production:
+        let _env: CardinalSessionEnvironment =
+            switch configuration?.environment {
+            case .production:
                 .production
-        case .sandbox:
+            case .sandbox:
                 .staging
-        default:
+            default:
                 .staging
-        }
+            }
 
         self.cardinalConfig?.deploymentEnvironment = _env
         self.cardinalConfig?.sdkMaxTimeout = 10
         self.cardinalConfig?.cardinalDatacenter = Cardinal
 
         guard let cardinalService = self.cardinalService,
-              let cardinalConfig = self.cardinalConfig,
-              let configuration = configuration,
-              let jwtToken = configuration.apiKey else {
+            let cardinalConfig = self.cardinalConfig,
+            let configuration = configuration,
+            let jwtToken = configuration.apiKey
+        else {
             let errorMessage: String
             if self.cardinalService == nil {
                 errorMessage = "Cardinal service is not found"
@@ -74,7 +76,7 @@ class CardinalProvider: ThreeDSProvider {
 
     func cleanup() {
         if let cardinalService = self.cardinalService {
-            cardinalService.cleanup();
+            cardinalService.cleanup()
         }
     }
 }
@@ -86,9 +88,16 @@ class CardinalSessionProvider: ThreeDSSessionProvider {
         self.cardinalService = service
     }
 
-    func createTransaction(messageVersion: String, directoryServerId: String?, cardNetwork: String?) async throws -> any ThreeDSTransactionProvider {
+    func createTransaction(
+        messageVersion: String,
+        directoryServerId: String?,
+        cardNetwork: String?
+    ) async throws -> any ThreeDSTransactionProvider {
         guard let cardNetwork = cardNetwork else {
-            throw TransactionError.transactionCreationFailed("missing card network, card network is required for Cardinal transactions", nil)
+            throw TransactionError.transactionCreationFailed(
+                "missing card network, card network is required for Cardinal transactions",
+                nil
+            )
         }
 
         return CardinalTransactionProvider(service: cardinalService, messageVersion: messageVersion, cardNetwork: cardNetwork)
@@ -108,7 +117,11 @@ class CardinalTransactionProvider: ThreeDSTransactionProvider {
 
     func getAuthenticationRequestParameters() async throws -> AuthenticationRequestParameters {
         var error: CardinalError?
-        let cardinalEncryptedData = self.cardinalService.getAuthentication(cardBrand: self.cardNetwork, messageVersion: self.messageVersion, error: &error)
+        let cardinalEncryptedData = self.cardinalService.getAuthentication(
+            cardBrand: self.cardNetwork,
+            messageVersion: self.messageVersion,
+            error: &error
+        )
 
         if let error = error {
             throw TransactionError.authReqParamGenerationFailed("\(error.errorCode) \(error.errorDescription)", nil)
@@ -125,7 +138,12 @@ class CardinalTransactionProvider: ThreeDSTransactionProvider {
         }
     }
 
-    func doChallenge(viewController: UIViewController, challengeParameters: ChallengeParameters, challengeStatusReceiver: any ChallengeStatusReceiver, timeOut: Int) throws {
+    func doChallenge(
+        viewController: UIViewController,
+        challengeParameters: ChallengeParameters,
+        challengeStatusReceiver: any ChallengeStatusReceiver,
+        timeOut: Int
+    ) throws {
         let cardinalChallengeParams = CardinalChallengeParameters()
 
         cardinalChallengeParams.threeDSServerTransactionId = challengeParameters.threeDSServerTransactionID
@@ -147,17 +165,18 @@ class CardinalTransactionProvider: ThreeDSTransactionProvider {
             error: &cardinalError
         )
 
-
         if let error = cardinalError {
-            throw TransactionError.challengeFailed("Cardinal doChallenge failed with error: \(error.errorCode) \(error.errorDescription)", nil)
+            throw TransactionError.challengeFailed(
+                "Cardinal doChallenge failed with error: \(error.errorCode) \(error.errorDescription)",
+                nil
+            )
         }
     }
 
     func close() {
-        cardinalService.cleanup();
+        cardinalService.cleanup()
     }
 }
-
 
 // Adapter to convert Cardinal challenge status callbacks to our interface
 class CardinalChallengeStatusAdapter: NSObject, CardinalMobile.ChallengeStatusReceiver {
@@ -193,6 +212,5 @@ class CardinalChallengeStatusAdapter: NSObject, CardinalMobile.ChallengeStatusRe
         receiver.runtimeError(ourEvent)
     }
 }
-
 
 #endif

@@ -59,7 +59,7 @@ public enum StatusCode: String, Codable, CaseIterable {
 // MARK: - Recognized Card Models
 
 /// Represents a recognized card in Click to Pay
-public struct RecognizedCard : Codable {
+public struct RecognizedCard: Codable {
     public let countryCode: String?
     public let dateOfCardCreated: String?
     public let dateOfCardLastUsed: String?
@@ -127,7 +127,7 @@ public enum CardType: String, Codable, CaseIterable {
 // MARK: - Sign Out Response
 
 public struct SignOutResponse {
-    public let recognized : Bool
+    public let recognized: Bool
 }
 
 // MARK: - Checkout Request
@@ -294,7 +294,7 @@ public enum ClickToPayErrorType: String, Codable {
     case isCustomerPresentError = "IS_CUSTOMER_PRESENT_ERROR"
     case getRecognizedCardsError = "GET_RECOGNIZED_CARDS_ERROR"
     case checkoutWithCardError = "CHECKOUT_WITH_CARD_ERROR"
-    
+
     // Fallback
     case error = "ERROR"
 

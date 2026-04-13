@@ -8,18 +8,18 @@
 import Foundation
 
 public class ThreeDSProviderFactory {
-    
+
     public static func createProvider(preferredProvider: ThreeDSProviderType? = nil) throws -> ThreeDSProvider {
-        
+
         let availableProviders = getAvailableProviders()
-        
+
         // No providers available
         if availableProviders.isEmpty {
             throw AuthenticationError.noProviderAvailable(
                 "No 3DS SDK provider found. Please ensure at least one supported 3DS SDK framework (Netcetera, Trident) is included in your project."
             )
         }
-        
+
         // If preferred provider is specified, try that
         if let preferred = preferredProvider {
             if let provider = tryCreateProvider(type: preferred) {
@@ -29,7 +29,7 @@ public class ThreeDSProviderFactory {
                 "Preferred provider '\(preferred.displayName)' is not available. Available providers: \(availableProviders.map { $0.displayName }.joined(separator: ", "))"
             )
         }
-        
+
         // No preference specified
         if availableProviders.count == 1 {
             // Only one provider available, use it automatically
@@ -47,32 +47,32 @@ public class ThreeDSProviderFactory {
             )
         }
     }
-    
+
     private static func tryCreateProvider(type: ThreeDSProviderType) -> ThreeDSProvider? {
         switch type {
         case .netcetera:
-#if canImport(ThreeDS_SDK)
+            #if canImport(ThreeDS_SDK)
             return NetceteraProvider()
-#else
+            #else
             return nil
-#endif
-            
+            #endif
+
         case .cardinal:
-#if canImport(CardinalMobile)
+            #if canImport(CardinalMobile)
             return CardinalProvider()
-#else
+            #else
             return nil
-#endif
-            
+            #endif
+
         case .trident:
-#if canImport(Trident)
+            #if canImport(Trident)
             return TridentProvider()
-#else
+            #else
             return nil
-#endif
+            #endif
         }
     }
-    
+
     public static func getAvailableProviders() -> [ThreeDSProviderType] {
         return ThreeDSProviderType.allCases.filter { tryCreateProvider(type: $0) != nil }
     }

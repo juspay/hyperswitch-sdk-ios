@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var selectedSegment = 0
-    
+
     var body: some View {
         VStack {
             Picker(selection: $selectedSegment, label: Text("")) {
@@ -18,8 +18,7 @@ struct ContentView: View {
             }.pickerStyle(SegmentedPickerStyle())
             if selectedSegment == 0 {
                 UIKitView()
-            }
-            else if selectedSegment == 1 {
+            } else if selectedSegment == 1 {
                 SwiftUIView()
             }
         }
@@ -28,11 +27,11 @@ struct ContentView: View {
 
 struct UIKitView: UIViewControllerRepresentable {
     typealias UIViewControllerType = ViewController
-    
+
     func makeUIViewController(context: Context) -> ViewController {
         return ViewController()
     }
-    
+
     func updateUIViewController(_ uiViewController: ViewController, context: Context) {
     }
 }

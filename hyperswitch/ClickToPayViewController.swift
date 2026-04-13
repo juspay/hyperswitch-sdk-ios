@@ -5,9 +5,9 @@
 //  Created by Harshit Srivastava on 31/10/25.
 //
 
-import UIKit
-import SwiftUI
 import Combine
+import SwiftUI
+import UIKit
 
 class ClickToPayViewController: UIViewController {
 
@@ -37,12 +37,14 @@ class ClickToPayViewController: UIViewController {
         asyncBind()
         viewFrame()
 
-        let nextButton = UIBarButtonItem(image: .init(systemName: "chevron.right"),
-                                         style: .plain,
-                                         target: self,
-                                         action: #selector(nextButtonTapped))
+        let nextButton = UIBarButtonItem(
+            image: .init(systemName: "chevron.right"),
+            style: .plain,
+            target: self,
+            action: #selector(nextButtonTapped)
+        )
 
-            navigationItem.rightBarButtonItem = nextButton
+        navigationItem.rightBarButtonItem = nextButton
     }
 
     @objc func nextButtonTapped() {
@@ -71,9 +73,12 @@ class ClickToPayViewController: UIViewController {
     func reload(_ sender: Any) {
         clickToPayViewModel.prepareAuthenticationSession()
         self.reloadButton.isUserInteractionEnabled = false
-        UIView.animate(withDuration: 1.6, animations: {
-            self.reloadButton.backgroundColor = .white
-        }) { (_) in
+        UIView.animate(
+            withDuration: 1.6,
+            animations: {
+                self.reloadButton.backgroundColor = .white
+            }
+        ) { (_) in
             self.reloadButton.backgroundColor = .systemBlue
             self.reloadButton.isUserInteractionEnabled = true
         }
@@ -82,7 +87,7 @@ class ClickToPayViewController: UIViewController {
     // MARK: - Click to Pay Functions
 
     @objc
-    private func initClickToPaySession(  _ sender: Any) {
+    private func initClickToPaySession(_ sender: Any) {
         guard let session = clickToPayViewModel.authenticationSession else {
             updateStatus("Authentication session not initialized")
             return
@@ -111,11 +116,13 @@ class ClickToPayViewController: UIViewController {
             textField.keyboardType = .emailAddress
             textField.text = ""
         }
-        alert.addAction(UIAlertAction(title: "Check", style: .default) { [weak self, weak alert] _ in
-            if let email = alert?.textFields?.first?.text, !email.isEmpty {
-                self?.checkCustomerPresence(email: email)
+        alert.addAction(
+            UIAlertAction(title: "Check", style: .default) { [weak self, weak alert] _ in
+                if let email = alert?.textFields?.first?.text, !email.isEmpty {
+                    self?.checkCustomerPresence(email: email)
+                }
             }
-        })
+        )
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(alert, animated: true)
     }
@@ -197,11 +204,13 @@ class ClickToPayViewController: UIViewController {
             textField.placeholder = "123456"
             textField.keyboardType = .numberPad
         }
-        alert.addAction(UIAlertAction(title: "Validate", style: .default) { [weak self, weak alert] _ in
-            if let otp = alert?.textFields?.first?.text, !otp.isEmpty {
-                self?.validateCustomerAuthentication(otp: otp)
+        alert.addAction(
+            UIAlertAction(title: "Validate", style: .default) { [weak self, weak alert] _ in
+                if let otp = alert?.textFields?.first?.text, !otp.isEmpty {
+                    self?.validateCustomerAuthentication(otp: otp)
+                }
             }
-        })
+        )
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(alert, animated: true)
     }
@@ -262,11 +271,13 @@ class ClickToPayViewController: UIViewController {
 
         let alert = UIAlertController(title: "Select Card", message: "Choose a card for checkout", preferredStyle: .actionSheet)
         for card in recognizedCards {
-            if let pan = card.panLastFour, let brand = card.paymentCardDescriptor  {
+            if let pan = card.panLastFour, let brand = card.paymentCardDescriptor {
                 let cardLabel = "**** \(pan) - \(brand)"
-                alert.addAction(UIAlertAction(title: cardLabel, style: .default) { [weak self] _ in
-                    self?.checkoutWithCard(srcDigitalCardId: card.srcDigitalCardId, rememberMe: true)
-                })
+                alert.addAction(
+                    UIAlertAction(title: cardLabel, style: .default) { [weak self] _ in
+                        self?.checkoutWithCard(srcDigitalCardId: card.srcDigitalCardId, rememberMe: true)
+                    }
+                )
             }
         }
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
@@ -349,7 +360,7 @@ extension ClickToPayViewController {
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
 
         let contentView = UIView()
@@ -361,33 +372,96 @@ extension ClickToPayViewController {
             contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
-            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
         ])
 
         // Reload Button
-        setupButton(reloadButton, title: "Reload Client Secret", target: #selector(reload(_:)), on: contentView, topAnchor: contentView.topAnchor, constant: 20)
+        setupButton(
+            reloadButton,
+            title: "Reload Client Secret",
+            target: #selector(reload(_:)),
+            on: contentView,
+            topAnchor: contentView.topAnchor,
+            constant: 20
+        )
 
         // Init C2P Button
-        setupButton(initC2PButton, title: "Init Click to Pay", target: #selector(initClickToPaySession(_:)), on: contentView, topAnchor: reloadButton.bottomAnchor, constant: 15)
+        setupButton(
+            initC2PButton,
+            title: "Init Click to Pay",
+            target: #selector(initClickToPaySession(_:)),
+            on: contentView,
+            topAnchor: reloadButton.bottomAnchor,
+            constant: 15
+        )
 
         // Check Customer Button
-        setupButton(checkCustomerButton, title: "Check Customer Presence", target: #selector(checkCustomer(_:)), on: contentView, topAnchor: initC2PButton.bottomAnchor, constant: 15)
+        setupButton(
+            checkCustomerButton,
+            title: "Check Customer Presence",
+            target: #selector(checkCustomer(_:)),
+            on: contentView,
+            topAnchor: initC2PButton.bottomAnchor,
+            constant: 15
+        )
 
         // Get User Type Button
-        setupButton(getUserTypeButton, title: "Get User Type", target: #selector(getUserType(_:)), on: contentView, topAnchor: checkCustomerButton.bottomAnchor, constant: 15)
+        setupButton(
+            getUserTypeButton,
+            title: "Get User Type",
+            target: #selector(getUserType(_:)),
+            on: contentView,
+            topAnchor: checkCustomerButton.bottomAnchor,
+            constant: 15
+        )
 
         // Get Cards Button
-        setupButton(getCardsButton, title: "Get Recognized Cards", target: #selector(getRecognizedCards(_:)), on: contentView, topAnchor: getUserTypeButton.bottomAnchor, constant: 15)
+        setupButton(
+            getCardsButton,
+            title: "Get Recognized Cards",
+            target: #selector(getRecognizedCards(_:)),
+            on: contentView,
+            topAnchor: getUserTypeButton.bottomAnchor,
+            constant: 15
+        )
 
         // Validate OTP Button
-        setupButton(validateOTPButton, title: "Validate OTP", target: #selector(validateOTP(_:)), on: contentView, topAnchor: getCardsButton.bottomAnchor, constant: 15)
+        setupButton(
+            validateOTPButton,
+            title: "Validate OTP",
+            target: #selector(validateOTP(_:)),
+            on: contentView,
+            topAnchor: getCardsButton.bottomAnchor,
+            constant: 15
+        )
 
-        setupButton(signOutButton, title: "Sign Out", target: #selector(signOut(_:)), on: contentView, topAnchor: validateOTPButton.bottomAnchor, constant: 15)
+        setupButton(
+            signOutButton,
+            title: "Sign Out",
+            target: #selector(signOut(_:)),
+            on: contentView,
+            topAnchor: validateOTPButton.bottomAnchor,
+            constant: 15
+        )
 
         // Checkout Button
-        setupButton(checkoutButton, title: "Checkout with Card", target: #selector(checkout(_:)), on: contentView, topAnchor: signOutButton.bottomAnchor, constant: 15)
+        setupButton(
+            checkoutButton,
+            title: "Checkout with Card",
+            target: #selector(checkout(_:)),
+            on: contentView,
+            topAnchor: signOutButton.bottomAnchor,
+            constant: 15
+        )
 
-        setupButton(closeSessionButton, title: "Close Session", target: #selector(closeSession(_:)), on: contentView, topAnchor: checkoutButton.bottomAnchor, constant: 15)
+        setupButton(
+            closeSessionButton,
+            title: "Close Session",
+            target: #selector(closeSession(_:)),
+            on: contentView,
+            topAnchor: checkoutButton.bottomAnchor,
+            constant: 15
+        )
 
         // Status Label
         statusLabel.textAlignment = .center
@@ -398,7 +472,7 @@ extension ClickToPayViewController {
         NSLayoutConstraint.activate([
             statusLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             statusLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            statusLabel.topAnchor.constraint(equalTo: closeSessionButton.bottomAnchor, constant: 30)
+            statusLabel.topAnchor.constraint(equalTo: closeSessionButton.bottomAnchor, constant: 30),
         ])
 
         // Cards Status Label
@@ -412,11 +486,18 @@ extension ClickToPayViewController {
             cardsStatusLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
             cardsStatusLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             cardsStatusLabel.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 15),
-            cardsStatusLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -30)
+            cardsStatusLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -30),
         ])
     }
 
-    private func setupButton(_ button: UIButton, title: String, target: Selector, on view: UIView, topAnchor: NSLayoutYAxisAnchor, constant: CGFloat) {
+    private func setupButton(
+        _ button: UIButton,
+        title: String,
+        target: Selector,
+        on view: UIView,
+        topAnchor: NSLayoutYAxisAnchor,
+        constant: CGFloat
+    ) {
         button.setTitle(title, for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 10
@@ -428,7 +509,7 @@ extension ClickToPayViewController {
             button.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 40),
             button.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -40),
             button.topAnchor.constraint(equalTo: topAnchor, constant: constant),
-            button.heightAnchor.constraint(equalToConstant: 44)
+            button.heightAnchor.constraint(equalToConstant: 44),
         ])
     }
 }

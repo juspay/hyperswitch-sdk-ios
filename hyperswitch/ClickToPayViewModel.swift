@@ -27,10 +27,10 @@ class ClickToPayViewModel: ObservableObject {
             do {
                 let json = try await NetworkUtility.postData(to: "/create-authentication", body: [:], baseUrl: backendUrl)
                 guard let paymentIntentClientSecret = json["clientSecret"] as? String,
-                      let publishableKey = json["publishableKey"] as? String,
-                      let profileId = json["profileId"] as? String,
-                      let authenticationId = json["authenticationId"] as? String,
-                      let merchantId = json["merchantId"] as? String
+                    let publishableKey = json["publishableKey"] as? String,
+                    let profileId = json["profileId"] as? String,
+                    let authenticationId = json["authenticationId"] as? String,
+                    let merchantId = json["merchantId"] as? String
 
                 else {
                     throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing required fields"])
@@ -41,7 +41,12 @@ class ClickToPayViewModel: ObservableObject {
                     if self.authenticationSession == nil {
                         self.authenticationSession = AuthenticationSession(publishableKey: publishableKey)
                     }
-                    self.authenticationSession?.initAuthenticationSession(clientSecret: paymentIntentClientSecret, profileId: profileId, authenticationId: authenticationId, merchantId: merchantId)
+                    self.authenticationSession?.initAuthenticationSession(
+                        clientSecret: paymentIntentClientSecret,
+                        profileId: profileId,
+                        authenticationId: authenticationId,
+                        merchantId: merchantId
+                    )
 
                 }
             } catch {

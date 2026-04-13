@@ -13,18 +13,23 @@ public final class Transaction {
     private let directoryServerId: String?
     private let cardNetwork: String?
     private let transactionProvider: ThreeDSTransactionProvider
-    
-    init(messageVersion: String, directoryServerId: String? = nil, cardNetwork: String? = nil, transactionProvider: ThreeDSTransactionProvider) {
+
+    init(
+        messageVersion: String,
+        directoryServerId: String? = nil,
+        cardNetwork: String? = nil,
+        transactionProvider: ThreeDSTransactionProvider
+    ) {
         self.messageVersion = messageVersion
         self.directoryServerId = directoryServerId
         self.cardNetwork = cardNetwork
         self.transactionProvider = transactionProvider
     }
-    
+
     public func getAuthenticationRequestParameters() async throws -> AuthenticationRequestParameters {
         return try await transactionProvider.getAuthenticationRequestParameters()
     }
-    
+
     public func doChallenge(
         viewController: UIViewController,
         challengeParameters: ChallengeParameters,
@@ -38,13 +43,13 @@ public final class Transaction {
             timeOut: timeOut
         )
     }
-    
+
     public func getProgressView() throws -> ProgressDialog {
         // Return a default ProgressDialog since getProgressView is not available in the provider protocol
         // TODO: implementation
         return ProgressDialog()
     }
-    
+
     public func close() {
         transactionProvider.close()
     }
@@ -63,7 +68,7 @@ public class AuthenticationRequestParameters {
     final public let sdkReferenceNumber: String?
     final public let messageVersion: String?
     final public let sdkEncryptedData: String?
-    
+
     init(
         sdkTransactionID: String?,
         deviceData: String?,
@@ -89,8 +94,14 @@ public class ChallengeParameters {
     public let acsRefNumber: String
     public let acsSignedContent: String
     public let threeDSRequestorAppURL: String?
-    
-    public init(threeDSServerTransactionID: String, acsTransactionID: String, acsRefNumber: String, acsSignedContent: String, threeDSRequestorAppURL: String? = nil) {
+
+    public init(
+        threeDSServerTransactionID: String,
+        acsTransactionID: String,
+        acsRefNumber: String,
+        acsSignedContent: String,
+        threeDSRequestorAppURL: String? = nil
+    ) {
         self.threeDSServerTransactionID = threeDSServerTransactionID
         self.acsTransactionID = acsTransactionID
         self.acsRefNumber = acsRefNumber
@@ -105,11 +116,11 @@ public class CompletionEvent {
 
 public class ProtocolErrorEvent {
     private let errorMessage: String
-    
+
     public init(errorMessage: String) {
         self.errorMessage = errorMessage
     }
-    
+
     public func getErrorMessage() -> String {
         return errorMessage
     }
@@ -118,16 +129,16 @@ public class ProtocolErrorEvent {
 public class RuntimeErrorEvent {
     private let errorMessage: String
     private let errorCode: String?
-    
+
     public init(errorMessage: String, errorCode: String? = nil) {
         self.errorMessage = errorMessage
         self.errorCode = errorCode
     }
-    
+
     public func getErrorMessage() -> String {
         return errorMessage
     }
-    
+
     public func getErrorCode() -> String? {
         return errorCode
     }
@@ -135,12 +146,12 @@ public class RuntimeErrorEvent {
 
 public protocol ChallengeStatusReceiver {
     func completed(_ completionEvent: CompletionEvent)
-    
+
     func cancelled()
-    
+
     func timedout()
-    
+
     func protocolError(_ protocolErrorEvent: ProtocolErrorEvent)
-    
+
     func runtimeError(_ runtimeErrorEvent: RuntimeErrorEvent)
 }
