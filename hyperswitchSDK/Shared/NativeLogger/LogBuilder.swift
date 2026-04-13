@@ -98,6 +98,7 @@ internal class LogBuilder {
             session_id: sessionId,
             merchant_id: merchantId,
             payment_id: paymentId,
+            authentication_id: authenticationId,
             app_id: appId,
             platform: platform,
             user_agent: userAgent,

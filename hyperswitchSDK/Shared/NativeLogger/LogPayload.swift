@@ -20,6 +20,7 @@ struct LogPayload: Codable {
     let session_id: String
     var merchant_id: String
     let payment_id: String
+    let authentication_id: String
     let app_id: String?
     let platform: String
     let user_agent: String
