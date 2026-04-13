@@ -37,9 +37,9 @@ public extension PaymentSheet {
         /// The shadow used for inputs and tabs in PaymentSheet
         /// - Note: Set this to `.disabled` to disable shadows
         public var shadow: Shadow?
-        
+
         public var theme: Theme?
-        
+
         public enum Theme: String, Codable {
             case `default` = "Default"
             case light = "Light"
@@ -52,7 +52,6 @@ public extension PaymentSheet {
             }
         }
 
-        
         // MARK: Fonts
 
         /// Describes the appearance of fonts in PaymentSheet
@@ -61,8 +60,8 @@ public extension PaymentSheet {
             /// Creates a `PaymentSheet.Appearance.Font` with default values
             public init() {}
 
-            /// The scale factor for all font sizes in PaymentSheet. 
-            /// Font sizes are multiplied by this value before being displayed. For example, setting this to 1.2 increases the size of all text by 20%. 
+            /// The scale factor for all font sizes in PaymentSheet.
+            /// Font sizes are multiplied by this value before being displayed. For example, setting this to 1.2 increases the size of all text by 20%.
             /// - Note: This value must be greater than 0. The default value is 1.0.
             /// - Note: This is used in conjunction with the Dynamic Type accessibility text size.
             public var sizeScaleFactor: CGFloat?
@@ -70,7 +69,7 @@ public extension PaymentSheet {
             /// The font family of this font is used throughout PaymentSheet. PaymentSheet uses this font at multiple weights (e.g., regular, medium, semibold) if they exist.
             /// - Note: The size and weight of the font is ignored. To adjust font sizes, see `sizeScaleFactor`.
             public var base: UIFont?
-            
+
             /// The size adjustment for all heading texts in PaymentSheet
             /// Font sizes of all headings will be increased by this value from their respective default size
             public var headingTextSizeAdjust: CGFloat?
@@ -102,7 +101,7 @@ public extension PaymentSheet {
             /// The size for all card texts in PaymentSheet
             /// Font sizes of all card texts will be increased by this value from their respective default size
             public var cardTextSizeAdjust: CGFloat?
-            
+
             /// the font Attributes for PaymentSheetLite
             public var family: String?
         }
@@ -144,13 +143,13 @@ public extension PaymentSheet {
 
             /// The color used for icons in PaymentSheet, such as the close or back icons
             public var icon: UIColor?
-            
+
             /// The color used to indicate errors or destructive actions in PaymentSheet
             public var danger: UIColor?
-            
+
             /// The color used to indicate Loader Background Color
             public var loaderBackground: UIColor?
-            
+
             /// The color used to indicate Loader Foreground Color
             public var loaderForeground: UIColor?
         }
@@ -178,7 +177,7 @@ public extension PaymentSheet {
             /// Radius of the shadow
             /// - Note: The behavior of this property is consistent with `CALayer.shadowRadius`
             public var radius: CGFloat?
-            
+
             /// intensity of the shadow
             /// - Note: The behavior of this property is consistent with `CALayer.shadowIntensity`
             public var intensity: CGFloat?
@@ -252,5 +251,3 @@ public extension PaymentSheet {
     }
 
 }
-
-

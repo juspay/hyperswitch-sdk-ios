@@ -52,8 +52,6 @@ extension PaymentSheet.Appearance.Colors: Codable {
     }
 }
 
-
-
 extension PaymentSheet.Appearance.Font: Codable {
     enum CodingKeys: String, CodingKey {
         case sizeScaleFactor, base, headingTextSizeAdjust, subHeadingTextSizeAdjust
@@ -93,8 +91,6 @@ extension PaymentSheet.Appearance.Font: Codable {
     }
 }
 
-
-
 extension PaymentSheet.Appearance.PrimaryButton: Codable {
     enum CodingKeys: String, CodingKey {
         case backgroundColor, textColor, successBackgroundColor, successTextColor
@@ -129,8 +125,6 @@ extension PaymentSheet.Appearance.PrimaryButton: Codable {
     }
 }
 
-
-
 extension PaymentSheet.Appearance.Shadow: Codable {
     enum CodingKeys: String, CodingKey {
         case color, opacity, offset, radius, intensity
@@ -155,8 +149,6 @@ extension PaymentSheet.Appearance.Shadow: Codable {
         intensity = try c.decodeIfPresent(CGFloat.self, forKey: .intensity)
     }
 }
-
-
 
 extension PaymentSheet.Appearance: Codable {
     enum CodingKeys: String, CodingKey {

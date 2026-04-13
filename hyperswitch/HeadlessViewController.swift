@@ -5,9 +5,9 @@
 //  Created by Harshit Srivastava on 02/07/24.
 //
 
+import Combine
 import SwiftUI
 import UIKit
-import Combine
 
 class HeadlessViewController: UIViewController {
 
@@ -66,19 +66,20 @@ class HeadlessViewController: UIViewController {
     func reload(_ sender: Any) {
         hyperViewModel.preparePaymentSheet()
         self.reloadButton.isUserInteractionEnabled = false
-        UIView.animate(withDuration: 1.6, animations: {
-            self.reloadButton.backgroundColor = .white
-        }) { (_) in
+        UIView.animate(
+            withDuration: 1.6,
+            animations: {
+                self.reloadButton.backgroundColor = .white
+            }
+        ) { (_) in
             self.reloadButton.backgroundColor = .systemBlue
             self.reloadButton.isUserInteractionEnabled = true
         }
     }
 
-
-    func initSavedPaymentMethodSessionCallback(handler: PaymentSessionHandler)-> Void {
+    func initSavedPaymentMethodSessionCallback(handler: PaymentSessionHandler) {
         self.handler = handler
     }
-
 
     @objc func launchHeadless(_ sender: Any) {
         hyperViewModel.paymentSession?.getCustomerSavedPaymentMethods(initSavedPaymentMethodSessionCallback)
@@ -89,7 +90,7 @@ class HeadlessViewController: UIViewController {
     }
 
     @objc func getCustomerDefaultSavedPaymentMethodData(_ sender: Any) {
-        
+
         guard let handler = self.handler else {
             self.statusLabel.text = "error → Handler unavailable"
             return
@@ -175,8 +176,8 @@ class HeadlessViewController: UIViewController {
 }
 
 extension HeadlessViewController {
-    func viewFrame(){
-        stackView.axis  = .vertical
+    func viewFrame() {
+        stackView.axis = .vertical
         stackView.alignment = .fill
         stackView.distribution = .equalCentering
         stackView.spacing = 20.0

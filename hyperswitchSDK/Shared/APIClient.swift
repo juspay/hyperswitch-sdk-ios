@@ -8,15 +8,15 @@
 import Foundation
 
 @objc internal class APIClient: NSObject {
-    
+
     @objc(sharedClient) public static let shared: APIClient = {
         let client = APIClient()
         return client
     }()
-    
+
     @objc public var publishableKey: String?
     @objc public var profileId: String?
     @objc public var customBackendUrl: String?
-    @objc public var customParams: [String : Any]?
+    @objc public var customParams: [String: Any]?
     @objc public var customLogUrl: String?
 }

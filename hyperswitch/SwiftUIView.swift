@@ -10,14 +10,15 @@ import SwiftUI
 struct SwiftUIView: View {
     @ObservedObject var hyperViewModel = HyperViewModel()
     @State var paymentResult: PaymentSheetResult?
-    
+
     var body: some View {
-        ZStack(alignment: .top){
+        ZStack(alignment: .top) {
             Color.gray.opacity(0.2)
                 .ignoresSafeArea()
             LazyVStack(spacing: 94) {
-                Button{hyperViewModel.preparePaymentSheet()}
-                label: {
+                Button {
+                    hyperViewModel.preparePaymentSheet()
+                } label: {
                     Text("Reload Client Secret")
                 }.padding(.vertical, 11)
                     .padding(.horizontal, 58)
@@ -26,9 +27,11 @@ struct SwiftUIView: View {
                     .cornerRadius(10.0)
                 Spacer()
                 if let paymentSession = hyperViewModel.paymentSession {
-                    PaymentSheet.PaymentButton(paymentSession: paymentSession,
-                                               configuration: setupConfiguration(),
-                                               onCompletion: onPaymentCompletion) {
+                    PaymentSheet.PaymentButton(
+                        paymentSession: paymentSession,
+                        configuration: setupConfiguration(),
+                        onCompletion: onPaymentCompletion
+                    ) {
                         Text("Launch Payment Sheet")
                             .padding(.vertical, 11)
                             .padding(.horizontal, 58)
@@ -36,7 +39,7 @@ struct SwiftUIView: View {
                             .foregroundColor(.white)
                             .cornerRadius(10.0)
                     }
-                    
+
                     if let result = paymentResult {
                         switch result {
                         case .completed:
@@ -61,7 +64,7 @@ struct SwiftUIView: View {
         configuration.savedPaymentSheetHeaderLabel = "Payment methods"
         configuration.paymentSheetHeaderLabel = "Select payment method"
         configuration.displaySavedPaymentMethods = true
-        
+
         var appearance = PaymentSheet.Appearance()
         appearance.font.base = UIFont(name: "montserrat", size: UIFont.systemFontSize)
         appearance.font.sizeScaleFactor = 1.0
@@ -70,7 +73,7 @@ struct SwiftUIView: View {
         appearance.colors.primary = UIColor(red: 0.55, green: 0.74, blue: 0.00, alpha: 1.00)
         appearance.primaryButton.cornerRadius = 32
         configuration.appearance = appearance
-        
+
         return configuration
     }
     func onPaymentCompletion(result: PaymentSheetResult) {

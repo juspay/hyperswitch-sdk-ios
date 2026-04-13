@@ -14,30 +14,48 @@ extension PaymentSession {
     internal static var headlessCompletion: ((PaymentSessionHandler) -> Void)?
     private static var completion: ((PaymentResult) -> Void)?
 
-    private static func safeResolve(_ callback: @escaping RCTResponseSenderBlock,_ result: [Any],_ resultHandler: @escaping (PaymentResult) -> Void){
+    private static func safeResolve(
+        _ callback: @escaping RCTResponseSenderBlock,
+        _ result: [Any],
+        _ resultHandler: @escaping (PaymentResult) -> Void
+    ) {
         guard !PaymentSession.hasResponded else {
             print("Warning: Attempt to resolve callback more than once")
-            resultHandler(.failed(error: NSError(domain: "Not Initialised", code: 0, userInfo: ["message" : "An error has occurred."])))
+            resultHandler(.failed(error: NSError(domain: "Not Initialised", code: 0, userInfo: ["message": "An error has occurred."])))
             return
         }
         PaymentSession.hasResponded = true
         callback(result)
     }
 
-    public func presentPaymentSheet(viewController: UIViewController, completion: @escaping (PaymentSheetResult) -> ()){
+    public func presentPaymentSheet(viewController: UIViewController, completion: @escaping (PaymentSheetResult) -> Void) {
         presentPaymentSheet(viewController: viewController, configuration: PaymentSheet.Configuration(), completion: completion)
     }
 
-    public func presentPaymentSheet(viewController: UIViewController, configuration: PaymentSheet.Configuration, completion: @escaping (PaymentSheetResult) -> ()){
+    public func presentPaymentSheet(
+        viewController: UIViewController,
+        configuration: PaymentSheet.Configuration,
+        completion: @escaping (PaymentSheetResult) -> Void
+    ) {
         PaymentSession.isPresented = true
-        let paymentSheet = PaymentSheet(paymentIntentClientSecret: PaymentSession.paymentIntentClientSecret ?? "", configuration: configuration)
+        let paymentSheet = PaymentSheet(
+            paymentIntentClientSecret: PaymentSession.paymentIntentClientSecret ?? "",
+            configuration: configuration
+        )
         paymentSheet.present(from: viewController, completion: completion)
     }
 
     // for external frameworks
-    public func presentPaymentSheetWithParams(viewController: UIViewController, params: [String: Any], completion: @escaping (PaymentSheetResult) -> ()){
+    public func presentPaymentSheetWithParams(
+        viewController: UIViewController,
+        params: [String: Any],
+        completion: @escaping (PaymentSheetResult) -> Void
+    ) {
         PaymentSession.isPresented = true
-        let paymentSheet = PaymentSheet(paymentIntentClientSecret: PaymentSession.paymentIntentClientSecret ?? "", configuration: PaymentSheet.Configuration())
+        let paymentSheet = PaymentSheet(
+            paymentIntentClientSecret: PaymentSession.paymentIntentClientSecret ?? "",
+            configuration: PaymentSheet.Configuration()
+        )
         paymentSheet.presentWithParams(from: viewController, props: params, completion: completion)
     }
 
@@ -54,12 +72,17 @@ extension PaymentSession {
             "hyperParams": hyperParams,
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,
-            "customParams": APIClient.shared.customParams as Any
+            "customParams": APIClient.shared.customParams as Any,
         ]
         let _ = RNHeadlessManager.sharedInstance.viewForModule("HyperHeadless", initialProperties: ["props": props])
     }
 
-    internal static func getPaymentSession(getPaymentMethodData: NSDictionary, getPaymentMethodData2: NSDictionary, getPaymentMethodDataArray: NSArray, callback: @escaping RCTResponseSenderBlock) {
+    internal static func getPaymentSession(
+        getPaymentMethodData: NSDictionary,
+        getPaymentMethodData2: NSDictionary,
+        getPaymentMethodDataArray: NSArray,
+        callback: @escaping RCTResponseSenderBlock
+    ) {
         DispatchQueue.main.async {
             PaymentSession.hasResponded = false
             let handler = PaymentSessionHandler(
@@ -82,10 +105,12 @@ extension PaymentSession {
                         }
                     }
                     if array.isEmpty {
-                        return .failure(PMError(
-                            code: "01",
-                            message: "No default type found"
-                        ))
+                        return .failure(
+                            PMError(
+                                code: "01",
+                                message: "No default type found"
+                            )
+                        )
                     }
                     return .success(array)
 
@@ -120,14 +145,15 @@ extension PaymentSession {
         }
     }
 
-
     internal static func exitHeadless(rnMessage: String) {
         DispatchQueue.main.async {
             if let data = rnMessage.data(using: .utf8) {
                 do {
                     if let message = try JSONSerialization.jsonObject(with: data, options: []) as? [String: String] {
                         guard let status = message["status"] else {
-                            completion?(.failed(error: NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message" : "An error has occurred."])))
+                            completion?(
+                                .failed(error: NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."]))
+                            )
                             return
                         }
                         switch status {
@@ -145,13 +171,13 @@ extension PaymentSession {
                         let domain = "UNKNOWN_ERROR"
                         let errorMessage = "An error has occurred."
                         let userInfo = ["message": errorMessage]
-                        self.completion?(.failed(error: NSError(domain: domain , code: 0, userInfo: userInfo)))
+                        self.completion?(.failed(error: NSError(domain: domain, code: 0, userInfo: userInfo)))
                     }
                 } catch {
                     let domain = "UNKNOWN_ERROR"
                     let errorMessage = "An error has occurred."
                     let userInfo = ["message": errorMessage]
-                    self.completion?(.failed(error: NSError(domain: domain , code: 0, userInfo: userInfo)))
+                    self.completion?(.failed(error: NSError(domain: domain, code: 0, userInfo: userInfo)))
                 }
             }
         }
@@ -159,14 +185,16 @@ extension PaymentSession {
 
     private static func decodePaymentMethodData(_ readableMap: NSDictionary) -> Result<PaymentMethod, PMError> {
         if let jsonData = try? JSONSerialization.data(withJSONObject: readableMap),
-           let paymentMethod = try? JSONDecoder().decode(PaymentMethod.self, from: jsonData) {
+            let paymentMethod = try? JSONDecoder().decode(PaymentMethod.self, from: jsonData)
+        {
             return .success(paymentMethod)
-        }
-        else {
-            return .failure(PMError(
-                code: readableMap["code"] as? String ?? "01",
-                message: readableMap["message"] as? String ?? "No default type found"
-            ))
+        } else {
+            return .failure(
+                PMError(
+                    code: readableMap["code"] as? String ?? "01",
+                    message: readableMap["message"] as? String ?? "No default type found"
+                )
+            )
         }
     }
 }

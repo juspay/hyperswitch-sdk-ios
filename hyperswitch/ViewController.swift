@@ -5,12 +5,12 @@
 //  Created by Harshit Srivastava on 14/07/23.
 //
 
-import UIKit
-import SwiftUI
 import Combine
+import SwiftUI
+import UIKit
 
 class ViewController: UIViewController {
-    
+
     @ObservedObject var hyperViewModel = HyperViewModel()
     private var reloadButton = UIButton()
     private var reloadButtonConfiguration = UIButton.Configuration.plain()
@@ -20,7 +20,7 @@ class ViewController: UIViewController {
     private var paymentMethodManagementButtonConfig = UIButton.Configuration.plain()
     private var statusLabel = UILabel()
     private var cancellables = Set<AnyCancellable>()
-    
+
     override func viewDidLoad() {
         self.view.backgroundColor = UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 0.2)
         super.viewDidLoad()
@@ -29,7 +29,7 @@ class ViewController: UIViewController {
         asyncBind()
         viewFrame()
     }
-    
+
     private func asyncBind() {
         hyperViewModel.$status
             .receive(on: DispatchQueue.main)
@@ -45,16 +45,16 @@ class ViewController: UIViewController {
             }
             .store(in: &cancellables)
     }
-    
+
     @objc
     func openPaymentSheet(_ sender: Any) {
-        
+
         var configuration = PaymentSheet.Configuration()
         configuration.primaryButtonLabel = "Purchase ($2.00)"
         configuration.savedPaymentSheetHeaderLabel = "Payment methods"
         configuration.paymentSheetHeaderLabel = "Select payment method"
         configuration.displaySavedPaymentMethods = true
-        
+
         var appearance = PaymentSheet.Appearance()
         appearance.font.base = UIFont(name: "montserrat", size: UIFont.systemFontSize)
         appearance.font.sizeScaleFactor = 1.0
@@ -66,40 +66,47 @@ class ViewController: UIViewController {
         if let netceteraApiKey = hyperViewModel.netceteraApiKey {
             configuration.netceteraSDKApiKey = netceteraApiKey
         }
-        
-        hyperViewModel.paymentSession?.presentPaymentSheet(viewController: self, configuration: configuration, completion: { result in
-            DispatchQueue.main.async {
-                switch result {
-                case .completed:
-                    self.statusLabel.text = "Payment complete"
-                case .failed(let error):
-                    self.statusLabel.text = "Payment failed: \(error)"
-                case .canceled:
-                    self.statusLabel.text = "Payment canceled."
+
+        hyperViewModel.paymentSession?.presentPaymentSheet(
+            viewController: self,
+            configuration: configuration,
+            completion: { result in
+                DispatchQueue.main.async {
+                    switch result {
+                    case .completed:
+                        self.statusLabel.text = "Payment complete"
+                    case .failed(let error):
+                        self.statusLabel.text = "Payment failed: \(error)"
+                    case .canceled:
+                        self.statusLabel.text = "Payment canceled."
+                    }
                 }
             }
-        })
+        )
     }
-    
+
     @objc
     func openPaymentMethodManagement(_ sender: Any) {
-        
+
         // Create an instance of PaymentMethodManagementViewController
         let paymentMethodVC = PaymentMethodManagementViewController()
-        
+
         // Present the PaymentMethodManagementViewController
         paymentMethodVC.modalPresentationStyle = .fullScreen
         present(paymentMethodVC, animated: true)
     }
-    
+
     @objc
     func reload(_ sender: Any) {
         hyperViewModel.fetchNetceteraSDKApiKey()
         hyperViewModel.preparePaymentSheet()
         self.reloadButton.isUserInteractionEnabled = false
-        UIView.animate(withDuration: 1.6, animations: {
-            self.reloadButton.backgroundColor = .white
-        }) { (_) in
+        UIView.animate(
+            withDuration: 1.6,
+            animations: {
+                self.reloadButton.backgroundColor = .white
+            }
+        ) { (_) in
             self.reloadButton.backgroundColor = .systemBlue
             self.reloadButton.isUserInteractionEnabled = true
         }
@@ -107,9 +114,8 @@ class ViewController: UIViewController {
 }
 
 extension ViewController {
-    
-    func viewFrame()
-    {
+
+    func viewFrame() {
         reloadButton.setTitle("Reload Client Secret", for: .normal)
         reloadButton.setTitleColor(.white, for: .normal)
         reloadButtonConfiguration.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
@@ -122,7 +128,7 @@ extension ViewController {
         reloadButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60).isActive = true
         reloadButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
         reloadButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 80).isActive = true
-        
+
         paymentSheetButton.setTitle("Launch Payment Sheet", for: .normal)
         paymentSheetButton.setTitleColor(.white, for: .normal)
         paymentSheetButtonConfiguration.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
@@ -135,7 +141,7 @@ extension ViewController {
         paymentSheetButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60).isActive = true
         paymentSheetButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
         paymentSheetButton.topAnchor.constraint(equalTo: reloadButton.bottomAnchor, constant: 80).isActive = true
-        
+
         paymentMethodManagementButton.setTitle("Payment Method Management", for: .normal)
         paymentMethodManagementButton.setTitleColor(.white, for: .normal)
         paymentMethodManagementButtonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 10)
@@ -148,7 +154,7 @@ extension ViewController {
         paymentMethodManagementButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60).isActive = true
         paymentMethodManagementButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
         paymentMethodManagementButton.topAnchor.constraint(equalTo: paymentSheetButton.bottomAnchor, constant: 80).isActive = true
-        
+
         statusLabel.textAlignment = .center
         statusLabel.numberOfLines = 7
         statusLabel.font = .systemFont(ofSize: 18)

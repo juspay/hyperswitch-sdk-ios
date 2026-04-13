@@ -9,22 +9,22 @@ import Foundation
 import UIKit
 
 public class PaymentIntentParams: NSObject {
-    
+
     public init(clientSecret: String) {
         self.clientSecret = clientSecret
         super.init()
     }
-    
+
     public var clientSecret: String = ""
     @objc public var paymentMethodParams: PaymentMethodParams?
-    
-    public func description() -> [String:Any] {
-        let props: [String:Any] = [
+
+    public func description() -> [String: Any] {
+        let props: [String: Any] = [
             "publishableKey": APIClient.shared.publishableKey ?? "",
             "profileId": APIClient.shared.profileId ?? "",
             "clientSecret": self.clientSecret,
             "paymentMethodType": "Card",
-            "paymentMethodData": ""
+            "paymentMethodData": "",
         ]
         return props
     }

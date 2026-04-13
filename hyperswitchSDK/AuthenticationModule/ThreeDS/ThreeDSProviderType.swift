@@ -11,7 +11,7 @@ public enum ThreeDSProviderType: String, CaseIterable {
     case netcetera = "Netcetera"
     case cardinal = "Cardinal"
     case trident = "Trident"
-    
+
     public var displayName: String {
         return self.rawValue
     }

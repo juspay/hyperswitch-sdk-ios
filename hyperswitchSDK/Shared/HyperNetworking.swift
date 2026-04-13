@@ -37,7 +37,7 @@ protocol HTTPClient {
 
     /// The HTTP JSON request parameters.
     var jsonParameters: [String: Any]? { get }
-    
+
     /// The HTTP Data request parameters.
     var bodyData: Data? { get }
 
@@ -77,34 +77,37 @@ extension HTTPClient {
         } else if let bodyData = bodyData {
             request.httpBody = bodyData
         }
-        
-        let configuration = URLSessionConfiguration.default
-        configuration.timeoutIntervalForRequest = 10.0 // 10 seconds
-        configuration.timeoutIntervalForResource = 10.0 // 10 seconds
-        let session = URLSession(configuration: configuration)
-        let dataTask = session.dataTask(with: request, completionHandler: { (data, response, error) -> Void in
-            var responseCode = 400
-            if let httpResponse = response as? HTTPURLResponse {
-                responseCode = httpResponse.statusCode
-            }
-            if let error = error {
-                completionHandler(.failure(error), responseCode)
-                return
-            }
 
-            if let data = data {
-                do {
-                    if T.self == Data.self {
-                        completionHandler(.success(data as! T), responseCode)
-                    } else {
-                        completionHandler(.success(try JSONDecoder().decode(type, from: data)), responseCode)
-                    }
-                } catch {
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 10.0  // 10 seconds
+        configuration.timeoutIntervalForResource = 10.0  // 10 seconds
+        let session = URLSession(configuration: configuration)
+        let dataTask = session.dataTask(
+            with: request,
+            completionHandler: { (data, response, error) -> Void in
+                var responseCode = 400
+                if let httpResponse = response as? HTTPURLResponse {
+                    responseCode = httpResponse.statusCode
+                }
+                if let error = error {
                     completionHandler(.failure(error), responseCode)
                     return
                 }
+
+                if let data = data {
+                    do {
+                        if T.self == Data.self {
+                            completionHandler(.success(data as! T), responseCode)
+                        } else {
+                            completionHandler(.success(try JSONDecoder().decode(type, from: data)), responseCode)
+                        }
+                    } catch {
+                        completionHandler(.failure(error), responseCode)
+                        return
+                    }
+                }
             }
-        })
+        )
 
         dataTask.resume()
     }
@@ -117,11 +120,19 @@ class HTTPRequestService: HTTPClient {
     let endpoint: String
     let method: HTTPMethod
 
-    var jsonParameters: [String : Any]?
+    var jsonParameters: [String: Any]?
     var bodyData: Data?
-    var headers: [String : String]?
+    var headers: [String: String]?
 
-    init(host: String, path: String, endpoint: String, method: HTTPMethod, jsonParameters: [String : Any]? = nil, bodyData: Data? = nil, headers: [String : String]? = nil) {
+    init(
+        host: String,
+        path: String,
+        endpoint: String,
+        method: HTTPMethod,
+        jsonParameters: [String: Any]? = nil,
+        bodyData: Data? = nil,
+        headers: [String: String]? = nil
+    ) {
         self.host = host
         self.path = path
         self.endpoint = endpoint
@@ -132,6 +143,9 @@ class HTTPRequestService: HTTPClient {
     }
 
     func getDictionary() -> [String: Any] {
-        return ["host": host, "path": path, "endpoint": endpoint, "method": method.rawValue,"jsonParameters": jsonParameters ?? "nil", "headers": headers ?? "nil"]
+        return [
+            "host": host, "path": path, "endpoint": endpoint, "method": method.rawValue, "jsonParameters": jsonParameters ?? "nil",
+            "headers": headers ?? "nil",
+        ]
     }
 }

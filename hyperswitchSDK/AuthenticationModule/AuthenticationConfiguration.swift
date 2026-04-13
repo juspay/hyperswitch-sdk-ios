@@ -9,7 +9,7 @@ public struct AuthenticationConfiguration {
     public let apiKey: String?
     public let preferredProvider: ThreeDSProviderType?
     public let environment: EnvironmentType
-    
+
     public init(apiKey: String? = nil, preferredProvider: ThreeDSProviderType? = nil, environment: EnvironmentType = .sandbox) {
         self.apiKey = apiKey
         self.preferredProvider = preferredProvider

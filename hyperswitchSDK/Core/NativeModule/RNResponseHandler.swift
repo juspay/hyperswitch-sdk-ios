@@ -8,5 +8,5 @@
 import Foundation
 
 internal protocol RNResponseHandler {
-    func didReceiveResponse(response: String?, error: Error?) -> Void
+    func didReceiveResponse(response: String?, error: Error?)
 }

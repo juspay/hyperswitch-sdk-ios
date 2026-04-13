@@ -138,7 +138,8 @@ public struct PaymentSessionHandler {
     public let getCustomerSavedPaymentMethodData: () -> Result<[PaymentMethod], PMError>
     private let confirmWithCustomerDefaultPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
     private let confirmWithCustomerLastUsedPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
-    private let confirmWithCustomerPaymentToken: (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+    private let confirmWithCustomerPaymentToken:
+        (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
 
     public init(
         getCustomerDefaultSavedPaymentMethodData: @escaping () -> Result<PaymentMethod, PMError>,
@@ -146,7 +147,8 @@ public struct PaymentSessionHandler {
         getCustomerSavedPaymentMethodData: @escaping () -> Result<[PaymentMethod], PMError>,
         confirmWithCustomerDefaultPaymentMethod: @escaping (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void,
         confirmWithCustomerLastUsedPaymentMethod: @escaping (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void,
-        confirmWithCustomerPaymentToken: @escaping (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+        confirmWithCustomerPaymentToken:
+            @escaping (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
     ) {
         self.getCustomerDefaultSavedPaymentMethodData = getCustomerDefaultSavedPaymentMethodData
         self.getCustomerLastUsedPaymentMethodData = getCustomerLastUsedPaymentMethodData

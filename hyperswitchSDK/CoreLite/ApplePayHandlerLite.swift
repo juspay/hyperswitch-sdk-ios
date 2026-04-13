@@ -8,13 +8,12 @@
 import Foundation
 import PassKit
 
-typealias ApplePayCallback = ([[String: Any]])->()
+typealias ApplePayCallback = ([[String: Any]]) -> Void
 
 internal class ApplePayHandlerLite: NSObject {
 
     var paymentStatus: PKPaymentAuthorizationStatus? = .failure
     var callback: ApplePayCallback?
-
 
     internal func startPayment(rnMessage: String, rnCallback: @escaping ApplePayCallback) {
 
@@ -52,14 +51,15 @@ internal class ApplePayHandlerLite: NSObject {
         }
 
         guard let amount = total["amount"] as? String,
-              let label = total["label"] as? String,
-              let type = total["type"] as? String else {
+            let label = total["label"] as? String,
+            let type = total["type"] as? String
+        else {
             callback?([["status": "Failed", "message": "ApplePay: missing fields amount, label, type"]])
             callback = nil
             return
         }
 
-        guard let merchant_capabilities_array = payment_request_data["merchant_capabilities"] as? Array<String> else {
+        guard let merchant_capabilities_array = payment_request_data["merchant_capabilities"] as? [String] else {
             callback?([["status": "Failed", "message": "ApplePay: missing field merchant_capabilities"]])
             callback = nil
             return
@@ -71,7 +71,7 @@ internal class ApplePayHandlerLite: NSObject {
             return
         }
 
-        guard let supported_networks_array = payment_request_data["supported_networks"] as? Array<String> else {
+        guard let supported_networks_array = payment_request_data["supported_networks"] as? [String] else {
             callback?([["status": "Failed", "message": "ApplePay: missing field supported_networks"]])
             callback = nil
             return
@@ -94,15 +94,19 @@ internal class ApplePayHandlerLite: NSObject {
             }
         }
 
-        if let required_billing_contact_fields = payment_request_data["required_billing_contact_fields"] as? Array<String> {
+        if let required_billing_contact_fields = payment_request_data["required_billing_contact_fields"] as? [String] {
             requiredBillingContactFields = Set(required_billing_contact_fields.compactMap(mapToPKContactField))
         }
 
-        if let required_shipping_contact_fields = payment_request_data["required_shipping_contact_fields"] as? Array<String> {
+        if let required_shipping_contact_fields = payment_request_data["required_shipping_contact_fields"] as? [String] {
             requiredShippingContactFields = Set(required_shipping_contact_fields.compactMap(mapToPKContactField))
         }
 
-        let paymentSummaryItems = PKPaymentSummaryItem(label: label, amount: NSDecimalNumber(string: amount), type: (type == "final") ? .final : .pending)
+        let paymentSummaryItems = PKPaymentSummaryItem(
+            label: label,
+            amount: NSDecimalNumber(string: amount),
+            type: (type == "final") ? .final : .pending
+        )
         let paymentRequest = PKPaymentRequest()
         paymentRequest.paymentSummaryItems = [paymentSummaryItems]
         paymentRequest.merchantIdentifier = merchantIdentifier
@@ -142,7 +146,11 @@ internal class ApplePayHandlerLite: NSObject {
 extension ApplePayHandlerLite: PKPaymentAuthorizationControllerDelegate {
 
     /// Handle successful payment authorization
-    internal func paymentAuthorizationController(_ controller: PKPaymentAuthorizationController, didAuthorizePayment payment: PKPayment, handler completion: @escaping (PKPaymentAuthorizationResult) -> Void) {
+    internal func paymentAuthorizationController(
+        _ controller: PKPaymentAuthorizationController,
+        didAuthorizePayment payment: PKPayment,
+        handler completion: @escaping (PKPaymentAuthorizationResult) -> Void
+    ) {
 
         let errors = [Error]()
         let status = PKPaymentAuthorizationStatus.success
@@ -161,18 +169,20 @@ extension ApplePayHandlerLite: PKPaymentAuthorizationControllerDelegate {
         }
 
         self.callback?(
-            [[
-                "status": "Success",
-                "payment_data": dataString,
-                "payment_method": [
-                    "type": paymentType,
-                    "network": payment.token.paymentMethod.network ?? "",
-                    "display_name": payment.token.paymentMethod.displayName ?? ""
-                ],
-                "transaction_identifier": payment.token.transactionIdentifier,
-                "billing_contact": convertPKContactToDictionary(payment.billingContact),
-                "shipping_contact": convertPKContactToDictionary(payment.shippingContact)
-            ]]
+            [
+                [
+                    "status": "Success",
+                    "payment_data": dataString,
+                    "payment_method": [
+                        "type": paymentType,
+                        "network": payment.token.paymentMethod.network ?? "",
+                        "display_name": payment.token.paymentMethod.displayName ?? "",
+                    ],
+                    "transaction_identifier": payment.token.transactionIdentifier,
+                    "billing_contact": convertPKContactToDictionary(payment.billingContact),
+                    "shipping_contact": convertPKContactToDictionary(payment.shippingContact),
+                ]
+            ]
         )
         completion(PKPaymentAuthorizationResult(status: paymentStatus ?? .failure, errors: errors))
     }

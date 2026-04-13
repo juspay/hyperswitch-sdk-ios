@@ -17,35 +17,35 @@ import WebKit
 
 internal class PaymentMethodManagementWidget: UIControl {
     internal static var onAddPaymentMethod: (() -> Void)?
-    private var completion: ((PaymentMethodManagementResult) -> ())?
-    
+    private var completion: ((PaymentMethodManagementResult) -> Void)?
+
     // Initialize the widget with the ephemeral key and configuration.
-    public init(onAddPaymentMethod: (() -> Void)?, completion: @escaping (PaymentMethodManagementResult) -> ()) {
+    public init(onAddPaymentMethod: (() -> Void)?, completion: @escaping (PaymentMethodManagementResult) -> Void) {
         PaymentMethodManagementWidget.onAddPaymentMethod = onAddPaymentMethod
         self.completion = completion
         super.init(frame: .zero)
         commonInit()
     }
-    
+
     required public init?(
         coder: NSCoder
     ) {
         super.init(coder: coder)
         commonInit()
     }
-    
+
     public override init(
         frame: CGRect
     ) {
         super.init(frame: frame)
         commonInit()
     }
-    
+
     private func commonInit() {
         let hyperParams = HyperParams.getHyperParams()
-        
+
         // Prepare the props to send to the React Native module.
-        let props: [String : Any] = [
+        let props: [String: Any] = [
             "type": "paymentMethodsManagement",
             "hyperParams": hyperParams,
             "ephemeralKey": PaymentSession.ephemeralKey ?? "",
@@ -55,23 +55,23 @@ internal class PaymentMethodManagementWidget: UIControl {
             "customLogUrl": APIClient.shared.customLogUrl as Any,
             "customParams": APIClient.shared.customParams as Any,
         ]
-        
+
         RNViewManager.sharedInstance.responseHandler = self
-        
+
         // Get the React Native view from RNViewManager.
         let rootView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": props])
-        
+
         rootView.frame = self.bounds
-        
+
         // Add the React Native view to the current view.
         addSubview(rootView)
-        
+
         rootView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             rootView.topAnchor.constraint(equalTo: self.topAnchor),
             rootView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
             rootView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            rootView.trailingAnchor.constraint(equalTo: self.trailingAnchor)
+            rootView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
         ])
     }
 }
@@ -82,14 +82,11 @@ extension PaymentMethodManagementWidget: RNResponseHandler {
         if let completion = completion {
             if let error = error {
                 completion(.failed(error: error))
-            }
-            else if (response == "cancelled"){
+            } else if response == "cancelled" {
                 completion(.closed(data: "cancelled"))
-            }
-            else {
+            } else {
                 completion(.closed(data: response ?? "failed"))
             }
         }
     }
 }
-

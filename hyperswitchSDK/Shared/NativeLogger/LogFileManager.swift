@@ -11,14 +11,14 @@ class LogFileManager {
     private let logFileName = "crash_logs.json"
     private let fileManager = FileManager.default
     private let queue = DispatchQueue(label: "logfile.queue", attributes: .concurrent)
-    
+
     private func getLogFileName() -> URL? {
         guard let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
             return nil
         }
         return documentDirectory.appendingPathComponent(logFileName)
     }
-    
+
     func addLogs(logs: [String]) {
         queue.async(flags: .barrier) { [weak self] in
             guard let self = self, let fileURL = self.getLogFileName() else { return }
@@ -32,7 +32,7 @@ class LogFileManager {
             }
         }
     }
-    
+
     func getStoredLogs() -> String? {
         guard let fileURL = getLogFileName(), fileManager.fileExists(atPath: fileURL.path) else {
             return nil
@@ -48,19 +48,20 @@ class LogFileManager {
             return nil
         }
     }
-    
+
     private func parseLogs(_ logs: String) -> [String] {
         if let data = logs.data(using: .utf8),
-           let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String] {
+            let json = try? JSONSerialization.jsonObject(with: data, options: []) as? [String]
+        {
             return json
         }
         return []
     }
-    
+
     func getStoredLogsInArray() -> [String] {
         return self.parseLogs(self.getStoredLogs() ?? "")
     }
-    
+
     func clearFile() {
         queue.async(flags: .barrier) { [weak self] in
             guard let self = self, let fileURL = self.getLogFileName() else { return }
