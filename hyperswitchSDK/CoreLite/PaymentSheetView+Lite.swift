@@ -20,7 +20,7 @@ extension PaymentSheet {
         let props: [String: Any] = [
             "configuration": configuration as Any,
             "type": "payment",
-            "clientSecret": self.intentClientSecret,
+            "sdkAuthorization": self.sdkAuthorization,
             "publishableKey": APIClient.shared.publishableKey as Any,
             "profileId": APIClient.shared.profileId as Any,
             "hyperParams": hyperParams,

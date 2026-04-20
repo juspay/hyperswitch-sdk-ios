@@ -17,7 +17,7 @@ extension PaymentSession {
     ) {
         PaymentSession.isPresented = true
         let paymentSheet = PaymentSheet(
-            paymentIntentClientSecret: PaymentSession.paymentIntentClientSecret ?? "",
+            sdkAuthorization: PaymentSession.sdkAuthorization ?? "",
             configuration: configuration
         )
         paymentSheet.presentLite(from: viewController, completion: completion)

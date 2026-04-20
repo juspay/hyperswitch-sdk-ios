@@ -25,7 +25,7 @@ class HyperViewModel: ObservableObject {
         Task {
             do {
                 let json = try await NetworkUtility.fetchData(from: "/create-payment-intent", baseUrl: backendUrl)
-                guard let paymentIntentClientSecret = json["clientSecret"] as? String,
+                guard let sdkAuthorization = json["sdkAuthorization"] as? String,
                     let publishableKey = json["publishableKey"] as? String,
                     let profileId = json["profileId"] as? String
                 else {
@@ -35,7 +35,7 @@ class HyperViewModel: ObservableObject {
                 DispatchQueue.main.async {
                     self.status = .success
                     self.paymentSession = PaymentSession(publishableKey: publishableKey, profileId: profileId)
-                    self.paymentSession?.initPaymentSession(paymentIntentClientSecret: paymentIntentClientSecret)
+                    self.paymentSession?.initPaymentSession(sdkAuthorization: sdkAuthorization)
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -54,7 +54,7 @@ class HyperViewModel: ObservableObject {
                 }
 
                 let json = try await NetworkUtility.fetchData(from: "/create-payment-intent", baseUrl: backendUrl)
-                guard let paymentIntentClientSecret = json["clientSecret"] as? String,
+                guard let sdkAuthorization = json["sdkAuthorization"] as? String,
                     let publishableKey = json["publishableKey"] as? String,
                     let profileId = json["profileId"] as? String
                 else {
@@ -65,8 +65,8 @@ class HyperViewModel: ObservableObject {
                     self.status = .success
                     self.paymentSession = PaymentSession(publishableKey: publishableKey, profileId: profileId)
 
-                    self.paymentSession?.initPaymentManagementSession(ephemeralKey: ephemeralKey, paymentIntentClientSecret: nil)
-                    self.paymentSession?.initPaymentSession(paymentIntentClientSecret: paymentIntentClientSecret)
+                    self.paymentSession?.initPaymentManagementSession(ephemeralKey: ephemeralKey, sdkAuthorization: nil)
+                    self.paymentSession?.initPaymentSession(sdkAuthorization: sdkAuthorization)
                 }
             } catch {
                 DispatchQueue.main.async {
