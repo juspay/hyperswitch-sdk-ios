@@ -10,19 +10,19 @@ import UIKit
 
 public class PaymentIntentParams: NSObject {
 
-    public init(clientSecret: String) {
-        self.clientSecret = clientSecret
+    public init(sdkAuthorization: String) {
+        self.sdkAuthorization = sdkAuthorization
         super.init()
     }
 
-    public var clientSecret: String = ""
+    public var sdkAuthorization: String = ""
     @objc public var paymentMethodParams: PaymentMethodParams?
 
     public func description() -> [String: Any] {
         let props: [String: Any] = [
             "publishableKey": APIClient.shared.publishableKey ?? "",
             "profileId": APIClient.shared.profileId ?? "",
-            "clientSecret": self.clientSecret,
+            "sdkAuthorization": self.sdkAuthorization,
             "paymentMethodType": "Card",
             "paymentMethodData": "",
         ]
