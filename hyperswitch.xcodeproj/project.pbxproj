@@ -100,6 +100,8 @@
 		79727F932EE73E7E00D60AB4 /* LogPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790F84812D8C31E500178A09 /* LogPayload.swift */; };
 		79727F952EE74F7400D60AB4 /* ClickToPayProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79727F942EE74F7400D60AB4 /* ClickToPayProtocol.swift */; };
 		79728FB92C3412BB00CA8C10 /* HeadlessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */; };
+		7973FF352F963E0D000ADE41 /* WidgetResponseRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7973FF342F963E0D000ADE41 /* WidgetResponseRegistry.swift */; };
+		7973FF372F963E13000ADE41 /* WidgetAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7973FF362F963E13000ADE41 /* WidgetAction.swift */; };
 		7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7996A8322BA1FDD000394FAF /* hyperswitch.bundle */; };
 		799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */; };
 		79D474B42CC6FDC30022C47E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B32CC6FDBF0022C47E /* Helper.swift */; };
@@ -264,6 +266,8 @@
 		7954A4492C23A49A00FEC02D /* ApplePayViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayViewManager.swift; sourceTree = "<group>"; };
 		79727F942EE74F7400D60AB4 /* ClickToPayProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayProtocol.swift; sourceTree = "<group>"; };
 		79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlessViewController.swift; sourceTree = "<group>"; };
+		7973FF342F963E0D000ADE41 /* WidgetResponseRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetResponseRegistry.swift; sourceTree = "<group>"; };
+		7973FF362F963E13000ADE41 /* WidgetAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetAction.swift; sourceTree = "<group>"; };
 		7996A8322BA1FDD000394FAF /* hyperswitch.bundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hyperswitch.bundle; sourceTree = "<group>"; };
 		799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		79D474B32CC6FDBF0022C47E /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
@@ -631,6 +635,8 @@
 				66486FA32943580F00150E4F /* RNViewManager.swift */,
 				752CF93B2DF6D47A0056F58A /* RNHeadlessManager.swift */,
 				75E692F92D5B28D70077C0F3 /* OTAServices.swift */,
+				7973FF342F963E0D000ADE41 /* WidgetResponseRegistry.swift */,
+				7973FF362F963E13000ADE41 /* WidgetAction.swift */,
 			);
 			path = NativeModule;
 			sourceTree = "<group>";
@@ -900,6 +906,7 @@
 				4E8C838A2E98CABF00A61749 /* AuthenticationError.swift in Sources */,
 				7905257A2BDA73A600D49FE8 /* SwiftUIView.swift in Sources */,
 				4EEA67042D37B493000D4DC5 /* HyperParams.swift in Sources */,
+				7973FF352F963E0D000ADE41 /* WidgetResponseRegistry.swift in Sources */,
 				DC5D0114294731480017C67A /* PaymentSheet.swift in Sources */,
 				4E87FA612CAAE8E300E74113 /* PaymentManagementConfiguration.swift in Sources */,
 				DC5D0115294731480017C67A /* PaymentSheetView+SwiftUI.swift in Sources */,
@@ -939,6 +946,7 @@
 				66486F94294355BD00150E4F /* ContentView.swift in Sources */,
 				792D69F62B95E942001598CD /* ExpressCheckoutLauncher.swift in Sources */,
 				4E69679B2CB7CF71000DBE0A /* PMMViewController.swift in Sources */,
+				7973FF372F963E13000ADE41 /* WidgetAction.swift in Sources */,
 				DC5D011E294844900017C67A /* ViewController.swift in Sources */,
 				DC5D011F2E968D7100185E87 /* AuthenticationViewController.swift in Sources */,
 				79D474B72CC6FDE80022C47E /* RNResponseHandler.swift in Sources */,
