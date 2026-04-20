@@ -20,12 +20,12 @@ public class ExpressCheckoutLauncher {
     init() {}
 
     static var configuration: PaymentSheet.Configuration?
-    static var intentClientSecret: String?
+    static var sdkAuthorization: String?
     static var completion: ((ExpressCheckoutResult) -> Void)?
     static var themes: String?
 
     public convenience init(
-        paymentIntentClientSecret: String,
+        sdkAuthorization: String,
         configuration: PaymentSheet.Configuration,
         themes: String? = nil,
         completion: @escaping ((ExpressCheckoutResult) -> Void)
@@ -34,14 +34,14 @@ public class ExpressCheckoutLauncher {
         self.init()
 
         ExpressCheckoutLauncher.configuration = configuration
-        ExpressCheckoutLauncher.intentClientSecret = paymentIntentClientSecret
+        ExpressCheckoutLauncher.sdkAuthorization = sdkAuthorization
         ExpressCheckoutLauncher.themes = themes
         ExpressCheckoutLauncher.completion = completion
 
         let props: [String: Any] = [
             "publishableKey": APIClient.shared.publishableKey as Any,
             "profileId": APIClient.shared.profileId as Any,
-            "clientSecret": paymentIntentClientSecret,
+            "sdkAuthorization": sdkAuthorization,
             "paymentMethodType": "expressCheckout",
             "paymentMethodData": "",
             "confirm": false,
@@ -59,7 +59,7 @@ public class ExpressCheckoutLauncher {
 
             let props: [String: Any] = [
                 "type": "widgetPayment",
-                "clientSecret": ExpressCheckoutLauncher.intentClientSecret as Any,
+                "sdkAuthorization": ExpressCheckoutLauncher.sdkAuthorization as Any,
                 "publishableKey": APIClient.shared.publishableKey as Any,
                 "profileId": APIClient.shared.profileId as Any,
                 "hyperParams": hyperParams,
@@ -106,7 +106,7 @@ extension ExpressCheckoutLauncher {
         var props: [String: Any] = [
             "publishableKey": APIClient.shared.publishableKey as Any,
             "profileId": APIClient.shared.profileId as Any,
-            "clientSecret": ExpressCheckoutLauncher.intentClientSecret as Any,
+            "sdkAuthorization": ExpressCheckoutLauncher.sdkAuthorization as Any,
             "paymentMethodType": "expressCheckout",
             "paymentMethodData": "",
             "confirm": true,
