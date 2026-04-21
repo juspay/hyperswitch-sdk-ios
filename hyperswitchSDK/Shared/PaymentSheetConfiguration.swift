@@ -221,6 +221,34 @@ extension PaymentSheet {
 
         /// Api key used to invoke netcetera sdk for redirection-less 3DS authentication.
         public var netceteraSDKApiKey: String?
+        
+        /// Custom display names for TAB-type payment methods.
+        ///
+        /// Each entry maps a payment method name (e.g. `"klarna"`) to a merchant-defined
+        /// alias (e.g. `"Buy Now, Pay Later"`). Only applies to TAB-type payment methods;
+        /// wallet buttons are not affected.
+        ///
+        /// Example:
+        /// ```swift
+        /// configuration.customMethodNames = [
+        ///     PaymentSheet.PaymentMethodAlias(paymentMethodName: "klarna", aliasName: "Buy Now, Pay Later")
+        /// ]
+        /// ```
+        public var customMethodNames: [PaymentMethodAlias]?
+    }
+    
+    /// A custom display name mapping for a TAB-type payment method.
+    ///
+    /// - Parameter paymentMethodName: The internal name of the payment method (e.g. `"klarna"`).
+    /// - Parameter aliasName: The merchant-defined display name shown to the customer.
+    public struct PaymentMethodAlias: DictionaryConverter {
+        public var paymentMethodName: String
+        public var aliasName: String
+        
+        public init(paymentMethodName: String, aliasName: String) {
+            self.paymentMethodName = paymentMethodName
+            self.aliasName = aliasName
+        }
     }
 
     /// Configuration related to the Hyperswitch Customer
