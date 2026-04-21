@@ -54,13 +54,29 @@ internal class HyperHeadless: RCTEventEmitter {
     }
 
     @objc
+    private func exitHeadless(_ rnMessage: String) {
+        PaymentSession.exitHeadless(rnMessage: rnMessage)
+    }
+
+    @objc
     private func exitHeadless(_ rootTag: NSNumber, _ rnMessage: String) {
-        //        PaymentSession.exitHeadless(rnMessage: rnMessage)
-        WidgetResponseRegistry.shared.dispatch(
-            rootTag: rootTag,
-            action: .confirmCVCPayment,
-            response: ["data": rnMessage],
-            shouldRemoveView: false
-        )
+        withWidget(rootTag) { w in
+            w.handleConfirmCVCPaymentResponse(rnMessage)
+        }
+    }
+    private func withWidget(_ rootTag: NSNumber, _ block: @escaping (CVCWidget) -> Void) {
+        RCTGetUIManagerQueue().async {
+            self.bridge.uiManager.addUIBlock { _, viewRegistry in
+                guard let view = viewRegistry?[rootTag] else { return }
+                var current: UIView? = view
+                while let v = current {
+                    if let widget = v as? CVCWidget {
+                        block(widget)
+                        return
+                    }
+                    current = v.superview
+                }
+            }
+        }
     }
 }

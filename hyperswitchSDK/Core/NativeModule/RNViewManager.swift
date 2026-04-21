@@ -28,6 +28,13 @@ internal class RNViewManager: NSObject {
         self.rootView = rootView
         return rootView
     }
+    internal func widgetViewForModule(_ moduleName: String, initialProperties: [String: Any]?) -> RCTRootView {
+        return RCTRootView(
+            bridge: self.bridge,
+            moduleName: moduleName,
+            initialProperties: initialProperties
+        )
+    }
 }
 
 extension RNViewManager: RCTBridgeDelegate {
