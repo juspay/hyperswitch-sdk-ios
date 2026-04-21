@@ -18,6 +18,7 @@ struct ContentView: View {
                 Text("Headless View").tag(2)
                 Text("3DS").tag(3)
                 Text("C2P").tag(4)
+                Text("Widget").tag(5)
             }.pickerStyle(SegmentedPickerStyle())
 
             switch selectedSegment {
@@ -31,6 +32,8 @@ struct ContentView: View {
                 ThreeDSView()
             case 4:
                 ClickToPayView()
+            case 5:
+                WidgetView()
             default:
                 UIKitView()
             }
@@ -79,5 +82,16 @@ struct ClickToPayView: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: UINavigationController, context: Context) {
+    }
+}
+
+struct WidgetView: UIViewControllerRepresentable {
+    typealias UIViewControllerType = WidgetViewController
+
+    func makeUIViewController(context: Context) -> WidgetViewController {
+        return WidgetViewController()
+    }
+
+    func updateUIViewController(_ uiViewController: WidgetViewController, context: Context) {
     }
 }

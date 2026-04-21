@@ -28,7 +28,7 @@ internal class HyperModule: RCTEventEmitter {
 
     @objc
     internal override func supportedEvents() -> [String] {
-        return ["confirm", "confirmEC", "initHeadless", "triggerWidgetAction", "updateIntentInit", "updateIntentComplete"]
+        return ["confirm", "confirmEC"]
     }
 
     @objc
@@ -101,24 +101,20 @@ internal class HyperModule: RCTEventEmitter {
     }
 
     @objc
-    private func exitWidgetPaymentsheet(_ rootTag: NSNumber, _ result: String, _ reset: Bool) {
-        WidgetResponseRegistry.shared.dispatch(
-            rootTag: rootTag,
-            action: .confirmPayment,
-            response: ["data": result],
-            shouldRemoveView: true
-        )
-        WidgetResponseRegistry.shared.dispatch(
-            rootTag: rootTag,
-            action: .paymentEvent,
-            response: ["data": result],
-            shouldRemoveView: true
-        )
+    private func exitWidgetPaymentsheet(_ reactTag: NSNumber, _ rnMessage: String, _ reset: Bool) {
+        exitSheet(rnMessage)
     }
 
     @objc
     private func exitPaymentMethodManagement(_ reactTag: NSNumber, _ rnMessage: String, _ reset: Bool) {
         exitSheet(rnMessage)
+    }
+
+    @objc
+    private func notifyWidgetPaymentResult(_ rootTag: NSNumber, _ rnMessage: String) {
+    }
+
+    @objc func emitPaymentEvent(_ rootTag: NSNumber, _ eventType: String, _ payload: NSDictionary) {
     }
 
     @objc
@@ -159,22 +155,6 @@ internal class HyperModule: RCTEventEmitter {
                 error: NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
             )
         }
-    }
-
-    @objc
-    private func notifyWidgetPaymentResult(_ rootTag: NSNumber, _ rnMessage: String) {
-        WidgetResponseRegistry.shared.dispatch(
-            rootTag: rootTag,
-            action: .confirmPayment,
-            response: ["data": rnMessage],
-            shouldRemoveView: false
-        )
-        WidgetResponseRegistry.shared.dispatch(
-            rootTag: rootTag,
-            action: .paymentEvent,
-            response: ["data": rnMessage],
-            shouldRemoveView: false
-        )
     }
 
     @objc
@@ -221,14 +201,5 @@ internal class HyperModule: RCTEventEmitter {
                 reactNativeVC?.dismiss(animated: false, completion: nil)
             }
         }
-    }
-
-    @objc func emitPaymentEvent(_ rootTag: NSNumber, _ eventType: String, _ payload: NSDictionary) {
-        WidgetResponseRegistry.shared.dispatch(
-            rootTag: rootTag,
-            action: .widgetEvent,
-            response: ["data": ["eventName": eventType, "payload": payload]],
-            shouldRemoveView: false
-        )
     }
 }
