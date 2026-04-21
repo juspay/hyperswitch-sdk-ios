@@ -15,9 +15,8 @@ import Foundation
 
 public class PaymentSession {
 
-    internal static var isPresented: Bool = false
-    internal static var sdkAuthorization: String?
-    internal static var ephemeralKey: String?
+    internal var sdkAuthorization: String?
+    internal var ephemeralKey: String?
 
     public init(
         publishableKey: String,
@@ -39,11 +38,11 @@ public class PaymentSession {
     }
 
     public func initPaymentSession(sdkAuthorization: String) {
-        PaymentSession.sdkAuthorization = sdkAuthorization
+        self.sdkAuthorization = sdkAuthorization
     }
 
     public func initPaymentManagementSession(ephemeralKey: String, sdkAuthorization: String? = nil) {
-        PaymentSession.ephemeralKey = ephemeralKey
-        PaymentSession.sdkAuthorization = sdkAuthorization
+        self.ephemeralKey = ephemeralKey
+        self.sdkAuthorization = sdkAuthorization
     }
 }

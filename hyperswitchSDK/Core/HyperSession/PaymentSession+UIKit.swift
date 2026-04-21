@@ -37,8 +37,7 @@ extension PaymentSession {
         configuration: PaymentSheet.Configuration,
         completion: @escaping (PaymentSheetResult) -> Void
     ) {
-        PaymentSession.isPresented = true
-        let paymentSheet = PaymentSheet(sdkAuthorization: PaymentSession.sdkAuthorization ?? "", configuration: configuration)
+        let paymentSheet = PaymentSheet(sdkAuthorization: self.sdkAuthorization ?? "", configuration: configuration)
         paymentSheet.present(from: viewController, completion: completion)
     }
 
@@ -48,9 +47,8 @@ extension PaymentSession {
         params: [String: Any],
         completion: @escaping (PaymentSheetResult) -> Void
     ) {
-        PaymentSession.isPresented = true
         let paymentSheet = PaymentSheet(
-            sdkAuthorization: PaymentSession.sdkAuthorization ?? "",
+            sdkAuthorization: self.sdkAuthorization ?? "",
             configuration: PaymentSheet.Configuration()
         )
         paymentSheet.presentWithParams(from: viewController, props: params, completion: completion)
@@ -58,12 +56,11 @@ extension PaymentSession {
 
     public func getCustomerSavedPaymentMethods(_ func_: @escaping (PaymentSessionHandler) -> Void) {
         PaymentSession.hasResponded = false
-        PaymentSession.isPresented = false
         PaymentSession.headlessCompletion = func_
         RNHeadlessManager.sharedInstance.reinvalidateBridge()
         let hyperParams = HyperParams.getHyperParams()
         let props: [String: Any] = [
-            "sdkAuthorization": PaymentSession.sdkAuthorization as Any,
+            "sdkAuthorization": self.sdkAuthorization as Any,
             "publishableKey": APIClient.shared.publishableKey as Any,
             "profileId": APIClient.shared.profileId as Any,
             "hyperParams": hyperParams,
