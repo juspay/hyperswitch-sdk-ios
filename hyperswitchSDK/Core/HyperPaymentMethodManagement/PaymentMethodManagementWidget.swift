@@ -48,7 +48,7 @@ internal class PaymentMethodManagementWidget: UIControl {
         let props: [String: Any] = [
             "type": "paymentMethodsManagement",
             "hyperParams": hyperParams,
-            "ephemeralKey": PaymentSession.ephemeralKey ?? "",
+            //            "ephemeralKey": PaymentSession.ephemeralKey ?? "",  // TODO: use paymentSession.ephemeralKey
             "publishableKey": APIClient.shared.publishableKey as Any,
             "profileId": APIClient.shared.profileId as Any,
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,

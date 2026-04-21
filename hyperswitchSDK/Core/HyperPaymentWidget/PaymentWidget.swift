@@ -33,7 +33,7 @@ public class PaymentWidget: UIControl {
         let props: [String: Any] = [
             "configuration": configuration.toDictionary() as Any,
             "type": "widgetPaymentSheet",
-            "sdkAuthorization": PaymentSession.sdkAuthorization as Any,
+            "sdkAuthorization": paymentSession.sdkAuthorization as Any,
             "publishableKey": APIClient.shared.publishableKey as Any,
             "profileId": APIClient.shared.profileId as Any,
             "hyperParams": hyperParams,
