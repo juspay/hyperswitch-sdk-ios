@@ -17,7 +17,11 @@ public class PaymentWidget: UIControl {
     private var initCallback: ((PaymentResult) -> Void)?
     private var confirmCallback: ((PaymentResult) -> Void)?
 
-    init(paymentSession: PaymentSession, configuration: PaymentSheet.Configuration? = nil, completion: ((PaymentResult) -> Void)? = nil) {
+    public init(
+        paymentSession: PaymentSession,
+        configuration: PaymentSheet.Configuration? = nil,
+        completion: ((PaymentResult) -> Void)? = nil
+    ) {
         self.paymentSession = paymentSession
         self.configuration = configuration
         self.configurationDict = nil
@@ -27,7 +31,11 @@ public class PaymentWidget: UIControl {
     }
 
     // pass through
-    init(paymentSession: PaymentSession, configuration: [String: Any]? = nil, completion: ((PaymentResult) -> Void)? = nil) {
+    public init(
+        paymentSession: PaymentSession,
+        configuration: [String: Any]? = nil,
+        completion: ((PaymentResult) -> Void)? = nil
+    ) {
         self.paymentSession = paymentSession
         self.configuration = nil
         self.configurationDict = configuration
@@ -78,7 +86,7 @@ public class PaymentWidget: UIControl {
         }
     }
 
-    func confirm(resolve: @escaping (PaymentResult) -> Void) {
+    public func confirm(resolve: @escaping (PaymentResult) -> Void) {
         self.confirmCallback = resolve
         let payload: [String: Any] = [
             "rootTag": self.widgetReactTag ?? -1,

@@ -16,7 +16,7 @@ public class CVCWidget: UIControl {
     private var rootView: RCTRootView?
     private var cvcCallback: ((PaymentResult) -> Void)?
 
-    init(paymentSession: PaymentSession, configuration: PaymentSheet.Configuration? = nil) {
+    public init(paymentSession: PaymentSession, configuration: PaymentSheet.Configuration? = nil) {
         self.paymentSession = paymentSession
         self.configuration = configuration
         self.configurationDict = nil
@@ -25,7 +25,7 @@ public class CVCWidget: UIControl {
     }
 
     // pass through
-    init(paymentSession: PaymentSession, configuration: [String: Any]? = nil) {
+    public init(paymentSession: PaymentSession, configuration: [String: Any]? = nil) {
         self.paymentSession = paymentSession
         self.configuration = nil
         self.configurationDict = configuration
