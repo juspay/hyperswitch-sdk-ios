@@ -10,14 +10,25 @@ import Foundation
 public class CVCWidget: UIControl {
 
     private let paymentSession: PaymentSession
-    private let configuration: PaymentSheet.Configuration
+    private let configuration: PaymentSheet.Configuration?
+    private let configurationDict: [String: Any]?
     private var widgetReactTag: NSNumber?
     private var rootView: RCTRootView?
-    private var cvcCallback: RCTResponseSenderBlock?
+    private var cvcCallback: ((PaymentResult) -> Void)?
 
-    init(paymentSession: PaymentSession, configuration: PaymentSheet.Configuration) {
+    init(paymentSession: PaymentSession, configuration: PaymentSheet.Configuration? = nil) {
         self.paymentSession = paymentSession
         self.configuration = configuration
+        self.configurationDict = nil
+        super.init(frame: .zero)
+        commonInit()
+    }
+
+    // pass through
+    init(paymentSession: PaymentSession, configuration: [String: Any]? = nil) {
+        self.paymentSession = paymentSession
+        self.configuration = nil
+        self.configurationDict = configuration
         super.init(frame: .zero)
         commonInit()
     }
@@ -31,7 +42,7 @@ public class CVCWidget: UIControl {
         let hyperParams = HyperParams.getHyperParams()
 
         let props: [String: Any] = [
-            "configuration": configuration.toDictionary() as Any,
+            "configuration": configurationDict ?? configuration?.toDictionary() as Any,
             "type": "cvcWidget",
             "sdkAuthorization": paymentSession.sdkAuthorization as Any,
             "publishableKey": APIClient.shared.publishableKey as Any,
@@ -63,13 +74,12 @@ public class CVCWidget: UIControl {
         }
     }
 
-    func confirm(paymentToken: String, paymentMethodId: String, resolve: @escaping RCTResponseSenderBlock) {
-        self.cvcCallback = resolve
+    func confirm(paymentToken: String) {
         let payload: [String: Any] = [
             "actionType": "CONFIRM_CVC_PAYMENT",
             "rootTag": self.widgetReactTag ?? -1,
+            "sdkAuthorization": paymentSession.sdkAuthorization as Any,
             "paymentToken": paymentToken,
-            "paymentMethodId": paymentMethodId,
         ]
         self.rootView?.bridge.enqueueJSCall(
             "RCTDeviceEventEmitter",
@@ -77,10 +87,5 @@ public class CVCWidget: UIControl {
             args: ["triggerWidgetAction", payload],
             completion: nil
         )
-    }
-
-    internal func handleConfirmCVCPaymentResponse(_ result: String) {
-        cvcCallback?([result])
-        cvcCallback = nil
     }
 }

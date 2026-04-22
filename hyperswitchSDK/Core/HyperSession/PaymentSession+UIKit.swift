@@ -28,14 +28,14 @@ extension PaymentSession {
         callback(result)
     }
 
-    public func presentPaymentSheet(viewController: UIViewController, completion: @escaping (PaymentSheetResult) -> Void) {
+    public func presentPaymentSheet(viewController: UIViewController, completion: @escaping (PaymentResult) -> Void) {
         presentPaymentSheet(viewController: viewController, configuration: PaymentSheet.Configuration(), completion: completion)
     }
 
     public func presentPaymentSheet(
         viewController: UIViewController,
         configuration: PaymentSheet.Configuration,
-        completion: @escaping (PaymentSheetResult) -> Void
+        completion: @escaping (PaymentResult) -> Void
     ) {
         let paymentSheet = PaymentSheet(sdkAuthorization: self.sdkAuthorization ?? "", configuration: configuration)
         paymentSheet.present(from: viewController, completion: completion)
@@ -45,7 +45,7 @@ extension PaymentSession {
     public func presentPaymentSheetWithParams(
         viewController: UIViewController,
         params: [String: Any],
-        completion: @escaping (PaymentSheetResult) -> Void
+        completion: @escaping (PaymentResult) -> Void
     ) {
         let paymentSheet = PaymentSheet(
             sdkAuthorization: self.sdkAuthorization ?? "",
@@ -120,11 +120,12 @@ extension PaymentSession {
                 },
                 confirmWithCustomerLastUsedPaymentMethod: { cvc, resultHandler in
                     if let paymentToken = getPaymentMethodData2["payment_token"] as? String {
+                        cvc.confirm(paymentToken: paymentToken)
                         self.completion = resultHandler
-                        var map = [String: Any]()
-                        map["paymentToken"] = paymentToken
-                        map["cvc"] = cvc
-                        self.safeResolve(callback, [map], resultHandler)
+                        //                        var map = [String: Any]()
+                        //                        map["paymentToken"] = paymentToken
+                        //                        map["cvc"] = cvc
+                        //                        self.safeResolve(callback, [map], resultHandler)
                     }
                 },
                 confirmWithCustomerPaymentToken: { paymentToken, cvc, resultHandler in

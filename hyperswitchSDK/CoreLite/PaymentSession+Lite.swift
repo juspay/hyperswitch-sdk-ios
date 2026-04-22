@@ -13,7 +13,7 @@ extension PaymentSession {
     public func presentPaymentSheetLite(
         viewController: UIViewController,
         configuration: PaymentSheet.Configuration,
-        completion: @escaping (PaymentSheetResult) -> Void
+        completion: @escaping (PaymentResult) -> Void
     ) {
         let paymentSheet = PaymentSheet(
             sdkAuthorization: self.sdkAuthorization ?? "",

@@ -137,7 +137,8 @@ public struct PaymentSessionHandler {
     public let getCustomerLastUsedPaymentMethodData: () -> Result<PaymentMethod, PMError>
     public let getCustomerSavedPaymentMethodData: () -> Result<[PaymentMethod], PMError>
     private let confirmWithCustomerDefaultPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
-    private let confirmWithCustomerLastUsedPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+    private let confirmWithCustomerLastUsedPaymentMethod:
+        (_ cvcWidget: CVCWidget, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
     private let confirmWithCustomerPaymentToken:
         (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
 
@@ -146,7 +147,8 @@ public struct PaymentSessionHandler {
         getCustomerLastUsedPaymentMethodData: @escaping () -> Result<PaymentMethod, PMError>,
         getCustomerSavedPaymentMethodData: @escaping () -> Result<[PaymentMethod], PMError>,
         confirmWithCustomerDefaultPaymentMethod: @escaping (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void,
-        confirmWithCustomerLastUsedPaymentMethod: @escaping (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void,
+        confirmWithCustomerLastUsedPaymentMethod:
+            @escaping (_ cvcWidget: CVCWidget, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void,
         confirmWithCustomerPaymentToken:
             @escaping (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
     ) {
@@ -162,8 +164,8 @@ public struct PaymentSessionHandler {
         confirmWithCustomerDefaultPaymentMethod(nil, resultHandler)
     }
 
-    public func confirmWithCustomerLastUsedPaymentMethod(resultHandler: @escaping (PaymentResult) -> Void) {
-        confirmWithCustomerLastUsedPaymentMethod(nil, resultHandler)
+    public func confirmWithCustomerLastUsedPaymentMethod(_ cvcWidget: CVCWidget, resultHandler: @escaping (PaymentResult) -> Void) {
+        confirmWithCustomerLastUsedPaymentMethod(cvcWidget, resultHandler)
     }
 
     public func confirmWithCustomerPaymentToken(paymentToken: String, resultHandler: @escaping (PaymentResult) -> Void) {

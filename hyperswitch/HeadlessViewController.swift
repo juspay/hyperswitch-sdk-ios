@@ -153,7 +153,7 @@ class HeadlessViewController: UIViewController {
     }
 
     @objc func confirmWithCustomerLastUsedPaymentMethod(_ sender: Any) {
-        handler?.confirmWithCustomerLastUsedPaymentMethod(resultHandler: resultHandler)
+        //        handler?.confirmWithCustomerLastUsedPaymentMethod(resultHandler: resultHandler)
     }
 
     @objc func confirmWithCustomerPaymentToken(_ sender: Any) {

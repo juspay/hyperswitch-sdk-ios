@@ -64,6 +64,21 @@ class WidgetViewController: UIViewController {
             print(["type": "error", "message": error])
             self.statusLabel.text = "error → \(error)"
         }
+
+    }
+
+    func resultHandler(_ paymentResult: PaymentResult) {
+        switch paymentResult {
+        case .completed(let data):
+            print(["type": "completed", "message": data])
+            self.statusLabel.text = "completed → \(data)"
+        case .canceled(let data):
+            print(["type": "canceled", "message": data])
+            self.statusLabel.text = "canceled → \(data)"
+        case .failed(let error):
+            print(["type": "failed", "message": "\(error)"])
+            self.statusLabel.text = "failed → \(error)"
+        }
     }
 
     func attachPaymentWidget() {
@@ -88,7 +103,9 @@ class WidgetViewController: UIViewController {
         }
 
         if let paymentSession = hyperViewModel.paymentSession {
-            self.paymentWidget = PaymentWidget(paymentSession: paymentSession, configuration: configuration)
+            self.paymentWidget = PaymentWidget(paymentSession: paymentSession, configuration: configuration) { x in
+                print(x)
+            }
             self.cvcWidget = CVCWidget(paymentSession: paymentSession, configuration: configuration)
             if let cvcWidget = cvcWidget {
                 view.addSubview(cvcWidget)
@@ -144,9 +161,7 @@ class WidgetViewController: UIViewController {
             let paymentToken = paymentToken,
             let paymentMethodId = paymentMethodId
         {
-            cvcWidget.confirm(paymentToken: paymentToken, paymentMethodId: paymentMethodId) { x in
-                print(x)
-            }
+            self.handler?.confirmWithCustomerLastUsedPaymentMethod(cvcWidget, resultHandler: resultHandler)
         }
     }
 }

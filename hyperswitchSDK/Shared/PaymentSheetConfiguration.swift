@@ -467,7 +467,7 @@ extension PaymentSheet {
         public typealias ExternalPaymentMethodConfirmHandler = (
             _ externalPaymentMethodType: String,
             _ billingDetails: BillingDetails,
-            _ completion: @escaping ((PaymentSheetResult) -> Void)
+            _ completion: @escaping ((PaymentResult) -> Void)
         ) -> Void
 
         /// This handler is called when the customer confirms the payment using an external payment method.

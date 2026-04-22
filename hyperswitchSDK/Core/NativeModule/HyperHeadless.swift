@@ -54,29 +54,54 @@ internal class HyperHeadless: RCTEventEmitter {
     }
 
     @objc
-    private func exitHeadless(_ rnMessage: String) {
+    private func exitHeadless(_ rootTag: NSNumber, _ rnMessage: String) {
         PaymentSession.exitHeadless(rnMessage: rnMessage)
     }
 
-    @objc
-    private func exitHeadless(_ rootTag: NSNumber, _ rnMessage: String) {
-        withWidget(rootTag) { w in
-            w.handleConfirmCVCPaymentResponse(rnMessage)
+    private func paymentResult(from rnMessage: String) -> PaymentResult {
+        guard let data = rnMessage.data(using: .utf8) else {
+            return .failed(
+                error: NSError(
+                    domain: "UNKNOWN_ERROR",
+                    code: 0,
+                    userInfo: ["message": "An error has occurred."]
+                )
+            )
         }
-    }
-    private func withWidget(_ rootTag: NSNumber, _ block: @escaping (CVCWidget) -> Void) {
-        RCTGetUIManagerQueue().async {
-            self.bridge.uiManager.addUIBlock { _, viewRegistry in
-                guard let view = viewRegistry?[rootTag] else { return }
-                var current: UIView? = view
-                while let v = current {
-                    if let widget = v as? CVCWidget {
-                        block(widget)
-                        return
-                    }
-                    current = v.superview
-                }
+
+        do {
+            guard let jsonDictionary = try JSONSerialization.jsonObject(with: data, options: []) as? [String: String] else {
+                return .failed(
+                    error: NSError(
+                        domain: "UNKNOWN_ERROR",
+                        code: 0,
+                        userInfo: ["message": "An error has occurred."]
+                    )
+                )
             }
+
+            let status = jsonDictionary["status"]
+
+            if status == "failed" || status == "requires_payment_method" {
+                let error = NSError(
+                    domain: (jsonDictionary["code"] ?? "") != "" ? jsonDictionary["code"]! : "UNKNOWN_ERROR",
+                    code: 0,
+                    userInfo: ["message": jsonDictionary["message"] ?? "An error has occurred."]
+                )
+                return .failed(error: error)
+            } else if status == "cancelled" {
+                return .canceled(data: "cancelled")
+            } else {
+                return .completed(data: status ?? "failed")
+            }
+        } catch {
+            return .failed(
+                error: NSError(
+                    domain: "UNKNOWN_ERROR",
+                    code: 0,
+                    userInfo: ["message": "An error has occurred."]
+                )
+            )
         }
     }
 }
