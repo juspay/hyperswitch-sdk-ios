@@ -10,16 +10,31 @@ import Foundation
 public class PaymentWidget: UIControl {
 
     private let paymentSession: PaymentSession
-    private let configuration: PaymentSheet.Configuration
+    private let configuration: PaymentSheet.Configuration?
+    private let configurationDict: [String: Any]?
     private var widgetReactTag: NSNumber?
     private var rootView: RCTRootView?
-    private var paymentCallback: RCTResponseSenderBlock?
+    private var initCallback: ((PaymentResult) -> Void)?
+    private var confirmCallback: ((PaymentResult) -> Void)?
 
-    init(paymentSession: PaymentSession, configuration: PaymentSheet.Configuration) {
+    init(paymentSession: PaymentSession, configuration: PaymentSheet.Configuration? = nil, completion: ((PaymentResult) -> Void)? = nil) {
         self.paymentSession = paymentSession
         self.configuration = configuration
+        self.configurationDict = nil
+        self.initCallback = completion
         super.init(frame: .zero)
         commonInit()
+    }
+
+    // pass through
+    init(paymentSession: PaymentSession, configuration: [String: Any]? = nil, completion: ((PaymentResult) -> Void)? = nil) {
+        self.paymentSession = paymentSession
+        self.configuration = nil
+        self.configurationDict = configuration
+        self.initCallback = completion
+        super.init(frame: .zero)
+        commonInit()
+
     }
 
     required init?(coder: NSCoder) {
@@ -31,7 +46,7 @@ public class PaymentWidget: UIControl {
         let hyperParams = HyperParams.getHyperParams()
 
         let props: [String: Any] = [
-            "configuration": configuration.toDictionary() as Any,
+            "configuration": configurationDict ?? configuration?.toDictionary() as Any,
             "type": "widgetPaymentSheet",
             "sdkAuthorization": paymentSession.sdkAuthorization as Any,
             "publishableKey": APIClient.shared.publishableKey as Any,
@@ -63,8 +78,8 @@ public class PaymentWidget: UIControl {
         }
     }
 
-    func confirm(resolve: @escaping RCTResponseSenderBlock) {
-        self.paymentCallback = resolve
+    func confirm(resolve: @escaping (PaymentResult) -> Void) {
+        self.confirmCallback = resolve
         let payload: [String: Any] = [
             "rootTag": self.widgetReactTag ?? -1,
             "actionType": "CONFIRM_PAYMENT_ACTION",
@@ -77,8 +92,16 @@ public class PaymentWidget: UIControl {
         )
     }
 
-    internal func handleConfirmPaymentResponse(_ result: String) {
-        paymentCallback?([result])
-        paymentCallback = nil
+    internal func handleConfirmPaymentResponse(_ result: PaymentResult) {
+        if let confirmCallback {
+            confirmCallback(result)
+        } else {
+            initCallback?(result)
+        }
+        confirmCallback = nil
+        initCallback = nil
+        rootView?.removeFromSuperview()
+        rootView = nil
+        widgetReactTag = nil
     }
 }

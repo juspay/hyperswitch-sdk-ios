@@ -9,7 +9,7 @@ import SwiftUI
 
 struct SwiftUIView: View {
     @ObservedObject var hyperViewModel = HyperViewModel()
-    @State var paymentResult: PaymentSheetResult?
+    @State var paymentResult: PaymentResult?
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -76,7 +76,7 @@ struct SwiftUIView: View {
 
         return configuration
     }
-    func onPaymentCompletion(result: PaymentSheetResult) {
+    func onPaymentCompletion(result: PaymentResult) {
         DispatchQueue.main.async {
             paymentResult = result
         }

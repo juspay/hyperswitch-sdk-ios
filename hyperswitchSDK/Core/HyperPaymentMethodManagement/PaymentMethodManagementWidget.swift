@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 import WebKit
 
-/// PaymentSheetResult is an enum that represents the possible outcomes of a payment sheet operation.
+/// PaymentResult is an enum that represents the possible outcomes of a payment sheet operation.
 @frozen public enum PaymentMethodManagementResult {
     case closed(data: String)
     case failed(error: Error)

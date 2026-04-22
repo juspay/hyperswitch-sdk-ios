@@ -17,7 +17,7 @@ extension PaymentSheet {
         private let paymentSession: PaymentSession
         private let configuration: Configuration
         private let content: Content
-        private let completion: (PaymentSheetResult) -> Void
+        private let completion: (PaymentResult) -> Void
 
         @Environment(\.viewController) private var viewControllerHolder: UIViewController?
 
@@ -25,7 +25,7 @@ extension PaymentSheet {
         public init(
             paymentSession: PaymentSession,
             configuration: Configuration,
-            onCompletion: @escaping (PaymentSheetResult) -> Void,
+            onCompletion: @escaping (PaymentResult) -> Void,
             @ViewBuilder content: () -> Content
         ) {
             self.paymentSession = paymentSession

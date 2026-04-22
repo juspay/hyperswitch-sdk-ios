@@ -20,7 +20,7 @@ internal class WebViewController: HyperUIViewController {
     private var webView: WKWebView = WKWebView()
     private var popupWebView: WKWebView?
     private var props: [String: Any]?
-    private var completion: ((PaymentSheetResult) -> Void)?
+    private var completion: ((PaymentResult) -> Void)?
 
     typealias scanCallback = ([[String: Any]]) -> Void
 
@@ -29,7 +29,7 @@ internal class WebViewController: HyperUIViewController {
         configureWebView()
     }
 
-    init(props: [String: Any], completion: ((PaymentSheetResult) -> Void)?) {
+    init(props: [String: Any], completion: ((PaymentResult) -> Void)?) {
         self.props = props
         self.completion = completion
         super.init(nibName: nil, bundle: nil)
@@ -98,7 +98,7 @@ internal class WebViewController: HyperUIViewController {
         }
     }
 
-    private func callback(_ result: PaymentSheetResult) {
+    private func callback(_ result: PaymentResult) {
         DispatchQueue.main.async { [weak self] in
             self?.completion?(result)
             self?.webView.stopLoading()
@@ -178,7 +178,7 @@ extension WebViewController: WKScriptMessageHandler {
                     throw NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
                 }
 
-                let result: PaymentSheetResult
+                let result: PaymentResult
 
                 if let status = jsonDictionary["status"] {
                     switch status {

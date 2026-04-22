@@ -15,7 +15,7 @@ internal extension PaymentSheet {
     private func presentWithRootView(
         from presentingViewController: UIViewController,
         rootView: RCTRootView,
-        completion: @escaping (PaymentSheetResult) -> Void
+        completion: @escaping (PaymentResult) -> Void
     ) {
 
         /// Set the completion closure for handling the payment sheet result.
@@ -38,7 +38,7 @@ internal extension PaymentSheet {
     }
 
     /// Method to present the payment sheet view with the default configuration.
-    func present(from presentingViewController: UIViewController, completion: @escaping (PaymentSheetResult) -> Void) {
+    func present(from presentingViewController: UIViewController, completion: @escaping (PaymentResult) -> Void) {
 
         // Present the payment sheet view with the root view obtained from the getRootView() method.
         self.presentWithRootView(from: presentingViewController, rootView: self.getRootView(), completion: completion)
@@ -48,7 +48,7 @@ internal extension PaymentSheet {
     func presentWithParams(
         from presentingViewController: UIViewController,
         props: [String: Any],
-        completion: @escaping ((PaymentSheetResult) -> Void)
+        completion: @escaping ((PaymentResult) -> Void)
     ) {
 
         // Present the payment sheet view with the root view obtained from the getRootViewWithParams() method.

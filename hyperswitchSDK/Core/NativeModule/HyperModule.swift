@@ -28,7 +28,7 @@ internal class HyperModule: RCTEventEmitter {
 
     @objc
     internal override func supportedEvents() -> [String] {
-        return ["confirm", "confirmEC"]
+        return ["confirm", "confirmEC", "triggerWidgetAction", "updateIntentInit", "updateIntentComplete"]
     }
 
     @objc
@@ -102,7 +102,57 @@ internal class HyperModule: RCTEventEmitter {
 
     @objc
     private func exitWidgetPaymentsheet(_ reactTag: NSNumber, _ rnMessage: String, _ reset: Bool) {
-        exitSheet(rnMessage)
+        let result = paymentResult(from: rnMessage)
+        withWidget(reactTag) { w in
+            w.handleConfirmPaymentResponse(result)
+        }
+    }
+
+    private func paymentResult(from rnMessage: String) -> PaymentResult {
+        guard let data = rnMessage.data(using: .utf8) else {
+            return .failed(
+                error: NSError(
+                    domain: "UNKNOWN_ERROR",
+                    code: 0,
+                    userInfo: ["message": "An error has occurred."]
+                )
+            )
+        }
+
+        do {
+            guard let jsonDictionary = try JSONSerialization.jsonObject(with: data, options: []) as? [String: String] else {
+                return .failed(
+                    error: NSError(
+                        domain: "UNKNOWN_ERROR",
+                        code: 0,
+                        userInfo: ["message": "An error has occurred."]
+                    )
+                )
+            }
+
+            let status = jsonDictionary["status"]
+
+            if status == "failed" || status == "requires_payment_method" {
+                let error = NSError(
+                    domain: (jsonDictionary["code"] ?? "") != "" ? jsonDictionary["code"]! : "UNKNOWN_ERROR",
+                    code: 0,
+                    userInfo: ["message": jsonDictionary["message"] ?? "An error has occurred."]
+                )
+                return .failed(error: error)
+            } else if status == "cancelled" {
+                return .canceled(data: "cancelled")
+            } else {
+                return .completed(data: status ?? "failed")
+            }
+        } catch {
+            return .failed(
+                error: NSError(
+                    domain: "UNKNOWN_ERROR",
+                    code: 0,
+                    userInfo: ["message": "An error has occurred."]
+                )
+            )
+        }
     }
 
     @objc
@@ -199,6 +249,21 @@ internal class HyperModule: RCTEventEmitter {
             if let view = RNViewManager.sharedInstance.rootView {
                 let reactNativeVC: UIViewController? = view.reactViewController()
                 reactNativeVC?.dismiss(animated: false, completion: nil)
+            }
+        }
+    }
+    private func withWidget(_ rootTag: NSNumber, _ block: @escaping (PaymentWidget) -> Void) {
+        RCTGetUIManagerQueue().async {
+            self.bridge.uiManager.addUIBlock { _, viewRegistry in
+                guard let view = viewRegistry?[rootTag] else { return }
+                var current: UIView? = view
+                while let v = current {
+                    if let widget = v as? PaymentWidget {
+                        block(widget)
+                        return
+                    }
+                    current = v.superview
+                }
             }
         }
     }

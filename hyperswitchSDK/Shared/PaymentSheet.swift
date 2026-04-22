@@ -7,13 +7,6 @@
 
 import Foundation
 
-/// PaymentSheetResult is an enum that represents the possible outcomes of a payment sheet operation.
-@frozen public enum PaymentSheetResult {
-    case completed(data: String)
-    case canceled(data: String)
-    case failed(error: Error)
-}
-
 /// PaymentSheet is a class that handles the presentation and management of a payment sheet interface.
 public class PaymentSheet {
 
@@ -26,5 +19,5 @@ public class PaymentSheet {
     /// The configuration object that holds the settings for the payment sheet.
     internal let configuration: Configuration?
     internal let sdkAuthorization: String
-    internal var completion: ((PaymentSheetResult) -> Void)?
+    internal var completion: ((PaymentResult) -> Void)?
 }
