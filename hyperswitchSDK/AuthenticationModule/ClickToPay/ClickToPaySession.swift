@@ -63,12 +63,6 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
     // MUST be called from outside `pendingRequestsQueue`
     private func checkSessionClosed() throws {
-        logger(
-            type: "DEBUG",
-            eventName: .checkSessionClosed,
-            category: .USER_EVENT,
-            value: "isClosed: \(isClosed)"
-        )
         try pendingRequestsQueue.sync {
             if isClosed {
                 throw ClickToPayException(message: "Session is closed", type: .error)
@@ -111,9 +105,9 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         LogManager.initialize(publishableKey: publishableKey)
         logger(
             type: "DEBUG",
-            eventName: .createWebviewInit,
+            eventName: .createWebViewInit,
             category: .USER_EVENT,
-            value: "hyperLoaderUrl: \(hyperLoaderUrl), baseUrl: \(baseUrl)"
+            value: "viewController \(String(describing: viewController))"
         )
 
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
@@ -125,7 +119,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             }
         }
 
-        logger(type: "DEBUG", eventName: .createWebviewReturned, category: .USER_EVENT, value: "")
+        logger(type: "DEBUG", eventName: .createWebViewReturned, category: .USER_EVENT, value: "")
     }
 
     private func setupWebView() {
@@ -209,6 +203,12 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                   <body></body>
                 </html>
             """
+        logger(
+            type: "DEBUG",
+            eventName: .scriptLoadInit,
+            category: .USER_EVENT,
+            value: "hyperLoaderUrl: \(hyperLoaderUrl), baseUrl: \(baseUrl)"
+        )
         webView?.loadHTMLString(baseHtml, baseURL: URL(string: baseUrl))
     }
 
@@ -220,7 +220,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     ) -> WKWebView? {
 
         if navigationAction.targetFrame == nil {
-            logger(type: "DEBUG", eventName: .createNewWebviewInit, category: .USER_EVENT, value: "")
+            logger(type: "DEBUG", eventName: .createNewWebViewInit, category: .USER_EVENT, value: "")
 
             self.popupWebView = WKWebView(frame: .zero, configuration: configuration)
             self.popupWebViewController = UIViewController()
@@ -252,7 +252,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
                 topViewController.present(popupWebViewController, animated: true)
             }
-            logger(type: "DEBUG", eventName: .createNewWebviewReturned, category: .USER_EVENT, value: "success")
+            logger(type: "DEBUG", eventName: .createNewWebViewReturned, category: .USER_EVENT, value: "success")
             return popupWebView
         }
         return nil
@@ -357,7 +357,12 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
             let data = json["data"] as? [String: Any]
         else {
-            logger(type: "ERROR", eventName: .initClickToPaySessionReturned, category: .USER_ERROR, value: "Failed to parse response")
+            logger(
+                type: "ERROR",
+                eventName: .initClickToPaySessionReturned,
+                category: .USER_ERROR,
+                value: "Type: ERROR, Message: Failed to parse response"
+            )
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
 
@@ -401,7 +406,12 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         }
         // INFO: always set before logging
 
-        logger(type: "DEBUG", eventName: .getActiveClickToPaySessionInit, category: .USER_EVENT, value: "")
+        logger(
+            type: "DEBUG",
+            eventName: .getActiveClickToPaySessionInit,
+            category: .USER_EVENT,
+            value: "viewController \(String(describing: viewController))"
+        )
         try checkSessionClosed()
 
         let requestId = UUID().uuidString
@@ -453,7 +463,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                 type: "ERROR",
                 eventName: .getActiveClickToPaySessionReturned,
                 category: .USER_ERROR,
-                value: "Failed to parse response"
+                value: "Type: ERROR, Message: Failed to parse response"
             )
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
@@ -519,7 +529,12 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
             let data = json["data"] as? [String: Any]
         else {
-            logger(type: "ERROR", eventName: .isCustomerPresentReturned, category: .USER_ERROR, value: "Failed to parse response")
+            logger(
+                type: "ERROR",
+                eventName: .isCustomerPresentReturned,
+                category: .USER_ERROR,
+                value: "Type: ERROR, Message: Failed to parse response"
+            )
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
 
@@ -549,7 +564,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             type: "ERROR",
             eventName: .isCustomerPresentReturned,
             category: .USER_ERROR,
-            value: "Type: error, Message: Failed to decode response"
+            value: "Type: ERROR, Message: Failed to decode response"
         )
         throw ClickToPayException(message: "Failed to decode response", type: .error)
     }
@@ -596,7 +611,12 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
             let data = json["data"] as? [String: Any]
         else {
-            logger(type: "ERROR", eventName: .getUserTypeReturned, category: .USER_ERROR, value: "Failed to parse response")
+            logger(
+                type: "ERROR",
+                eventName: .getUserTypeReturned,
+                category: .USER_ERROR,
+                value: "Type: ERROR, Message: Failed to parse response"
+            )
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
 
@@ -670,7 +690,12 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
             let data = json["data"]
         else {
-            logger(type: "ERROR", eventName: .getRecognisedCardsReturned, category: .USER_ERROR, value: "Failed to parse response")
+            logger(
+                type: "ERROR",
+                eventName: .getRecognisedCardsReturned,
+                category: .USER_ERROR,
+                value: "Type: ERROR, Message: Failed to parse response"
+            )
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
 
@@ -699,7 +724,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                 type: "ERROR",
                 eventName: .getRecognisedCardsReturned,
                 category: .USER_ERROR,
-                value: "Type: error, Message: Failed to decode response"
+                value: "Type: ERROR, Message: Failed to decode response"
             )
             throw ClickToPayException(message: "Failed to decode response", type: .error)
         }
@@ -764,7 +789,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                 type: "ERROR",
                 eventName: .validateCustomerAuthenticationReturned,
                 category: .USER_ERROR,
-                value: "Failed to parse response"
+                value: "Type: ERROR, Message: Failed to parse response"
             )
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
@@ -799,7 +824,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                 type: "ERROR",
                 eventName: .validateCustomerAuthenticationReturned,
                 category: .USER_ERROR,
-                value: "Type: error, Message: Failed to decode response"
+                value: "Type: ERROR, Message: Failed to decode response"
             )
             throw ClickToPayException(message: "Failed to decode response", type: .error)
         }
@@ -858,7 +883,12 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
             let data = json["data"] as? [String: Any]
         else {
-            logger(type: "ERROR", eventName: .signOutReturned, category: .USER_ERROR, value: "Failed to parse response")
+            logger(
+                type: "ERROR",
+                eventName: .signOutReturned,
+                category: .USER_ERROR,
+                value: "Type: ERROR, Message: Failed to parse response"
+            )
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
 
@@ -879,7 +909,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             logger(type: "DEBUG", eventName: .signOutReturned, category: .USER_EVENT, value: "recognized: \(recognized)")
             return SignOutResponse(recognized: recognized)
         }
-        logger(type: "ERROR", eventName: .signOutReturned, category: .USER_ERROR, value: "Type: error, Message: Failed to decode response")
+        logger(type: "ERROR", eventName: .signOutReturned, category: .USER_ERROR, value: "Type: ERROR, Message: Failed to decode response")
         throw ClickToPayException(message: "Failed to decode response", type: .error)
     }
 
@@ -934,7 +964,12 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
             let data = json["data"] as? [String: Any]
         else {
-            logger(type: "ERROR", eventName: .checkoutReturned, category: .USER_ERROR, value: "Failed to parse response")
+            logger(
+                type: "ERROR",
+                eventName: .checkoutReturned,
+                category: .USER_ERROR,
+                value: "Type: ERROR, Message: Failed to parse response"
+            )
             throw ClickToPayException(message: "Failed to parse response", type: .error)
         }
 
@@ -958,13 +993,66 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                 type: "ERROR",
                 eventName: .checkoutReturned,
                 category: .USER_ERROR,
-                value: "Type: error, Message: Failed to decode response"
+                value: "Type: ERROR, Message: Failed to decode response"
             )
             throw ClickToPayException(message: "Failed to decode response", type: .error)
         }
 
         logger(type: "DEBUG", eventName: .checkoutReturned, category: .USER_EVENT, value: "")
         return checkoutResponse
+    }
+
+    private func deinitialize() async throws -> String {
+        let requestId = UUID().uuidString
+        let responseJson: String = try await withCheckedThrowingContinuation { continuation in
+            pendingRequestsQueue.async { [weak self] in
+                self?.pendingRequests[requestId] = continuation
+            }
+
+            let jsCode = """
+                (async function() {
+                    try {
+                        await window.hyperInstance.deinit();
+                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                            requestId: "\(requestId)",
+                            data: { code: "success" }
+                        }));
+                    } catch (error) {
+                        window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                            requestId: "\(requestId)",
+                            data: {
+                                error: {
+                                    type: error.type || "CloseInstanceFailed",
+                                    message: error.message
+                                }
+                            }
+                        }));
+                    }
+                })();
+                """
+
+            DispatchQueue.main.async { [weak self] in
+                self?.webView?.evaluateJavaScript(jsCode, completionHandler: nil)
+            }
+        }
+        guard let jsonData = responseJson.data(using: .utf8),
+            let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+            let data = json["data"] as? [String: Any]
+        else {
+            throw ClickToPayException(message: "Failed to parse response", type: .error)
+        }
+
+        if let error = data["error"] as? [String: Any] {
+            let typeString = error["type"] as? String ?? "ERROR"
+            let errorMessage = error["message"] as? String ?? "Unknown error"
+            let errorType = ClickToPayErrorType(caseInsensitive: typeString) ?? .error
+            throw ClickToPayException(message: errorMessage, type: errorType)
+        }
+
+        if let success = data["code"] as? String {
+            return success
+        }
+        throw ClickToPayException(message: "Failed to decode response", type: .error)
     }
 
     public func close() async {
@@ -977,7 +1065,10 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
         }
 
         guard !alreadyClosed else { return }
-        logger(type: "DEBUG", eventName: .closeWebviewInit, category: .USER_EVENT, value: "")
+
+        let _ = try? await deinitialize()
+
+        logger(type: "DEBUG", eventName: .closeWebViewInit, category: .USER_EVENT, value: "")
         pendingRequestsQueue.sync {
             let pendingRequestsCopy = pendingRequests
             pendingRequests.removeAll()
@@ -1013,8 +1104,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                 }
                 self.cleanupPopupWebView()
                 self.cleanupMainWebView()
-                logger(type: "DEBUG", eventName: .closeWebviewReturned, category: .USER_EVENT, value: "success")
-                logger(type: "DEBUG", eventName: .closeReturned, category: .USER_EVENT, value: "success")
+                logger(type: "DEBUG", eventName: .closeWebViewReturned, category: .USER_EVENT, value: "")
+                logger(type: "DEBUG", eventName: .closeReturned, category: .USER_EVENT, value: "")
                 continuation.resume()
             }
         }
@@ -1159,14 +1250,14 @@ extension ClickToPaySessionImpl: WKScriptMessageHandler {
                 guard let self = self else { return }
 
                 if sdkInitialised {
-                    logger(type: "DEBUG", eventName: .initClickToPaySessionWebReturned, category: .USER_EVENT, value: "")
+                    logger(type: "DEBUG", eventName: .scriptLoadReturn, category: .USER_EVENT, value: "")
                     if let continuation = self.sdkInitContinuation {
                         self.sdkInitContinuation = nil
                         continuation.resume()
                     }
                 } else {
                     let errorMessage = json["error"] as? String ?? "Unknown SDK initialization error"
-                    logger(type: "ERROR", eventName: .initClickToPaySessionWebReturned, category: .USER_ERROR, value: "")
+                    logger(type: "ERROR", eventName: .scriptLoadReturn, category: .USER_ERROR, value: "")
                     if let continuation = self.sdkInitContinuation {
                         self.sdkInitContinuation = nil
                         continuation.resume(
@@ -1182,7 +1273,7 @@ extension ClickToPaySessionImpl: WKScriptMessageHandler {
         }
 
         if let requestId = json["requestId"] as? String {
-            logger(type: "DEBUG", eventName: .userContentControllerWebReturned, category: .USER_EVENT, value: "")
+            logger(type: "DEBUG", eventName: .userContentControllerReturned, category: .USER_EVENT, value: "")
             pendingRequestsQueue.async { [weak self] in
                 if let continuation = self?.pendingRequests.removeValue(forKey: requestId) {
                     continuation.resume(returning: body)
