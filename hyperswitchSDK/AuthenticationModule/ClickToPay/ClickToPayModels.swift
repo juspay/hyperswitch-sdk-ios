@@ -43,10 +43,26 @@ public struct CustomerPresenceResponse: Codable {
 /// Response containing the status of card retrieval
 public struct CardsStatusResponse: Codable {
     public let statusCode: StatusCode
+    public let maskedValidationChannel: MaskedValidationChannel? = nil
+    public let supportedValidationChannel: [SupportedValidationChannel]? = nil
 
     enum CodingKeys: String, CodingKey {
         case statusCode
+        case maskedValidationChannel
+        case supportedValidationChannel
     }
+}
+
+public struct MaskedValidationChannel: Codable {
+    let email: String?
+    let phoneNumber: String?
+}
+
+public struct SupportedValidationChannel: Codable {
+    let validationChannelId: String?
+    let identityProvider: String?
+    let identityType: String?
+    let maskedValidationChannel: String?
 }
 
 /// Status codes for card retrieval
@@ -259,7 +275,16 @@ public enum PaymentData: Codable {
 // MARK: - Error Model
 
 /// Error types for Click to Pay operations
-public enum ClickToPayErrorType: String, Codable {
+public enum ClickToPayErrorType: String, Codable, CaseIterable {
+
+    init?(caseInsensitive rawValue: String) {
+        guard
+            let match = Self.allCases.first(where: {
+                $0.rawValue.caseInsensitiveCompare(rawValue) == .orderedSame
+            })
+        else { return nil }
+        self = match
+    }
     // Get User Type errors
     case authInvalid = "AUTH_INVALID"
     case acctInaccessible = "ACCT_INACCESSIBLE"
