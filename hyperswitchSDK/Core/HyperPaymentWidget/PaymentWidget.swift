@@ -63,6 +63,7 @@ public class PaymentWidget: UIControl {
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,
             "customParams": APIClient.shared.customParams as Any,
+            "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
 
         self.rootView = RNViewManager.sharedInstance.widgetViewForModule(
