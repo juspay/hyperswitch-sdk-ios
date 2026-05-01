@@ -1,4 +1,4 @@
-version = "0.4.5"
+version = "0.4.7"
 
 Pod::Spec.new do |s|
   s.name                      = 'hyperswitch-sdk-ios-lite'
