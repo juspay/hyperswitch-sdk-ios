@@ -5,6 +5,7 @@
 //  Created by Harshit Srivastava on 07/03/24.
 //
 
+import Combine
 import Foundation
 
 @frozen public enum PaymentResult {
@@ -17,6 +18,8 @@ public class PaymentSession {
 
     internal var sdkAuthorization: String?
     internal var ephemeralKey: String?
+    internal let updateIntentDidStart = PassthroughSubject<Void, Never>()
+    internal let updateIntentDidComplete = PassthroughSubject<String, Never>()
 
     public init(
         publishableKey: String,
@@ -44,5 +47,13 @@ public class PaymentSession {
     public func initPaymentManagementSession(ephemeralKey: String, sdkAuthorization: String? = nil) {
         self.ephemeralKey = ephemeralKey
         self.sdkAuthorization = sdkAuthorization
+    }
+
+    public func updateIntent(completion: @escaping (@escaping (String) -> Void) -> Void) {
+        updateIntentDidStart.send(())
+        completion { [weak self] sdkAuthorization in
+            self?.sdkAuthorization = sdkAuthorization
+            self?.updateIntentDidComplete.send(sdkAuthorization)
+        }
     }
 }

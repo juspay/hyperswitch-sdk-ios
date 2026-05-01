@@ -14,6 +14,19 @@ class WidgetViewController: UIViewController {
     @ObservedObject var hyperViewModel = HyperViewModel()
     private var reloadButton = UIButton()
     private var reloadButtonConfiguration = UIButton.Configuration.plain()
+
+    private var updateIntentButton = UIButton()
+    private var updateIntentButtonConfiguration = UIButton.Configuration.plain()
+
+    private var getCustomerSPMButton = UIButton()
+    private var getCustomerSPMButtonConfiguration = UIButton.Configuration.plain()
+
+    private var confirmPaymentWidgetButton = UIButton()
+    private var confirmPaymentWidgetButtonConfiguration = UIButton.Configuration.plain()
+
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
+
     private var statusLabel = UILabel()
     private var cancellables = Set<AnyCancellable>()
     private var paymentWidget: PaymentWidget?
@@ -29,6 +42,7 @@ class WidgetViewController: UIViewController {
         super.viewDidLoad()
         hyperViewModel.fetchNetceteraSDKApiKey()
         hyperViewModel.preparePaymentSheet()
+        setupScrollView()
         asyncBind()
         viewFrame()
     }
@@ -50,6 +64,27 @@ class WidgetViewController: UIViewController {
             .store(in: &cancellables)
     }
 
+    private func setupScrollView() {
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+
+            contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+
+            contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+        ])
+    }
+
     func initSavedPaymentMethodSessionCallback(handler: PaymentSessionHandler) {
         self.handler = handler
         let paymentMethod = handler.getCustomerDefaultSavedPaymentMethodData()
@@ -64,7 +99,6 @@ class WidgetViewController: UIViewController {
             print(["type": "error", "message": error])
             self.statusLabel.text = "error → \(error)"
         }
-
     }
 
     func resultHandler(_ paymentResult: PaymentResult) {
@@ -82,7 +116,6 @@ class WidgetViewController: UIViewController {
     }
 
     func attachPaymentWidget() {
-        hyperViewModel.paymentSession?.getCustomerSavedPaymentMethods(initSavedPaymentMethodSessionCallback)
 
         var configuration = PaymentSheet.Configuration()
         configuration.primaryButtonLabel = "Purchase ($2.00)"
@@ -103,14 +136,12 @@ class WidgetViewController: UIViewController {
         }
 
         if let paymentSession = hyperViewModel.paymentSession {
-            self.paymentWidget = PaymentWidget(paymentSession: paymentSession, configuration: configuration) { x in
-                print(x)
-            }
+            self.paymentWidget = PaymentWidget(paymentSession: paymentSession, configuration: configuration)
             self.cvcWidget = CVCWidget(paymentSession: paymentSession, configuration: configuration)
             if let cvcWidget = cvcWidget {
-                view.addSubview(cvcWidget)
+                contentView.addSubview(cvcWidget)
                 cvcWidget.translatesAutoresizingMaskIntoConstraints = false
-                cvcWidget.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+                cvcWidget.centerXAnchor.constraint(equalTo: contentView.centerXAnchor).isActive = true
                 cvcWidget.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 20).isActive = true
                 cvcWidget.heightAnchor.constraint(equalToConstant: 40).isActive = true
                 cvcWidget.widthAnchor.constraint(equalToConstant: 100).isActive = true
@@ -122,20 +153,21 @@ class WidgetViewController: UIViewController {
                 confirmButton.layer.cornerRadius = 10
                 confirmButton.backgroundColor = .systemBlue
                 confirmButton.isEnabled = false
-                view.addSubview(confirmButton)
+                contentView.addSubview(confirmButton)
                 confirmButton.translatesAutoresizingMaskIntoConstraints = false
-                confirmButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60).isActive = true
-                confirmButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
+                confirmButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 60).isActive = true
+                confirmButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -60).isActive = true
                 confirmButton.topAnchor.constraint(equalTo: cvcWidget.bottomAnchor, constant: 20).isActive = true
                 confirmButton.addTarget(self, action: #selector(confirm(_:)), for: .touchUpInside)
 
                 if let paymentWidget = paymentWidget {
-                    view.addSubview(paymentWidget)
+                    contentView.addSubview(paymentWidget)
                     paymentWidget.translatesAutoresizingMaskIntoConstraints = false
-                    paymentWidget.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10).isActive = true
-                    paymentWidget.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10).isActive = true
+                    paymentWidget.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10).isActive = true
+                    paymentWidget.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
                     paymentWidget.topAnchor.constraint(equalTo: confirmButton.bottomAnchor, constant: 20).isActive = true
                     paymentWidget.heightAnchor.constraint(equalToConstant: 400).isActive = true
+                    paymentWidget.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20).isActive = true
                 }
             }
         }
@@ -154,6 +186,26 @@ class WidgetViewController: UIViewController {
             self.reloadButton.backgroundColor = .systemBlue
             self.reloadButton.isUserInteractionEnabled = true
         }
+    }
+
+    @objc
+    func updateIntent(_ sender: Any) {
+        hyperViewModel.updatePaymentIntent()
+        self.updateIntentButton.isUserInteractionEnabled = false
+        UIView.animate(
+            withDuration: 1.6,
+            animations: {
+                self.updateIntentButton.backgroundColor = .white
+            }
+        ) { (_) in
+            self.updateIntentButton.backgroundColor = .systemBlue
+            self.updateIntentButton.isUserInteractionEnabled = true
+        }
+    }
+
+    @objc
+    func getCustomerSPM(_ sender: Any) {
+        hyperViewModel.paymentSession?.getCustomerSavedPaymentMethods(initSavedPaymentMethodSessionCallback)
     }
     @objc
     func confirm(_ sender: Any) {
@@ -176,19 +228,45 @@ extension WidgetViewController {
         reloadButton.layer.cornerRadius = 10
         reloadButton.backgroundColor = .systemBlue
         reloadButton.addTarget(self, action: #selector(reload(_:)), for: .touchUpInside)
-        view.addSubview(reloadButton)
+        contentView.addSubview(reloadButton)
         reloadButton.translatesAutoresizingMaskIntoConstraints = false
-        reloadButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60).isActive = true
-        reloadButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
-        reloadButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 80).isActive = true
+        reloadButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 60).isActive = true
+        reloadButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -60).isActive = true
+        reloadButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 80).isActive = true
+
+        updateIntentButton.setTitle("Update Intent", for: .normal)
+        updateIntentButton.setTitleColor(.white, for: .normal)
+        updateIntentButtonConfiguration.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        updateIntentButton.configuration = updateIntentButtonConfiguration
+        updateIntentButton.layer.cornerRadius = 10
+        updateIntentButton.backgroundColor = .systemBlue
+        updateIntentButton.addTarget(self, action: #selector(updateIntent(_:)), for: .touchUpInside)
+        contentView.addSubview(updateIntentButton)
+        updateIntentButton.translatesAutoresizingMaskIntoConstraints = false
+        updateIntentButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 60).isActive = true
+        updateIntentButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -60).isActive = true
+        updateIntentButton.topAnchor.constraint(equalTo: reloadButton.bottomAnchor, constant: 20).isActive = true
+
+        getCustomerSPMButton.setTitle("Get Customer SPM", for: .normal)
+        getCustomerSPMButton.setTitleColor(.white, for: .normal)
+        getCustomerSPMButtonConfiguration.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        getCustomerSPMButton.configuration = getCustomerSPMButtonConfiguration
+        getCustomerSPMButton.layer.cornerRadius = 10
+        getCustomerSPMButton.backgroundColor = .systemBlue
+        getCustomerSPMButton.addTarget(self, action: #selector(getCustomerSPM(_:)), for: .touchUpInside)
+        contentView.addSubview(getCustomerSPMButton)
+        getCustomerSPMButton.translatesAutoresizingMaskIntoConstraints = false
+        getCustomerSPMButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 60).isActive = true
+        getCustomerSPMButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -60).isActive = true
+        getCustomerSPMButton.topAnchor.constraint(equalTo: updateIntentButton.bottomAnchor, constant: 20).isActive = true
 
         statusLabel.textAlignment = .center
         statusLabel.numberOfLines = 7
         statusLabel.font = .systemFont(ofSize: 18)
-        view.addSubview(statusLabel)
+        contentView.addSubview(statusLabel)
         statusLabel.translatesAutoresizingMaskIntoConstraints = false
-        statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
-        statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
-        statusLabel.topAnchor.constraint(equalTo: reloadButton.bottomAnchor, constant: 20).isActive = true
+        statusLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
+        statusLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20).isActive = true
+        statusLabel.topAnchor.constraint(equalTo: getCustomerSPMButton.bottomAnchor, constant: 20).isActive = true
     }
 }

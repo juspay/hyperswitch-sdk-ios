@@ -14,6 +14,7 @@ class HyperViewModel: ObservableObject {
     @Published var paymentSession: PaymentSession?
     @Published var status: APIStatus = .loading
     internal var netceteraApiKey: String?
+    internal var paymentId: String?
 
     enum APIStatus {
         case loading
@@ -31,6 +32,7 @@ class HyperViewModel: ObservableObject {
                 else {
                     throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing required fields"])
                 }
+                self.paymentId = json["paymentId"] as? String
 
                 DispatchQueue.main.async {
                     self.status = .success
@@ -40,6 +42,29 @@ class HyperViewModel: ObservableObject {
             } catch {
                 DispatchQueue.main.async {
                     self.status = .failure(error.localizedDescription)
+                }
+            }
+        }
+    }
+
+    func updatePaymentIntent() {
+        self.paymentSession?.updateIntent { completion in
+            if let paymentId = self.paymentId {
+                Task {
+                    do {
+                        let json = try await NetworkUtility.postData(
+                            to: "/update-payment",
+                            body: ["paymentId": paymentId],
+                            baseUrl: self.backendUrl
+                        )
+                        guard let sdkAuthorization = json["sdkAuthorization"] as? String
+                        else {
+                            throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing required fields"])
+                        }
+                        completion(sdkAuthorization)
+                    } catch {
+                        completion("") //needs to be handled
+                    }
                 }
             }
         }
