@@ -9,15 +9,13 @@ import Foundation
 
 public class CVCWidget: UIControl {
 
-    private let paymentSession: PaymentSession
     private let configuration: PaymentSheet.Configuration?
     private let configurationDict: [String: Any]?
     private var widgetReactTag: NSNumber?
     private var rootView: RCTRootView?
     private var cvcCallback: ((PaymentResult) -> Void)?
 
-    public init(paymentSession: PaymentSession, configuration: PaymentSheet.Configuration? = nil) {
-        self.paymentSession = paymentSession
+    public init(configuration: PaymentSheet.Configuration? = nil) {
         self.configuration = configuration
         self.configurationDict = nil
         super.init(frame: .zero)
@@ -25,8 +23,7 @@ public class CVCWidget: UIControl {
     }
 
     // pass through
-    public init(paymentSession: PaymentSession, configurationDict: [String: Any]?) {
-        self.paymentSession = paymentSession
+    public init(configurationDict: [String: Any]?) {
         self.configuration = nil
         self.configurationDict = configurationDict
         super.init(frame: .zero)
@@ -44,7 +41,6 @@ public class CVCWidget: UIControl {
         let props: [String: Any] = [
             "configuration": configurationDict ?? configuration?.toDictionary() as Any,
             "type": "cvcWidget",
-            "sdkAuthorization": paymentSession.sdkAuthorization as Any,
             "publishableKey": APIClient.shared.publishableKey as Any,
             "profileId": APIClient.shared.profileId as Any,
             "hyperParams": hyperParams,
@@ -75,11 +71,11 @@ public class CVCWidget: UIControl {
         }
     }
 
-    func confirm(paymentToken: String) {
+    func confirm(sdkAuthorization: String, paymentToken: String) {
         let payload: [String: Any] = [
             "actionType": "CONFIRM_CVC_PAYMENT",
             "rootTag": self.widgetReactTag ?? -1,
-            "sdkAuthorization": paymentSession.sdkAuthorization as Any,
+            "sdkAuthorization": sdkAuthorization,
             "paymentToken": paymentToken,
         ]
         self.rootView?.bridge.enqueueJSCall(
