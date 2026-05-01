@@ -13,6 +13,7 @@ extension PaymentSession {
     private static var hasResponded: Bool = false
     internal static var headlessCompletion: ((PaymentSessionHandler) -> Void)?
     private static var completion: ((PaymentResult) -> Void)?
+    internal static weak var activeSession: PaymentSession?   // NEW
 
     private static func safeResolve(
         _ callback: @escaping RCTResponseSenderBlock,
@@ -57,6 +58,7 @@ extension PaymentSession {
     public func getCustomerSavedPaymentMethods(_ func_: @escaping (PaymentSessionHandler) -> Void) {
         PaymentSession.hasResponded = false
         PaymentSession.headlessCompletion = func_
+        PaymentSession.activeSession = self
         RNHeadlessManager.sharedInstance.reinvalidateBridge()
         let hyperParams = HyperParams.getHyperParams()
         let props: [String: Any] = [
@@ -120,7 +122,7 @@ extension PaymentSession {
                 },
                 confirmWithCustomerLastUsedPaymentMethod: { cvc, resultHandler in
                     if let paymentToken = getPaymentMethodData2["payment_token"] as? String {
-                        cvc.confirm(paymentToken: paymentToken)
+                        cvc.confirm(sdkAuthorization: PaymentSession.activeSession?.sdkAuthorization ?? "", paymentToken: paymentToken)
                         self.completion = resultHandler
                         //                        var map = [String: Any]()
                         //                        map["paymentToken"] = paymentToken
