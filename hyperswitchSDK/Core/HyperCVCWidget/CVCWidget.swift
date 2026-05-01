@@ -25,10 +25,10 @@ public class CVCWidget: UIControl {
     }
 
     // pass through
-    public init(paymentSession: PaymentSession, configuration: [String: Any]? = nil) {
+    public init(paymentSession: PaymentSession, configurationDict: [String: Any]?) {
         self.paymentSession = paymentSession
         self.configuration = nil
-        self.configurationDict = configuration
+        self.configurationDict = configurationDict
         super.init(frame: .zero)
         commonInit()
     }

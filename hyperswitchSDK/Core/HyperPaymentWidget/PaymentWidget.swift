@@ -5,44 +5,39 @@
 //  Created by Harshit Srivastava on 21/04/26.
 //
 
+import Combine
 import Foundation
 
 public class PaymentWidget: UIControl {
 
     private let paymentSession: PaymentSession
     private let configuration: PaymentSheet.Configuration?
-    private let configurationDict: [String: Any]?
+    private var configurationDict: [String: Any]?
     private var widgetReactTag: NSNumber?
     private var rootView: RCTRootView?
-    private var initCallback: ((PaymentResult) -> Void)?
     private var confirmCallback: ((PaymentResult) -> Void)?
+    private var cancellables = Set<AnyCancellable>()
 
     public init(
         paymentSession: PaymentSession,
-        configuration: PaymentSheet.Configuration? = nil,
-        completion: ((PaymentResult) -> Void)? = nil
+        configuration: PaymentSheet.Configuration? = nil
     ) {
         self.paymentSession = paymentSession
         self.configuration = configuration
         self.configurationDict = nil
-        self.initCallback = completion
         super.init(frame: .zero)
         commonInit()
     }
 
-    // pass through
     public init(
         paymentSession: PaymentSession,
-        configuration: [String: Any]? = nil,
-        completion: ((PaymentResult) -> Void)? = nil
+        configurationDict: [String: Any]?
     ) {
         self.paymentSession = paymentSession
         self.configuration = nil
-        self.configurationDict = configuration
-        self.initCallback = completion
+        self.configurationDict = configurationDict
         super.init(frame: .zero)
         commonInit()
-
     }
 
     required init?(coder: NSCoder) {
@@ -53,8 +48,12 @@ public class PaymentWidget: UIControl {
 
         let hyperParams = HyperParams.getHyperParams()
 
+        var nativeConfig = configuration?.toDictionary()
+        nativeConfig?["hideConfirmButton"] = true
+        configurationDict?["hideConfirmButton"] = true
+
         let props: [String: Any] = [
-            "configuration": configurationDict ?? configuration?.toDictionary() as Any,
+            "configuration": configurationDict ?? nativeConfig as Any,
             "type": "widgetPaymentSheet",
             "sdkAuthorization": paymentSession.sdkAuthorization as Any,
             "publishableKey": APIClient.shared.publishableKey as Any,
@@ -85,6 +84,37 @@ public class PaymentWidget: UIControl {
                 rootView.trailingAnchor.constraint(equalTo: trailingAnchor),
             ])
         }
+
+        paymentSession.updateIntentDidStart
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] in
+                guard let self = self else { return }
+                let payload: [String: Any] = ["rootTag": self.widgetReactTag ?? -1]
+                self.rootView?.bridge.enqueueJSCall(
+                    "RCTDeviceEventEmitter",
+                    method: "emit",
+                    args: ["updateIntentInit", payload],
+                    completion: nil
+                )
+            }
+            .store(in: &cancellables)
+
+        paymentSession.updateIntentDidComplete
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] sdkAuthorization in
+                guard let self = self else { return }
+                let payload: [String: Any] = [
+                    "rootTag": self.widgetReactTag ?? -1,
+                    "sdkAuthorization": sdkAuthorization,
+                ]
+                self.rootView?.bridge.enqueueJSCall(
+                    "RCTDeviceEventEmitter",
+                    method: "emit",
+                    args: ["updateIntentComplete", payload],
+                    completion: nil
+                )
+            }
+            .store(in: &cancellables)
     }
 
     public func confirm(resolve: @escaping (PaymentResult) -> Void) {
@@ -102,13 +132,9 @@ public class PaymentWidget: UIControl {
     }
 
     internal func handleConfirmPaymentResponse(_ result: PaymentResult) {
-        if let confirmCallback {
-            confirmCallback(result)
-        } else {
-            initCallback?(result)
-        }
+        confirmCallback?(result)
         confirmCallback = nil
-        initCallback = nil
+        cancellables.removeAll()
         rootView?.removeFromSuperview()
         rootView = nil
         widgetReactTag = nil
