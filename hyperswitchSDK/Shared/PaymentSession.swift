@@ -23,7 +23,7 @@ public class PaymentSession {
 
     public init(
         publishableKey: String,
-        profileId: String,
+        profileId: String? = nil,
         customBackendUrl: String? = nil,
         customParams: [String: Any]? = nil,
         customLogUrl: String? = nil
