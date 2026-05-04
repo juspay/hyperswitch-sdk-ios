@@ -34,6 +34,14 @@ public class PaymentSession {
         APIClient.shared.customLogUrl = customLogUrl
         APIClient.shared.customParams = customParams
 
+        // Superposition config (fire-and-forget)
+        let serverBaseUrl = "http://10.0.2.2:5252"
+        SuperpositionManager.shared.initialise(
+            configUrl: "\(serverBaseUrl)/v1/sdk/configs/test-id/web/sandbox.json",
+            publishableKey: publishableKey
+        )
+        SuperpositionManager.shared.fetchConfig()
+
         #if canImport(HyperOTA)
         OTAServices.shared.initialize(publishableKey: publishableKey)
         LogManager.initialize(publishableKey: publishableKey)
