@@ -38,7 +38,6 @@ extension PaymentSession {
         configuration: PaymentSheet.Configuration,
         completion: @escaping (PaymentResult) -> Void
     ) {
-        HyperEventEmitter.shared.clear()
         let paymentSheet = PaymentSheet(sdkAuthorization: self.sdkAuthorization ?? "", configuration: configuration)
         paymentSheet.present(from: viewController, completion: completion)
     }
@@ -63,17 +62,17 @@ extension PaymentSession {
         completion: @escaping (PaymentResult) -> Void
     ) {
         var subscribedEvents: [String] = []
+        var listener: PaymentEventListener?
         if let subscribe {
             let builder = PaymentEventSubscriptionBuilder()
             subscribe(builder)
-            let (subscription, listener) = builder.build()
-            HyperEventEmitter.shared.setEventListener(listener, subscription: subscription)
+            let (subscription, builtListener) = builder.build()
+            listener = builtListener
             subscribedEvents = subscription.subscribedEventStrings()
-        } else {
-            HyperEventEmitter.shared.clear()
         }
         let paymentSheet = PaymentSheet(sdkAuthorization: self.sdkAuthorization ?? "", configuration: configuration)
         paymentSheet.subscribedEvents = subscribedEvents
+        paymentSheet.paymentEventListener = listener
         paymentSheet.present(from: viewController, completion: completion)
     }
 
@@ -85,20 +84,20 @@ extension PaymentSession {
         completion: @escaping (PaymentResult) -> Void
     ) {
         var subscribedEvents: [String] = []
+        var listener: PaymentEventListener?
         if let subscribe {
             let builder = PaymentEventSubscriptionBuilder()
             subscribe(builder)
-            let (subscription, listener) = builder.build()
-            HyperEventEmitter.shared.setEventListener(listener, subscription: subscription)
+            let (subscription, builtListener) = builder.build()
+            listener = builtListener
             subscribedEvents = subscription.subscribedEventStrings()
-        } else {
-            HyperEventEmitter.shared.clear()
         }
         let paymentSheet = PaymentSheet(
             sdkAuthorization: self.sdkAuthorization ?? "",
             configuration: PaymentSheet.Configuration()
         )
         paymentSheet.subscribedEvents = subscribedEvents
+        paymentSheet.paymentEventListener = listener
         paymentSheet.presentWithParams(from: viewController, props: params, completion: completion)
     }
 

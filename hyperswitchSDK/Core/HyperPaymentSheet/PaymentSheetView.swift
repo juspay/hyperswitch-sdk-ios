@@ -68,17 +68,3 @@ internal extension PaymentSheet {
     }
 }
 
-/// An extension that conforms to the RNResponseHandler protocol, which handles the response from the payment sheet operation.
-extension PaymentSheet: RNResponseHandler {
-    func didReceiveResponse(response: String?, error: Error?) {
-        if let completion = completion {
-            if let error = error {
-                completion(.failed(error: error))
-            } else if response == "cancelled" {
-                completion(.canceled(data: "cancelled"))
-            } else {
-                completion(.completed(data: response ?? "failed"))
-            }
-        }
-    }
-}
