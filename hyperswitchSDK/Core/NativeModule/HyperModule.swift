@@ -168,6 +168,13 @@ internal class HyperModule: RCTEventEmitter {
     private func notifyWidgetPaymentResult(_ rootTag: NSNumber, _ rnMessage: String) {
     }
 
+    @objc
+    private func onUpdateIntentEvent(_ rootTag: NSNumber, _ type: String, _ result: String) {
+        withWidget(rootTag) { widget in
+            widget.handleUpdateIntentEvent(type: type, result: result)
+        }
+    }
+
     @objc func emitPaymentEvent(_ rootTag: NSNumber, _ eventType: String, _ payload: NSDictionary) {
         let map = (payload as? [String: Any]) ?? [:]
         resolveSubscribingTarget(rootTag) { target in
