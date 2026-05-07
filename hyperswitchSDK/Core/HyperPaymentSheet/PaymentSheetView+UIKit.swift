@@ -18,19 +18,11 @@ internal extension PaymentSheet {
         completion: @escaping (PaymentResult) -> Void
     ) {
 
-        /// Set the completion closure for handling the payment sheet result.
         self.completion = completion
 
-        /// Set the response handler for the RNViewManager to be the current PaymentSheet instance.
-        RNViewManager.sharedInstance.responseHandler = self
-
-        /// Create a new UIViewController to present the payment sheet view.
         let paymentSheetViewController = HyperUIViewController()
-
-        /// Set the modal presentation style to cover the entire screen.
+        paymentSheetViewController.paymentSheet = self
         paymentSheetViewController.modalPresentationStyle = .overFullScreen
-
-        /// Set the view of the payment sheet view controller to the provided root view.
         paymentSheetViewController.view = rootView
 
         /// Present the payment sheet view controller modally from the presenting view controller.

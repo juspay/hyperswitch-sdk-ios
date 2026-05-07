@@ -9,6 +9,8 @@ import Foundation
 import UIKit
 
 internal class HyperUIViewController: UIViewController {
+    internal var paymentSheet: PaymentSheet?
+
     internal override var shouldAutorotate: Bool {
         return false
     }

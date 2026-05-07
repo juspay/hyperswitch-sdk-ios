@@ -97,7 +97,11 @@ internal class HyperModule: RCTEventEmitter {
 
     @objc
     private func exitPaymentsheet(_ reactTag: NSNumber, _ rnMessage: String, _ reset: Bool) {
-        exitSheet(rnMessage)
+        let result = paymentResult(from: rnMessage)
+        withPaymentSheet(reactTag) { vc, sheet in
+            sheet?.completion?(result)
+            vc?.dismiss(animated: false, completion: nil)
+        }
     }
 
     @objc
@@ -166,13 +170,13 @@ internal class HyperModule: RCTEventEmitter {
 
     @objc func emitPaymentEvent(_ rootTag: NSNumber, _ eventType: String, _ payload: NSDictionary) {
         let map = (payload as? [String: Any]) ?? [:]
-        resolveSubscribingView(rootTag) { view in
-            if let widget = view as? PaymentWidget, widget.paymentEventListener != nil {
+        resolveSubscribingTarget(rootTag) { target in
+            if let widget = target as? PaymentWidget, widget.paymentEventListener != nil {
                 widget.dispatchPaymentEvent(type: eventType, payload: map)
-            } else if let cvc = view as? CVCWidget, cvc.paymentEventListener != nil {
+            } else if let cvc = target as? CVCWidget, cvc.paymentEventListener != nil {
                 cvc.dispatchPaymentEvent(type: eventType, payload: map)
-            } else {
-                HyperEventEmitter.shared.emit(eventType: eventType, payload: map)
+            } else if let sheet = target as? PaymentSheet, sheet.paymentEventListener != nil {
+                sheet.dispatchPaymentEvent(type: eventType, payload: map)
             }
         }
     }
@@ -278,7 +282,7 @@ internal class HyperModule: RCTEventEmitter {
         }
     }
 
-    private func resolveSubscribingView(_ rootTag: NSNumber, _ block: @escaping (UIView?) -> Void) {
+    private func resolveSubscribingTarget(_ rootTag: NSNumber, _ block: @escaping (AnyObject?) -> Void) {
         RCTGetUIManagerQueue().async {
             self.bridge.uiManager.addUIBlock { _, viewRegistry in
                 guard let view = viewRegistry?[rootTag] else {
@@ -293,7 +297,19 @@ internal class HyperModule: RCTEventEmitter {
                     }
                     current = v.superview
                 }
-                DispatchQueue.main.async { block(nil) }
+                let sheet = (view.reactViewController() as? HyperUIViewController)?.paymentSheet
+                DispatchQueue.main.async { block(sheet) }
+            }
+        }
+    }
+
+    private func withPaymentSheet(_ rootTag: NSNumber, _ block: @escaping (UIViewController?, PaymentSheet?) -> Void) {
+        RCTGetUIManagerQueue().async {
+            self.bridge.uiManager.addUIBlock { _, viewRegistry in
+                let view = viewRegistry?[rootTag]
+                let vc = view?.reactViewController() as? HyperUIViewController
+                let sheet = vc?.paymentSheet
+                DispatchQueue.main.async { block(vc, sheet) }
             }
         }
     }
