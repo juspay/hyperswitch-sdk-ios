@@ -137,7 +137,16 @@ class WidgetViewController: UIViewController {
 
         if let paymentSession = hyperViewModel.paymentSession {
             self.paymentWidget = PaymentWidget(paymentSession: paymentSession, configuration: configuration)
-            self.cvcWidget = CVCWidget(configuration: configuration)
+            self.cvcWidget = CVCWidget(
+                configuration: configuration,
+                subscribe: { builder in
+                    builder.on(.cvcStatus) { event in
+                        if case .cvcStatus(let info) = event.data {
+                            print(info)
+                        }
+                    }
+                }
+            )
             if let cvcWidget = cvcWidget {
                 contentView.addSubview(cvcWidget)
                 cvcWidget.translatesAutoresizingMaskIntoConstraints = false

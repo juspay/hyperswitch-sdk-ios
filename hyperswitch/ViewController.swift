@@ -70,6 +70,13 @@ class ViewController: UIViewController {
         hyperViewModel.paymentSession?.presentPaymentSheet(
             viewController: self,
             configuration: configuration,
+            subscribe: { builder in
+                builder.on(.paymentMethodInfoCard) { event in
+                    if case .cardInfo(let info) = event.data {
+                        print(info)
+                    }
+                }
+            },
             completion: { result in
                 DispatchQueue.main.async {
                     switch result {

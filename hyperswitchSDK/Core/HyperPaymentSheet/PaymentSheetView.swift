@@ -32,6 +32,7 @@ internal extension PaymentSheet {
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,
             "customParams": APIClient.shared.customParams as Any,
+            "subscribedEvents": self.subscribedEvents,
         ]
         /// Get the root view from the RNViewManager with the "hyperSwitch" module and the props dictionary.
         let rootView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": props])
@@ -56,6 +57,7 @@ internal extension PaymentSheet {
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,
             "customParams": APIClient.shared.customParams as Any,
+            "subscribedEvents": self.subscribedEvents,
             "from": "rn",
         ]
 

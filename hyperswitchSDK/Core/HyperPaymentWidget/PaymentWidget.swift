@@ -17,25 +17,43 @@ public class PaymentWidget: UIControl {
     private var rootView: RCTRootView?
     private var confirmCallback: ((PaymentResult) -> Void)?
     private var cancellables = Set<AnyCancellable>()
+    internal var paymentEventListener: PaymentEventListener?
+    internal var subscribedEventNames: [String] = []
 
     public init(
         paymentSession: PaymentSession,
-        configuration: PaymentSheet.Configuration? = nil
+        configuration: PaymentSheet.Configuration? = nil,
+        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil
     ) {
         self.paymentSession = paymentSession
         self.configuration = configuration
         self.configurationDict = nil
+        if let subscribe {
+            let builder = PaymentEventSubscriptionBuilder()
+            subscribe(builder)
+            let (subscription, listener) = builder.build()
+            self.paymentEventListener = listener
+            self.subscribedEventNames = subscription.subscribedEventStrings()
+        }
         super.init(frame: .zero)
         commonInit()
     }
 
     public init(
         paymentSession: PaymentSession,
-        configurationDict: [String: Any]?
+        configurationDict: [String: Any]?,
+        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil
     ) {
         self.paymentSession = paymentSession
         self.configuration = nil
         self.configurationDict = configurationDict
+        if let subscribe {
+            let builder = PaymentEventSubscriptionBuilder()
+            subscribe(builder)
+            let (subscription, listener) = builder.build()
+            self.paymentEventListener = listener
+            self.subscribedEventNames = subscription.subscribedEventStrings()
+        }
         super.init(frame: .zero)
         commonInit()
     }
@@ -62,6 +80,7 @@ public class PaymentWidget: UIControl {
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,
             "customParams": APIClient.shared.customParams as Any,
+            "subscribedEvents": self.subscribedEventNames,
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
 

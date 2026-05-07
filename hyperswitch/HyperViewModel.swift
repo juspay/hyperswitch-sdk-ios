@@ -63,7 +63,7 @@ class HyperViewModel: ObservableObject {
                         }
                         completion(sdkAuthorization)
                     } catch {
-                        completion("") //needs to be handled
+                        completion("")  //needs to be handled
                     }
                 }
             }

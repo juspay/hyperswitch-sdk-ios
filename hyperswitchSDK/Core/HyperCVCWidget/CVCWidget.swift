@@ -14,18 +14,34 @@ public class CVCWidget: UIControl {
     private var widgetReactTag: NSNumber?
     private var rootView: RCTRootView?
     private var cvcCallback: ((PaymentResult) -> Void)?
+    internal var paymentEventListener: PaymentEventListener?
+    internal var subscribedEventNames: [String] = []
 
-    public init(configuration: PaymentSheet.Configuration? = nil) {
+    public init(configuration: PaymentSheet.Configuration? = nil, subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil) {
         self.configuration = configuration
         self.configurationDict = nil
+        if let subscribe {
+            let builder = PaymentEventSubscriptionBuilder()
+            subscribe(builder)
+            let (subscription, listener) = builder.build()
+            self.paymentEventListener = listener
+            self.subscribedEventNames = subscription.subscribedEventStrings()
+        }
         super.init(frame: .zero)
         commonInit()
     }
 
     // pass through
-    public init(configurationDict: [String: Any]?) {
+    public init(configurationDict: [String: Any]?, subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil) {
         self.configuration = nil
         self.configurationDict = configurationDict
+        if let subscribe {
+            let builder = PaymentEventSubscriptionBuilder()
+            subscribe(builder)
+            let (subscription, listener) = builder.build()
+            self.paymentEventListener = listener
+            self.subscribedEventNames = subscription.subscribedEventStrings()
+        }
         super.init(frame: .zero)
         commonInit()
     }
@@ -47,6 +63,7 @@ public class CVCWidget: UIControl {
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,
             "customParams": APIClient.shared.customParams as Any,
+            "subscribedEvents": self.subscribedEventNames,
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
 
