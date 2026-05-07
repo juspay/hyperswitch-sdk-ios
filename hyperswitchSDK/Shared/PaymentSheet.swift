@@ -20,4 +20,5 @@ public class PaymentSheet {
     internal let configuration: Configuration?
     internal let sdkAuthorization: String
     internal var completion: ((PaymentResult) -> Void)?
+    internal var subscribedEvents: [String] = []
 }

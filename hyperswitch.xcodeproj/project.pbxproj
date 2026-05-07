@@ -108,6 +108,12 @@
 		79D474B42CC6FDC30022C47E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B32CC6FDBF0022C47E /* Helper.swift */; };
 		79D474B52CC6FDC30022C47E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B32CC6FDBF0022C47E /* Helper.swift */; };
 		79D474B72CC6FDE80022C47E /* RNResponseHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B62CC6FDE50022C47E /* RNResponseHandler.swift */; };
+		79DF06D72FAC63F200854FF9 /* HyperEventEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79DF06D22FAC63F200854FF9 /* HyperEventEmitter.swift */; };
+		79DF06D82FAC63F200854FF9 /* PaymentEventSubscriptionBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79DF06D42FAC63F200854FF9 /* PaymentEventSubscriptionBuilder.swift */; };
+		79DF06D92FAC63F200854FF9 /* PaymentEventData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79DF06D32FAC63F200854FF9 /* PaymentEventData.swift */; };
+		79DF06DA2FAC63F200854FF9 /* PaymentEventType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79DF06D52FAC63F200854FF9 /* PaymentEventType.swift */; };
+		79DF06DC2FAC641500854FF9 /* CVCWidget+Events.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79DF06DB2FAC641500854FF9 /* CVCWidget+Events.swift */; };
+		79DF06DE2FAC643500854FF9 /* PaymentWidget+Events.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79DF06DD2FAC643500854FF9 /* PaymentWidget+Events.swift */; };
 		79E528922CCBB55F00070AD9 /* hyperClip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E528912CCBB55800070AD9 /* hyperClip.swift */; };
 		79E528942CCBB56700070AD9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E528932CCBB56200070AD9 /* ContentView.swift */; };
 		79E528972CCBB57300070AD9 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E528962CCBB56E00070AD9 /* SwiftUIView.swift */; };
@@ -274,6 +280,12 @@
 		799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		79D474B32CC6FDBF0022C47E /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		79D474B62CC6FDE50022C47E /* RNResponseHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNResponseHandler.swift; sourceTree = "<group>"; };
+		79DF06D22FAC63F200854FF9 /* HyperEventEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperEventEmitter.swift; sourceTree = "<group>"; };
+		79DF06D32FAC63F200854FF9 /* PaymentEventData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentEventData.swift; sourceTree = "<group>"; };
+		79DF06D42FAC63F200854FF9 /* PaymentEventSubscriptionBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentEventSubscriptionBuilder.swift; sourceTree = "<group>"; };
+		79DF06D52FAC63F200854FF9 /* PaymentEventType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentEventType.swift; sourceTree = "<group>"; };
+		79DF06DB2FAC641500854FF9 /* CVCWidget+Events.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CVCWidget+Events.swift"; sourceTree = "<group>"; };
+		79DF06DD2FAC643500854FF9 /* PaymentWidget+Events.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentWidget+Events.swift"; sourceTree = "<group>"; };
 		79E528912CCBB55800070AD9 /* hyperClip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = hyperClip.swift; sourceTree = "<group>"; };
 		79E528932CCBB56200070AD9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		79E528962CCBB56E00070AD9 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
@@ -500,6 +512,7 @@
 			isa = PBXGroup;
 			children = (
 				793451F42F96E4C700416A4B /* PaymentWidget.swift */,
+				79DF06DD2FAC643500854FF9 /* PaymentWidget+Events.swift */,
 			);
 			path = HyperPaymentWidget;
 			sourceTree = "<group>";
@@ -508,6 +521,7 @@
 			isa = PBXGroup;
 			children = (
 				793451FA2F96EB9F00416A4B /* CVCWidget.swift */,
+				79DF06DB2FAC641500854FF9 /* CVCWidget+Events.swift */,
 			);
 			path = HyperCVCWidget;
 			sourceTree = "<group>";
@@ -520,6 +534,17 @@
 				66C2F89A29444E6700ACD32D /* ApplePayHandler.swift */,
 			);
 			path = ApplePay;
+			sourceTree = "<group>";
+		};
+		79DF06D62FAC63F200854FF9 /* HyperEvents */ = {
+			isa = PBXGroup;
+			children = (
+				79DF06D22FAC63F200854FF9 /* HyperEventEmitter.swift */,
+				79DF06D32FAC63F200854FF9 /* PaymentEventData.swift */,
+				79DF06D42FAC63F200854FF9 /* PaymentEventSubscriptionBuilder.swift */,
+				79DF06D52FAC63F200854FF9 /* PaymentEventType.swift */,
+			);
+			path = HyperEvents;
 			sourceTree = "<group>";
 		};
 		79E8E4B72EB23A0500FA3886 /* ThreeDS */ = {
@@ -597,6 +622,7 @@
 				DC4AC9F3296D737300E0D2A6 /* HyperPaymentCardTextField */,
 				792D69F42B95E91D001598CD /* HyperExpressCheckout */,
 				4E0A93E52CA2F3E000E3A767 /* HyperPaymentMethodManagement */,
+				79DF06D62FAC63F200854FF9 /* HyperEvents */,
 				DC5D012C29486B560017C67A /* Resources */,
 			);
 			path = Core;
@@ -933,9 +959,14 @@
 				793451FB2F96EB9F00416A4B /* CVCWidget.swift in Sources */,
 				7954A4472C23A44B00FEC02D /* ApplePayViewManager.m in Sources */,
 				79728FB92C3412BB00CA8C10 /* HeadlessViewController.swift in Sources */,
+				79DF06D72FAC63F200854FF9 /* HyperEventEmitter.swift in Sources */,
+				79DF06D82FAC63F200854FF9 /* PaymentEventSubscriptionBuilder.swift in Sources */,
+				79DF06D92FAC63F200854FF9 /* PaymentEventData.swift in Sources */,
+				79DF06DA2FAC63F200854FF9 /* PaymentEventType.swift in Sources */,
 				790BA8272B99DB5E006678FD /* PaymentSession.swift in Sources */,
 				4E8C83892E98CABF00A61749 /* AuthenticationSession.swift in Sources */,
 				4E8C838A2E98CABF00A61749 /* AuthenticationError.swift in Sources */,
+				79DF06DC2FAC641500854FF9 /* CVCWidget+Events.swift in Sources */,
 				7905257A2BDA73A600D49FE8 /* SwiftUIView.swift in Sources */,
 				4EEA67042D37B493000D4DC5 /* HyperParams.swift in Sources */,
 				DC5D0114294731480017C67A /* PaymentSheet.swift in Sources */,
@@ -988,6 +1019,7 @@
 				79FE014D2E97C18F00C5D94A /* Codable+UIKit.swift in Sources */,
 				DC4AC9F2296D6D6C00E0D2A6 /* PaymentCardTextField.swift in Sources */,
 				79D474B42CC6FDC30022C47E /* Helper.swift in Sources */,
+				79DF06DE2FAC643500854FF9 /* PaymentWidget+Events.swift in Sources */,
 				7938D81B2A4EF45000286CEE /* PaymentMethodParams.swift in Sources */,
 				DC5D0125294847E90017C67A /* PaymentSheetView+UIKit.swift in Sources */,
 				66486FA72943580F00150E4F /* SwiftUIManager.swift in Sources */,

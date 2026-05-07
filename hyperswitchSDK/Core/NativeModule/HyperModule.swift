@@ -165,6 +165,16 @@ internal class HyperModule: RCTEventEmitter {
     }
 
     @objc func emitPaymentEvent(_ rootTag: NSNumber, _ eventType: String, _ payload: NSDictionary) {
+        let map = (payload as? [String: Any]) ?? [:]
+        resolveSubscribingView(rootTag) { view in
+            if let widget = view as? PaymentWidget, widget.paymentEventListener != nil {
+                widget.dispatchPaymentEvent(type: eventType, payload: map)
+            } else if let cvc = view as? CVCWidget, cvc.paymentEventListener != nil {
+                cvc.dispatchPaymentEvent(type: eventType, payload: map)
+            } else {
+                HyperEventEmitter.shared.emit(eventType: eventType, payload: map)
+            }
+        }
     }
 
     @objc
@@ -264,6 +274,26 @@ internal class HyperModule: RCTEventEmitter {
                     }
                     current = v.superview
                 }
+            }
+        }
+    }
+
+    private func resolveSubscribingView(_ rootTag: NSNumber, _ block: @escaping (UIView?) -> Void) {
+        RCTGetUIManagerQueue().async {
+            self.bridge.uiManager.addUIBlock { _, viewRegistry in
+                guard let view = viewRegistry?[rootTag] else {
+                    DispatchQueue.main.async { block(nil) }
+                    return
+                }
+                var current: UIView? = view
+                while let v = current {
+                    if v is PaymentWidget || v is CVCWidget {
+                        DispatchQueue.main.async { block(v) }
+                        return
+                    }
+                    current = v.superview
+                }
+                DispatchQueue.main.async { block(nil) }
             }
         }
     }
