@@ -67,4 +67,3 @@ internal extension PaymentSheet {
         return rootView
     }
 }
-

@@ -150,6 +150,17 @@ public class PaymentWidget: UIControl {
         )
     }
 
+    internal func handleUpdateIntentEvent(type: String, result: String) {
+        switch type {
+        case "UPDATE_INTENT_INIT_RETURNED":
+            paymentSession.updateIntentInitReturned.send(result)
+        case "UPDATE_INTENT_COMPLETE_RETURNED":
+            paymentSession.updateIntentCompleteReturned.send(result)
+        default:
+            break
+        }
+    }
+
     internal func handleConfirmPaymentResponse(_ result: PaymentResult) {
         confirmCallback?(result)
         confirmCallback = nil

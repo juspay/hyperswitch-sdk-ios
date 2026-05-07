@@ -48,26 +48,42 @@ class HyperViewModel: ObservableObject {
     }
 
     func updatePaymentIntent() {
-        self.paymentSession?.updateIntent { completion in
-            if let paymentId = self.paymentId {
-                Task {
-                    do {
-                        let json = try await NetworkUtility.postData(
-                            to: "/update-payment",
-                            body: ["paymentId": paymentId],
-                            baseUrl: self.backendUrl
-                        )
-                        guard let sdkAuthorization = json["sdkAuthorization"] as? String
-                        else {
-                            throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing required fields"])
+        self.paymentSession?.updateIntent(
+            authorizationProvider: { completion in
+                if let paymentId = self.paymentId {
+                    Task {
+                        do {
+                            let json = try await NetworkUtility.postData(
+                                to: "/update-payment",
+                                body: ["paymentId": paymentId],
+                                baseUrl: self.backendUrl
+                            )
+                            guard let sdkAuthorization = json["sdkAuthorization"] as? String
+                            else {
+                                throw NSError(
+                                    domain: "API Error",
+                                    code: 500,
+                                    userInfo: [NSLocalizedDescriptionKey: "Missing required fields"]
+                                )
+                            }
+                            completion(sdkAuthorization)
+                        } catch {
+                            completion("")  //needs to be handled
                         }
-                        completion(sdkAuthorization)
-                    } catch {
-                        completion("")  //needs to be handled
                     }
                 }
+            },
+            completion: { result in
+                switch result {
+                case .success:
+                    print("updateIntent: success")
+                case .cancelled:
+                    print("updateIntent: cancelled")
+                case .failure(let error):
+                    print("updateIntent: failed — \(error.localizedDescription)")
+                }
             }
-        }
+        )
     }
 
     func preparePaymentMethodManagement() {
