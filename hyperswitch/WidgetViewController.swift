@@ -33,6 +33,9 @@ class WidgetViewController: UIViewController {
     private var cvcWidget: CVCWidget?
     private var confirmButton = UIButton()
     private var confirmButtonConfiguration = UIButton.Configuration.plain()
+
+    private var elementConfirmButton = UIButton()
+    private var elementConfirmButtonConfiguration = UIButton.Configuration.plain()
     private var handler: PaymentSessionHandler?
     private var paymentToken: String?
     private var paymentMethodId: String?
@@ -176,7 +179,26 @@ class WidgetViewController: UIViewController {
                     paymentWidget.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10).isActive = true
                     paymentWidget.topAnchor.constraint(equalTo: confirmButton.bottomAnchor, constant: 20).isActive = true
                     paymentWidget.heightAnchor.constraint(equalToConstant: 400).isActive = true
-                    paymentWidget.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20).isActive = true
+
+                    elementConfirmButton.setTitle("confirm", for: .normal)
+                    elementConfirmButton.setTitleColor(.white, for: .normal)
+                    elementConfirmButtonConfiguration.contentInsets = NSDirectionalEdgeInsets(
+                        top: 10,
+                        leading: 10,
+                        bottom: 10,
+                        trailing: 10
+                    )
+                    elementConfirmButton.configuration = elementConfirmButtonConfiguration
+                    elementConfirmButton.layer.cornerRadius = 10
+                    elementConfirmButton.backgroundColor = .systemBlue
+//                    elementConfirmButton.isEnabled = false
+                    contentView.addSubview(elementConfirmButton)
+                    elementConfirmButton.translatesAutoresizingMaskIntoConstraints = false
+                    elementConfirmButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 60).isActive = true
+                    elementConfirmButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -60).isActive = true
+                    elementConfirmButton.topAnchor.constraint(equalTo: paymentWidget.bottomAnchor, constant: 20).isActive = true
+                    elementConfirmButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10).isActive = true
+                    elementConfirmButton.addTarget(self, action: #selector(confirmElement(_:)), for: .touchUpInside)
                 }
             }
         }
@@ -223,6 +245,25 @@ class WidgetViewController: UIViewController {
             let paymentMethodId = paymentMethodId
         {
             self.handler?.confirmWithCustomerLastUsedPaymentMethod(cvcWidget, resultHandler: resultHandler)
+        }
+    }
+
+    @objc
+    func confirmElement(_ sender: Any) {
+        if let paymentWidget = paymentWidget {
+            paymentWidget.confirm { paymentResult in
+                switch paymentResult {
+                case .completed(let data):
+                    print(["type": "completed", "message": data])
+                    self.statusLabel.text = "completed → \(data)"
+                case .canceled(let data):
+                    print(["type": "canceled", "message": data])
+                    self.statusLabel.text = "canceled → \(data)"
+                case .failed(let error):
+                    print(["type": "failed", "message": "\(error)"])
+                    self.statusLabel.text = "failed → \(error)"
+                }
+            }
         }
     }
 }
