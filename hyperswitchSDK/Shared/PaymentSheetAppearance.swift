@@ -11,8 +11,6 @@ public extension PaymentSheet {
 
     /// Describes the appearance of PaymentSheet
     struct Appearance: Equatable, DictionaryConverter {
-        /// The default appearance for PaymentSheet
-        public static let `default` = Appearance()
 
         /// Creates a `PaymentSheet.Appearance` with default values
         public init() {}
@@ -159,6 +157,9 @@ public extension PaymentSheet {
         /// Represents a shadow in PaymentSheet
         public struct Shadow: Equatable, DictionaryConverter {
 
+            /// Creates a `PaymentSheet.Appearance.Shadow` with default values
+            public init() {}
+
             /// A pre-configured `Shadow` in the disabled or off state
             public static var disabled: Shadow?
 
@@ -181,9 +182,6 @@ public extension PaymentSheet {
             /// intensity of the shadow
             /// - Note: The behavior of this property is consistent with `CALayer.shadowIntensity`
             public var intensity: CGFloat?
-
-            /// Creates a `PaymentSheet.Appearance.Shadow` with default values
-            public init() {}
 
             /// Creates a `Shadow` with the specified parameters
             /// - Parameters:
@@ -249,5 +247,4 @@ public extension PaymentSheet {
             public var shadow: Shadow?
         }
     }
-
 }

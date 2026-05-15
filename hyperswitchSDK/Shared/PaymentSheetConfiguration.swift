@@ -15,27 +15,17 @@ extension PaymentSheet {
     /// Configuration for PaymentSheet
     public struct Configuration: DictionaryConverter {
 
+        /// Initializes a Configuration with default values
+        public init() {}
+
         /// If true, allows payment methods that do not move money at the end of the checkout. Defaults to false.
         /// - Description: Some payment methods can't guarantee you will receive funds from your customer at the end of the checkout because they take time to settle (eg. most bank debits, like SEPA or ACH) or require customer action to complete (e.g. OXXO, Konbini, Boleto). If this is set to true, make sure your integration listens to webhooks for notifications on whether a payment has succeeded or not.
-        /// - Seealso: https://docs.hyperswitch.io/payments/payment-methods#payment-notification
-        public var allowsDelayedPaymentMethods: Bool = false
+        public var allowsDelayedPaymentMethods: Bool?
 
         /// If `true`, allows payment methods that require a shipping address, like Afterpay and Affirm. Defaults to `false`.
         /// Set this to `true` if you collect shipping addresses and set `Configuration.shippingDetails` or set `shipping` details directly on the PaymentIntent.
         /// - Note: PaymentSheet considers this property `true` and allows payment methods that require a shipping address if `shipping` details are present on the PaymentIntent when PaymentSheet loads.
-        public var allowsPaymentMethodsRequiringShippingAddress: Bool = false
-
-
-        /// The color of the Buy or Add button. Defaults to `.systemBlue` when `nil`.
-        public var primaryButtonColor: UIColor? {
-            get {
-                return appearance.primaryButton.backgroundColor
-            }
-
-            set {
-                appearance.primaryButton.backgroundColor = newValue
-            }
-        }
+        public var allowsPaymentMethodsRequiringShippingAddress: Bool?
 
         /// The label to use for the primary button.
         ///
@@ -45,27 +35,21 @@ extension PaymentSheet {
         public var paymentSheetHeaderLabel: String?
         public var savedPaymentSheetHeaderLabel: String?
 
-        private var styleRawValue: Int = 0  // SheetStyle.automatic.rawValue
-
-        /// Configuration related to the Hyperswitch Customer
-        /// If set, the customer can select a previously saved payment method within PaymentSheet
-        public var customer: CustomerConfiguration?
-
         /// Your customer-facing business name.
         /// The default value is the name of your app, using CFBundleDisplayName or CFBundleName
-        public var merchantDisplayName: String? = ""
+        public var merchantDisplayName: String?
 
         ///
         /// toggle to disable SaveCard CheckBox
-        public var displaySavedPaymentMethodsCheckbox: Bool? = true
+        public var displaySavedPaymentMethodsCheckbox: Bool?
 
         ///
         /// toggle to disable SavedCard Screen
-        public var displaySavedPaymentMethods: Bool? = true
+        public var displaySavedPaymentMethods: Bool?
 
         ///
         /// toggle to disable Branding
-        public var disableBranding: Bool? = false
+        public var disableBranding: Bool?
 
         ///
         /// add custom placeholder text
@@ -73,7 +57,7 @@ extension PaymentSheet {
 
         ///
         /// toggle to  disable Default Saved Payment Icon
-        public var displayDefaultSavedPaymentIcon: Bool? = true
+        public var displayDefaultSavedPaymentIcon: Bool?
 
         /// A URL that redirects back to your app that PaymentSheet can use to auto-dismiss
         /// web views used for additional authentication, e.g. 3DS2
@@ -86,10 +70,10 @@ extension PaymentSheet {
 
         /// DefaultView = `true` launches PaymentSheet with cardForm, never shows the loading state.
         /// Default value is `false`
-        public var defaultView: Bool? = false
+        public var defaultView: Bool?
 
         /// Describes the appearance of PaymentSheet
-        public var appearance = PaymentSheet.Appearance.default
+        public var appearance: PaymentSheet.Appearance = PaymentSheet.Appearance()
 
         /// A closure that returns the customer's shipping details.
         /// This is used to display a "Billing address is same as shipping" checkbox if `defaultBillingDetails` is not provided
@@ -107,12 +91,6 @@ extension PaymentSheet {
         //            }
         //        }
 
-        /// Initializes a Configuration with default values
-        public init() {}
-
-        // MARK: Internal
-        internal var linkPaymentMethodsOnly: Bool = false
-
         /// Optional configuration to display a custom message when a saved payment method is removed.
         public var removeSavedPaymentMethodMessage: String?
 
@@ -128,22 +106,6 @@ extension PaymentSheet {
 
         /// hide confirm button for external confirm action
         public var hideConfirmButton: Bool?
-    }
-
-    /// Configuration related to the Hyperswitch Customer
-    public struct CustomerConfiguration: DictionaryConverter {
-        /// The identifier of the Hyperswitch Customer object.
-        /// See https://docs.hyperswitch.io/api/customers/object#customer_object-id
-        public let id: String
-
-        /// A short-lived token that allows the SDK to access a Customer's payment methods
-        public let ephemeralKeySecret: String
-
-        /// Initializes a CustomerConfiguration
-        public init(id: String, ephemeralKeySecret: String) {
-            self.id = id
-            self.ephemeralKeySecret = ephemeralKeySecret
-        }
     }
 
     /// An address.
