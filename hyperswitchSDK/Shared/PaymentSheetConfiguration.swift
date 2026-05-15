@@ -12,71 +12,6 @@ import UIKit
 // MARK: - Configuration
 extension PaymentSheet {
 
-    /// Style options for colors in PaymentSheet
-    public enum UserInterfaceStyle: Int, DictionaryConverter {
-
-        /// (default) PaymentSheet will automatically switch between standard and dark mode compatible colors based on device settings
-        case automatic = 0
-
-        /// PaymentSheet will always use colors appropriate for standard, i.e. non-dark mode UI
-        case alwaysLight
-
-        /// PaymentSheet will always use colors appropriate for dark mode UI
-        case alwaysDark
-
-        func configure(_ viewController: UIViewController) {
-            switch self {
-            case .automatic:
-                break  // no-op
-
-            case .alwaysLight:
-                if #available(iOS 13.0, *) {
-                    viewController.overrideUserInterfaceStyle = .light
-                }
-            case .alwaysDark:
-                if #available(iOS 13.0, *) {
-                    viewController.overrideUserInterfaceStyle = .dark
-                }
-            }
-        }
-    }
-
-    /// Options for the default state of save payment method controls
-    /// @note Some jurisdictions may have rules governing the ability to default to opt-out behaviors
-    public enum SavePaymentMethodOptInBehavior: DictionaryConverter {
-
-        /// (Default) The SDK will apply opt-out behavior for supported countries.
-        /// Currently, this behavior is supported in the US.
-        case automatic
-
-        /// The control will always default to unselected and users
-        /// will have to explicitly interact to save their payment method
-        case requiresOptIn
-
-        /// The control will always default to selected and users
-        /// will have to explicitly interact to not save their payment method
-        case requiresOptOut
-
-        var isSelectedByDefault: Bool {
-            switch self {
-            case .automatic:
-                // only enable the save checkbox by default for US
-                return Locale.current.regionCode == "US"
-            case .requiresOptIn:
-                return false
-            case .requiresOptOut:
-                return true
-            }
-        }
-    }
-
-    public struct PlaceHolder: Equatable, DictionaryConverter {
-        public init() {}
-        public var cardNumber: String?
-        public var expiryDate: String?  //  MM/YY
-        public var cvv: String?
-    }
-
     /// Configuration for PaymentSheet
     public struct Configuration: DictionaryConverter {
 
@@ -90,12 +25,6 @@ extension PaymentSheet {
         /// - Note: PaymentSheet considers this property `true` and allows payment methods that require a shipping address if `shipping` details are present on the PaymentIntent when PaymentSheet loads.
         public var allowsPaymentMethodsRequiringShippingAddress: Bool = false
 
-        /// The APIClient instance used to make requests to Hyperswitch
-        //        internal var apiClient: APIClient = APIClient.shared
-
-        /// Configuration related to Apple Pay
-        /// If set, PaymentSheet displays Apple Pay as a payment option
-        public var applePay: ApplePayConfiguration?
 
         /// The color of the Buy or Add button. Defaults to `.systemBlue` when `nil`.
         public var primaryButtonColor: UIColor? {
@@ -117,17 +46,6 @@ extension PaymentSheet {
         public var savedPaymentSheetHeaderLabel: String?
 
         private var styleRawValue: Int = 0  // SheetStyle.automatic.rawValue
-        /// The color styling to use for PaymentSheet UI
-        /// Default value is SheetStyle.automatic
-        /// @see SheetStyle
-        public var style: UserInterfaceStyle {  // stored properties can't be marked @available which is why this uses the styleRawValue private var
-            get {
-                return UserInterfaceStyle(rawValue: styleRawValue)!
-            }
-            set {
-                styleRawValue = newValue.rawValue
-            }
-        }
 
         /// Configuration related to the Hyperswitch Customer
         /// If set, the customer can select a previously saved payment method within PaymentSheet
@@ -135,7 +53,7 @@ extension PaymentSheet {
 
         /// Your customer-facing business name.
         /// The default value is the name of your app, using CFBundleDisplayName or CFBundleName
-        public var merchantDisplayName: String = Bundle.displayName ?? ""
+        public var merchantDisplayName: String? = ""
 
         ///
         /// toggle to disable SaveCard CheckBox
@@ -166,11 +84,6 @@ extension PaymentSheet {
         /// be attached to the payment method even if they are not collected by the PaymentSheet UI.
         public var defaultBillingDetails: BillingDetails = BillingDetails()
 
-        /// PaymentSheet offers users an option to save some payment methods for later use.
-        /// Default value is .automatic
-        /// @see SavePaymentMethodOptInBehavior
-        public var savePaymentMethodOptInBehavior: SavePaymentMethodOptInBehavior = .automatic
-
         /// DefaultView = `true` launches PaymentSheet with cardForm, never shows the loading state.
         /// Default value is `false`
         public var defaultView: Bool? = false
@@ -200,17 +113,8 @@ extension PaymentSheet {
         // MARK: Internal
         internal var linkPaymentMethodsOnly: Bool = false
 
-        /// Describes how billing details should be collected.
-        /// All values default to `automatic`.
-        /// If `never` is used for a required field for the Payment Method used during checkout,
-        /// you **must** provide an appropriate value as part of `defaultBillingDetails`.
-        public var billingDetailsCollectionConfiguration = BillingDetailsCollectionConfiguration()
-
         /// Optional configuration to display a custom message when a saved payment method is removed.
         public var removeSavedPaymentMethodMessage: String?
-
-        /// Configuration for external payment methods.
-        public var externalPaymentMethodConfiguration: ExternalPaymentMethodConfiguration?
 
         /// By default, PaymentSheet will use a dynamic ordering that optimizes payment method display for the customer.
         /// You can override the default order in which payment methods are displayed in PaymentSheet with a list of payment method types.
@@ -239,87 +143,6 @@ extension PaymentSheet {
         public init(id: String, ephemeralKeySecret: String) {
             self.id = id
             self.ephemeralKeySecret = ephemeralKeySecret
-        }
-    }
-
-    /// Configuration related to Apple Pay
-    public struct ApplePayConfiguration {
-        /// The Apple Merchant Identifier to use during Apple Pay transactions.
-        /// To obtain one, see https://docs.hyperswitch.io/apple-pay#native
-        public let merchantId: String
-
-        /// The two-letter ISO 3166 code of the country of your business, e.g. "US"
-        /// See your account's country value here https://app.hyperswitch.io/settings/account
-        public let merchantCountryCode: String
-
-        /// Defines the label that will be displayed in the Apple Pay button.
-        /// See <https://developer.apple.com/design/human-interface-guidelines/technologies/apple-pay/buttons-and-marks/>
-        /// for all available options.
-        public let buttonType: PKPaymentButtonType
-
-        /// An array of payment summary item objects that summarize the amount of the payment. This property is identical to `PKPaymentRequest.paymentSummaryItems`.
-        /// If `nil`, we display a single line item with the amount on the PaymentIntent or "Amount pending" for SetupIntents.
-        /// If you're using a SetupIntent for a recurring payment, you should set this to display the amount you intend to charge, in accordance with https://developer.apple.com/design/human-interface-guidelines/technologies/apple-pay/subscriptions-and-donations
-        /// Follow Apple's documentation to set this property: https://developer.apple.com/documentation/passkit/pkpaymentrequest/1619231-paymentsummaryitems
-        public let paymentSummaryItems: [PKPaymentSummaryItem]?
-
-        /// Optional handler blocks for Apple Pay
-        public let customHandlers: Handlers?
-
-        /// Custom handler blocks for Apple Pay
-        public struct Handlers {
-            /// Optionally configure additional information on your PKPaymentRequest.
-            /// This closure will be called after the PKPaymentRequest is created, but before the Apple Pay sheet is presented.
-            /// In your implementation, you can configure the PKPaymentRequest to add custom fields, such as `recurringPaymentRequest`.
-            /// See https://developer.apple.com/documentation/passkit/pkpaymentrequest for all configuration options.
-            /// - Parameter: The PKPaymentRequest created by PaymentSheet.
-            /// - Return: The PKPaymentRequest after your modifications.
-            public let paymentRequestHandler: ((PKPaymentRequest) -> PKPaymentRequest)?
-
-            /// Optionally configure additional information on your PKPaymentAuthorizationResult.
-            /// This closure will be called after the PaymentIntent or SetupIntent is confirmed, but before
-            /// the Apple Pay sheet has been closed.
-            /// In your implementation, you can configure the PKPaymentAuthorizationResult to add custom fields, such as `orderDetails`.
-            /// See https://developer.apple.com/documentation/passkit/pkpaymentauthorizationresult for all configuration options.
-            /// - Parameter $0: The PKPaymentAuthorizationResult created by PaymentSheet.
-            /// - Parameter $1: A completion handler. You must call this handler with the PKPaymentAuthorizationResult on the main queue
-            /// after applying your modifications.
-            /// For example:
-            /// ```
-            /// .authorizationResultHandler = { result, completion in
-            ///     result.orderDetails = PKPaymentOrderDetails(/* ... */)
-            ///     completion(result)
-            /// }
-            /// ```
-            /// WARNING: If you do not call the completion handler, your app will hang until the Apple Pay sheet times out.
-            public let authorizationResultHandler:
-                ((PKPaymentAuthorizationResult, @escaping ((PKPaymentAuthorizationResult) -> Void)) -> Void)?
-
-            /// Initializes the ApplePayConfiguration Handlers.
-            public init(
-                paymentRequestHandler: ((PKPaymentRequest) -> PKPaymentRequest)? = nil,
-                authorizationResultHandler: (
-                    (PKPaymentAuthorizationResult, @escaping ((PKPaymentAuthorizationResult) -> Void)) -> Void
-                )? = nil
-            ) {
-                self.paymentRequestHandler = paymentRequestHandler
-                self.authorizationResultHandler = authorizationResultHandler
-            }
-        }
-
-        /// Initializes a ApplePayConfiguration
-        public init(
-            merchantId: String,
-            merchantCountryCode: String,
-            buttonType: PKPaymentButtonType = .plain,
-            paymentSummaryItems: [PKPaymentSummaryItem]? = nil,
-            customHandlers: Handlers? = nil
-        ) {
-            self.merchantId = merchantId
-            self.merchantCountryCode = merchantCountryCode
-            self.buttonType = buttonType
-            self.paymentSummaryItems = paymentSummaryItems
-            self.customHandlers = customHandlers
         }
     }
 
@@ -391,111 +214,10 @@ extension PaymentSheet {
         }
     }
 
-    /// Configuration for how billing details are collected during checkout.
-    public struct BillingDetailsCollectionConfiguration: Equatable {
-        /// Billing details fields collection options.
-        public enum CollectionMode: String, CaseIterable {
-            /// The field will be collected depending on the Payment Method's requirements.
-            case automatic
-            /// The field will never be collected.
-            /// If this field is required by the Payment Method, you must provide it as part of `defaultBillingDetails`.
-            case never
-            /// The field will always be collected, even if it isn't required for the Payment Method.
-            case always
-        }
-
-        /// Billing address collection options.
-        public enum AddressCollectionMode: String, CaseIterable {
-            /// Only the fields required by the Payment Method will be collected, this may be none.
-            case automatic
-            /// Address will never be collected.
-            /// If the Payment Method requires a billing address, you must provide it as part of
-            /// `defaultBillingDetails`.
-            case never
-            /// Collect the full billing address, regardless of the Payment Method requirements.
-            case full
-        }
-
-        /// How to collect the name field.
-        /// Defaults to `automatic`.
-        public var name: CollectionMode = .automatic
-
-        /// How to collect the phone field.
-        /// Defaults to `automatic`.
-        public var phone: CollectionMode = .automatic
-
-        /// How to collect the email field.
-        /// Defaults to `automatic`.
-        public var email: CollectionMode = .automatic
-
-        /// How to collect the billing address.
-        /// Defaults to `automatic`.
-        public var address: AddressCollectionMode = .automatic
-
-        /// Whether the values included in `Configuration.defaultBillingDetails` should be attached to the payment
-        /// method, this includes fields that aren't displayed in the form.
-        ///
-        /// If `false` (the default), those values will only be used to prefill the corresponding fields in the form.
-        public var attachDefaultsToPaymentMethod = false
-    }
-
-    /// Configuration for external payment methods
-    /// - Seealso: See the [integration guide](https://docs.hyperswitch.io/payments/external-payment-methods?platform=ios).
-    public struct ExternalPaymentMethodConfiguration {
-
-        /// Initializes an `ExternalPaymentMethodConfiguration`
-        /// - Parameter externalPaymentMethods: A list of external payment methods to display in PaymentSheet e.g., ["external_paypal"].
-        /// - Parameter externalPaymentMethodConfirmHandler: A handler called when the customer confirms the payment using an external payment method.
-        /// - Seealso: See the [integration guide](https://docs.hyperswitch.io/payments/external-payment-methods?platform=ios).
-        public init(
-            externalPaymentMethods: [String],
-            externalPaymentMethodConfirmHandler:
-                @escaping PaymentSheet.ExternalPaymentMethodConfiguration.ExternalPaymentMethodConfirmHandler
-        ) {
-            self.externalPaymentMethods = externalPaymentMethods
-            self.externalPaymentMethodConfirmHandler = externalPaymentMethodConfirmHandler
-        }
-
-        /// A list of external payment methods to display in PaymentSheet.
-        /// e.g. ["external_paypal"].
-        public var externalPaymentMethods: [String] = []
-
-        /// - Parameter externalPaymentMethodType: The external payment method to confirm payment with e.g., "external_paypal"
-        /// - Parameter billingDetails: An object containing any billing details you've configured PaymentSheet to collect.
-        /// - Parameter completion: Call this after payment has completed, passing the result of the payment.
-        /// - Returns: The result of the attempt to confirm payment using the given external payment method.
-        public typealias ExternalPaymentMethodConfirmHandler = (
-            _ externalPaymentMethodType: String,
-            _ billingDetails: BillingDetails,
-            _ completion: @escaping ((PaymentResult) -> Void)
-        ) -> Void
-
-        /// This handler is called when the customer confirms the payment using an external payment method.
-        /// Your implementation should complete the payment and call the `completion` parameter with the result.
-        /// - Note: This is always called on the main thread.
-        public var externalPaymentMethodConfirmHandler: ExternalPaymentMethodConfirmHandler
-    }
-}
-
-extension Bundle {
-    public class func applicationName() -> String? {
-        return self.main.infoDictionary?[kCFBundleNameKey as String] as? String
-    }
-
-    public class func applicationVersion() -> String? {
-        return self.main.infoDictionary?["CFBundleShortVersionString"] as? String
-    }
-
-    public class func applicationBundleId() -> String? {
-        return self.main.bundleIdentifier
-    }
-
-    public class func buildVersion() -> String? {
-        return self.main.infoDictionary?["CFBundleVersion"] as? String
-    }
-
-    public class var displayName: String? {
-        return self.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? self.main
-            .object(forInfoDictionaryKey: "CFBundleName") as? String
+    public struct PlaceHolder: Equatable, DictionaryConverter {
+        public init() {}
+        public var cardNumber: String?
+        public var expiryDate: String?  //  MM/YY
+        public var cvv: String?
     }
 }
