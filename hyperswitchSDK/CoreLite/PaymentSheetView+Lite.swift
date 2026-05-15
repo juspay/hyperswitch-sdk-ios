@@ -12,7 +12,7 @@ extension PaymentSheet {
 
     func presentLite(from presentingViewController: UIViewController, completion: @escaping (PaymentResult) -> Void) {
 
-        let configuration = self.configuration?.toDictionary()
+        let configuration = try? self.configuration?.toDictionary()
 
         let hyperParams = HyperParams.getHyperParams()
 

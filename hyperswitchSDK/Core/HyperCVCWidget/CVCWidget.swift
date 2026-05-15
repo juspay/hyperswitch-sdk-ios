@@ -53,9 +53,10 @@ public class CVCWidget: UIControl {
     private func commonInit() {
 
         let hyperParams = HyperParams.getHyperParams()
+        let nativeConfig = try? configuration?.toDictionary()
 
         let props: [String: Any] = [
-            "configuration": configurationDict ?? configuration?.toDictionary() as Any,
+            "configuration": configurationDict ?? nativeConfig as Any,
             "type": "cvcWidget",
             "publishableKey": APIClient.shared.publishableKey as Any,
             "profileId": APIClient.shared.profileId as Any,

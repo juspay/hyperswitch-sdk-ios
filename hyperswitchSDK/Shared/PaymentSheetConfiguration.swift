@@ -13,7 +13,7 @@ import UIKit
 extension PaymentSheet {
 
     /// Configuration for PaymentSheet
-    public struct Configuration: DictionaryConverter {
+    public struct Configuration: Codable {
 
         /// Initializes a Configuration with default values
         public init() {}
@@ -96,7 +96,7 @@ extension PaymentSheet {
         /// hide confirm button for external confirm action
         public var hideConfirmButton: Bool?
 
-        public struct PlaceHolder: Equatable, DictionaryConverter {
+        public struct PlaceHolder: Codable {
 
             public init() {}
 
@@ -108,7 +108,7 @@ extension PaymentSheet {
         }
 
         /// Billing details of a customer
-        public struct AddressDetails: Equatable, DictionaryConverter {
+        public struct AddressDetails: Codable {
 
             /// Initializes billing details
             public init() {}
@@ -129,7 +129,7 @@ extension PaymentSheet {
         }
 
         /// An address.
-        public struct Address: Equatable, DictionaryConverter {
+        public struct Address: Codable {
 
             /// Initializes an Address
             public init() {}
