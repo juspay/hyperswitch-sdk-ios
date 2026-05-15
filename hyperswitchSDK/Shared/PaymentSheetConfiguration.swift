@@ -32,7 +32,9 @@ extension PaymentSheet {
         /// If not set, Payment Sheet will display suitable default labels
         /// for payment and setup intents.
         public var primaryButtonLabel: String?
+
         public var paymentSheetHeaderLabel: String?
+
         public var savedPaymentSheetHeaderLabel: String?
 
         /// Your customer-facing business name.
@@ -63,11 +65,6 @@ extension PaymentSheet {
         /// web views used for additional authentication, e.g. 3DS2
         public var returnURL: String?
 
-        /// PaymentSheet pre-populates fields with the values provided.
-        /// If `billingDetailsCollectionConfiguration.attachDefaultsToPaymentMethod` is `true`, these values will
-        /// be attached to the payment method even if they are not collected by the PaymentSheet UI.
-        public var defaultBillingDetails: BillingDetails = BillingDetails()
-
         /// DefaultView = `true` launches PaymentSheet with cardForm, never shows the loading state.
         /// Default value is `false`
         public var defaultView: Bool?
@@ -75,21 +72,13 @@ extension PaymentSheet {
         /// Describes the appearance of PaymentSheet
         public var appearance: PaymentSheet.Appearance = PaymentSheet.Appearance()
 
+        /// PaymentSheet pre-populates fields with the values provided.
+        /// be attached to the payment method even if they are not collected by the PaymentSheet UI.
+        public var defaultBillingDetails: AddressDetails = AddressDetails()
+
         /// A closure that returns the customer's shipping details.
         /// This is used to display a "Billing address is same as shipping" checkbox if `defaultBillingDetails` is not provided
-        /// If `name` and `line1` are populated, it's also [attached to the PaymentIntent](https://docs.hyperswitch.io/api/payment_intents/object#payment_intent_object-shipping) during payment.
-        //        public var shippingDetails: () -> AddressViewController.AddressDetails? = { return nil }
-        public var shippingDetails: BillingDetails = BillingDetails()
-
-        /// The list of preferred networks that should be used to process payments made with a co-branded card.
-        /// This value will only be used if your user hasn't selected a network themselves.
-        //        public var preferredNetworks: [CardBrand]? {
-        //            didSet {
-        //                guard let preferredNetworks = preferredNetworks else { return }
-        //                assert(Set<CardBrand>(preferredNetworks).count == preferredNetworks.count,
-        //                       "preferredNetworks must not contain any duplicate card brands")
-        //            }
-        //        }
+        public var shippingDetails: AddressDetails = AddressDetails()
 
         /// Optional configuration to display a custom message when a saved payment method is removed.
         public var removeSavedPaymentMethodMessage: String?
@@ -106,80 +95,67 @@ extension PaymentSheet {
 
         /// hide confirm button for external confirm action
         public var hideConfirmButton: Bool?
-    }
 
-    /// An address.
-    public struct Address: Equatable, DictionaryConverter {
-        /// City, district, suburb, town, or village.
-        /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
-        public var city: String?
+        public struct PlaceHolder: Equatable, DictionaryConverter {
 
-        /// Two-letter country code (ISO 3166-1 alpha-2).
-        public var country: String?
+            public init() {}
 
-        /// Address line 1 (e.g., street, PO Box, or company name).
-        /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
-        public var line1: String?
+            public var cardNumber: String?
 
-        /// Address line 2 (e.g., apartment, suite, unit, or building).
-        /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
-        public var line2: String?
+            public var expiryDate: String?  //  MM/YY
 
-        /// ZIP or postal code.
-        /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
-        public var postalCode: String?
-
-        /// State, county, province, or region.
-        /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
-        public var state: String?
-
-        /// Initializes an Address
-        public init(
-            city: String? = nil,
-            country: String? = nil,
-            line1: String? = nil,
-            line2: String? = nil,
-            postalCode: String? = nil,
-            state: String? = nil
-        ) {
-            self.city = city
-            self.country = country
-            self.line1 = line1
-            self.line2 = line2
-            self.postalCode = postalCode
-            self.state = state
+            public var cvv: String?
         }
-    }
 
-    /// Billing details of a customer
-    public struct BillingDetails: Equatable, DictionaryConverter {
-        /// The customer's billing address
-        public var address: Address = Address()
+        /// Billing details of a customer
+        public struct AddressDetails: Equatable, DictionaryConverter {
 
-        /// The customer's email
-        /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
-        public var email: String?
+            /// Initializes billing details
+            public init() {}
 
-        /// The customer's full name
-        /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
-        public var name: String?
+            /// The customer's billing address
+            public var address: Address = Address()
 
-        /// The customer's phone number without formatting (e.g. 5551234567)
-        public var phone: String?
+            /// The customer's email
+            /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
+            public var email: String?
 
-        /// Initializes billing details
-        public init(address: PaymentSheet.Address = Address(), email: String? = nil, name: String? = nil, phone: String? = nil) {
-            self.address = address
-            self.email = email
-            self.name = name
-            self.phone = phone
+            /// The customer's full name
+            /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
+            public var name: String?
+
+            /// The customer's phone number without formatting (e.g. 5551234567)
+            public var phone: String?
         }
-    }
 
-    public struct PlaceHolder: Equatable, DictionaryConverter {
-        public init() {}
-        public var cardNumber: String?
-        public var expiryDate: String?  //  MM/YY
-        public var cvv: String?
+        /// An address.
+        public struct Address: Equatable, DictionaryConverter {
+
+            /// Initializes an Address
+            public init() {}
+
+            /// City, district, suburb, town, or village.
+            /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
+            public var city: String?
+
+            /// Two-letter country code (ISO 3166-1 alpha-2).
+            public var country: String?
+
+            /// Address line 1 (e.g., street, PO Box, or company name).
+            /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
+            public var line1: String?
+
+            /// Address line 2 (e.g., apartment, suite, unit, or building).
+            /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
+            public var line2: String?
+
+            /// ZIP or postal code.
+            /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
+            public var postalCode: String?
+
+            /// State, county, province, or region.
+            /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
+            public var state: String?
+        }
     }
 }
