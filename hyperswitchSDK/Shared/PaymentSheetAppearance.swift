@@ -182,21 +182,6 @@ public extension PaymentSheet {
             /// intensity of the shadow
             /// - Note: The behavior of this property is consistent with `CALayer.shadowIntensity`
             public var intensity: CGFloat?
-
-            /// Creates a `Shadow` with the specified parameters
-            /// - Parameters:
-            ///   - color: Color of the shadow
-            ///   - opacity: Opacity or opacity of the shadow
-            ///   - offset: Offset of the shadow
-            ///   - radius: Radius of the shadow
-            ///   - intensity: Intensity of the shadow
-            public init(color: UIColor?, opacity: CGFloat?, offset: CGSize?, radius: CGFloat?, intensity: CGFloat?) {
-                self.color = color
-                self.opacity = opacity
-                self.offset = offset
-                self.radius = radius
-                self.intensity = intensity
-            }
         }
 
         // MARK: Primary Button
