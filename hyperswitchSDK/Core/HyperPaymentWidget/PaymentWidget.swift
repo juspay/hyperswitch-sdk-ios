@@ -66,7 +66,7 @@ public class PaymentWidget: UIControl {
 
         let hyperParams = HyperParams.getHyperParams()
 
-        var nativeConfig = configuration?.toDictionary()
+        var nativeConfig = try? configuration?.toDictionary()
         nativeConfig?["hideConfirmButton"] = true
         configurationDict?["hideConfirmButton"] = true
 

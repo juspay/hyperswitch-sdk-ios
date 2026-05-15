@@ -16,7 +16,7 @@ internal extension PaymentSheet {
     func getRootView() -> RCTRootView {
 
         /// Get the configuration dictionary from the configuration object.
-        let configuration = self.configuration?.toDictionary()
+        let configuration = try? self.configuration?.toDictionary()
 
         /// Create a dictionary of hyperParams with app ID, sdkVersion, country, user agent, default view, and launch time.
         let hyperParams = HyperParams.getHyperParams()

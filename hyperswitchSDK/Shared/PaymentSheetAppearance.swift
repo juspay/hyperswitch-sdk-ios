@@ -10,7 +10,7 @@ import UIKit
 public extension PaymentSheet {
 
     /// Describes the appearance of PaymentSheet
-    struct Appearance: Equatable, DictionaryConverter {
+    struct Appearance {
 
         /// Creates a `PaymentSheet.Appearance` with default values
         public init() {}
@@ -53,7 +53,7 @@ public extension PaymentSheet {
         // MARK: Fonts
 
         /// Describes the appearance of fonts in PaymentSheet
-        public struct Font: Equatable, DictionaryConverter {
+        public struct Font {
 
             /// Creates a `PaymentSheet.Appearance.Font` with default values
             public init() {}
@@ -107,7 +107,7 @@ public extension PaymentSheet {
         // MARK: Colors
 
         /// Describes the colors in PaymentSheet
-        public struct Colors: Equatable, DictionaryConverter {
+        public struct Colors {
 
             /// Creates a `PaymentSheet.Appearance.Colors` with default values
             public init() {}
@@ -155,7 +155,7 @@ public extension PaymentSheet {
         // MARK: Shadow
 
         /// Represents a shadow in PaymentSheet
-        public struct Shadow: Equatable, DictionaryConverter {
+        public struct Shadow {
 
             /// Creates a `PaymentSheet.Appearance.Shadow` with default values
             public init() {}
@@ -187,7 +187,7 @@ public extension PaymentSheet {
         // MARK: Primary Button
 
         /// Describes the appearance of the primary button (e.g., the "Pay" button)
-        public struct PrimaryButton: Equatable, DictionaryConverter {
+        public struct PrimaryButton {
 
             /// Creates a `PaymentSheet.Appearance.PrimaryButton` with default values
             public init() {}
