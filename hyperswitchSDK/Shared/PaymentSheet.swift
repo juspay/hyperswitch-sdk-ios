@@ -23,4 +23,18 @@ public class PaymentSheet {
     internal var subscribedEvents: [String] = []
     internal var paymentEventListener: PaymentEventListener?
     internal var shouldProceedWithPaymentCallback: ((String, @escaping (Bool) -> Void) -> Void)?
+
+    private var onConfirmButtonTriggered: ((String, @escaping (Bool) -> Void) -> Void)?
+
+    public func setOnConfirmButtonTriggered(_ callback: @escaping (String, @escaping (Bool) -> Void) -> Void) {
+        self.onConfirmButtonTriggered = callback
+    }
+
+    internal func notifyConfirmButtonTriggered(payload: String, callback: @escaping (Bool) -> Void) {
+        if(self.onConfirmButtonTriggered == nil){
+            callback(true)
+        }else{
+            self.onConfirmButtonTriggered?(payload, callback)
+        }
+    }
 }

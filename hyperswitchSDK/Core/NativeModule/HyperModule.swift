@@ -189,6 +189,23 @@ internal class HyperModule: RCTEventEmitter {
     }
 
     @objc
+    private func onPaymentConfirmButtonClick(_ rootTag: NSNumber, _ payload: String, _ callback: @escaping RCTResponseSenderBlock) {
+        resolveSubscribingTarget(rootTag) { target in
+            if let widget = target as? PaymentWidget {
+                widget.notifyConfirmButtonTriggered(payload: payload) { shouldProceed in
+                    callback([shouldProceed])
+                }
+            } else if let sheet = target as? PaymentSheet {
+                sheet.notifyConfirmButtonTriggered(payload: payload) { shouldProceed in
+                    callback([shouldProceed])
+                }
+            } else {
+                callback([true])
+            }
+        }
+    }
+
+    @objc
     private func exitCardForm(_ rnMessage: String) {
         var response: String?
         var error: NSError?

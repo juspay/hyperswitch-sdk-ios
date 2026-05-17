@@ -17,6 +17,8 @@ public class PaymentWidget: UIControl {
     private var rootView: RCTRootView?
     private var initCallback: ((PaymentResult) -> Void)?
     private var shouldProceedWithPaymentCallback: ((String, @escaping (Bool) -> Void) -> Void)?
+    private var confirmCallback: ((PaymentResult) -> Void)?
+    private var onConfirmButtonTriggered: ((String, @escaping (Bool) -> Void) -> Void)?
     private var cancellables = Set<AnyCancellable>()
     internal var paymentEventListener: PaymentEventListener?
     internal var subscribedEventNames: [String] = []
@@ -145,7 +147,20 @@ public class PaymentWidget: UIControl {
             .store(in: &cancellables)
     }
 
-    public func confirm() {
+    public func setOnConfirmButtonTriggered(_ callback: @escaping (String, @escaping (Bool) -> Void) -> Void) {
+        self.onConfirmButtonTriggered = callback
+    }
+
+    internal func notifyConfirmButtonTriggered(payload: String, callback: @escaping (Bool) -> Void) {
+        if(self.onConfirmButtonTriggered == nil){
+            callback(true)
+        }else{
+            self.onConfirmButtonTriggered?(payload, callback)
+        }
+    }
+
+    public func confirm(resolve: @escaping (PaymentResult) -> Void) {
+        self.confirmCallback = resolve
         let payload: [String: Any] = [
             "rootTag": self.widgetReactTag ?? -1,
             "actionType": "CONFIRM_PAYMENT_ACTION",

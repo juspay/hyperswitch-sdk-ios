@@ -159,7 +159,6 @@ class WidgetViewController: UIViewController {
                     callback(true)
                 }
             }
-
             self.cvcWidget = CVCWidget(
                 configuration: configuration,
                 subscribe: { builder in
