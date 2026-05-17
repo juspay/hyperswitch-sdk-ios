@@ -11,8 +11,8 @@ import UIKit
 extension PaymentSheet.Appearance.Colors: Codable {
     enum CodingKeys: String, CodingKey {
         case primary, background, componentBackground, componentBorder
-        case componentDivider, text, textSecondary, componentText
-        case componentPlaceholderText, icon, danger
+        case componentDivider, primaryText, secondaryText, componentText
+        case placeholderText, icon, error
         case loaderBackground, loaderForeground
     }
 
@@ -23,12 +23,12 @@ extension PaymentSheet.Appearance.Colors: Codable {
         try c.encodeIfPresent(componentBackground.map { CodableColor($0) }, forKey: .componentBackground)
         try c.encodeIfPresent(componentBorder.map { CodableColor($0) }, forKey: .componentBorder)
         try c.encodeIfPresent(componentDivider.map { CodableColor($0) }, forKey: .componentDivider)
-        try c.encodeIfPresent(text.map { CodableColor($0) }, forKey: .text)
-        try c.encodeIfPresent(textSecondary.map { CodableColor($0) }, forKey: .textSecondary)
+        try c.encodeIfPresent(text.map { CodableColor($0) }, forKey: .primaryText)
+        try c.encodeIfPresent(textSecondary.map { CodableColor($0) }, forKey: .secondaryText)
         try c.encodeIfPresent(componentText.map { CodableColor($0) }, forKey: .componentText)
-        try c.encodeIfPresent(componentPlaceholderText.map { CodableColor($0) }, forKey: .componentPlaceholderText)
+        try c.encodeIfPresent(componentPlaceholderText.map { CodableColor($0) }, forKey: .placeholderText)
         try c.encodeIfPresent(icon.map { CodableColor($0) }, forKey: .icon)
-        try c.encodeIfPresent(danger.map { CodableColor($0) }, forKey: .danger)
+        try c.encodeIfPresent(danger.map { CodableColor($0) }, forKey: .error)
         try c.encodeIfPresent(loaderBackground.map { CodableColor($0) }, forKey: .loaderBackground)
         try c.encodeIfPresent(loaderForeground.map { CodableColor($0) }, forKey: .loaderForeground)
     }
@@ -41,12 +41,12 @@ extension PaymentSheet.Appearance.Colors: Codable {
         componentBackground = try c.decodeIfPresent(CodableColor.self, forKey: .componentBackground)?.uiColor
         componentBorder = try c.decodeIfPresent(CodableColor.self, forKey: .componentBorder)?.uiColor
         componentDivider = try c.decodeIfPresent(CodableColor.self, forKey: .componentDivider)?.uiColor
-        text = try c.decodeIfPresent(CodableColor.self, forKey: .text)?.uiColor
-        textSecondary = try c.decodeIfPresent(CodableColor.self, forKey: .textSecondary)?.uiColor
+        text = try c.decodeIfPresent(CodableColor.self, forKey: .primaryText)?.uiColor
+        textSecondary = try c.decodeIfPresent(CodableColor.self, forKey: .secondaryText)?.uiColor
         componentText = try c.decodeIfPresent(CodableColor.self, forKey: .componentText)?.uiColor
-        componentPlaceholderText = try c.decodeIfPresent(CodableColor.self, forKey: .componentPlaceholderText)?.uiColor
+        componentPlaceholderText = try c.decodeIfPresent(CodableColor.self, forKey: .placeholderText)?.uiColor
         icon = try c.decodeIfPresent(CodableColor.self, forKey: .icon)?.uiColor
-        danger = try c.decodeIfPresent(CodableColor.self, forKey: .danger)?.uiColor
+        danger = try c.decodeIfPresent(CodableColor.self, forKey: .error)?.uiColor
         loaderBackground = try c.decodeIfPresent(CodableColor.self, forKey: .loaderBackground)?.uiColor
         loaderForeground = try c.decodeIfPresent(CodableColor.self, forKey: .loaderForeground)?.uiColor
     }
@@ -54,14 +54,14 @@ extension PaymentSheet.Appearance.Colors: Codable {
 
 extension PaymentSheet.Appearance.Font: Codable {
     enum CodingKeys: String, CodingKey {
-        case sizeScaleFactor, base, headingTextSizeAdjust, subHeadingTextSizeAdjust
+        case scale, base, headingTextSizeAdjust, subHeadingTextSizeAdjust
         case placeholderTextSizeAdjust, buttonTextSizeAdjust, errorTextSizeAdjust
         case linkTextSizeAdjust, modalTextSizeAdjust, cardTextSizeAdjust, family
     }
 
     public func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
-        try c.encodeIfPresent(sizeScaleFactor, forKey: .sizeScaleFactor)
+        try c.encodeIfPresent(sizeScaleFactor, forKey: .scale)
         try c.encodeIfPresent(base.map { CodableFont($0) }, forKey: .base)
         try c.encodeIfPresent(headingTextSizeAdjust, forKey: .headingTextSizeAdjust)
         try c.encodeIfPresent(subHeadingTextSizeAdjust, forKey: .subHeadingTextSizeAdjust)
@@ -77,7 +77,7 @@ extension PaymentSheet.Appearance.Font: Codable {
     public init(from decoder: Decoder) throws {
         self.init()
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        sizeScaleFactor = try c.decodeIfPresent(CGFloat.self, forKey: .sizeScaleFactor)
+        sizeScaleFactor = try c.decodeIfPresent(CGFloat.self, forKey: .scale)
         base = try c.decodeIfPresent(CodableFont.self, forKey: .base)?.uiFont
         headingTextSizeAdjust = try c.decodeIfPresent(CGFloat.self, forKey: .headingTextSizeAdjust)
         subHeadingTextSizeAdjust = try c.decodeIfPresent(CGFloat.self, forKey: .subHeadingTextSizeAdjust)
@@ -91,21 +91,56 @@ extension PaymentSheet.Appearance.Font: Codable {
     }
 }
 
-extension PaymentSheet.Appearance.PrimaryButton: Codable {
+extension PaymentSheet.Appearance.PrimaryButtonColors: Codable {
     enum CodingKeys: String, CodingKey {
-        case backgroundColor, textColor, successBackgroundColor, successTextColor
-        case cornerRadius, borderColor, borderWidth, font, shadow
+        case background, text, border
     }
 
     public func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
-        try c.encodeIfPresent(backgroundColor.map { CodableColor($0) }, forKey: .backgroundColor)
-        try c.encodeIfPresent(textColor.map { CodableColor($0) }, forKey: .textColor)
-        try c.encodeIfPresent(successBackgroundColor.map { CodableColor($0) }, forKey: .successBackgroundColor)
-        try c.encodeIfPresent(successTextColor.map { CodableColor($0) }, forKey: .successTextColor)
-        try c.encodeIfPresent(cornerRadius, forKey: .cornerRadius)
-        try c.encodeIfPresent(borderColor.map { CodableColor($0) }, forKey: .borderColor)
-        try c.encodeIfPresent(borderWidth, forKey: .borderWidth)
+        try c.encodeIfPresent(background.map { CodableColor($0) }, forKey: .background)
+        try c.encodeIfPresent(text.map { CodableColor($0) }, forKey: .text)
+        try c.encodeIfPresent(border.map { CodableColor($0) }, forKey: .border)
+    }
+
+    public init(from decoder: Decoder) throws {
+        self.init()
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        background = try c.decodeIfPresent(CodableColor.self, forKey: .background)?.uiColor
+        text = try c.decodeIfPresent(CodableColor.self, forKey: .text)?.uiColor
+        border = try c.decodeIfPresent(CodableColor.self, forKey: .border)?.uiColor
+    }
+}
+
+extension PaymentSheet.Appearance.PrimaryButton: Codable {
+    // Wire keys that SdkTypes.res parser expects
+    enum CodingKeys: String, CodingKey {
+        case shapes, colors, font, shadow
+    }
+
+    // Sub-key containers used during encode
+    private enum ShapesKeys: String, CodingKey {
+        case borderRadius, borderWidth
+    }
+    private enum ColorsWrapperKeys: String, CodingKey {
+        case light, dark
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+
+        // shapes: { borderRadius, borderWidth }
+        var shapesContainer = c.nestedContainer(keyedBy: ShapesKeys.self, forKey: .shapes)
+        try shapesContainer.encodeIfPresent(cornerRadius, forKey: .borderRadius)
+        try shapesContainer.encodeIfPresent(borderWidth, forKey: .borderWidth)
+
+        // colors: { light: { background, text, border }, dark: { ... } }
+        var colorsContainer = c.nestedContainer(keyedBy: ColorsWrapperKeys.self, forKey: .colors)
+        let light = colorsLight ?? PaymentSheet.Appearance.PrimaryButtonColors()
+        let dark = colorsDark ?? PaymentSheet.Appearance.PrimaryButtonColors()
+        try colorsContainer.encode(light, forKey: .light)
+        try colorsContainer.encode(dark, forKey: .dark)
+
         try c.encodeIfPresent(font.map { CodableFont($0) }, forKey: .font)
         try c.encodeIfPresent(shadow, forKey: .shadow)
     }
@@ -113,13 +148,14 @@ extension PaymentSheet.Appearance.PrimaryButton: Codable {
     public init(from decoder: Decoder) throws {
         self.init()
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        backgroundColor = try c.decodeIfPresent(CodableColor.self, forKey: .backgroundColor)?.uiColor
-        textColor = try c.decodeIfPresent(CodableColor.self, forKey: .textColor)?.uiColor
-        successBackgroundColor = try c.decodeIfPresent(CodableColor.self, forKey: .successBackgroundColor)?.uiColor
-        successTextColor = try c.decodeIfPresent(CodableColor.self, forKey: .successTextColor)?.uiColor
-        cornerRadius = try c.decodeIfPresent(CGFloat.self, forKey: .cornerRadius)
-        borderColor = try c.decodeIfPresent(CodableColor.self, forKey: .borderColor)?.uiColor
-        borderWidth = try c.decodeIfPresent(CGFloat.self, forKey: .borderWidth)
+        if let shapesContainer = try? c.nestedContainer(keyedBy: ShapesKeys.self, forKey: .shapes) {
+            cornerRadius = try shapesContainer.decodeIfPresent(CGFloat.self, forKey: .borderRadius)
+            borderWidth = try shapesContainer.decodeIfPresent(CGFloat.self, forKey: .borderWidth)
+        }
+        if let colorsContainer = try? c.nestedContainer(keyedBy: ColorsWrapperKeys.self, forKey: .colors) {
+            colorsLight = try colorsContainer.decodeIfPresent(PaymentSheet.Appearance.PrimaryButtonColors.self, forKey: .light)
+            colorsDark = try colorsContainer.decodeIfPresent(PaymentSheet.Appearance.PrimaryButtonColors.self, forKey: .dark)
+        }
         font = try c.decodeIfPresent(CodableFont.self, forKey: .font)?.uiFont
         shadow = try c.decodeIfPresent(PaymentSheet.Appearance.Shadow.self, forKey: .shadow)
     }
@@ -151,17 +187,33 @@ extension PaymentSheet.Appearance.Shadow: Codable {
 }
 
 extension PaymentSheet.Appearance: Codable {
+    // Wire keys that SdkTypes.res parser expects
     enum CodingKeys: String, CodingKey {
-        case font, colors, primaryButton, cornerRadius, borderWidth, shadow, theme
+        case font, colors, shapes, primaryButton, shadow, theme
+    }
+
+    private enum ColorsWrapperKeys: String, CodingKey {
+        case light, dark
+    }
+    private enum ShapesKeys: String, CodingKey {
+        case borderRadius, borderWidth
     }
 
     public func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encodeIfPresent(font, forKey: .font)
-        try c.encodeIfPresent(colors, forKey: .colors)
+
+        // colors: { light: colorsLight, dark: colorsDark }
+        var colorsContainer = c.nestedContainer(keyedBy: ColorsWrapperKeys.self, forKey: .colors)
+        try colorsContainer.encode(colorsLight ?? Colors(), forKey: .light)
+        try colorsContainer.encode(colorsDark ?? Colors(), forKey: .dark)
+
+        // shapes: { borderRadius, borderWidth }
+        var shapesContainer = c.nestedContainer(keyedBy: ShapesKeys.self, forKey: .shapes)
+        try shapesContainer.encodeIfPresent(cornerRadius, forKey: .borderRadius)
+        try shapesContainer.encodeIfPresent(borderWidth, forKey: .borderWidth)
+
         try c.encodeIfPresent(primaryButton, forKey: .primaryButton)
-        try c.encodeIfPresent(cornerRadius, forKey: .cornerRadius)
-        try c.encodeIfPresent(borderWidth, forKey: .borderWidth)
         try c.encodeIfPresent(shadow, forKey: .shadow)
         try c.encodeIfPresent(theme, forKey: .theme)
     }
@@ -170,10 +222,15 @@ extension PaymentSheet.Appearance: Codable {
         self.init()
         let c = try decoder.container(keyedBy: CodingKeys.self)
         font = try c.decodeIfPresent(PaymentSheet.Appearance.Font.self, forKey: .font) ?? Font()
-        colors = try c.decodeIfPresent(PaymentSheet.Appearance.Colors.self, forKey: .colors) ?? Colors()
+        if let colorsContainer = try? c.nestedContainer(keyedBy: ColorsWrapperKeys.self, forKey: .colors) {
+            colorsLight = try colorsContainer.decodeIfPresent(PaymentSheet.Appearance.Colors.self, forKey: .light)
+            colorsDark = try colorsContainer.decodeIfPresent(PaymentSheet.Appearance.Colors.self, forKey: .dark)
+        }
+        if let shapesContainer = try? c.nestedContainer(keyedBy: ShapesKeys.self, forKey: .shapes) {
+            cornerRadius = try shapesContainer.decodeIfPresent(CGFloat.self, forKey: .borderRadius)
+            borderWidth = try shapesContainer.decodeIfPresent(CGFloat.self, forKey: .borderWidth)
+        }
         primaryButton = try c.decodeIfPresent(PaymentSheet.Appearance.PrimaryButton.self, forKey: .primaryButton) ?? PrimaryButton()
-        cornerRadius = try c.decodeIfPresent(CGFloat.self, forKey: .cornerRadius)
-        borderWidth = try c.decodeIfPresent(CGFloat.self, forKey: .borderWidth)
         shadow = try c.decodeIfPresent(PaymentSheet.Appearance.Shadow.self, forKey: .shadow)
         theme = try c.decodeIfPresent(PaymentSheet.Appearance.Theme.self, forKey: .theme)
     }

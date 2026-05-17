@@ -18,9 +18,6 @@ public extension PaymentSheet {
         /// Describes the appearance of fonts in PaymentSheet
         public var font: Font = Font()
 
-        /// Describes the colors in PaymentSheet
-        public var colors: Colors = Colors()
-
         /// Describes the appearance of the primary button (e.g., the "Pay" button)
         public var primaryButton: PrimaryButton = PrimaryButton()
 
@@ -37,6 +34,12 @@ public extension PaymentSheet {
         public var shadow: Shadow?
 
         public var theme: Theme?
+
+        /// The colors used in PaymentSheet in light mode
+        public var colorsLight: Colors?
+
+        /// The colors used in PaymentSheet in dark mode
+        public var colorsDark: Colors?
 
         public enum Theme: String, Codable {
             case `default` = "Default"
@@ -184,6 +187,24 @@ public extension PaymentSheet {
             public var intensity: CGFloat?
         }
 
+        // MARK: Primary Button Colors
+
+        /// Describes the color of the primary button in PaymentSheet
+        public struct PrimaryButtonColors {
+
+            /// Creates a `PaymentSheet.Appearance.PrimaryButtonColors` with default values
+            public init() {}
+
+            /// The background color of the primary button
+            public var background: UIColor?
+
+            /// The text color of the primary button
+            public var text: UIColor?
+
+            /// The border color of the primary button
+            public var border: UIColor?
+        }
+
         // MARK: Primary Button
 
         /// Describes the appearance of the primary button (e.g., the "Pay" button)
@@ -192,8 +213,7 @@ public extension PaymentSheet {
             /// Creates a `PaymentSheet.Appearance.PrimaryButton` with default values
             public init() {}
 
-            /// The background color of the primary button
-            /// - Note: If `nil`, `appearance.colors.primary` will be used as the primary button background color
+            /// The background color of the primary button in light mode (use colorsLight/colorsDark instead)
             public var backgroundColor: UIColor?
 
             /// The text color of the primary button
@@ -230,6 +250,12 @@ public extension PaymentSheet {
             /// The shadow of the primary button
             /// - Note: If `nil`, `appearance.shadow` will be used as the primary button shadow
             public var shadow: Shadow?
+
+            /// The colors of the primary button in light mode
+            public var colorsLight: PrimaryButtonColors?
+
+            /// The colors of the primary button in dark mode
+            public var colorsDark: PrimaryButtonColors?
         }
     }
 }

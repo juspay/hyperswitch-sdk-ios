@@ -57,12 +57,20 @@ public class ExpressCheckoutLauncher {
 
             let hyperParams = HyperParams.getHyperParams()
 
+            var sdkParams = hyperParams
+            sdkParams["sessionId"] = ""
+            sdkParams["confirm"] = false
+
             let props: [String: Any] = [
                 "type": "widgetPayment",
-                "sdkAuthorization": ExpressCheckoutLauncher.sdkAuthorization as Any,
-                "publishableKey": APIClient.shared.publishableKey as Any,
-                "profileId": APIClient.shared.profileId as Any,
-                "hyperParams": hyperParams,
+                "hyperswitchConfig": [
+                    "publishableKey": APIClient.shared.publishableKey as Any,
+                    "profileId": APIClient.shared.profileId as Any,
+                ],
+                "paymentSessionConfig": [
+                    "sdkAuthorization": ExpressCheckoutLauncher.sdkAuthorization as Any,
+                ],
+                "sdkParams": sdkParams,
                 "customBackendUrl": APIClient.shared.customBackendUrl as Any,
                 "customLogUrl": APIClient.shared.customLogUrl as Any,
                 "customParams": APIClient.shared.customParams as Any,

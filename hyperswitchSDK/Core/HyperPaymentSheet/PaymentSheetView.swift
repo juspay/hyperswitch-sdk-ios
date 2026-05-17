@@ -15,26 +15,31 @@ internal extension PaymentSheet {
     /// Method to get the root view for the payment sheet based on the configured properties.
     func getRootView() -> RCTRootView {
 
-        /// Get the configuration dictionary from the configuration object.
-        let configuration = try? self.configuration?.toDictionary()
+        /// Encode configuration and merge subscribedEvents into it
+        var configuration = (try? self.configuration?.toDictionary()) ?? [:]
+        configuration["subscribedEvents"] = self.subscribedEvents
 
-        /// Create a dictionary of hyperParams with app ID, sdkVersion, country, user agent, default view, and launch time.
-        let hyperParams = HyperParams.getHyperParams()
+        /// Build sdkParams from hyperParams, adding sessionId and confirm
+        var sdkParams = HyperParams.getHyperParams()
+        sdkParams["sessionId"] = ""
+        sdkParams["confirm"] = false
 
-        /// Create a dictionary of props to be sent to React Native with configuration, type, sdkAuthorization, publishable key, hyperParams, custom backend URL, themes, and custom parameters.
+        /// Build props matching the nativeJsonToRecord structure expected by SdkTypes.res
         let props: [String: Any] = [
-            "configuration": configuration as Any,
             "type": "payment",
-            "sdkAuthorization": self.sdkAuthorization,
-            "publishableKey": APIClient.shared.publishableKey as Any,
-            "profileId": APIClient.shared.profileId as Any,
-            "hyperParams": hyperParams,
+            "hyperswitchConfig": [
+                "publishableKey": APIClient.shared.publishableKey as Any,
+                "profileId": APIClient.shared.profileId as Any,
+            ],
+            "paymentSessionConfig": [
+                "sdkAuthorization": self.sdkAuthorization,
+            ],
+            "sdkParams": sdkParams,
+            "configuration": configuration,
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,
             "customParams": APIClient.shared.customParams as Any,
-            "subscribedEvents": self.subscribedEvents,
         ]
-        /// Get the root view from the RNViewManager with the "hyperSwitch" module and the props dictionary.
         let rootView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": props])
 
         rootView.backgroundColor = UIColor.clear
@@ -45,19 +50,27 @@ internal extension PaymentSheet {
     /// - Note: Used by Flutter and React Native Wrappers to send separate props.
     func getRootViewWithParams(props: [String: Any]) -> RCTRootView {
 
-        let hyperParams = HyperParams.getHyperParams()
+        var sdkParams = HyperParams.getHyperParams()
+        sdkParams["sessionId"] = ""
+        sdkParams["confirm"] = false
+
+        var configuration = props
+        configuration["subscribedEvents"] = self.subscribedEvents
 
         let props: [String: Any] = [
-            "configuration": props,
             "type": "payment",
-            "sdkAuthorization": self.sdkAuthorization,
-            "publishableKey": APIClient.shared.publishableKey as Any,
-            "profileId": APIClient.shared.profileId as Any,
-            "hyperParams": hyperParams,
+            "hyperswitchConfig": [
+                "publishableKey": APIClient.shared.publishableKey as Any,
+                "profileId": APIClient.shared.profileId as Any,
+            ],
+            "paymentSessionConfig": [
+                "sdkAuthorization": self.sdkAuthorization,
+            ],
+            "sdkParams": sdkParams,
+            "configuration": configuration,
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,
             "customParams": APIClient.shared.customParams as Any,
-            "subscribedEvents": self.subscribedEvents,
             "from": "rn",
         ]
 

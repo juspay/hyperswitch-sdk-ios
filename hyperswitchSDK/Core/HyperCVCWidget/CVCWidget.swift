@@ -55,16 +55,24 @@ public class CVCWidget: UIControl {
         let hyperParams = HyperParams.getHyperParams()
         let nativeConfig = try? configuration?.toDictionary()
 
+        var config: [String: Any] = configurationDict ?? nativeConfig ?? [:]
+        config["subscribedEvents"] = self.subscribedEventNames
+
+        var sdkParams = hyperParams
+        sdkParams["sessionId"] = ""
+        sdkParams["confirm"] = false
+
         let props: [String: Any] = [
-            "configuration": configurationDict ?? nativeConfig as Any,
             "type": "cvcWidget",
-            "publishableKey": APIClient.shared.publishableKey as Any,
-            "profileId": APIClient.shared.profileId as Any,
-            "hyperParams": hyperParams,
+            "hyperswitchConfig": [
+                "publishableKey": APIClient.shared.publishableKey as Any,
+                "profileId": APIClient.shared.profileId as Any,
+            ],
+            "sdkParams": sdkParams,
+            "configuration": config,
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,
             "customParams": APIClient.shared.customParams as Any,
-            "subscribedEvents": self.subscribedEventNames,
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
 
