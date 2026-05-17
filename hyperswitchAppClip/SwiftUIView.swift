@@ -69,8 +69,10 @@ struct SwiftUIView: View {
         appearance.font.base = UIFont(name: "montserrat", size: UIFont.systemFontSize)
         appearance.font.sizeScaleFactor = 1.0
         appearance.shadow = .disabled
-        appearance.colors.background = UIColor(red: 0.96, green: 0.97, blue: 0.98, alpha: 1.00)
-        appearance.colors.primary = UIColor(red: 0.55, green: 0.74, blue: 0.00, alpha: 1.00)
+        var lightColors = PaymentSheet.Appearance.Colors()
+        lightColors.background = UIColor(red: 0.96, green: 0.97, blue: 0.98, alpha: 1.00)
+        lightColors.primary = UIColor(red: 0.55, green: 0.74, blue: 0.00, alpha: 1.00)
+        appearance.colorsLight = lightColors
         appearance.primaryButton.cornerRadius = 32
         configuration.appearance = appearance
 

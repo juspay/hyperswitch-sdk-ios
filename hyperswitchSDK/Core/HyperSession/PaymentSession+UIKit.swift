@@ -106,12 +106,20 @@ extension PaymentSession {
         PaymentSession.headlessCompletion = func_
         PaymentSession.activeSession = self
         RNHeadlessManager.sharedInstance.reinvalidateBridge()
-        let hyperParams = HyperParams.getHyperParams()
+
+        var sdkParams = HyperParams.getHyperParams()
+        sdkParams["sessionId"] = ""
+        sdkParams["confirm"] = false
+
         let props: [String: Any] = [
-            "sdkAuthorization": self.sdkAuthorization as Any,
-            "publishableKey": APIClient.shared.publishableKey as Any,
-            "profileId": APIClient.shared.profileId as Any,
-            "hyperParams": hyperParams,
+            "hyperswitchConfig": [
+                "publishableKey": APIClient.shared.publishableKey as Any,
+                "profileId": APIClient.shared.profileId as Any,
+            ],
+            "paymentSessionConfig": [
+                "sdkAuthorization": self.sdkAuthorization as Any,
+            ],
+            "sdkParams": sdkParams,
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,
             "customParams": APIClient.shared.customParams as Any,

@@ -14,16 +14,22 @@ extension PaymentSheet {
 
         let configuration = try? self.configuration?.toDictionary()
 
-        let hyperParams = HyperParams.getHyperParams()
+        var sdkParams = HyperParams.getHyperParams()
+        sdkParams["sessionId"] = ""
+        sdkParams["confirm"] = false
 
-        /// Create a dictionary of props to be sent to React Native with configuration, type, client secret, publishable key, hyperParams, custom backend URL, themes, and custom parameters
+        /// Build props matching the nativeJsonToRecord structure expected by SdkTypes.res
         let props: [String: Any] = [
-            "configuration": configuration as Any,
             "type": "payment",
-            "sdkAuthorization": self.sdkAuthorization,
-            "publishableKey": APIClient.shared.publishableKey as Any,
-            "profileId": APIClient.shared.profileId as Any,
-            "hyperParams": hyperParams,
+            "hyperswitchConfig": [
+                "publishableKey": APIClient.shared.publishableKey as Any,
+                "profileId": APIClient.shared.profileId as Any,
+            ],
+            "paymentSessionConfig": [
+                "sdkAuthorization": self.sdkAuthorization,
+            ],
+            "sdkParams": sdkParams,
+            "configuration": configuration as Any,
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,
             "customParams": APIClient.shared.customParams as Any,

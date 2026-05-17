@@ -70,17 +70,27 @@ public class PaymentWidget: UIControl {
         nativeConfig?["hideConfirmButton"] = true
         configurationDict?["hideConfirmButton"] = true
 
+        var config: [String: Any] = configurationDict ?? nativeConfig ?? [:]
+        config["subscribedEvents"] = self.subscribedEventNames
+
+        var sdkParams = hyperParams
+        sdkParams["sessionId"] = ""
+        sdkParams["confirm"] = false
+
         let props: [String: Any] = [
-            "configuration": configurationDict ?? nativeConfig as Any,
             "type": "widgetPaymentSheet",
-            "sdkAuthorization": paymentSession.sdkAuthorization as Any,
-            "publishableKey": APIClient.shared.publishableKey as Any,
-            "profileId": APIClient.shared.profileId as Any,
-            "hyperParams": hyperParams,
+            "hyperswitchConfig": [
+                "publishableKey": APIClient.shared.publishableKey as Any,
+                "profileId": APIClient.shared.profileId as Any,
+            ],
+            "paymentSessionConfig": [
+                "sdkAuthorization": paymentSession.sdkAuthorization as Any,
+            ],
+            "sdkParams": sdkParams,
+            "configuration": config,
             "customBackendUrl": APIClient.shared.customBackendUrl as Any,
             "customLogUrl": APIClient.shared.customLogUrl as Any,
             "customParams": APIClient.shared.customParams as Any,
-            "subscribedEvents": self.subscribedEventNames,
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
 
