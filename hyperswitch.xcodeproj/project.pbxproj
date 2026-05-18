@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		192F175E42A8AC4EC54D289E /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		192F175E42A8AC4EC54D289E /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		4365207C2C8768B90006C856 /* ApplePayHandlerLite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4365207B2C8768B90006C856 /* ApplePayHandlerLite.swift */; };
 		43E668682C084FB70094BD13 /* montserrat_extralight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668552C084FB60094BD13 /* montserrat_extralight.ttf */; };
 		43E668692C084FB70094BD13 /* montserrat_bolditalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668562C084FB70094BD13 /* montserrat_bolditalic.ttf */; };
@@ -44,8 +44,8 @@
 		4E971A722CC2764F0040EFEB /* PaymentMethodManagementWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E971A712CC2764F0040EFEB /* PaymentMethodManagementWidget.swift */; };
 		4E97AA1E2E992D6A0029501E /* NetworkUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA2BD52E9926040094AA83 /* NetworkUtils.swift */; };
 		4E97AA1F2E992D6A0029501E /* NetworkUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA2BD52E9926040094AA83 /* NetworkUtils.swift */; };
-		4EEA67032D37B493000D4DC5 /* HyperParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA67022D37B487000D4DC5 /* HyperParams.swift */; };
-		4EEA67042D37B493000D4DC5 /* HyperParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA67022D37B487000D4DC5 /* HyperParams.swift */; };
+		4EEA67032D37B493000D4DC5 /* SDKParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA67022D37B487000D4DC5 /* SDKParams.swift */; };
+		4EEA67042D37B493000D4DC5 /* SDKParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA67022D37B487000D4DC5 /* SDKParams.swift */; };
 		570D085C0EE0B792AD674EC7 /* libPods-hyperswitch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 326F2B616140E767CA0149B9 /* libPods-hyperswitch.a */; };
 		60931E98C132E4509C70F829 /* Pods_hyperswitchAppClip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EAED38BB9AD107A31AB764F5 /* Pods_hyperswitchAppClip.framework */; };
 		663F68FC29CCC93C006E91BD /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663F68FB29CCC93C006E91BD /* APIClient.swift */; };
@@ -102,6 +102,14 @@
 		79727F932EE73E7E00D60AB4 /* LogPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790F84812D8C31E500178A09 /* LogPayload.swift */; };
 		79727F952EE74F7400D60AB4 /* ClickToPayProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79727F942EE74F7400D60AB4 /* ClickToPayProtocol.swift */; };
 		79728FB92C3412BB00CA8C10 /* HeadlessViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */; };
+		798F8DE12FBAC13000765B4C /* Hyperswitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8DDF2FBAC13000765B4C /* Hyperswitch.swift */; };
+		798F8DE22FBAC13000765B4C /* HyperswitchConfigurationSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8DE02FBAC13000765B4C /* HyperswitchConfigurationSchema.swift */; };
+		798F8DE32FBAC13000765B4C /* CustomEndpointConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8DDE2FBAC13000765B4C /* CustomEndpointConfiguration.swift */; };
+		798F8DE42FBAC13000765B4C /* Hyperswitch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8DDF2FBAC13000765B4C /* Hyperswitch.swift */; };
+		798F8DE52FBAC13000765B4C /* HyperswitchConfigurationSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8DE02FBAC13000765B4C /* HyperswitchConfigurationSchema.swift */; };
+		798F8DE62FBAC13000765B4C /* CustomEndpointConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8DDE2FBAC13000765B4C /* CustomEndpointConfiguration.swift */; };
+		798F8DEB2FBAC16E00765B4C /* PaymentSessionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8DEA2FBAC16E00765B4C /* PaymentSessionConfiguration.swift */; };
+		798F8DEC2FBAC16E00765B4C /* PaymentSessionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8DEA2FBAC16E00765B4C /* PaymentSessionConfiguration.swift */; };
 		7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7996A8322BA1FDD000394FAF /* hyperswitch.bundle */; };
 		799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */; };
 		79D474B42CC6FDC30022C47E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B32CC6FDBF0022C47E /* Helper.swift */; };
@@ -227,7 +235,7 @@
 		4E8C83A32E9904CD00A61749 /* AuthenticationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationViewModel.swift; sourceTree = "<group>"; };
 		4E971A712CC2764F0040EFEB /* PaymentMethodManagementWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodManagementWidget.swift; sourceTree = "<group>"; };
 		4EEA2BD52E9926040094AA83 /* NetworkUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkUtils.swift; sourceTree = "<group>"; };
-		4EEA67022D37B487000D4DC5 /* HyperParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperParams.swift; sourceTree = "<group>"; };
+		4EEA67022D37B487000D4DC5 /* SDKParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SDKParams.swift; sourceTree = "<group>"; };
 		652884677D31EE32A61ADD6C /* Pods-hyperswitch.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitch.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitch/Pods-hyperswitch.debug.xcconfig"; sourceTree = "<group>"; };
 		663F68FB29CCC93C006E91BD /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
 		66486F8E294355BD00150E4F /* hyperswitch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = hyperswitch.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -275,6 +283,10 @@
 		7954A4492C23A49A00FEC02D /* ApplePayViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayViewManager.swift; sourceTree = "<group>"; };
 		79727F942EE74F7400D60AB4 /* ClickToPayProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayProtocol.swift; sourceTree = "<group>"; };
 		79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlessViewController.swift; sourceTree = "<group>"; };
+		798F8DDE2FBAC13000765B4C /* CustomEndpointConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomEndpointConfiguration.swift; sourceTree = "<group>"; };
+		798F8DDF2FBAC13000765B4C /* Hyperswitch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Hyperswitch.swift; sourceTree = "<group>"; };
+		798F8DE02FBAC13000765B4C /* HyperswitchConfigurationSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperswitchConfigurationSchema.swift; sourceTree = "<group>"; };
+		798F8DEA2FBAC16E00765B4C /* PaymentSessionConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSessionConfiguration.swift; sourceTree = "<group>"; };
 		7996A8322BA1FDD000394FAF /* hyperswitch.bundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hyperswitch.bundle; sourceTree = "<group>"; };
 		799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		79D474B32CC6FDBF0022C47E /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
@@ -325,7 +337,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				192F175E42A8AC4EC54D289E /* BuildFile in Frameworks */,
+				192F175E42A8AC4EC54D289E /* (null) in Frameworks */,
 				570D085C0EE0B792AD674EC7 /* libPods-hyperswitch.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -585,12 +597,16 @@
 		79EAB09A2C81EEBC006B40AD /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				798F8DDF2FBAC13000765B4C /* Hyperswitch.swift */,
+				798F8DE02FBAC13000765B4C /* HyperswitchConfigurationSchema.swift */,
+				798F8DDE2FBAC13000765B4C /* CustomEndpointConfiguration.swift */,
 				79DF06D62FAC63F200854FF9 /* HyperEvents */,
 				75AA28DA2D477F6500CD88A6 /* NativeLogger */,
 				75AA28E52D477FF200CD88A6 /* HyperNetworking.swift */,
-				4EEA67022D37B487000D4DC5 /* HyperParams.swift */,
+				4EEA67022D37B487000D4DC5 /* SDKParams.swift */,
 				66486FA02943580F00150E4F /* SwiftUIManager.swift */,
 				790BA8262B99DB5E006678FD /* PaymentSession.swift */,
+				798F8DEA2FBAC16E00765B4C /* PaymentSessionConfiguration.swift */,
 				DC5D0111294731480017C67A /* PaymentSheet.swift */,
 				DC5D0113294731480017C67A /* PaymentSheetConfiguration.swift */,
 				43F6051D2B45FA3300BAA90E /* PaymentSheetAppearance.swift */,
@@ -826,9 +842,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -843,9 +863,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -924,9 +948,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -946,12 +974,13 @@
 				79DF06D82FAC63F200854FF9 /* PaymentEventSubscriptionBuilder.swift in Sources */,
 				79DF06D92FAC63F200854FF9 /* PaymentEventData.swift in Sources */,
 				79DF06DA2FAC63F200854FF9 /* PaymentEventType.swift in Sources */,
+				798F8DEB2FBAC16E00765B4C /* PaymentSessionConfiguration.swift in Sources */,
 				790BA8272B99DB5E006678FD /* PaymentSession.swift in Sources */,
 				4E8C83892E98CABF00A61749 /* AuthenticationSession.swift in Sources */,
 				4E8C838A2E98CABF00A61749 /* AuthenticationError.swift in Sources */,
 				79DF06DC2FAC641500854FF9 /* CVCWidget+Events.swift in Sources */,
 				7905257A2BDA73A600D49FE8 /* SwiftUIView.swift in Sources */,
-				4EEA67042D37B493000D4DC5 /* HyperParams.swift in Sources */,
+				4EEA67042D37B493000D4DC5 /* SDKParams.swift in Sources */,
 				DC5D0114294731480017C67A /* PaymentSheet.swift in Sources */,
 				DC5D0115294731480017C67A /* PaymentSheetView+SwiftUI.swift in Sources */,
 				7954A44A2C23A49A00FEC02D /* ApplePayViewManager.swift in Sources */,
@@ -1014,6 +1043,9 @@
 				752CF93C2DF6D47A0056F58A /* RNHeadlessManager.swift in Sources */,
 				79E8E4B62EB2333D00FA3886 /* ThreeDSSession.swift in Sources */,
 				DC4AC9F5296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift in Sources */,
+				798F8DE42FBAC13000765B4C /* Hyperswitch.swift in Sources */,
+				798F8DE52FBAC13000765B4C /* HyperswitchConfigurationSchema.swift in Sources */,
+				798F8DE62FBAC13000765B4C /* CustomEndpointConfiguration.swift in Sources */,
 				DC5D0127294853A90017C67A /* PaymentSheetView.swift in Sources */,
 				4E34835F2EA643DC007067EA /* CardinalProvider.swift in Sources */,
 				792D6A062B99C204001598CD /* HyperHeadless.m in Sources */,
@@ -1029,6 +1061,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				798F8DEC2FBAC16E00765B4C /* PaymentSessionConfiguration.swift in Sources */,
 				75AA28EA2D48F61800CD88A6 /* Environment.swift in Sources */,
 				75AA28EB2D48F61800CD88A6 /* HyperNetworking.swift in Sources */,
 				79EAB0172C81CCDA006B40AD /* ViewController.swift in Sources */,
@@ -1045,6 +1078,9 @@
 				79DF06E22FAC986700854FF9 /* PaymentEventData.swift in Sources */,
 				79E528942CCBB56700070AD9 /* ContentView.swift in Sources */,
 				79D474B52CC6FDC30022C47E /* Helper.swift in Sources */,
+				798F8DE12FBAC13000765B4C /* Hyperswitch.swift in Sources */,
+				798F8DE22FBAC13000765B4C /* HyperswitchConfigurationSchema.swift in Sources */,
+				798F8DE32FBAC13000765B4C /* CustomEndpointConfiguration.swift in Sources */,
 				79727F8F2EE73E7E00D60AB4 /* LogBuilder.swift in Sources */,
 				79727F902EE73E7E00D60AB4 /* LogManager.swift in Sources */,
 				79727F912EE73E7E00D60AB4 /* LogFileManager.swift in Sources */,
@@ -1063,7 +1099,7 @@
 				4E97AA1F2E992D6A0029501E /* NetworkUtils.swift in Sources */,
 				79E528972CCBB57300070AD9 /* SwiftUIView.swift in Sources */,
 				79EAB0342C81CF59006B40AD /* APIClient.swift in Sources */,
-				4EEA67032D37B493000D4DC5 /* HyperParams.swift in Sources */,
+				4EEA67032D37B493000D4DC5 /* SDKParams.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

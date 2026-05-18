@@ -55,7 +55,7 @@ public class ExpressCheckoutLauncher {
 
             RNViewManager.sharedInstance.responseHandler = self
 
-            let hyperParams = HyperParams.getHyperParams()
+            let hyperParams = SDKParams.getSDKParams()
 
             let props: [String: Any] = [
                 "type": "widgetPayment",

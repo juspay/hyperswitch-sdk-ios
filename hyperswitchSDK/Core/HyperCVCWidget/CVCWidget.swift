@@ -52,18 +52,13 @@ public class CVCWidget: UIControl {
 
     private func commonInit() {
 
-        let hyperParams = HyperParams.getHyperParams()
+        let sdkParams = SDKParams.getSDKParams()
         let nativeConfig = try? configuration?.toDictionary()
 
         let props: [String: Any] = [
-            "configuration": configurationDict ?? nativeConfig as Any,
             "type": "cvcWidget",
-            "publishableKey": APIClient.shared.publishableKey as Any,
-            "profileId": APIClient.shared.profileId as Any,
-            "hyperParams": hyperParams,
-            "customBackendUrl": APIClient.shared.customBackendUrl as Any,
-            "customLogUrl": APIClient.shared.customLogUrl as Any,
-            "customParams": APIClient.shared.customParams as Any,
+            "sdkParams": sdkParams,
+            "configuration": configurationDict ?? nativeConfig as Any,
             "subscribedEvents": self.subscribedEventNames,
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]

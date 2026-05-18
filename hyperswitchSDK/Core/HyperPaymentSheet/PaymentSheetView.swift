@@ -15,23 +15,22 @@ internal extension PaymentSheet {
     /// Method to get the root view for the payment sheet based on the configured properties.
     func getRootView() -> RCTRootView {
 
+        let hyperswitchConfiguration = try? hyperswitchConfiguration?.toDictionary()
+        let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
+
         /// Get the configuration dictionary from the configuration object.
         let configuration = try? self.configuration?.toDictionary()
 
         /// Create a dictionary of hyperParams with app ID, sdkVersion, country, user agent, default view, and launch time.
-        let hyperParams = HyperParams.getHyperParams()
+        let sdkParams = SDKParams.getSDKParams()
 
         /// Create a dictionary of props to be sent to React Native with configuration, type, sdkAuthorization, publishable key, hyperParams, custom backend URL, themes, and custom parameters.
         let props: [String: Any] = [
-            "configuration": configuration as Any,
             "type": "payment",
-            "sdkAuthorization": self.sdkAuthorization,
-            "publishableKey": APIClient.shared.publishableKey as Any,
-            "profileId": APIClient.shared.profileId as Any,
-            "hyperParams": hyperParams,
-            "customBackendUrl": APIClient.shared.customBackendUrl as Any,
-            "customLogUrl": APIClient.shared.customLogUrl as Any,
-            "customParams": APIClient.shared.customParams as Any,
+            "hyperswitchConfig": hyperswitchConfiguration as Any,
+            "paymentSessionConfig": paymentSessionConfiguration as Any,
+            "sdkParams": sdkParams,
+            "configuration": configuration as Any,
             "subscribedEvents": self.subscribedEvents,
         ]
         /// Get the root view from the RNViewManager with the "hyperSwitch" module and the props dictionary.
@@ -45,18 +44,17 @@ internal extension PaymentSheet {
     /// - Note: Used by Flutter and React Native Wrappers to send separate props.
     func getRootViewWithParams(props: [String: Any]) -> RCTRootView {
 
-        let hyperParams = HyperParams.getHyperParams()
+        let hyperswitchConfiguration = try? hyperswitchConfiguration?.toDictionary()
+        let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
+
+        let sdkParams = SDKParams.getSDKParams()
 
         let props: [String: Any] = [
-            "configuration": props,
             "type": "payment",
-            "sdkAuthorization": self.sdkAuthorization,
-            "publishableKey": APIClient.shared.publishableKey as Any,
-            "profileId": APIClient.shared.profileId as Any,
-            "hyperParams": hyperParams,
-            "customBackendUrl": APIClient.shared.customBackendUrl as Any,
-            "customLogUrl": APIClient.shared.customLogUrl as Any,
-            "customParams": APIClient.shared.customParams as Any,
+            "hyperswitchConfig": hyperswitchConfiguration as Any,
+            "paymentSessionConfig": paymentSessionConfiguration as Any,
+            "sdkParams": sdkParams,
+            "configuration": props,
             "subscribedEvents": self.subscribedEvents,
             "from": "rn",
         ]

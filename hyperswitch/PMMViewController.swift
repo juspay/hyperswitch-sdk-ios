@@ -56,7 +56,7 @@ class PaymentMethodManagementViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .green
         viewFrame()
-        hyperViewModel.preparePaymentMethodManagement()
+        //        hyperViewModel.preparePaymentMethodManagement()
         asyncBindPaymentManagementWidget(onAddPaymentMethod: onAddPaymentMethod)
     }
 
@@ -79,10 +79,10 @@ class PaymentMethodManagementViewController: UIViewController {
                     switch result {
                     case .completed:
                         self.showAlert(title: "Success", message: "Successfully saved the payment method")
-                        self.hyperViewModel.preparePaymentMethodManagement()
+                    //                        self.hyperViewModel.preparePaymentMethodManagement()
                     case .failed(let error):
                         self.showAlert(title: "Error", message: "Failure: \(error.localizedDescription)")
-                        self.hyperViewModel.preparePaymentMethodManagement()
+                    //                        self.hyperViewModel.preparePaymentMethodManagement()
                     case .canceled:
                         break
                     }

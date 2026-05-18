@@ -12,21 +12,20 @@ extension PaymentSheet {
 
     func presentLite(from presentingViewController: UIViewController, completion: @escaping (PaymentResult) -> Void) {
 
+        let hyperswitchConfiguration = try? hyperswitchConfiguration?.toDictionary()
+        let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
+
         let configuration = try? self.configuration?.toDictionary()
 
-        let hyperParams = HyperParams.getHyperParams()
+        let sdkParams = SDKParams.getSDKParams()
 
         /// Create a dictionary of props to be sent to React Native with configuration, type, client secret, publishable key, hyperParams, custom backend URL, themes, and custom parameters
         let props: [String: Any] = [
-            "configuration": configuration as Any,
             "type": "payment",
-            "sdkAuthorization": self.sdkAuthorization,
-            "publishableKey": APIClient.shared.publishableKey as Any,
-            "profileId": APIClient.shared.profileId as Any,
-            "hyperParams": hyperParams,
-            "customBackendUrl": APIClient.shared.customBackendUrl as Any,
-            "customLogUrl": APIClient.shared.customLogUrl as Any,
-            "customParams": APIClient.shared.customParams as Any,
+            "hyperswitchConfig": hyperswitchConfiguration as Any,
+            "paymentSessionConfig": paymentSessionConfiguration as Any,
+            "sdkParams": sdkParams,
+            "configuration": configuration as Any,
         ]
 
         let initialProps: [String: Any] = [

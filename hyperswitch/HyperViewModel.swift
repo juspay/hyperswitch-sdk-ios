@@ -11,6 +11,7 @@ class HyperViewModel: ObservableObject {
 
     let backendUrl = URL(string: "http://localhost:5252")!
 
+    @Published var hyperswitch: Hyperswitch?
     @Published var paymentSession: PaymentSession?
     @Published var status: APIStatus = .loading
     internal var netceteraApiKey: String?
@@ -36,8 +37,11 @@ class HyperViewModel: ObservableObject {
 
                 DispatchQueue.main.async {
                     self.status = .success
-                    self.paymentSession = PaymentSession(publishableKey: publishableKey, profileId: profileId)
-                    self.paymentSession?.initPaymentSession(sdkAuthorization: sdkAuthorization)
+                    let hyperswitchConfiguration = HyperswitchConfiguration(publishableKey: publishableKey, profileId: profileId)
+                    let paymentSessionConfiguration = PaymentSessionConfiguration(sdkAuthorization: sdkAuthorization)
+
+                    self.hyperswitch = Hyperswitch(configuration: hyperswitchConfiguration)
+                    self.paymentSession = self.hyperswitch?.initPaymentSession(configuration: paymentSessionConfiguration)
                 }
             } catch {
                 DispatchQueue.main.async {
@@ -84,37 +88,6 @@ class HyperViewModel: ObservableObject {
                 }
             }
         )
-    }
-
-    func preparePaymentMethodManagement() {
-        Task {
-            do {
-                let ephemeralKeyJson = try await NetworkUtility.fetchData(from: "/create-ephemeral-key", baseUrl: backendUrl)
-                guard let ephemeralKey = ephemeralKeyJson["ephemeralKey"] as? String else {
-                    throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing ephemeral key"])
-                }
-
-                let json = try await NetworkUtility.fetchData(from: "/create-payment-intent", baseUrl: backendUrl)
-                guard let sdkAuthorization = json["sdkAuthorization"] as? String,
-                    let publishableKey = json["publishableKey"] as? String,
-                    let profileId = json["profileId"] as? String
-                else {
-                    throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: "Missing required fields"])
-                }
-
-                DispatchQueue.main.async {
-                    self.status = .success
-                    self.paymentSession = PaymentSession(publishableKey: publishableKey, profileId: profileId)
-
-                    self.paymentSession?.initPaymentManagementSession(ephemeralKey: ephemeralKey, sdkAuthorization: nil)
-                    self.paymentSession?.initPaymentSession(sdkAuthorization: sdkAuthorization)
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    self.status = .failure(error.localizedDescription)
-                }
-            }
-        }
     }
 
     func fetchNetceteraSDKApiKey() {
