@@ -157,10 +157,10 @@ class WidgetViewController: UIViewController {
                 switch paymentRequestData.paymentMethodType {
                 case .applePay:
                     print("applePay")
-                // callback(false)
+                 callback(true)
                 case .payPal:
                     print("payPal")
-                // callback(false)
+                 callback(true)
                 }
             }
             if let hyperswitch = hyperViewModel.hyperswitch {
