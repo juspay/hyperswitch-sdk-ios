@@ -6,7 +6,7 @@
 //
 
 public struct PaymentRequestData: Codable {
-    var paymentMethodType: PaymentMethodType
+    public var paymentMethodType: PaymentMethodType
 }
 
 public enum PaymentMethodType: String, Codable {

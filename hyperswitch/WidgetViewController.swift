@@ -152,11 +152,14 @@ class WidgetViewController: UIViewController {
                     self.statusLabel.text = "failed → \(error)"
                 }
             }
-            self.paymentWidget?.shouldProceedWithPayment { data, callback in
-                if data.contains("paypal") {
-                    callback(false)
-                } else {
-                    callback(true)
+            self.paymentWidget?.shouldProceedWithPayment { paymentRequestData, callback in
+                switch paymentRequestData.paymentMethodType {
+                case .applePay:
+                    print("applePay")
+                // callback(false)
+                case .payPal:
+                    print("payPal")
+                // callback(false)
                 }
             }
 
