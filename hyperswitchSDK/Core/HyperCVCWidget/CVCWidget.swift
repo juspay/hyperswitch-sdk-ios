@@ -10,7 +10,7 @@ import Foundation
 public class CVCWidget: UIControl {
 
     private let configuration: PaymentSheet.Configuration?
-    private let configurationDict: [String: Any]?
+    private var configurationDict: [String: Any]?
     private var widgetReactTag: NSNumber?
     private var rootView: RCTRootView?
     private var cvcCallback: ((PaymentResult) -> Void)?
@@ -62,6 +62,7 @@ public class CVCWidget: UIControl {
 
         var nativeConfig = try? configuration?.toDictionary()
         nativeConfig?["subscribedEvents"] = self.subscribedEventNames
+        configurationDict?["subscribedEvents"] = self.subscribedEventNames
 
         let props: [String: Any] = [
             "hyperswitchConfig": hyperswitchConfiguration as Any,
