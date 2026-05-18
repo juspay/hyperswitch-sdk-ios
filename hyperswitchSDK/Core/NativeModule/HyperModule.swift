@@ -273,6 +273,24 @@ internal class HyperModule: RCTEventEmitter {
             }
         }
     }
+
+    @objc
+    private func onPaymentConfirmButtonClick(_ rootTag: NSNumber, _ payload: String, _ callback: @escaping RCTResponseSenderBlock) {
+        resolveSubscribingTarget(rootTag) { target in
+            if let widget = target as? PaymentWidget {
+                widget.handleShouldProceedWithPayment(payload: payload) { shouldProceed in
+                    callback([shouldProceed])
+                }
+            } else if let sheet = target as? PaymentSheet {
+                sheet.handleShouldProceedWithPayment(payload: payload) { shouldProceed in
+                    callback([shouldProceed])
+                }
+            } else {
+                callback([true])
+            }
+        }
+    }
+
     private func withWidget(_ rootTag: NSNumber, _ block: @escaping (PaymentWidget) -> Void) {
         RCTGetUIManagerQueue().async {
             self.bridge.uiManager.addUIBlock { _, viewRegistry in

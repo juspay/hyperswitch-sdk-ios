@@ -22,4 +22,5 @@ public class PaymentSheet {
     internal var completion: ((PaymentResult) -> Void)?
     internal var subscribedEvents: [String] = []
     internal var paymentEventListener: PaymentEventListener?
+    internal var shouldProceedWithPaymentCallback: ((String, @escaping (Bool) -> Void) -> Void)?
 }

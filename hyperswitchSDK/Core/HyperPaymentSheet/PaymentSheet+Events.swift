@@ -17,4 +17,16 @@ extension PaymentSheet {
             DispatchQueue.main.async { listener.onPaymentEvent(event) }
         }
     }
+
+    public func shouldProceedWithPayment(_ callback: @escaping (String, @escaping (Bool) -> Void) -> Void) {
+        self.shouldProceedWithPaymentCallback = callback
+    }
+
+    internal func handleShouldProceedWithPayment(payload: String, callback: @escaping (Bool) -> Void) {
+        if self.shouldProceedWithPaymentCallback == nil {
+            callback(true)
+        } else {
+            self.shouldProceedWithPaymentCallback?(payload, callback)
+        }
+    }
 }

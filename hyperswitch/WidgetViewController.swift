@@ -152,6 +152,14 @@ class WidgetViewController: UIViewController {
                     self.statusLabel.text = "failed → \(error)"
                 }
             }
+            self.paymentWidget?.shouldProceedWithPayment { data, callback in
+                if data.contains("paypal") {
+                    callback(false)
+                } else {
+                    callback(true)
+                }
+            }
+
             self.cvcWidget = CVCWidget(
                 configuration: configuration,
                 subscribe: { builder in
