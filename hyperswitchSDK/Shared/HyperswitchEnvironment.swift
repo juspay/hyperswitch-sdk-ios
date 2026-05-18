@@ -5,8 +5,7 @@
 //  Created by Harshit Srivastava on 18/05/26.
 //
 
-public enum HyperswitchEnvironment: Codable {
-    case prod
+public enum HyperswitchEnvironment: String, Codable {
+    case production
     case sandbox
-    case integ
 }
