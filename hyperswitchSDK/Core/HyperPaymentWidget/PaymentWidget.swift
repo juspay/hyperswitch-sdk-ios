@@ -18,8 +18,8 @@ public class PaymentWidget: UIControl {
     private var initCallback: ((PaymentResult) -> Void)?
     private var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
     private var cancellables = Set<AnyCancellable>()
+    private var subscribedEventNames: [String]?
     internal var paymentEventListener: PaymentEventListener?
-    internal var subscribedEventNames: [String] = []
 
     public init(
         paymentSession: PaymentSession,
@@ -80,6 +80,7 @@ public class PaymentWidget: UIControl {
 
         var nativeConfig = try? configuration?.toDictionary()
         nativeConfig?["hideConfirmButton"] = true
+        nativeConfig?["subscribedEvents"] = subscribedEventNames
         configurationDict?["hideConfirmButton"] = true
 
         let props: [String: Any] = [
@@ -88,7 +89,6 @@ public class PaymentWidget: UIControl {
             "paymentSessionConfig": paymentSessionConfiguration as Any,
             "sdkParams": sdkParams,
             "configuration": configurationDict ?? nativeConfig as Any,
-            "subscribedEvents": self.subscribedEventNames,
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
 
@@ -187,5 +187,15 @@ public class PaymentWidget: UIControl {
         rootView?.removeFromSuperview()
         rootView = nil
         widgetReactTag = nil
+    }
+
+    internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {
+        guard let listener = paymentEventListener else { return }
+        let event = PaymentEvent(type: type, payload: payload)
+        if Thread.isMainThread {
+            listener.onPaymentEvent(event)
+        } else {
+            DispatchQueue.main.async { listener.onPaymentEvent(event) }
+        }
     }
 }

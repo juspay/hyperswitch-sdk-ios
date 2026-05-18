@@ -19,7 +19,8 @@ internal extension PaymentSheet {
         let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
 
         /// Get the configuration dictionary from the configuration object.
-        let configuration = try? self.configuration?.toDictionary()
+        var configuration = try? self.configuration?.toDictionary()
+        configuration?["subscribedEvents"] = subscribedEvents
 
         /// Create a dictionary of hyperParams with app ID, sdkVersion, country, user agent, default view, and launch time.
         let sdkParams = SDKParams.getSDKParams()
@@ -30,8 +31,7 @@ internal extension PaymentSheet {
             "hyperswitchConfig": hyperswitchConfiguration as Any,
             "paymentSessionConfig": paymentSessionConfiguration as Any,
             "sdkParams": sdkParams,
-            "configuration": configuration as Any,
-            "subscribedEvents": self.subscribedEvents,
+            "configuration": configuration as Any
         ]
         /// Get the root view from the RNViewManager with the "hyperSwitch" module and the props dictionary.
         let rootView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": props])
@@ -55,7 +55,6 @@ internal extension PaymentSheet {
             "paymentSessionConfig": paymentSessionConfiguration as Any,
             "sdkParams": sdkParams,
             "configuration": props,
-            "subscribedEvents": self.subscribedEvents,
             "from": "rn",
         ]
 

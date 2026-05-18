@@ -14,10 +14,13 @@ public class CVCWidget: UIControl {
     private var widgetReactTag: NSNumber?
     private var rootView: RCTRootView?
     private var cvcCallback: ((PaymentResult) -> Void)?
-    internal var paymentEventListener: PaymentEventListener?
-    internal var subscribedEventNames: [String] = []
+    private var subscribedEventNames: [String]?
+    private let hyperswitch: Hyperswitch
 
-    public init(configuration: PaymentSheet.Configuration? = nil, subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil) {
+    internal var paymentEventListener: PaymentEventListener?
+
+    public init(hyperswitch: Hyperswitch, configuration: PaymentSheet.Configuration? = nil, subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil) {
+        self.hyperswitch = hyperswitch
         self.configuration = configuration
         self.configurationDict = nil
         if let subscribe {
@@ -31,8 +34,9 @@ public class CVCWidget: UIControl {
         commonInit()
     }
 
-    // pass through
-    public init(configurationDict: [String: Any]?, subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil) {
+    //MARK: pass through
+    public init(hyperswitch: Hyperswitch, configurationDict: [String: Any]?, subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil) {
+        self.hyperswitch = hyperswitch
         self.configuration = nil
         self.configurationDict = configurationDict
         if let subscribe {
@@ -52,14 +56,18 @@ public class CVCWidget: UIControl {
 
     private func commonInit() {
 
+        let hyperswitchConfiguration = try? hyperswitch.hyperswitchConfiguration.toDictionary()
+
         let sdkParams = SDKParams.getSDKParams()
-        let nativeConfig = try? configuration?.toDictionary()
+
+        var nativeConfig = try? configuration?.toDictionary()
+        nativeConfig?["subscribedEvents"] = self.subscribedEventNames
 
         let props: [String: Any] = [
+            "hyperswitchConfig": hyperswitchConfiguration as Any,
             "type": "cvcWidget",
             "sdkParams": sdkParams,
             "configuration": configurationDict ?? nativeConfig as Any,
-            "subscribedEvents": self.subscribedEventNames,
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
 
@@ -97,5 +105,15 @@ public class CVCWidget: UIControl {
             args: ["triggerWidgetAction", payload],
             completion: nil
         )
+    }
+
+    internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {
+        guard let listener = paymentEventListener else { return }
+        let event = PaymentEvent(type: type, payload: payload)
+        if Thread.isMainThread {
+            listener.onPaymentEvent(event)
+        } else {
+            DispatchQueue.main.async { listener.onPaymentEvent(event) }
+        }
     }
 }
