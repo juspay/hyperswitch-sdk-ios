@@ -10,9 +10,7 @@ import UIKit
 public extension PaymentSheet {
 
     /// Describes the appearance of PaymentSheet
-    struct Appearance: Equatable, DictionaryConverter {
-        /// The default appearance for PaymentSheet
-        public static let `default` = Appearance()
+    struct Appearance {
 
         /// Creates a `PaymentSheet.Appearance` with default values
         public init() {}
@@ -55,7 +53,7 @@ public extension PaymentSheet {
         // MARK: Fonts
 
         /// Describes the appearance of fonts in PaymentSheet
-        public struct Font: Equatable, DictionaryConverter {
+        public struct Font {
 
             /// Creates a `PaymentSheet.Appearance.Font` with default values
             public init() {}
@@ -109,7 +107,7 @@ public extension PaymentSheet {
         // MARK: Colors
 
         /// Describes the colors in PaymentSheet
-        public struct Colors: Equatable, DictionaryConverter {
+        public struct Colors {
 
             /// Creates a `PaymentSheet.Appearance.Colors` with default values
             public init() {}
@@ -157,7 +155,10 @@ public extension PaymentSheet {
         // MARK: Shadow
 
         /// Represents a shadow in PaymentSheet
-        public struct Shadow: Equatable, DictionaryConverter {
+        public struct Shadow {
+
+            /// Creates a `PaymentSheet.Appearance.Shadow` with default values
+            public init() {}
 
             /// A pre-configured `Shadow` in the disabled or off state
             public static var disabled: Shadow?
@@ -181,30 +182,12 @@ public extension PaymentSheet {
             /// intensity of the shadow
             /// - Note: The behavior of this property is consistent with `CALayer.shadowIntensity`
             public var intensity: CGFloat?
-
-            /// Creates a `PaymentSheet.Appearance.Shadow` with default values
-            public init() {}
-
-            /// Creates a `Shadow` with the specified parameters
-            /// - Parameters:
-            ///   - color: Color of the shadow
-            ///   - opacity: Opacity or opacity of the shadow
-            ///   - offset: Offset of the shadow
-            ///   - radius: Radius of the shadow
-            ///   - intensity: Intensity of the shadow
-            public init(color: UIColor?, opacity: CGFloat?, offset: CGSize?, radius: CGFloat?, intensity: CGFloat?) {
-                self.color = color
-                self.opacity = opacity
-                self.offset = offset
-                self.radius = radius
-                self.intensity = intensity
-            }
         }
 
         // MARK: Primary Button
 
         /// Describes the appearance of the primary button (e.g., the "Pay" button)
-        public struct PrimaryButton: Equatable, DictionaryConverter {
+        public struct PrimaryButton {
 
             /// Creates a `PaymentSheet.Appearance.PrimaryButton` with default values
             public init() {}
@@ -249,5 +232,4 @@ public extension PaymentSheet {
             public var shadow: Shadow?
         }
     }
-
 }

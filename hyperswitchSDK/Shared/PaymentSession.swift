@@ -22,40 +22,27 @@ public enum UpdateIntentResult {
 
 public class PaymentSession {
 
-    internal var sdkAuthorization: String?
-    internal var ephemeralKey: String?
+    internal let paymentSessionConfiguration: PaymentSessionConfiguration
+    internal var hyperswitchConfiguration: HyperswitchConfiguration?
+    private var sdkAuthorization: String?
+
     internal let updateIntentDidStart = PassthroughSubject<Void, Never>()
     internal let updateIntentDidComplete = PassthroughSubject<String, Never>()
     internal let updateIntentInitReturned = PassthroughSubject<String, Never>()
     internal let updateIntentCompleteReturned = PassthroughSubject<String, Never>()
     private var cancellables = Set<AnyCancellable>()
 
-    public init(
-        publishableKey: String,
-        profileId: String,
-        customBackendUrl: String? = nil,
-        customParams: [String: Any]? = nil,
-        customLogUrl: String? = nil
-    ) {
-        APIClient.shared.publishableKey = publishableKey
-        APIClient.shared.profileId = profileId
-        APIClient.shared.customBackendUrl = customBackendUrl
-        APIClient.shared.customLogUrl = customLogUrl
-        APIClient.shared.customParams = customParams
+    internal init(paymentSessionConfiguration: PaymentSessionConfiguration, hyperswitchConfiguration: HyperswitchConfiguration? = nil) {
+        self.paymentSessionConfiguration = paymentSessionConfiguration
+        self.hyperswitchConfiguration = hyperswitchConfiguration
+        self.sdkAuthorization = paymentSessionConfiguration.sdkAuthorization
 
-        #if canImport(HyperOTA)
-        OTAServices.shared.initialize(publishableKey: publishableKey)
-        LogManager.initialize(publishableKey: publishableKey)
-        #endif
-    }
-
-    public func initPaymentSession(sdkAuthorization: String) {
-        self.sdkAuthorization = sdkAuthorization
-    }
-
-    public func initPaymentManagementSession(ephemeralKey: String, sdkAuthorization: String? = nil) {
-        self.ephemeralKey = ephemeralKey
-        self.sdkAuthorization = sdkAuthorization
+        if let hyperswitchConfiguration = hyperswitchConfiguration {
+            #if canImport(HyperOTA)
+            OTAServices.shared.initialize(publishableKey: hyperswitchConfiguration.publishableKey)
+            LogManager.initialize(publishableKey: hyperswitchConfiguration.publishableKey)
+            #endif
+        }
     }
 
     public func updateIntent(

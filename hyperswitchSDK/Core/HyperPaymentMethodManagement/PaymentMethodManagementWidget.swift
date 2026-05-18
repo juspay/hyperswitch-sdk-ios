@@ -42,7 +42,7 @@ internal class PaymentMethodManagementWidget: UIControl {
     }
 
     private func commonInit() {
-        let hyperParams = HyperParams.getHyperParams()
+        let hyperParams = SDKParams.getSDKParams()
 
         // Prepare the props to send to the React Native module.
         let props: [String: Any] = [

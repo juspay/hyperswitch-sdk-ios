@@ -16,7 +16,8 @@ extension PaymentSession {
         completion: @escaping (PaymentResult) -> Void
     ) {
         let paymentSheet = PaymentSheet(
-            sdkAuthorization: self.sdkAuthorization ?? "",
+            paymentSessionConfiguration: paymentSessionConfiguration,
+            hyperswitchConfiguration: hyperswitchConfiguration,
             configuration: configuration
         )
         paymentSheet.presentLite(from: viewController, completion: completion)

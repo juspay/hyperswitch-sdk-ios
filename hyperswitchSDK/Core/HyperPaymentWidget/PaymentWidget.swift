@@ -15,7 +15,8 @@ public class PaymentWidget: UIControl {
     private var configurationDict: [String: Any]?
     private var widgetReactTag: NSNumber?
     private var rootView: RCTRootView?
-    private var confirmCallback: ((PaymentResult) -> Void)?
+    private var initCallback: ((PaymentResult) -> Void)?
+    private var shouldProceedWithPaymentCallback: ((String, @escaping (Bool) -> Void) -> Void)?
     private var cancellables = Set<AnyCancellable>()
     internal var paymentEventListener: PaymentEventListener?
     internal var subscribedEventNames: [String] = []
@@ -23,6 +24,7 @@ public class PaymentWidget: UIControl {
     public init(
         paymentSession: PaymentSession,
         configuration: PaymentSheet.Configuration? = nil,
+        completion: @escaping ((PaymentResult) -> Void),
         subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil
     ) {
         self.paymentSession = paymentSession
@@ -35,6 +37,7 @@ public class PaymentWidget: UIControl {
             self.paymentEventListener = listener
             self.subscribedEventNames = subscription.subscribedEventStrings()
         }
+        self.initCallback = completion
         super.init(frame: .zero)
         commonInit()
     }
@@ -42,6 +45,7 @@ public class PaymentWidget: UIControl {
     public init(
         paymentSession: PaymentSession,
         configurationDict: [String: Any]?,
+        completion: @escaping ((PaymentResult) -> Void),
         subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil
     ) {
         self.paymentSession = paymentSession
@@ -54,6 +58,7 @@ public class PaymentWidget: UIControl {
             self.paymentEventListener = listener
             self.subscribedEventNames = subscription.subscribedEventStrings()
         }
+        self.initCallback = completion
         super.init(frame: .zero)
         commonInit()
     }
@@ -62,24 +67,27 @@ public class PaymentWidget: UIControl {
         fatalError("init(coder:) has not been implemented")
     }
 
+    public func shouldProceedWithPayment(_ callback: @escaping (String, @escaping (Bool) -> Void) -> Void) {
+        self.shouldProceedWithPaymentCallback = callback
+    }
+
     private func commonInit() {
 
-        let hyperParams = HyperParams.getHyperParams()
+        let hyperswitchConfiguration = try? paymentSession.hyperswitchConfiguration?.toDictionary()
+        let paymentSessionConfiguration = try? paymentSession.paymentSessionConfiguration.toDictionary()
 
-        var nativeConfig = configuration?.toDictionary()
+        let sdkParams = SDKParams.getSDKParams()
+
+        var nativeConfig = try? configuration?.toDictionary()
         nativeConfig?["hideConfirmButton"] = true
         configurationDict?["hideConfirmButton"] = true
 
         let props: [String: Any] = [
-            "configuration": configurationDict ?? nativeConfig as Any,
             "type": "widgetPaymentSheet",
-            "sdkAuthorization": paymentSession.sdkAuthorization as Any,
-            "publishableKey": APIClient.shared.publishableKey as Any,
-            "profileId": APIClient.shared.profileId as Any,
-            "hyperParams": hyperParams,
-            "customBackendUrl": APIClient.shared.customBackendUrl as Any,
-            "customLogUrl": APIClient.shared.customLogUrl as Any,
-            "customParams": APIClient.shared.customParams as Any,
+            "hyperswitchConfig": hyperswitchConfiguration as Any,
+            "paymentSessionConfig": paymentSessionConfiguration as Any,
+            "sdkParams": sdkParams,
+            "configuration": configurationDict ?? nativeConfig as Any,
             "subscribedEvents": self.subscribedEventNames,
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
@@ -136,8 +144,7 @@ public class PaymentWidget: UIControl {
             .store(in: &cancellables)
     }
 
-    public func confirm(resolve: @escaping (PaymentResult) -> Void) {
-        self.confirmCallback = resolve
+    public func confirm() {
         let payload: [String: Any] = [
             "rootTag": self.widgetReactTag ?? -1,
             "actionType": "CONFIRM_PAYMENT_ACTION",
@@ -148,6 +155,14 @@ public class PaymentWidget: UIControl {
             args: ["triggerWidgetAction", payload],
             completion: nil
         )
+    }
+
+    internal func handleShouldProceedWithPayment(payload: String, callback: @escaping (Bool) -> Void) {
+        if shouldProceedWithPaymentCallback == nil {
+            callback(true)
+        } else {
+            shouldProceedWithPaymentCallback?(payload, callback)
+        }
     }
 
     internal func handleUpdateIntentEvent(type: String, result: String) {
@@ -162,8 +177,8 @@ public class PaymentWidget: UIControl {
     }
 
     internal func handleConfirmPaymentResponse(_ result: PaymentResult) {
-        confirmCallback?(result)
-        confirmCallback = nil
+        initCallback?(result)
+        initCallback = nil
         cancellables.removeAll()
         rootView?.removeFromSuperview()
         rootView = nil
