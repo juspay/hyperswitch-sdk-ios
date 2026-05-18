@@ -48,13 +48,15 @@ internal extension PaymentSheet {
         let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
 
         let sdkParams = SDKParams.getSDKParams()
+        var propsDict = props
+        propsDict["subscribedEvents"] = subscribedEvents
 
         let props: [String: Any] = [
             "type": "payment",
             "hyperswitchConfig": hyperswitchConfiguration as Any,
             "paymentSessionConfig": paymentSessionConfiguration as Any,
             "sdkParams": sdkParams,
-            "configuration": props,
+            "configuration": propsDict,
             "from": "rn",
         ]
 

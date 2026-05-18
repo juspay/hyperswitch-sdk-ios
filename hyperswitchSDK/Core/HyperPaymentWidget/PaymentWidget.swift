@@ -82,6 +82,7 @@ public class PaymentWidget: UIControl {
         nativeConfig?["hideConfirmButton"] = true
         nativeConfig?["subscribedEvents"] = subscribedEventNames
         configurationDict?["hideConfirmButton"] = true
+        configurationDict?["subscribedEvents"] = subscribedEventNames
 
         let props: [String: Any] = [
             "type": "widgetPaymentSheet",
