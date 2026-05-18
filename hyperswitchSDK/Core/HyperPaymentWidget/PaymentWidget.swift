@@ -16,6 +16,7 @@ public class PaymentWidget: UIControl {
     private var widgetReactTag: NSNumber?
     private var rootView: RCTRootView?
     private var initCallback: ((PaymentResult) -> Void)?
+    private var shouldProceedWithPaymentCallback: ((String, @escaping (Bool) -> Void) -> Void)?
     private var cancellables = Set<AnyCancellable>()
     internal var paymentEventListener: PaymentEventListener?
     internal var subscribedEventNames: [String] = []
@@ -64,6 +65,10 @@ public class PaymentWidget: UIControl {
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    public func shouldProceedWithPayment(_ callback: @escaping (String, @escaping (Bool) -> Void) -> Void) {
+        self.shouldProceedWithPaymentCallback = callback
     }
 
     private func commonInit() {
@@ -140,7 +145,7 @@ public class PaymentWidget: UIControl {
             .store(in: &cancellables)
     }
 
-    public func confirm() -> Void {
+    public func confirm() {
         let payload: [String: Any] = [
             "rootTag": self.widgetReactTag ?? -1,
             "actionType": "CONFIRM_PAYMENT_ACTION",
@@ -151,6 +156,14 @@ public class PaymentWidget: UIControl {
             args: ["triggerWidgetAction", payload],
             completion: nil
         )
+    }
+
+    internal func handleShouldProceedWithPayment(payload: String, callback: @escaping (Bool) -> Void) {
+        if shouldProceedWithPaymentCallback == nil {
+            callback(true)
+        } else {
+            shouldProceedWithPaymentCallback?(payload, callback)
+        }
     }
 
     internal func handleUpdateIntentEvent(type: String, result: String) {
