@@ -43,33 +43,6 @@ internal class HyperModule: RCTEventEmitter {
     @objc
     private func sendMessageToNative(_ rnMessage: String) {}
 
-    //React Native Wrapper Function
-    @objc
-    private func presentPaymentSheet(_ request: NSMutableDictionary, _ callBack: @escaping RCTResponseSenderBlock) {
-        DispatchQueue.main.async {
-            let paymentSheet = PaymentSheet(sdkAuthorization: "", configuration: PaymentSheet.Configuration())
-            paymentSheet.presentWithParams(
-                from: (UIApplication.shared.delegate?.window??.rootViewController)!,  //TODO: safely check this
-                props: request as! [String: Any],
-                completion: { result2 in
-                    switch result2 {
-                    case .completed(let data):
-                        callBack([["status": "completed", "message": data]])
-                    case .failed(let error as NSError):
-                        callBack([
-                            [
-                                "status": "failed", "code": error.domain,
-                                "message": "Payment failed: \(error.userInfo["message"] ?? "Failed")",
-                            ]
-                        ])
-                    case .canceled(let data):
-                        callBack([["status": "cancelled", "message": data]])
-                    }
-                }
-            )
-        }
-    }
-
     @objc
     private func launchWidgetPaymentSheet(_ request: NSMutableDictionary, _ callback: @escaping RCTResponseSenderBlock) {
         expressCheckoutHandler.launchPaymentSheet(paymentResult: request, callBack: callback)

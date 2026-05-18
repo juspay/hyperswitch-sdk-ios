@@ -29,50 +29,25 @@ extension PaymentSession {
         callback(result)
     }
 
-    public func presentPaymentSheet(viewController: UIViewController, completion: @escaping (PaymentResult) -> Void) {
-        presentPaymentSheet(viewController: viewController, configuration: PaymentSheet.Configuration(), completion: completion)
-    }
-
     public func presentPaymentSheet(
         viewController: UIViewController,
-        configuration: PaymentSheet.Configuration,
+        configuration: PaymentSheet.Configuration? = nil,
+        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil,
         completion: @escaping (PaymentResult) -> Void
     ) {
-        let paymentSheet = PaymentSheet(sdkAuthorization: self.sdkAuthorization ?? "", configuration: configuration)
-        paymentSheet.present(from: viewController, completion: completion)
-    }
-
-    public func presentPaymentSheet(
-        viewController: UIViewController,
-        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)?,
-        completion: @escaping (PaymentResult) -> Void
-    ) {
-        presentPaymentSheet(
-            viewController: viewController,
-            configuration: PaymentSheet.Configuration(),
-            subscribe: subscribe,
-            completion: completion
+        let paymentSheet = PaymentSheet(
+            paymentSessionConfiguration: paymentSessionConfiguration,
+            hyperswitchConfiguration: hyperswitchConfiguration ?? nil,
+            configuration: configuration
         )
-    }
 
-    public func presentPaymentSheet(
-        viewController: UIViewController,
-        configuration: PaymentSheet.Configuration,
-        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)?,
-        completion: @escaping (PaymentResult) -> Void
-    ) {
-        var subscribedEvents: [String] = []
-        var listener: PaymentEventListener?
         if let subscribe {
             let builder = PaymentEventSubscriptionBuilder()
             subscribe(builder)
             let (subscription, builtListener) = builder.build()
-            listener = builtListener
-            subscribedEvents = subscription.subscribedEventStrings()
+            paymentSheet.subscribedEvents = subscription.subscribedEventStrings()
+            paymentSheet.paymentEventListener = builtListener
         }
-        let paymentSheet = PaymentSheet(sdkAuthorization: self.sdkAuthorization ?? "", configuration: configuration)
-        paymentSheet.subscribedEvents = subscribedEvents
-        paymentSheet.paymentEventListener = listener
         paymentSheet.present(from: viewController, completion: completion)
     }
 
@@ -83,21 +58,18 @@ extension PaymentSession {
         subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil,
         completion: @escaping (PaymentResult) -> Void
     ) {
-        var subscribedEvents: [String] = []
-        var listener: PaymentEventListener?
+        let paymentSheet = PaymentSheet(
+            paymentSessionConfiguration: paymentSessionConfiguration,
+            hyperswitchConfiguration: hyperswitchConfiguration ?? nil
+        )
+
         if let subscribe {
             let builder = PaymentEventSubscriptionBuilder()
             subscribe(builder)
             let (subscription, builtListener) = builder.build()
-            listener = builtListener
-            subscribedEvents = subscription.subscribedEventStrings()
+            paymentSheet.subscribedEvents = subscription.subscribedEventStrings()
+            paymentSheet.paymentEventListener = builtListener
         }
-        let paymentSheet = PaymentSheet(
-            sdkAuthorization: self.sdkAuthorization ?? "",
-            configuration: PaymentSheet.Configuration()
-        )
-        paymentSheet.subscribedEvents = subscribedEvents
-        paymentSheet.paymentEventListener = listener
         paymentSheet.presentWithParams(from: viewController, props: params, completion: completion)
     }
 
@@ -106,15 +78,14 @@ extension PaymentSession {
         PaymentSession.headlessCompletion = func_
         PaymentSession.activeSession = self
         RNHeadlessManager.sharedInstance.reinvalidateBridge()
-        let hyperParams = HyperParams.getHyperParams()
+        let hyperswitchConfiguration = try? hyperswitchConfiguration?.toDictionary()
+        let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
+        let sdkParams = SDKParams.getSDKParams()
+
         let props: [String: Any] = [
-            "sdkAuthorization": self.sdkAuthorization as Any,
-            "publishableKey": APIClient.shared.publishableKey as Any,
-            "profileId": APIClient.shared.profileId as Any,
-            "hyperParams": hyperParams,
-            "customBackendUrl": APIClient.shared.customBackendUrl as Any,
-            "customLogUrl": APIClient.shared.customLogUrl as Any,
-            "customParams": APIClient.shared.customParams as Any,
+            "hyperswitchConfig": hyperswitchConfiguration as Any,
+            "paymentSessionConfig": paymentSessionConfiguration as Any,
+            "sdkParams": sdkParams,
         ]
         let _ = RNHeadlessManager.sharedInstance.viewForModule("HyperHeadless", initialProperties: ["props": props])
     }
@@ -168,7 +139,10 @@ extension PaymentSession {
                 },
                 confirmWithCustomerLastUsedPaymentMethod: { cvc, resultHandler in
                     if let paymentToken = getPaymentMethodData2["payment_token"] as? String {
-                        cvc.confirm(sdkAuthorization: PaymentSession.activeSession?.sdkAuthorization ?? "", paymentToken: paymentToken)
+                        cvc.confirm(
+                            sdkAuthorization: PaymentSession.activeSession?.paymentSessionConfiguration.sdkAuthorization ?? "",
+                            paymentToken: paymentToken
+                        )
                         self.completion = resultHandler
                         //                        var map = [String: Any]()
                         //                        map["paymentToken"] = paymentToken

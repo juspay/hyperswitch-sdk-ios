@@ -73,22 +73,21 @@ public class PaymentWidget: UIControl {
 
     private func commonInit() {
 
-        let hyperParams = HyperParams.getHyperParams()
+        let hyperswitchConfiguration = try? paymentSession.hyperswitchConfiguration?.toDictionary()
+        let paymentSessionConfiguration = try? paymentSession.paymentSessionConfiguration.toDictionary()
+
+        let sdkParams = SDKParams.getSDKParams()
 
         var nativeConfig = try? configuration?.toDictionary()
         nativeConfig?["hideConfirmButton"] = true
         configurationDict?["hideConfirmButton"] = true
 
         let props: [String: Any] = [
-            "configuration": configurationDict ?? nativeConfig as Any,
             "type": "widgetPaymentSheet",
-            "sdkAuthorization": paymentSession.sdkAuthorization as Any,
-            "publishableKey": APIClient.shared.publishableKey as Any,
-            "profileId": APIClient.shared.profileId as Any,
-            "hyperParams": hyperParams,
-            "customBackendUrl": APIClient.shared.customBackendUrl as Any,
-            "customLogUrl": APIClient.shared.customLogUrl as Any,
-            "customParams": APIClient.shared.customParams as Any,
+            "hyperswitchConfig": hyperswitchConfiguration as Any,
+            "paymentSessionConfig": paymentSessionConfiguration as Any,
+            "sdkParams": sdkParams,
+            "configuration": configurationDict ?? nativeConfig as Any,
             "subscribedEvents": self.subscribedEventNames,
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
