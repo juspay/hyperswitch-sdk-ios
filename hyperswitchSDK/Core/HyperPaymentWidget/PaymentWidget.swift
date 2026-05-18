@@ -15,7 +15,7 @@ public class PaymentWidget: UIControl {
     private var configurationDict: [String: Any]?
     private var widgetReactTag: NSNumber?
     private var rootView: RCTRootView?
-    private var confirmCallback: ((PaymentResult) -> Void)?
+    private var initCallback: ((PaymentResult) -> Void)?
     private var cancellables = Set<AnyCancellable>()
     internal var paymentEventListener: PaymentEventListener?
     internal var subscribedEventNames: [String] = []
@@ -23,6 +23,7 @@ public class PaymentWidget: UIControl {
     public init(
         paymentSession: PaymentSession,
         configuration: PaymentSheet.Configuration? = nil,
+        completion: @escaping ((PaymentResult) -> Void),
         subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil
     ) {
         self.paymentSession = paymentSession
@@ -35,6 +36,7 @@ public class PaymentWidget: UIControl {
             self.paymentEventListener = listener
             self.subscribedEventNames = subscription.subscribedEventStrings()
         }
+        self.initCallback = completion
         super.init(frame: .zero)
         commonInit()
     }
@@ -42,6 +44,7 @@ public class PaymentWidget: UIControl {
     public init(
         paymentSession: PaymentSession,
         configurationDict: [String: Any]?,
+        completion: @escaping ((PaymentResult) -> Void),
         subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil
     ) {
         self.paymentSession = paymentSession
@@ -54,6 +57,7 @@ public class PaymentWidget: UIControl {
             self.paymentEventListener = listener
             self.subscribedEventNames = subscription.subscribedEventStrings()
         }
+        self.initCallback = completion
         super.init(frame: .zero)
         commonInit()
     }
@@ -136,8 +140,7 @@ public class PaymentWidget: UIControl {
             .store(in: &cancellables)
     }
 
-    public func confirm(resolve: @escaping (PaymentResult) -> Void) {
-        self.confirmCallback = resolve
+    public func confirm() -> Void {
         let payload: [String: Any] = [
             "rootTag": self.widgetReactTag ?? -1,
             "actionType": "CONFIRM_PAYMENT_ACTION",
@@ -162,8 +165,8 @@ public class PaymentWidget: UIControl {
     }
 
     internal func handleConfirmPaymentResponse(_ result: PaymentResult) {
-        confirmCallback?(result)
-        confirmCallback = nil
+        initCallback?(result)
+        initCallback = nil
         cancellables.removeAll()
         rootView?.removeFromSuperview()
         rootView = nil
