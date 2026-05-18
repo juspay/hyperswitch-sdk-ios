@@ -112,6 +112,8 @@
 		798F8DEC2FBAC16E00765B4C /* PaymentSessionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8DEA2FBAC16E00765B4C /* PaymentSessionConfiguration.swift */; };
 		798F8FF62FBB2CDD00765B4C /* HyperswitchEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8FF52FBB2CDD00765B4C /* HyperswitchEnvironment.swift */; };
 		798F8FF72FBB2CDD00765B4C /* HyperswitchEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8FF52FBB2CDD00765B4C /* HyperswitchEnvironment.swift */; };
+		798F8FF92FBB4B0500765B4C /* PaymentMethodType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8FF82FBB4B0500765B4C /* PaymentMethodType.swift */; };
+		798F8FFA2FBB4B0500765B4C /* PaymentMethodType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8FF82FBB4B0500765B4C /* PaymentMethodType.swift */; };
 		7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7996A8322BA1FDD000394FAF /* hyperswitch.bundle */; };
 		799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */; };
 		79D474B42CC6FDC30022C47E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B32CC6FDBF0022C47E /* Helper.swift */; };
@@ -290,6 +292,7 @@
 		798F8DE02FBAC13000765B4C /* HyperswitchConfigurationSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperswitchConfigurationSchema.swift; sourceTree = "<group>"; };
 		798F8DEA2FBAC16E00765B4C /* PaymentSessionConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSessionConfiguration.swift; sourceTree = "<group>"; };
 		798F8FF52FBB2CDD00765B4C /* HyperswitchEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperswitchEnvironment.swift; sourceTree = "<group>"; };
+		798F8FF82FBB4B0500765B4C /* PaymentMethodType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodType.swift; sourceTree = "<group>"; };
 		7996A8322BA1FDD000394FAF /* hyperswitch.bundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hyperswitch.bundle; sourceTree = "<group>"; };
 		799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		79D474B32CC6FDBF0022C47E /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
@@ -600,6 +603,7 @@
 		79EAB09A2C81EEBC006B40AD /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				798F8FF82FBB4B0500765B4C /* PaymentMethodType.swift */,
 				798F8FF52FBB2CDD00765B4C /* HyperswitchEnvironment.swift */,
 				798F8DDF2FBAC13000765B4C /* Hyperswitch.swift */,
 				798F8DE02FBAC13000765B4C /* HyperswitchConfigurationSchema.swift */,
@@ -999,6 +1003,7 @@
 				79052A242C8922E90011804E /* Version.swift in Sources */,
 				4E0A93DE2CA2F29500E3A767 /* HyperUIViewController.swift in Sources */,
 				4E8C83992E98CAF700A61749 /* NetceteraProvider.swift in Sources */,
+				798F8FF92FBB4B0500765B4C /* PaymentMethodType.swift in Sources */,
 				4E8C839A2E98CAF700A61749 /* ThreeDSProvider.swift in Sources */,
 				4E8C839B2E98CAF700A61749 /* ThreeDSProviderFactory.swift in Sources */,
 				4E8C839C2E98CAF700A61749 /* TridentProvider.swift in Sources */,
@@ -1077,6 +1082,7 @@
 				4365207C2C8768B90006C856 /* ApplePayHandlerLite.swift in Sources */,
 				79E5289A2CCBB71E00070AD9 /* SwiftUIManager.swift in Sources */,
 				79EAB0322C81CF2E006B40AD /* PaymentSheet.swift in Sources */,
+				798F8FFA2FBB4B0500765B4C /* PaymentMethodType.swift in Sources */,
 				79FE01512E97C22800C5D94A /* PaymentSheetAppearance+Codable.swift in Sources */,
 				79DF06DF2FAC986700854FF9 /* PaymentEventSubscriptionBuilder.swift in Sources */,
 				79DF06E12FAC986700854FF9 /* PaymentEventType.swift in Sources */,

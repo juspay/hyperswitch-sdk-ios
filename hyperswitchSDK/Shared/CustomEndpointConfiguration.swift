@@ -30,8 +30,7 @@ public enum CustomEndpointConfiguration: Codable {
             self = .commonEndpoint(value)
         } else if let config = try container.decodeIfPresent(OverrideEndpointConfiguration.self, forKey: .overrideEndpoints) {
             self = .overrideEndpoints(config)
-        }
-        else {
+        } else {
             throw DecodingError.dataCorrupted(
                 DecodingError.Context(
                     codingPath: decoder.codingPath,

@@ -16,7 +16,7 @@ public class PaymentWidget: UIControl {
     private var widgetReactTag: NSNumber?
     private var rootView: RCTRootView?
     private var initCallback: ((PaymentResult) -> Void)?
-    private var shouldProceedWithPaymentCallback: ((String, @escaping (Bool) -> Void) -> Void)?
+    private var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
     private var cancellables = Set<AnyCancellable>()
     internal var paymentEventListener: PaymentEventListener?
     internal var subscribedEventNames: [String] = []
@@ -67,7 +67,7 @@ public class PaymentWidget: UIControl {
         fatalError("init(coder:) has not been implemented")
     }
 
-    public func shouldProceedWithPayment(_ callback: @escaping (String, @escaping (Bool) -> Void) -> Void) {
+    public func shouldProceedWithPayment(_ callback: @escaping (PaymentRequestData, @escaping (Bool) -> Void) -> Void) {
         self.shouldProceedWithPaymentCallback = callback
     }
 
@@ -161,7 +161,11 @@ public class PaymentWidget: UIControl {
         if shouldProceedWithPaymentCallback == nil {
             callback(true)
         } else {
-            shouldProceedWithPaymentCallback?(payload, callback)
+            if let data = payload.data(using: .utf8),
+                let paymentRequestData = try? JSONDecoder().decode(PaymentRequestData.self, from: data)
+            {
+                shouldProceedWithPaymentCallback?(paymentRequestData, callback)
+            }
         }
     }
 

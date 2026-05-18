@@ -18,7 +18,7 @@ extension PaymentSheet {
         }
     }
 
-    public func shouldProceedWithPayment(_ callback: @escaping (String, @escaping (Bool) -> Void) -> Void) {
+    public func shouldProceedWithPayment(_ callback: @escaping (PaymentRequestData, @escaping (Bool) -> Void) -> Void) {
         self.shouldProceedWithPaymentCallback = callback
     }
 
@@ -26,7 +26,11 @@ extension PaymentSheet {
         if self.shouldProceedWithPaymentCallback == nil {
             callback(true)
         } else {
-            self.shouldProceedWithPaymentCallback?(payload, callback)
+            if let data = payload.data(using: .utf8),
+                let paymentRequestData = try? JSONDecoder().decode(PaymentRequestData.self, from: data)
+            {
+                shouldProceedWithPaymentCallback?(paymentRequestData, callback)
+            }
         }
     }
 }
