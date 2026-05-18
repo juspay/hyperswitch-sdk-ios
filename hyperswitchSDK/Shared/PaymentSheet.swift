@@ -27,7 +27,7 @@ public class PaymentSheet {
     /// The configuration object that holds the settings for the payment sheet.
     internal let configuration: Configuration?
     internal var completion: ((PaymentResult) -> Void)?
-    internal var subscribedEvents: [String] = []
+    internal var subscribedEvents: [String]?
     internal var paymentEventListener: PaymentEventListener?
     internal var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
 }

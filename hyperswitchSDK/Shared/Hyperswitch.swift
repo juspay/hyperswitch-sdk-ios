@@ -7,7 +7,7 @@
 
 public final class Hyperswitch {
 
-    private let hyperswitchConfiguration: HyperswitchConfiguration
+    internal let hyperswitchConfiguration: HyperswitchConfiguration
 
     public init(configuration: HyperswitchConfiguration) {  // MARK: async on superposition impl
         self.hyperswitchConfiguration = configuration

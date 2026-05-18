@@ -90,13 +90,14 @@ class WidgetViewController: UIViewController {
 
     func initSavedPaymentMethodSessionCallback(handler: PaymentSessionHandler) {
         self.handler = handler
-        let paymentMethod = handler.getCustomerDefaultSavedPaymentMethodData()
+        let paymentMethod = handler.getCustomerLastUsedPaymentMethodData()
         switch paymentMethod {
         case .success(let paymentMethod):
             if paymentMethod.requiresCvv == true {
                 paymentToken = paymentMethod.paymentToken
                 paymentMethodId = paymentMethod.paymentMethodId
                 confirmButton.isEnabled = true
+                self.statusLabel.text = "\(paymentMethod)"
             }
         case .failure(let error):
             print(["type": "error", "message": error])
@@ -162,17 +163,19 @@ class WidgetViewController: UIViewController {
                 // callback(false)
                 }
             }
-
-            self.cvcWidget = CVCWidget(
-                configuration: configuration,
-                subscribe: { builder in
-                    builder.on(.cvcStatus) { event in
-                        if case .cvcStatus(let info) = event.data {
-                            print(info)
+            if let hyperswitch = hyperViewModel.hyperswitch {
+                self.cvcWidget = CVCWidget(
+                    hyperswitch: hyperswitch,
+                    configuration: configuration,
+                    subscribe: { builder in
+                        builder.on(.cvcStatus) { event in
+                            if case .cvcStatus(let info) = event.data {
+                                print(info)
+                            }
                         }
                     }
-                }
-            )
+                )
+            }
             if let cvcWidget = cvcWidget {
                 contentView.addSubview(cvcWidget)
                 cvcWidget.translatesAutoresizingMaskIntoConstraints = false
@@ -263,9 +266,7 @@ class WidgetViewController: UIViewController {
     }
     @objc
     func confirm(_ sender: Any) {
-        if let cvcWidget = cvcWidget,
-            let paymentToken = paymentToken,
-            let paymentMethodId = paymentMethodId
+        if let cvcWidget = cvcWidget
         {
             self.handler?.confirmWithCustomerLastUsedPaymentMethod(cvcWidget, resultHandler: resultHandler)
         }

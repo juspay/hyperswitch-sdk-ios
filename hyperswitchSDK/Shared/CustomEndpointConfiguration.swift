@@ -42,26 +42,23 @@ public enum CustomEndpointConfiguration: Codable {
 }
 
 public struct OverrideEndpointConfiguration: Codable {
-    let backendEndpoint: String?
-    let assetsEndpoint: String?
-    let sdkConfigEndpoint: String?
-    let confirmEndpoint: String?
-    let airborneEndpoint: String?
-    let loggingEndpoint: String?
+    let customBackendEndpoint: String?
+    let customAssetsEndpoint: String?
+    let customConfirmEndpoint: String?
+    let customAirborneEndpoint: String?
+    let customLoggingEndpoint: String?
 
     public init(
-        backendEndpoint: String? = nil,
-        assetsEndpoint: String? = nil,
-        sdkConfigEndpoint: String? = nil,
-        confirmEndpoint: String? = nil,
-        airborneEndpoint: String? = nil,
-        loggingEndpoint: String? = nil
+        customBackendEndpoint: String? = nil,
+        customAssetsEndpoint: String? = nil,
+        customConfirmEndpoint: String? = nil,
+        customAirborneEndpoint: String? = nil,
+        customLoggingEndpoint: String? = nil
     ) {
-        self.backendEndpoint = backendEndpoint
-        self.assetsEndpoint = assetsEndpoint
-        self.sdkConfigEndpoint = sdkConfigEndpoint
-        self.confirmEndpoint = confirmEndpoint
-        self.airborneEndpoint = airborneEndpoint
-        self.loggingEndpoint = loggingEndpoint
+        self.customBackendEndpoint = customBackendEndpoint
+        self.customAssetsEndpoint = customAssetsEndpoint
+        self.customConfirmEndpoint = customConfirmEndpoint
+        self.customAirborneEndpoint = customAirborneEndpoint
+        self.customLoggingEndpoint = customLoggingEndpoint
     }
 }
