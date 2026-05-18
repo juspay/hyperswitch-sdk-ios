@@ -8,22 +8,26 @@
 private protocol HyperswitchConfigurationSchema {
     var publishableKey: String { get }
     var profileId: String? { get }
-    var customConfig: CustomEndpointConfiguration? { get }
+    var customEndpoints: CustomEndpointConfiguration? { get }
+    var environment: HyperswitchEnvironment? { get }
 }
 
 public struct HyperswitchConfiguration: HyperswitchConfigurationSchema, Codable {
     let publishableKey: String
     let profileId: String?
-    let customConfig: CustomEndpointConfiguration?
+    let customEndpoints: CustomEndpointConfiguration?
+    let environment: HyperswitchEnvironment?
 
     public init(
         publishableKey: String,
         profileId: String? = nil,
-        customConfig: CustomEndpointConfiguration? = nil
+        customEndpoints: CustomEndpointConfiguration? = nil,
+        environment: HyperswitchEnvironment? = nil
     ) {
         self.publishableKey = publishableKey
         self.profileId = profileId
-        self.customConfig = customConfig
+        self.customEndpoints = customEndpoints
+        self.environment = environment
     }
 }
 
@@ -31,17 +35,20 @@ public struct HyperswitchPlatformConfiguration: HyperswitchConfigurationSchema, 
     let platformPublishableKey: String
     let publishableKey: String
     let profileId: String?
-    let customConfig: CustomEndpointConfiguration?
+    let customEndpoints: CustomEndpointConfiguration?
+    let environment: HyperswitchEnvironment?
 
     public init(
         platformPublishableKey: String,
         publishableKey: String,
         profileId: String? = nil,
-        customConfig: CustomEndpointConfiguration? = nil
+        customEndpoints: CustomEndpointConfiguration? = nil,
+        environment: HyperswitchEnvironment? = nil
     ) {
         self.platformPublishableKey = platformPublishableKey
         self.publishableKey = publishableKey
         self.profileId = profileId
-        self.customConfig = customConfig
+        self.customEndpoints = customEndpoints
+        self.environment = environment
     }
 }
