@@ -139,7 +139,19 @@ class WidgetViewController: UIViewController {
         }
 
         if let paymentSession = hyperViewModel.paymentSession {
-            self.paymentWidget = PaymentWidget(paymentSession: paymentSession, configuration: configuration)
+            self.paymentWidget = PaymentWidget(paymentSession: paymentSession, configuration: configuration) { paymentResult in
+                switch paymentResult {
+                case .completed(let data):
+                    print(["type": "completed", "message": data])
+                    self.statusLabel.text = "completed → \(data)"
+                case .canceled(let data):
+                    print(["type": "canceled", "message": data])
+                    self.statusLabel.text = "canceled → \(data)"
+                case .failed(let error):
+                    print(["type": "failed", "message": "\(error)"])
+                    self.statusLabel.text = "failed → \(error)"
+                }
+            }
             self.cvcWidget = CVCWidget(
                 configuration: configuration,
                 subscribe: { builder in
@@ -251,19 +263,7 @@ class WidgetViewController: UIViewController {
     @objc
     func confirmElement(_ sender: Any) {
         if let paymentWidget = paymentWidget {
-            paymentWidget.confirm { paymentResult in
-                switch paymentResult {
-                case .completed(let data):
-                    print(["type": "completed", "message": data])
-                    self.statusLabel.text = "completed → \(data)"
-                case .canceled(let data):
-                    print(["type": "canceled", "message": data])
-                    self.statusLabel.text = "canceled → \(data)"
-                case .failed(let error):
-                    print(["type": "failed", "message": "\(error)"])
-                    self.statusLabel.text = "failed → \(error)"
-                }
-            }
+            paymentWidget.confirm()
         }
     }
 }
