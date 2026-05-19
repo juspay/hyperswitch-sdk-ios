@@ -44,6 +44,11 @@ Pod::Spec.new do |s|
     airborne.dependency 'hyperswitch-sdk-ios/core'
   end
 
+  s.subspec 'paypal' do |paypal|
+    paypal.vendored_frameworks = 'frameworkgen/Frameworks/PayPal/*.xcframework'
+    paypal.dependency 'hyperswitch-sdk-ios/core'
+  end
+
   s.subspec 'common' do |common|
     common.source_files = 'hyperswitchSDK/Shared/**/*.{m,swift,h}'
   end

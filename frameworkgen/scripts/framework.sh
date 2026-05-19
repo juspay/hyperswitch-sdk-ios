@@ -7,6 +7,7 @@ set -euo pipefail
 
 excluded_frameworks=("Pods_DummyApp" "DummyApp", "react-native-hyperswitch-netcetera-3ds", "react_native_hyperswitch_scancard")
 sentry_frameworks=("Sentry" "SentryPrivate" "RNSentry")
+paypal_frameworks=("PayPal","ReactNativeHyperswitchPaypal")
 
 function unzip_archives() {
   PLATFORM="$1"
@@ -36,6 +37,12 @@ function create_xcframework() {
       -framework ./build/iphonesimulator/$basename \
       -framework ./build/iphoneos/$basename \
       -output $SRCROOT/Frameworks/Sentry/$framework_name.xcframework
+
+    elif [[ " ${paypal_frameworks[*]} " =~ " ${framework_name} " ]]; then
+      xcodebuild -create-xcframework \
+      -framework ./build/iphonesimulator/$basename \
+      -framework ./build/iphoneos/$basename \
+      -output $SRCROOT/Frameworks/PayPal/$framework_name.xcframework
       
     else
       xcodebuild -create-xcframework \
