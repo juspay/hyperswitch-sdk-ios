@@ -73,7 +73,10 @@ extension PaymentSession {
             paymentSheet.presentWithParams(from: viewController, props: params, completion: completion)
         }
 
-    public func getCustomerSavedPaymentMethods(_ func_: @escaping (PaymentSessionHandler) -> Void) {
+    public func getCustomerSavedPaymentMethods(
+        _ func_: @escaping (PaymentSessionHandler) -> Void,
+        configuration: SavedPaymentMethodsConfiguration? = nil
+    ) {
         PaymentSession.hasResponded = false
         PaymentSession.headlessCompletion = func_
         PaymentSession.activeSession = self
@@ -81,12 +84,20 @@ extension PaymentSession {
         let hyperswitchConfiguration = try? hyperswitchConfiguration?.toDictionary()
         let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
         let sdkParams = SDKParams.getSDKParams()
+        let configurationDict = try? configuration.toDictionary()
 
-        let props: [String: Any] = [
+        var props: [String: Any] = [
             "hyperswitchConfig": hyperswitchConfiguration as Any,
             "paymentSessionConfig": paymentSessionConfiguration as Any,
             "sdkParams": sdkParams,
         ]
+
+        props["configuration"] = [
+            "paymentMethodLayout": [
+                "savedMethodCustomization": configurationDict
+            ]
+        ]
+
         let _ = RNHeadlessManager.sharedInstance.viewForModule("HyperHeadless", initialProperties: ["props": props])
     }
 
