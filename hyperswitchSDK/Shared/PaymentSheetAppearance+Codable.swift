@@ -94,7 +94,7 @@ extension PaymentSheet.Appearance.Font: Codable {
 extension PaymentSheet.Appearance.PrimaryButton: Codable {
     enum CodingKeys: String, CodingKey {
         case backgroundColor, textColor, successBackgroundColor, successTextColor
-        case cornerRadius, borderColor, borderWidth, font, shadow
+        case cornerRadius, borderColor, borderWidth, font, shadow, height
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -108,6 +108,7 @@ extension PaymentSheet.Appearance.PrimaryButton: Codable {
         try c.encodeIfPresent(borderWidth, forKey: .borderWidth)
         try c.encodeIfPresent(font.map { CodableFont($0) }, forKey: .font)
         try c.encodeIfPresent(shadow, forKey: .shadow)
+        try c.encodeIfPresent(height, forKey: .height)
     }
 
     public init(from decoder: Decoder) throws {
@@ -122,6 +123,7 @@ extension PaymentSheet.Appearance.PrimaryButton: Codable {
         borderWidth = try c.decodeIfPresent(CGFloat.self, forKey: .borderWidth)
         font = try c.decodeIfPresent(CodableFont.self, forKey: .font)?.uiFont
         shadow = try c.decodeIfPresent(PaymentSheet.Appearance.Shadow.self, forKey: .shadow)
+        height = try c.decodeIfPresent(CGFloat.self, forKey: .height)
     }
 }
 
