@@ -52,26 +52,26 @@ extension PaymentSession {
     }
 
     // MARK: for external frameworks
-        public func presentPaymentSheetWithParams(
-            viewController: UIViewController,
-            params: [String: Any],
-            subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil,
-            completion: @escaping (PaymentResult) -> Void
-        ) {
-            let paymentSheet = PaymentSheet(
-                paymentSessionConfiguration: paymentSessionConfiguration,
-                hyperswitchConfiguration: hyperswitchConfiguration ?? nil
-            )
+    public func presentPaymentSheetWithParams(
+        viewController: UIViewController,
+        params: [String: Any],
+        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil,
+        completion: @escaping (PaymentResult) -> Void
+    ) {
+        let paymentSheet = PaymentSheet(
+            paymentSessionConfiguration: paymentSessionConfiguration,
+            hyperswitchConfiguration: hyperswitchConfiguration ?? nil
+        )
 
-            if let subscribe {
-                let builder = PaymentEventSubscriptionBuilder()
-                subscribe(builder)
-                let (subscription, builtListener) = builder.build()
-                paymentSheet.subscribedEvents = subscription.subscribedEventStrings()
-                paymentSheet.paymentEventListener = builtListener
-            }
-            paymentSheet.presentWithParams(from: viewController, props: params, completion: completion)
+        if let subscribe {
+            let builder = PaymentEventSubscriptionBuilder()
+            subscribe(builder)
+            let (subscription, builtListener) = builder.build()
+            paymentSheet.subscribedEvents = subscription.subscribedEventStrings()
+            paymentSheet.paymentEventListener = builtListener
         }
+        paymentSheet.presentWithParams(from: viewController, props: params, completion: completion)
+    }
 
     public func getCustomerSavedPaymentMethods(
         _ func_: @escaping (PaymentSessionHandler) -> Void,

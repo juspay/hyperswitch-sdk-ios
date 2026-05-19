@@ -157,10 +157,10 @@ class WidgetViewController: UIViewController {
                 switch paymentRequestData.paymentMethodType {
                 case .applePay:
                     print("applePay")
-                 callback(true)
+                    callback(true)
                 case .payPal:
                     print("payPal")
-                 callback(true)
+                    callback(true)
                 }
             }
             if let hyperswitch = hyperViewModel.hyperswitch {
@@ -266,8 +266,7 @@ class WidgetViewController: UIViewController {
     }
     @objc
     func confirm(_ sender: Any) {
-        if let cvcWidget = cvcWidget
-        {
+        if let cvcWidget = cvcWidget {
             self.handler?.confirmWithCustomerLastUsedPaymentMethod(cvcWidget, resultHandler: resultHandler)
         }
     }

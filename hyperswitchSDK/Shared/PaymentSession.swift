@@ -47,32 +47,32 @@ public class PaymentSession {
         authorizationProvider: @escaping (@escaping (String) -> Void) -> Void,
         completion: @escaping (UpdateIntentResult) -> Void
     ) {
-//        updateIntentInitReturned
-//            .first()
-//            .receive(on: DispatchQueue.main)
-//            .sink { [weak self] _ in
-//                guard let self = self else { return }
-//                authorizationProvider { [weak self] sdkAuthorization in
-//                    guard let self = self else { return }
-//                    self.updateIntentCompleteReturned
-//                        .first()
-//                        .receive(on: DispatchQueue.main)
-//                        .sink { result in
-//                            completion(self.parseUpdateIntentResult(result))
-//                        }
-//                        .store(in: &self.cancellables)
-//                    self.sdkAuthorization = sdkAuthorization
-//                    self.updateIntentDidComplete.send(sdkAuthorization)
-//                }
-//            }
-//            .store(in: &cancellables)
-//        updateIntentDidStart.send(())
+        //        updateIntentInitReturned
+        //            .first()
+        //            .receive(on: DispatchQueue.main)
+        //            .sink { [weak self] _ in
+        //                guard let self = self else { return }
+        //                authorizationProvider { [weak self] sdkAuthorization in
+        //                    guard let self = self else { return }
+        //                    self.updateIntentCompleteReturned
+        //                        .first()
+        //                        .receive(on: DispatchQueue.main)
+        //                        .sink { result in
+        //                            completion(self.parseUpdateIntentResult(result))
+        //                        }
+        //                        .store(in: &self.cancellables)
+        //                    self.sdkAuthorization = sdkAuthorization
+        //                    self.updateIntentDidComplete.send(sdkAuthorization)
+        //                }
+        //            }
+        //            .store(in: &cancellables)
+        //        updateIntentDidStart.send(())
 
         // MARK: workaround
         authorizationProvider { [weak self] sdkAuthorization in
-                    self?.paymentSessionConfiguration = PaymentSessionConfiguration(sdkAuthorization: sdkAuthorization)
-                    completion(UpdateIntentResult.success)
-                }
+            self?.paymentSessionConfiguration = PaymentSessionConfiguration(sdkAuthorization: sdkAuthorization)
+            completion(UpdateIntentResult.success)
+        }
     }
 
     private func parseUpdateIntentResult(_ data: String) -> UpdateIntentResult {
