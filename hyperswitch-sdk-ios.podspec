@@ -45,7 +45,10 @@ Pod::Spec.new do |s|
   end
 
   s.subspec 'paypal' do |paypal|
-    paypal.vendored_frameworks = 'frameworkgen/Frameworks/PayPal/*.xcframework'
+    paypal.source_files = 'frameworkgen/paypal/Source/**/*.{h,m,mm,swift}'
+    paypal.dependency "PayPal/CardPayments", "~> 2.0"
+    paypal.dependency "PayPal/PaymentButtons", "~> 2.0"
+    paypal.dependency "PayPal/PayPalWebPayments", "~> 2.0"   
     paypal.dependency 'hyperswitch-sdk-ios/core'
   end
 

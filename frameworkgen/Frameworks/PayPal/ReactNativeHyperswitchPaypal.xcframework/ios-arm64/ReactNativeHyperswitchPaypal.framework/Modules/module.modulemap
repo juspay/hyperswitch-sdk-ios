@@ -1,0 +1,11 @@
+framework module ReactNativeHyperswitchPaypal {
+  umbrella header "ReactNativeHyperswitchPaypal-umbrella.h"
+
+  export *
+  module * { export * }
+}
+
+module ReactNativeHyperswitchPaypal.Swift {
+  header "ReactNativeHyperswitchPaypal-Swift.h"
+  requires objc
+}

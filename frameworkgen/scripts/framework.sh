@@ -7,7 +7,7 @@ set -euo pipefail
 
 excluded_frameworks=("Pods_DummyApp" "DummyApp", "react-native-hyperswitch-netcetera-3ds", "react_native_hyperswitch_scancard")
 sentry_frameworks=("Sentry" "SentryPrivate" "RNSentry")
-paypal_frameworks=("PayPal","ReactNativeHyperswitchPaypal")
+paypal_frameworks=("PayPal" "ReactNativeHyperswitchPaypal")
 
 function unzip_archives() {
   PLATFORM="$1"

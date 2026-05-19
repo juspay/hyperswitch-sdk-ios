@@ -1,0 +1,570 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 6.2.4 effective-5.10 (swiftlang-6.2.4.1.4 clang-1700.6.4.2)
+// swift-module-flags: -target arm64-apple-ios15.1 -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -module-name PayPal
+// swift-module-flags-ignorable: -no-verify-emitted-module-interface -formal-cxx-interoperability-mode=off -interface-compiler-version 6.2.4
+import AuthenticationServices
+import Foundation
+@_exported import PayPal
+import Swift
+import SwiftUI
+import UIKit
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+public struct Address : Swift.Codable, Swift.Equatable {
+  public var addressLine1: Swift.String?
+  public var addressLine2: Swift.String?
+  public var locality: Swift.String?
+  public var region: Swift.String?
+  public var postalCode: Swift.String?
+  public var countryCode: Swift.String
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(addressLine1: Swift.String? = nil, addressLine2: Swift.String? = nil, locality: Swift.String? = nil, region: Swift.String? = nil, postalCode: Swift.String? = nil, countryCode: Swift.String)
+  #endif
+  public static func == (a: PayPal.Address, b: PayPal.Address) -> Swift.Bool
+  public func encode(to encoder: any Swift.Encoder) throws
+  public init(from decoder: any Swift.Decoder) throws
+}
+@_documentation(visibility: private) public struct AnalyticsService {
+  public init(coreConfig: PayPal.CoreConfig, orderID: Swift.String)
+  public init(coreConfig: PayPal.CoreConfig, setupToken: Swift.String)
+  #if compiler(>=5.3) && $NonescapableTypes
+  public func sendEvent(_ name: Swift.String, correlationID: Swift.String? = nil, buttonType: Swift.String? = nil)
+  #endif
+}
+public struct Card : Swift.Encodable {
+  public var number: Swift.String
+  public var expirationMonth: Swift.String
+  public var expirationYear: Swift.String
+  public var securityCode: Swift.String
+  public var cardholderName: Swift.String?
+  public var billingAddress: PayPal.Address?
+  @_documentation(visibility: private) public var expiry: Swift.String {
+    get
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(number: Swift.String, expirationMonth: Swift.String, expirationYear: Swift.String, securityCode: Swift.String, cardholderName: Swift.String? = nil, billingAddress: PayPal.Address? = nil)
+  #endif
+  public func encode(to encoder: any Swift.Encoder) throws
+}
+@objc @_hasMissingDesignatedInitializers public class CardClient : ObjectiveC.NSObject {
+  public init(config: PayPal.CoreConfig)
+  #if compiler(>=5.3) && $NonescapableTypes
+  public func vault(_ vaultRequest: PayPal.CardVaultRequest, completion: @escaping (Swift.Result<PayPal.CardVaultResult, PayPal.CoreSDKError>) -> Swift.Void)
+  #endif
+  public func vault(_ vaultRequest: PayPal.CardVaultRequest) async throws -> PayPal.CardVaultResult
+  #if compiler(>=5.3) && $NonescapableTypes
+  public func approveOrder(request: PayPal.CardRequest, completion: @escaping (Swift.Result<PayPal.CardResult, PayPal.CoreSDKError>) -> Swift.Void)
+  #endif
+  public func approveOrder(request: PayPal.CardRequest) async throws -> PayPal.CardResult
+  @objc deinit
+}
+extension PayPal.CardClient : AuthenticationServices.ASWebAuthenticationPresentationContextProviding {
+  @_Concurrency.MainActor @preconcurrency @objc dynamic public func presentationAnchor(for session: AuthenticationServices.ASWebAuthenticationSession) -> AuthenticationServices.ASPresentationAnchor
+}
+public enum CardError {
+  public static let unknownError: PayPal.CoreSDKError
+  public static let encodingError: PayPal.CoreSDKError
+  public static let threeDSecureError: (_ error: any Swift.Error) -> PayPal.CoreSDKError
+  public static let threeDSecureURLError: PayPal.CoreSDKError
+  public static let threeDSecureCanceledError: PayPal.CoreSDKError
+  public static let noVaultTokenDataError: PayPal.CoreSDKError
+  public static let vaultTokenError: PayPal.CoreSDKError
+  public static let nilGraphQLClientError: PayPal.CoreSDKError
+  public static func isThreeDSecureCanceled(_ error: any Swift.Error) -> Swift.Bool
+}
+public struct CardRequest {
+  public let orderID: Swift.String
+  public let card: PayPal.Card
+  public let sca: PayPal.SCA
+  public init(orderID: Swift.String, card: PayPal.Card, sca: PayPal.SCA = .scaWhenRequired)
+}
+public struct CardResult {
+  public let orderID: Swift.String
+  public let status: Swift.String?
+  public let didAttemptThreeDSecureAuthentication: Swift.Bool
+}
+public struct CardVaultRequest {
+  public let card: PayPal.Card
+  public let setupTokenID: Swift.String
+  public init(card: PayPal.Card, setupTokenID: Swift.String)
+}
+public struct CardVaultResult {
+  public let setupTokenID: Swift.String
+  public let status: Swift.String?
+  public let didAttemptThreeDSecureAuthentication: Swift.Bool
+}
+@_documentation(visibility: private) public struct ClientConfigResponse : Swift.Decodable {
+  public init(from decoder: any Swift.Decoder) throws
+}
+public class Coordinator {
+  public init(action: @escaping () -> Swift.Void)
+  @objc deinit
+}
+public struct CoreConfig {
+  public let environment: PayPal.Environment
+  public let clientID: Swift.String
+  public init(clientID: Swift.String, environment: PayPal.Environment)
+}
+public enum CorePaymentsError {
+  public static let urlEncodingFailed: PayPal.CoreSDKError
+}
+public struct CoreSDKError : Swift.Error, Foundation.LocalizedError, Swift.Equatable {
+  public let code: Swift.Int?
+  public let domain: Swift.String?
+  public let errorDescription: Swift.String?
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(code: Swift.Int?, domain: Swift.String?, errorDescription: Swift.String?)
+  #endif
+  public static func == (a: PayPal.CoreSDKError, b: PayPal.CoreSDKError) -> Swift.Bool
+}
+public enum Environment {
+  case sandbox
+  case live
+  public var graphQLURL: Foundation.URL {
+    get
+  }
+  public var paypalVaultCheckoutURL: Foundation.URL {
+    get
+  }
+  public var toString: Swift.String {
+    get
+  }
+  public static func == (a: PayPal.Environment, b: PayPal.Environment) -> Swift.Bool
+  public func hash(into hasher: inout Swift.Hasher)
+  public var hashValue: Swift.Int {
+    get
+  }
+}
+@_documentation(visibility: private) public struct GraphQLHTTPResponse<T> : Swift.Decodable where T : Swift.Decodable {
+  public let data: T?
+  public init(from decoder: any Swift.Decoder) throws
+}
+@_documentation(visibility: private) public struct GraphQLRequest {
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(query: Swift.String, variables: any Swift.Encodable, queryNameForURL: Swift.String? = nil)
+  #endif
+}
+public enum HTTPHeader : Swift.String {
+  case accept
+  case acceptLanguage
+  case appName
+  case authorization
+  case contentType
+  case origin
+  case payPalClientContext
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum HTTPMethod : Swift.String {
+  case get
+  case post
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+@_documentation(visibility: private) public struct HTTPRequest {
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(headers: [PayPal.HTTPHeader : Swift.String], method: PayPal.HTTPMethod, url: Foundation.URL, body: Foundation.Data?)
+  #endif
+}
+@_documentation(visibility: private) public struct HTTPResponse {
+}
+@_documentation(visibility: private) public class HTTPResponseParser {
+  public init(decoder: Foundation.JSONDecoder = JSONDecoder())
+  public func parseREST<T>(_ httpResponse: PayPal.HTTPResponse, as type: T.Type) throws -> T where T : Swift.Decodable
+  public func parseGraphQL<T>(_ httpResponse: PayPal.HTTPResponse, as type: T.Type) throws -> T where T : Swift.Decodable
+  @objc deinit
+}
+extension PayPal.HTTPResponseParser {
+  @_documentation(visibility: private) public func parseGraphQLDictionary(_ httpResponse: PayPal.HTTPResponse) throws -> [Swift.String : Any]
+}
+@_hasMissingDesignatedInitializers @_documentation(visibility: private) public class NetworkingClient {
+  public init(coreConfig: PayPal.CoreConfig)
+  @_documentation(visibility: private) public func fetch(request: PayPal.RESTRequest) async throws -> PayPal.HTTPResponse
+  #if compiler(>=5.3) && $NonescapableTypes
+  @_documentation(visibility: private) public func fetch(request: PayPal.GraphQLRequest, clientContext: Swift.String? = nil) async throws -> PayPal.HTTPResponse
+  #endif
+  @objc deinit
+}
+public enum NetworkingError {
+  public static let unknownError: PayPal.CoreSDKError
+  public static let urlSessionError: PayPal.CoreSDKError
+  public static let jsonDecodingError: (_ description: Swift.String) -> PayPal.CoreSDKError
+  public static let invalidURLResponseError: PayPal.CoreSDKError
+  public static let noResponseDataError: PayPal.CoreSDKError
+  public static let invalidURLRequestError: PayPal.CoreSDKError
+  public static let serverResponseError: (_ description: Swift.String) -> PayPal.CoreSDKError
+  public static let noGraphQLDataKey: PayPal.CoreSDKError
+}
+@objc @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency public class PaymentButton : UIKit.UIButton {
+  @_Concurrency.MainActor @preconcurrency public var fundingSource: PayPal.PaymentButtonFundingSource {
+    get
+  }
+  @_Concurrency.MainActor @preconcurrency public var color: PayPal.PaymentButtonColor {
+    get
+  }
+  @_Concurrency.MainActor @preconcurrency public var edges: PayPal.PaymentButtonEdges {
+    get
+  }
+  @_Concurrency.MainActor @preconcurrency public var size: PayPal.PaymentButtonSize {
+    get
+  }
+  @_Concurrency.MainActor @preconcurrency public var insets: UIKit.NSDirectionalEdgeInsets? {
+    get
+  }
+  @_Concurrency.MainActor @preconcurrency public var label: PayPal.PaymentButtonLabel? {
+    get
+  }
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public func layoutSubviews()
+  @_Concurrency.MainActor @preconcurrency @objc override dynamic public var intrinsicContentSize: CoreFoundation.CGSize {
+    @objc get
+  }
+  @objc deinit
+}
+public enum PaymentButtonColor : Swift.String {
+  case gold
+  case white
+  case black
+  case silver
+  case blue
+  case darkBlue
+  public var description: Swift.String {
+    get
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum PaymentButtonEdges : Swift.Equatable {
+  case hardEdges
+  case softEdges
+  case rounded
+  case custom(CoreFoundation.CGFloat)
+  public var description: Swift.String {
+    get
+  }
+  public static func == (a: PayPal.PaymentButtonEdges, b: PayPal.PaymentButtonEdges) -> Swift.Bool
+}
+public enum PaymentButtonFundingSource : Swift.String {
+  case payPal
+  case payLater
+  case credit
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum PaymentButtonLabel : Swift.String {
+  case checkout
+  case buyNow
+  case payWith
+  case payLater
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public enum PaymentButtonSize : Swift.Int, Swift.CustomStringConvertible {
+  case mini
+  case collapsed
+  case expanded
+  case full
+  public var description: Swift.String {
+    get
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.Int)
+  #endif
+  public typealias RawValue = Swift.Int
+  public var rawValue: Swift.Int {
+    get
+  }
+}
+public struct PaymentSource : Swift.Decodable {
+  public let card: PayPal.PaymentSource.Card
+  public struct Card : Swift.Decodable {
+    public let lastFourDigits: Swift.String?
+    public let brand: Swift.String?
+    public let type: Swift.String?
+    public let authenticationResult: PayPal.AuthenticationResult?
+    public init(from decoder: any Swift.Decoder) throws
+  }
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct AuthenticationResult : Swift.Decodable {
+  public let liabilityShift: Swift.String?
+  public let threeDSecure: PayPal.ThreeDSecure?
+  public init(from decoder: any Swift.Decoder) throws
+}
+public struct ThreeDSecure : Swift.Decodable {
+  public let enrollmentStatus: Swift.String?, authenticationStatus: Swift.String?
+  public init(from decoder: any Swift.Decoder) throws
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency final public class PayPalButton : PayPal.PaymentButton {
+  public enum Color : Swift.String {
+    case gold
+    case white
+    case black
+    case silver
+    case blue
+    #if compiler(>=5.3) && $NonescapableTypes
+    public init?(rawValue: Swift.String)
+    #endif
+    public typealias RawValue = Swift.String
+    public var rawValue: Swift.String {
+      get
+    }
+  }
+  public enum Label : Swift.String {
+    case none
+    case checkout
+    case buyNow
+    case payWith
+    #if compiler(>=5.3) && $NonescapableTypes
+    public init?(rawValue: Swift.String)
+    #endif
+    public typealias RawValue = Swift.String
+    public var rawValue: Swift.String {
+      get
+    }
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  @_Concurrency.MainActor @preconcurrency convenience public init(insets: UIKit.NSDirectionalEdgeInsets? = nil, color: PayPal.PayPalButton.Color = .gold, edges: PayPal.PaymentButtonEdges = .softEdges, size: PayPal.PaymentButtonSize = .collapsed, label: PayPal.PayPalButton.Label? = nil)
+  #endif
+  @objc deinit
+}
+extension PayPal.PayPalButton {
+  @_Concurrency.MainActor @preconcurrency public struct Representable : SwiftUI.UIViewRepresentable {
+    #if compiler(>=5.3) && $NonescapableTypes
+    @_Concurrency.MainActor @preconcurrency public init(insets: UIKit.NSDirectionalEdgeInsets? = nil, color: PayPal.PayPalButton.Color = .gold, edges: PayPal.PaymentButtonEdges = .softEdges, size: PayPal.PaymentButtonSize = .collapsed, label: PayPal.PayPalButton.Label? = nil, _ action: @escaping () -> Swift.Void = { })
+    #endif
+    @_Concurrency.MainActor @preconcurrency public func makeCoordinator() -> PayPal.Coordinator
+    @_Concurrency.MainActor @preconcurrency public func makeUIView(context: PayPal.PayPalButton.Representable.Context) -> PayPal.PaymentButton
+    @_Concurrency.MainActor @preconcurrency public func updateUIView(_ uiView: PayPal.PaymentButton, context: PayPal.PayPalButton.Representable.Context)
+    public typealias Body = Swift.Never
+    public typealias Coordinator = PayPal.Coordinator
+    public typealias UIViewType = PayPal.PaymentButton
+  }
+}
+@_documentation(visibility: private) public enum PayPalCoreConstants {
+  public static let payPalSDKVersion: Swift.String
+  public static let callbackURLScheme: Swift.String
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency final public class PayPalCreditButton : PayPal.PaymentButton {
+  public enum Color : Swift.String {
+    case white
+    case black
+    case darkBlue
+    #if compiler(>=5.3) && $NonescapableTypes
+    public init?(rawValue: Swift.String)
+    #endif
+    public typealias RawValue = Swift.String
+    public var rawValue: Swift.String {
+      get
+    }
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  @_Concurrency.MainActor @preconcurrency convenience public init(insets: UIKit.NSDirectionalEdgeInsets? = nil, color: PayPal.PayPalCreditButton.Color = .darkBlue, edges: PayPal.PaymentButtonEdges = .softEdges, size: PayPal.PaymentButtonSize = .collapsed)
+  #endif
+  @objc deinit
+}
+extension PayPal.PayPalCreditButton {
+  @_Concurrency.MainActor @preconcurrency public struct Representable : SwiftUI.UIViewRepresentable {
+    #if compiler(>=5.3) && $NonescapableTypes
+    @_Concurrency.MainActor @preconcurrency public init(insets: UIKit.NSDirectionalEdgeInsets? = nil, color: PayPal.PayPalCreditButton.Color = .darkBlue, edges: PayPal.PaymentButtonEdges = .softEdges, size: PayPal.PaymentButtonSize = .collapsed, _ action: @escaping () -> Swift.Void = { })
+    #endif
+    @_Concurrency.MainActor @preconcurrency public func makeCoordinator() -> PayPal.Coordinator
+    @_Concurrency.MainActor @preconcurrency public func makeUIView(context: PayPal.PayPalCreditButton.Representable.Context) -> PayPal.PaymentButton
+    @_Concurrency.MainActor @preconcurrency public func updateUIView(_ uiView: PayPal.PaymentButton, context: PayPal.PayPalCreditButton.Representable.Context)
+    public typealias Body = Swift.Never
+    public typealias Coordinator = PayPal.Coordinator
+    public typealias UIViewType = PayPal.PaymentButton
+  }
+}
+public enum PayPalError {
+  public static let webSessionError: (_ error: any Swift.Error) -> PayPal.CoreSDKError
+  public static let payPalURLError: PayPal.CoreSDKError
+  public static let malformedResultError: PayPal.CoreSDKError
+  public static let payPalVaultResponseError: PayPal.CoreSDKError
+  public static let checkoutCanceledError: PayPal.CoreSDKError
+  public static let vaultCanceledError: PayPal.CoreSDKError
+  public static func isCheckoutCanceled(_ error: any Swift.Error) -> Swift.Bool
+  public static func isVaultCanceled(_ error: any Swift.Error) -> Swift.Bool
+}
+@objc @_inheritsConvenienceInitializers @_hasMissingDesignatedInitializers @_Concurrency.MainActor @preconcurrency final public class PayPalPayLaterButton : PayPal.PaymentButton {
+  public enum Color : Swift.String {
+    case gold
+    case white
+    case black
+    case silver
+    case blue
+    #if compiler(>=5.3) && $NonescapableTypes
+    public init?(rawValue: Swift.String)
+    #endif
+    public typealias RawValue = Swift.String
+    public var rawValue: Swift.String {
+      get
+    }
+  }
+  #if compiler(>=5.3) && $NonescapableTypes
+  @_Concurrency.MainActor @preconcurrency convenience public init(insets: UIKit.NSDirectionalEdgeInsets? = nil, color: PayPal.PayPalPayLaterButton.Color = .gold, edges: PayPal.PaymentButtonEdges = .softEdges, size: PayPal.PaymentButtonSize = .collapsed, _ action: @escaping () -> Swift.Void = { })
+  #endif
+  @objc deinit
+}
+extension PayPal.PayPalPayLaterButton {
+  @_Concurrency.MainActor @preconcurrency public struct Representable : SwiftUI.UIViewRepresentable {
+    #if compiler(>=5.3) && $NonescapableTypes
+    @_Concurrency.MainActor @preconcurrency public init(insets: UIKit.NSDirectionalEdgeInsets? = nil, color: PayPal.PayPalPayLaterButton.Color = .gold, edges: PayPal.PaymentButtonEdges = .softEdges, size: PayPal.PaymentButtonSize = .collapsed, _ action: @escaping () -> Swift.Void = { })
+    #endif
+    @_Concurrency.MainActor @preconcurrency public func makeCoordinator() -> PayPal.Coordinator
+    @_Concurrency.MainActor @preconcurrency public func makeUIView(context: PayPal.PayPalPayLaterButton.Representable.Context) -> PayPal.PaymentButton
+    @_Concurrency.MainActor @preconcurrency public func updateUIView(_ uiView: PayPal.PaymentButton, context: PayPal.PayPalPayLaterButton.Representable.Context)
+    public typealias Body = Swift.Never
+    public typealias Coordinator = PayPal.Coordinator
+    public typealias UIViewType = PayPal.PaymentButton
+  }
+}
+public struct PayPalVaultRequest {
+  public let url: Foundation.URL?
+  public let setupTokenID: Swift.String
+  @available(*, deprecated, message: "Use `init(setupTokenID:)` instead.")
+  public init(url: Foundation.URL, setupTokenID: Swift.String)
+  public init(setupTokenID: Swift.String)
+}
+public struct PayPalVaultResult : Swift.Decodable, Swift.Equatable {
+  public let tokenID: Swift.String
+  public let approvalSessionID: Swift.String
+  public static func == (a: PayPal.PayPalVaultResult, b: PayPal.PayPalVaultResult) -> Swift.Bool
+  public init(from decoder: any Swift.Decoder) throws
+}
+@objc @_hasMissingDesignatedInitializers public class PayPalWebCheckoutClient : ObjectiveC.NSObject {
+  public init(config: PayPal.CoreConfig)
+  #if compiler(>=5.3) && $NonescapableTypes
+  public func start(request: PayPal.PayPalWebCheckoutRequest, completion: @escaping (Swift.Result<PayPal.PayPalWebCheckoutResult, PayPal.CoreSDKError>) -> Swift.Void)
+  #endif
+  public func start(request: PayPal.PayPalWebCheckoutRequest) async throws -> PayPal.PayPalWebCheckoutResult
+  #if compiler(>=5.3) && $NonescapableTypes
+  public func vault(_ vaultRequest: PayPal.PayPalVaultRequest, completion: @escaping (Swift.Result<PayPal.PayPalVaultResult, PayPal.CoreSDKError>) -> Swift.Void)
+  #endif
+  public func vault(_ vaultRequest: PayPal.PayPalVaultRequest) async throws -> PayPal.PayPalVaultResult
+  @objc deinit
+}
+extension PayPal.PayPalWebCheckoutClient : AuthenticationServices.ASWebAuthenticationPresentationContextProviding {
+  @_Concurrency.MainActor @preconcurrency @objc dynamic public func presentationAnchor(for session: AuthenticationServices.ASWebAuthenticationSession) -> AuthenticationServices.ASPresentationAnchor
+}
+public enum PayPalWebCheckoutFundingSource : Swift.String {
+  case paypalCredit
+  case paylater
+  case paypal
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+public struct PayPalWebCheckoutRequest {
+  public let orderID: Swift.String
+  public let fundingSource: PayPal.PayPalWebCheckoutFundingSource
+  public init(orderID: Swift.String, fundingSource: PayPal.PayPalWebCheckoutFundingSource = .paypal)
+}
+public struct PayPalWebCheckoutResult {
+  public let orderID: Swift.String
+  public let payerID: Swift.String
+}
+@_documentation(visibility: private) public struct RESTRequest {
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init(path: Swift.String, method: PayPal.HTTPMethod, queryParameters: [Swift.String : Swift.String]? = nil, postParameters: (any Swift.Encodable)? = nil)
+  #endif
+}
+public enum SCA : Swift.String {
+  case scaAlways
+  case scaWhenRequired
+  #if compiler(>=5.3) && $NonescapableTypes
+  public init?(rawValue: Swift.String)
+  #endif
+  public typealias RawValue = Swift.String
+  public var rawValue: Swift.String {
+    get
+  }
+}
+@_hasMissingDesignatedInitializers @_documentation(visibility: private) public class UpdateClientConfigAPI {
+  public init(coreConfig: PayPal.CoreConfig)
+  public func updateClientConfig(token: Swift.String, fundingSource: Swift.String) async throws -> PayPal.ClientConfigResponse
+  @objc deinit
+}
+extension Foundation.URLSession : PayPal.URLSessionProtocol {
+  public func performRequest(with urlRequest: Foundation.URLRequest) async throws -> (Foundation.Data, Foundation.URLResponse)
+}
+@_documentation(visibility: private) public protocol URLSessionProtocol {
+  func performRequest(with urlRequest: Foundation.URLRequest) async throws -> (Foundation.Data, Foundation.URLResponse)
+}
+@objc @_inheritsConvenienceInitializers public class WebAuthenticationSession : ObjectiveC.NSObject {
+  #if compiler(>=5.3) && $NonescapableTypes
+  public func start(url: Foundation.URL, context: any AuthenticationServices.ASWebAuthenticationPresentationContextProviding, sessionDidDisplay: @escaping (Swift.Bool) -> Swift.Void, sessionDidComplete: @escaping (Foundation.URL?, (any Swift.Error)?) -> Swift.Void)
+  #endif
+  @objc override dynamic public init()
+  @objc deinit
+}
+extension PayPal.Environment : Swift.Equatable {}
+extension PayPal.Environment : Swift.Hashable {}
+extension PayPal.HTTPHeader : Swift.Equatable {}
+extension PayPal.HTTPHeader : Swift.Hashable {}
+extension PayPal.HTTPHeader : Swift.RawRepresentable {}
+extension PayPal.HTTPMethod : Swift.Equatable {}
+extension PayPal.HTTPMethod : Swift.Hashable {}
+extension PayPal.HTTPMethod : Swift.RawRepresentable {}
+extension PayPal.PaymentButtonColor : Swift.Equatable {}
+extension PayPal.PaymentButtonColor : Swift.Hashable {}
+extension PayPal.PaymentButtonColor : Swift.RawRepresentable {}
+extension PayPal.PaymentButtonFundingSource : Swift.Equatable {}
+extension PayPal.PaymentButtonFundingSource : Swift.Hashable {}
+extension PayPal.PaymentButtonFundingSource : Swift.RawRepresentable {}
+extension PayPal.PaymentButtonLabel : Swift.Equatable {}
+extension PayPal.PaymentButtonLabel : Swift.Hashable {}
+extension PayPal.PaymentButtonLabel : Swift.RawRepresentable {}
+extension PayPal.PaymentButtonSize : Swift.Equatable {}
+extension PayPal.PaymentButtonSize : Swift.Hashable {}
+extension PayPal.PaymentButtonSize : Swift.RawRepresentable {}
+extension PayPal.PayPalButton.Color : Swift.Equatable {}
+extension PayPal.PayPalButton.Color : Swift.Hashable {}
+extension PayPal.PayPalButton.Color : Swift.RawRepresentable {}
+extension PayPal.PayPalButton.Label : Swift.Equatable {}
+extension PayPal.PayPalButton.Label : Swift.Hashable {}
+extension PayPal.PayPalButton.Label : Swift.RawRepresentable {}
+extension PayPal.PayPalButton.Representable : Swift.Sendable {}
+extension PayPal.PayPalCreditButton.Color : Swift.Equatable {}
+extension PayPal.PayPalCreditButton.Color : Swift.Hashable {}
+extension PayPal.PayPalCreditButton.Color : Swift.RawRepresentable {}
+extension PayPal.PayPalCreditButton.Representable : Swift.Sendable {}
+extension PayPal.PayPalPayLaterButton.Color : Swift.Equatable {}
+extension PayPal.PayPalPayLaterButton.Color : Swift.Hashable {}
+extension PayPal.PayPalPayLaterButton.Color : Swift.RawRepresentable {}
+extension PayPal.PayPalPayLaterButton.Representable : Swift.Sendable {}
+extension PayPal.PayPalWebCheckoutFundingSource : Swift.Equatable {}
+extension PayPal.PayPalWebCheckoutFundingSource : Swift.Hashable {}
+extension PayPal.PayPalWebCheckoutFundingSource : Swift.RawRepresentable {}
+extension PayPal.SCA : Swift.Equatable {}
+extension PayPal.SCA : Swift.Hashable {}
+extension PayPal.SCA : Swift.RawRepresentable {}
