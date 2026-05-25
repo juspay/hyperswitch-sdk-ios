@@ -16,6 +16,7 @@ RCT_EXTERN_METHOD(notifyWidgetPaymentResult: (nonnull NSNumber *)rootTag :(NSStr
 RCT_EXTERN_METHOD(emitPaymentEvent: (nonnull NSNumber *)rootTag :(NSString)eventType :(NSDictionary)payload)
 RCT_EXTERN_METHOD(onUpdateIntentEvent: (nonnull NSNumber *)rootTag :(NSString)type :(NSString)result)
 RCT_EXTERN_METHOD(onPaymentConfirmButtonClick: (nonnull NSNumber *)rootTag :(NSString)payload :(RCTResponseSenderBlock)callback)
+RCT_EXTERN_METHOD(openIframeBridge: (NSString)url :(nonnull NSNumber *)timeoutMs :(RCTResponseSenderBlock)callback)
 
 + (BOOL)requiresMainQueueSetup
 {

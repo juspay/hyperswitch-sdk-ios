@@ -264,6 +264,14 @@ internal class HyperModule: RCTEventEmitter {
         }
     }
 
+    @objc
+    private func openIframeBridge(_ url: String, _ timeoutMs: NSNumber, _ callback: @escaping RCTResponseSenderBlock) {
+        DispatchQueue.main.async {
+            let ddcwv = DeviceDataCollectionWebView(url: url, timeoutMs: timeoutMs, callback: callback)
+            ddcwv.startFlow()
+        }
+    }
+
     private func withWidget(_ rootTag: NSNumber, _ block: @escaping (PaymentWidget) -> Void) {
         RCTGetUIManagerQueue().async {
             self.bridge.uiManager.addUIBlock { _, viewRegistry in
