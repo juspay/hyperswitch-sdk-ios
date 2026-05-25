@@ -14,6 +14,10 @@ extension PaymentSheet.Appearance.Colors: Codable {
         case componentDivider, text, textSecondary, componentText
         case componentPlaceholderText, icon, danger
         case loaderBackground, loaderForeground
+        case overlay
+        case selectedComponentBackground, selectedComponentBorder
+        case selectedComponentBorderWidth
+        case selectedComponentDivider, selectedComponentText
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -31,6 +35,12 @@ extension PaymentSheet.Appearance.Colors: Codable {
         try c.encodeIfPresent(danger.map { CodableColor($0) }, forKey: .danger)
         try c.encodeIfPresent(loaderBackground.map { CodableColor($0) }, forKey: .loaderBackground)
         try c.encodeIfPresent(loaderForeground.map { CodableColor($0) }, forKey: .loaderForeground)
+        try c.encodeIfPresent(overlay.map { CodableColor($0) }, forKey: .overlay)
+        try c.encodeIfPresent(selectedComponentBackground.map { CodableColor($0) }, forKey: .selectedComponentBackground)
+        try c.encodeIfPresent(selectedComponentBorder.map { CodableColor($0) }, forKey: .selectedComponentBorder)
+        try c.encodeIfPresent(selectedComponentBorderWidth, forKey: .selectedComponentBorderWidth)
+        try c.encodeIfPresent(selectedComponentDivider.map { CodableColor($0) }, forKey: .selectedComponentDivider)
+        try c.encodeIfPresent(selectedComponentText.map { CodableColor($0) }, forKey: .selectedComponentText)
     }
 
     public init(from decoder: Decoder) throws {
@@ -49,6 +59,12 @@ extension PaymentSheet.Appearance.Colors: Codable {
         danger = try c.decodeIfPresent(CodableColor.self, forKey: .danger)?.uiColor
         loaderBackground = try c.decodeIfPresent(CodableColor.self, forKey: .loaderBackground)?.uiColor
         loaderForeground = try c.decodeIfPresent(CodableColor.self, forKey: .loaderForeground)?.uiColor
+        overlay = try c.decodeIfPresent(CodableColor.self, forKey: .overlay)?.uiColor
+        selectedComponentBackground = try c.decodeIfPresent(CodableColor.self, forKey: .selectedComponentBackground)?.uiColor
+        selectedComponentBorder = try c.decodeIfPresent(CodableColor.self, forKey: .selectedComponentBorder)?.uiColor
+        selectedComponentBorderWidth = try c.decodeIfPresent(CGFloat.self, forKey: .selectedComponentBorderWidth)
+        selectedComponentDivider = try c.decodeIfPresent(CodableColor.self, forKey: .selectedComponentDivider)?.uiColor
+        selectedComponentText = try c.decodeIfPresent(CodableColor.self, forKey: .selectedComponentText)?.uiColor
     }
 }
 
@@ -155,6 +171,7 @@ extension PaymentSheet.Appearance.Shadow: Codable {
 extension PaymentSheet.Appearance: Codable {
     enum CodingKeys: String, CodingKey {
         case font, colors, primaryButton, cornerRadius, borderWidth, shadow, theme
+        case inputHeight, gap
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -166,6 +183,8 @@ extension PaymentSheet.Appearance: Codable {
         try c.encodeIfPresent(borderWidth, forKey: .borderWidth)
         try c.encodeIfPresent(shadow, forKey: .shadow)
         try c.encodeIfPresent(theme, forKey: .theme)
+        try c.encodeIfPresent(inputHeight, forKey: .inputHeight)
+        try c.encodeIfPresent(gap, forKey: .gap)
     }
 
     public init(from decoder: Decoder) throws {
@@ -178,5 +197,7 @@ extension PaymentSheet.Appearance: Codable {
         borderWidth = try c.decodeIfPresent(CGFloat.self, forKey: .borderWidth)
         shadow = try c.decodeIfPresent(PaymentSheet.Appearance.Shadow.self, forKey: .shadow)
         theme = try c.decodeIfPresent(PaymentSheet.Appearance.Theme.self, forKey: .theme)
+        inputHeight = try c.decodeIfPresent(CGFloat.self, forKey: .inputHeight)
+        gap = try c.decodeIfPresent(CGFloat.self, forKey: .gap)
     }
 }

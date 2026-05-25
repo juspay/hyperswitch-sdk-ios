@@ -96,6 +96,12 @@ extension PaymentSheet {
         /// hide confirm button for external confirm action
         public var hideConfirmButton: Bool?
 
+        /// Whether to split card fields (number, expiry, CVC) into separate inputs
+        public var splitCardFields: Bool?
+
+        /// Layout configuration for the payment method list
+        public var paymentMethodLayout: PaymentMethodLayout?
+
         public struct PlaceHolder: Codable {
 
             public init() {}
@@ -157,5 +163,122 @@ extension PaymentSheet {
             /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
             public var state: String?
         }
+    }
+
+    // MARK: - Visibility
+
+    /// Controls whether a UI element is shown or hidden.
+    public enum Visibility: String, Codable {
+        /// Show the element when available (default).
+        case auto = "shown"
+        /// Never show the element.
+        case never = "hidden"
+    }
+
+    // MARK: - CardBrandVisibility
+
+    /// Controls visibility/style of the card brand icon in card inputs.
+    public enum CardBrandVisibility: String, Codable {
+        case hidden = "hidden"
+        case animated = "animated"
+        case standard = "standard"
+        case hideGeneric = "hideGeneric"
+    }
+
+    // MARK: - LayoutType
+
+    /// Layout type for the payment method list.
+    public enum LayoutType: String, Codable {
+        case accordion = "accordion"
+        case tabs = "tabs"
+    }
+
+    // MARK: - PaymentMethodsArrangement
+
+    /// Arrangement of payment methods in the tabs layout.
+    public enum PaymentMethodsArrangement: String, Codable {
+        case `default` = "default"
+        case grid = "grid"
+    }
+
+    // MARK: - GroupingBehavior
+
+    /// Grouping behaviour for saved payment methods in the accordion layout.
+    public struct GroupingBehavior: Codable {
+        public init() {}
+
+        /// Whether to display saved payment methods in a separate screen.
+        public var displayInSeparateScreen: Bool?
+
+        /// Whether to display saved payment methods in a separate section.
+        public var displayInSeparateSection: Bool?
+
+        /// Whether to group items by payment method type.
+        public var groupByPaymentMethods: Bool?
+    }
+
+    // MARK: - SavedMethodCustomization
+
+    /// Customisation options for the saved payment methods section.
+    public struct SavedMethodCustomization: Codable {
+        public init() {}
+
+        /// Whether the saved payment method section is collapsed by default.
+        public var defaultCollapsed: Bool?
+
+        /// Whether to hide the card expiry date on saved card tiles.
+        public var hideCardExpiry: Bool?
+
+        /// Whether to hide CVC error messages for saved cards.
+        public var hideCVCError: Bool?
+
+        /// Controls visibility of the CVC icon in saved card inputs.
+        public var cvcIcon: Visibility?
+
+        /// Grouping behaviour for saved payment methods.
+        public var groupingBehavior: GroupingBehavior?
+
+        /// Payment method types to exclude from the saved methods list.
+        public var hiddenPaymentMethods: [String]?
+    }
+
+    // MARK: - PaymentMethodLayout
+
+    /// Layout configuration for the payment method list.
+    public struct PaymentMethodLayout: Codable {
+        public init() {}
+
+        /// The layout type (accordion or tabs).
+        public var type: LayoutType?
+
+        /// Whether to use radio buttons for selection (accordion layout).
+        public var radios: Bool?
+
+        /// Maximum number of items shown expanded in accordion layout.
+        public var maxAccordionItems: Int?
+
+        /// Whether accordion items have spacing between them.
+        public var spacedAccordionItems: Bool?
+
+        /// Whether the payment method list is collapsed by default.
+        public var defaultCollapsed: Bool?
+
+        /// Whether to show one-click wallets at the top of the list (default: true).
+        public var showOneClickWalletsOnTop: Bool?
+
+        /// Arrangement of payment methods in the tabs layout.
+        public var paymentMethodsArrangementForTabs: PaymentMethodsArrangement?
+
+        /// Customisation options for the saved payment methods section.
+        public var savedMethodCustomization: SavedMethodCustomization?
+
+        /// Controls visibility of the CVC icon in card inputs.
+        public var cvcIcon: Visibility?
+
+        /// Controls visibility/style of the card brand icon in card inputs.
+        public var cardBrandIcon: CardBrandVisibility?
+
+        /// Whether to show a checked icon on the selected payment method.
+        public var showCheckedIconForSelection: Bool?
     }
 }
