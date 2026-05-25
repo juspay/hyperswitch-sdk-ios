@@ -40,6 +40,7 @@ internal class HyperHeadless: RCTEventEmitter {
 
     @objc
     private func getPaymentSession(
+        _ rootTag: NSNumber,
         _ rnMessage: NSDictionary,
         _ rnMessage2: NSDictionary,
         _ rnMessage3: NSArray,

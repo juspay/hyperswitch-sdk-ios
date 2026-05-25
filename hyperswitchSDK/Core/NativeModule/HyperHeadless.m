@@ -9,7 +9,7 @@
 
 @interface RCT_EXTERN_MODULE(HyperHeadless, RCTEventEmitter)
 
-RCT_EXTERN_METHOD(getPaymentSession: (NSDictionary)rnMessage :(NSDictionary)rnMessage2 :(NSArray)rnMessage3 :(RCTResponseSenderBlock)rnCallback)
+RCT_EXTERN_METHOD(getPaymentSession: (nonnull NSNumber *)rootTag :(NSDictionary)rnMessage :(NSDictionary)rnMessage2 :(NSArray)rnMessage3 :(RCTResponseSenderBlock)rnCallback)
 RCT_EXTERN_METHOD(exitHeadless: (nonnull NSNumber *)rootTag: (NSString)rnMessage)
 
 @end
