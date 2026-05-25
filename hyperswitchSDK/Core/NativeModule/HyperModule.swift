@@ -283,35 +283,8 @@ internal class HyperModule: RCTEventEmitter {
                 return
             }
 
-
-            let userContentController = WKUserContentController()
-            let interceptScript = WKUserScript(
-                source: """
-                (function() {
-                    var nativePostMessage = function(msg) {
-                        var str = (typeof msg === 'string') ? msg : JSON.stringify(msg);
-                        window.webkit.messageHandlers.ddcPostMessage.postMessage(str);
-                    };
-                    var orig = window.postMessage.bind(window);
-                    window.postMessage = function(msg) {
-                        nativePostMessage(msg);
-                        orig(msg, '*');
-                    };
-                    if (window.parent && window.parent !== window) {
-                        window.parent.postMessage = nativePostMessage;
-                    }
-                })();
-                """,
-                injectionTime: .atDocumentStart,
-                forMainFrameOnly: false
-            )
-            userContentController.addUserScript(interceptScript)
-
-            let ddcDelegate = DDCWebViewDelegate(callback: callback, window: window, userContentController: userContentController)
-            userContentController.add(ddcDelegate, name: "ddcPostMessage")
-
+            let ddcDelegate = DDCWebViewDelegate(callback: callback, window: window)
             let config = WKWebViewConfiguration()
-            config.userContentController = userContentController
 
             let webView = WKWebView(frame: CGRect(x: -9999, y: -9999, width: 1, height: 1), configuration: config)
             webView.navigationDelegate = ddcDelegate
@@ -320,7 +293,6 @@ internal class HyperModule: RCTEventEmitter {
             window.addSubview(webView)
 
             guard let url = URL(string: ddcUrl) else {
-                ("[HyperDDC] openDDCWebView: invalid URL, aborting")
                 ddcDelegate.invokeCallback("")
                 return
             }
@@ -329,7 +301,6 @@ internal class HyperModule: RCTEventEmitter {
 
             let timeoutInterval = timeoutMs.doubleValue / 1000.0
             let workItem = DispatchWorkItem { [weak ddcDelegate] in
-                ("[HyperDDC] DDC timed out after %d ms", timeoutMs.intValue)
                 ddcDelegate?.invokeCallback("")
             }
             ddcDelegate.timeoutWorkItem = workItem
@@ -386,14 +357,9 @@ internal class HyperModule: RCTEventEmitter {
     }
 }
 
-private class DDCWebViewDelegate: NSObject, WKScriptMessageHandler, WKNavigationDelegate, WKUIDelegate {
+private class DDCWebViewDelegate: NSObject, WKNavigationDelegate, WKUIDelegate {
     private let callback: RCTResponseSenderBlock
     private weak var window: UIWindow?
-    // Strong reference to userContentController so it (and our message handler
-    // registration) is not released when WKWebViewConfiguration is copied by WKWebView.
-    private var userContentController: WKUserContentController?
-    // Self-retain: keeps this delegate alive while the WKWebView's weak
-    // navigationDelegate reference is the only external pointer to us.
     private var strongSelf: DDCWebViewDelegate?
     private var callbackInvoked = false
     private var ddcPageLoaded = false
@@ -401,74 +367,36 @@ private class DDCWebViewDelegate: NSObject, WKScriptMessageHandler, WKNavigation
     var webView: WKWebView?
     var timeoutWorkItem: DispatchWorkItem?
 
-    init(callback: @escaping RCTResponseSenderBlock, window: UIWindow, userContentController: WKUserContentController) {
+    init(callback: @escaping RCTResponseSenderBlock, window: UIWindow) {
         self.callback = callback
         self.window = window
-        self.userContentController = userContentController
         super.init()
-        self.strongSelf = self  // prevent premature deallocation
+        self.strongSelf = self
     }
 
     func invokeCallback(_ url: String) {
-        guard !callbackInvoked else {
-            ("[HyperDDC] invokeCallback: already invoked, ignoring url=%@", url)
-            return
-        }
+        guard !callbackInvoked else { return }
         callbackInvoked = true
         timeoutWorkItem?.cancel()
         timeoutWorkItem = nil
-        if url.isEmpty {
-            ("[HyperDDC] invokeCallback: empty url — DDC timed out or failed")
-        } else {
-            ("[HyperDDC] invokeCallback: redirectUrl=%@", url)
-        }
         DispatchQueue.main.async { [weak self] in
-            // guard let creates a local strong reference for the duration of this
-            // block, so callback([url]) is safe even after strongSelf is released.
             guard let self = self else { return }
             self.webView?.stopLoading()
             self.webView?.navigationDelegate = nil
             self.webView?.uiDelegate = nil
-            self.userContentController?.removeAllUserScripts()
-            self.userContentController = nil
             self.webView?.removeFromSuperview()
             self.webView = nil
-            self.strongSelf = nil  // release self-retain; local strong ref keeps us alive
+            self.strongSelf = nil
             self.callback([url])
         }
     }
 
-    // WKScriptMessageHandler — postMessage fallback
-    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        let body = message.body as? String ?? ""
-        ("[HyperDDC] postMessage received: %@", body)
-        guard !callbackInvoked,
-              let data = body.data(using: .utf8),
-              let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-              let nextAction = json["next_action"] as? [String: Any],
-              nextAction["type"] as? String == "redirect_to_url",
-              let redirectUrl = nextAction["url"] as? String else {
-            ("[HyperDDC] postMessage: no redirect_to_url action or already invoked, ignoring")
-            return
-        }
-        ("[HyperDDC] postMessage: intercepting redirect_to_url=%@", redirectUrl)
-        invokeCallback(redirectUrl)
-    }
-
-    // WKNavigationDelegate — mark the DDC page as started loading so subsequent
-    // navigations (the stepUp redirect) can be intercepted in decidePolicyFor.
-    // Using didStartProvisionalNavigation instead of didFinish ensures we catch
-    // HTTP-redirect responses that arrive before the page fully loads.
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        ("[HyperDDC] didStartProvisionalNavigation: url=%@ ddcPageLoaded=%d", webView.url?.absoluteString ?? "nil", ddcPageLoaded ? 1 : 0)
         if !ddcPageLoaded {
             ddcPageLoaded = true
         }
     }
 
-    // WKNavigationDelegate — primary interception: capture redirect after DDC completes.
-    // Handles both same-frame navigation (targetFrame.isMainFrame == true) and
-    // navigations where targetFrame is nil (e.g. anchor with target="_blank").
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         let url = navigationAction.request.url?.absoluteString ?? ""
@@ -486,18 +414,15 @@ private class DDCWebViewDelegate: NSObject, WKScriptMessageHandler, WKNavigation
         decisionHandler(.allow)
     }
 
-    // WKUIDelegate — intercept window.open() navigations after DDC completes.
-    // On iOS, window.open() bypasses decidePolicyFor entirely and comes here instead.
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration,
                  for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         let url = navigationAction.request.url?.absoluteString ?? ""
         if ddcPageLoaded {
             invokeCallback(url)
         }
-        return nil  // never create a visible new WebView
+        return nil
     }
 
-    // WKNavigationDelegate — handle page load failures
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         invokeCallback("")
     }
