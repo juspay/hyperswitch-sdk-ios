@@ -266,47 +266,62 @@ internal class HyperModule: RCTEventEmitter {
     }
 
     @objc
-    private func openDDCWebView(_ ddcUrl: String, _ timeoutMs: NSNumber, _ callback: @escaping RCTResponseSenderBlock) {
-        DispatchQueue.main.async {
-            let keyWindow: UIWindow?
-            if #available(iOS 13.0, *) {
-                keyWindow = UIApplication.shared.connectedScenes
-                    .compactMap { $0 as? UIWindowScene }
-                    .flatMap { $0.windows }
-                    .first { $0.isKeyWindow }
-            } else {
-                keyWindow = UIApplication.shared.windows.first { $0.isKeyWindow }
-            }
+     private func openIframeBridge(_ url: String, _ timeoutMs: NSNumber, _ callback: @escaping RCTResponseSenderBlock) {
+         DispatchQueue.main.async {
+             let keyWindow: UIWindow?
+             if #available(iOS 13.0, *) {
+                 keyWindow = UIApplication.shared.connectedScenes
+                     .compactMap { $0 as? UIWindowScene }
+                     .flatMap { $0.windows }
+                     .first { $0.isKeyWindow }
+             } else {
+                 keyWindow = UIApplication.shared.windows.first { $0.isKeyWindow }
+             }
 
-            guard let window = keyWindow else {
-                callback([""])
-                return
-            }
+             guard let window = keyWindow else {
+                 callback([""])
+                 return
+             }
 
-            let ddcDelegate = DDCWebViewDelegate(callback: callback, window: window)
-            let config = WKWebViewConfiguration()
+             let config = WKWebViewConfiguration()
+             let contentController = WKUserContentController()
 
-            let webView = WKWebView(frame: CGRect(x: -9999, y: -9999, width: 1, height: 1), configuration: config)
-            webView.navigationDelegate = ddcDelegate
-            webView.uiDelegate = ddcDelegate
-            ddcDelegate.webView = webView
-            window.addSubview(webView)
+             let ddcDelegate = DDCWebViewDelegate(callback: callback, window: window, contentController: contentController)
+             contentController.add(ddcDelegate, name: "hyperDDC")
+             config.userContentController = contentController
 
-            guard let url = URL(string: ddcUrl) else {
-                ddcDelegate.invokeCallback("")
-                return
-            }
+             let webView = WKWebView(frame: CGRect(x: -9999, y: -9999, width: 1, height: 1), configuration: config)
+             webView.navigationDelegate = ddcDelegate
+             webView.uiDelegate = ddcDelegate
+             ddcDelegate.webView = webView
+             window.addSubview(webView)
 
-            webView.load(URLRequest(url: url))
+             guard let baseURL = URL(string: url) else {
+                 ddcDelegate.invokeCallback("")
+                 return
+             }
 
-            let timeoutInterval = timeoutMs.doubleValue / 1000.0
-            let workItem = DispatchWorkItem { [weak ddcDelegate] in
-                ddcDelegate?.invokeCallback("")
-            }
-            ddcDelegate.timeoutWorkItem = workItem
-            DispatchQueue.main.asyncAfter(deadline: .now() + timeoutInterval, execute: workItem)
-        }
-    }
+             let wrapperHtml = """
+                 <html><body>
+                 <iframe src="\(url)" style="display:none;width:1px;height:1px;"></iframe>
+                 <script>
+                 window.addEventListener('message', function(event) {
+                   var str = typeof event.data === 'string' ? event.data : JSON.stringify(event.data);
+                   try { window.webkit.messageHandlers.hyperDDC.postMessage(str); } catch(e) {}
+                 });
+                 </script>
+                 </body></html>
+             """
+             webView.loadHTMLString(wrapperHtml, baseURL: baseURL)
+
+             let timeoutInterval = timeoutMs.doubleValue / 1000.0
+             let workItem = DispatchWorkItem { [weak ddcDelegate] in
+                 ddcDelegate?.invokeCallback("")
+             }
+             ddcDelegate.timeoutWorkItem = workItem
+             DispatchQueue.main.asyncAfter(deadline: .now() + timeoutInterval, execute: workItem)
+         }
+     }
 
     private func withWidget(_ rootTag: NSNumber, _ block: @escaping (PaymentWidget) -> Void) {
         RCTGetUIManagerQueue().async {
@@ -357,19 +372,20 @@ internal class HyperModule: RCTEventEmitter {
     }
 }
 
-private class DDCWebViewDelegate: NSObject, WKNavigationDelegate, WKUIDelegate {
+private class DDCWebViewDelegate: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
     private let callback: RCTResponseSenderBlock
     private weak var window: UIWindow?
+    private weak var contentController: WKUserContentController?
     private var strongSelf: DDCWebViewDelegate?
     private var callbackInvoked = false
-    private var ddcPageLoaded = false
 
     var webView: WKWebView?
     var timeoutWorkItem: DispatchWorkItem?
 
-    init(callback: @escaping RCTResponseSenderBlock, window: UIWindow) {
+    init(callback: @escaping RCTResponseSenderBlock, window: UIWindow, contentController: WKUserContentController) {
         self.callback = callback
         self.window = window
+        self.contentController = contentController
         super.init()
         self.strongSelf = self
     }
@@ -381,6 +397,7 @@ private class DDCWebViewDelegate: NSObject, WKNavigationDelegate, WKUIDelegate {
         timeoutWorkItem = nil
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+            self.contentController?.removeScriptMessageHandler(forName: "hyperDDC")
             self.webView?.stopLoading()
             self.webView?.navigationDelegate = nil
             self.webView?.uiDelegate = nil
@@ -391,37 +408,37 @@ private class DDCWebViewDelegate: NSObject, WKNavigationDelegate, WKUIDelegate {
         }
     }
 
-    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        if !ddcPageLoaded {
-            ddcPageLoaded = true
-        }
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        guard message.name == "hyperDDC", let body = message.body as? String else { return }
+        invokeCallback(body)
     }
 
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
-                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        let url = navigationAction.request.url?.absoluteString ?? ""
-        let isMainFrame = navigationAction.targetFrame?.isMainFrame == true
-        let isNewWindow = navigationAction.targetFrame == nil
-        guard !callbackInvoked else {
-            decisionHandler(.cancel)
-            return
-        }
-        if ddcPageLoaded && (isMainFrame || isNewWindow) {
-            invokeCallback(url)
-            decisionHandler(.cancel)
-            return
-        }
-        decisionHandler(.allow)
-    }
+//    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
+//                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+//        let url = navigationAction.request.url?.absoluteString ?? ""
+//        let isMainFrame = navigationAction.targetFrame?.isMainFrame == true
+//        let isNewWindow = navigationAction.targetFrame == nil
+//        guard !callbackInvoked else {
+//            decisionHandler(.cancel)
+//            return
+//        }
+//        if isMainFrame || isNewWindow {
+//            print("HyperDDC decidePolicyFor intercepted: \(url)")
+//            let payload = "{\"next_action\":{\"type\":\"redirect_to_url\",\"url\":\"\(url)\"}}"
+//            invokeCallback(payload)
+//            decisionHandler(.cancel)
+//            return
+//        }
+//        decisionHandler(.allow)
+//    }
 
-    func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration,
-                 for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
-        let url = navigationAction.request.url?.absoluteString ?? ""
-        if ddcPageLoaded {
-            invokeCallback(url)
-        }
-        return nil
-    }
+//    func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration,
+//                 for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+//        let url = navigationAction.request.url?.absoluteString ?? ""
+//        let payload = "{\"next_action\":{\"type\":\"redirect_to_url\",\"url\":\"\(url)\"}}"
+//        invokeCallback(payload)
+//        return nil
+//    }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         invokeCallback("")
