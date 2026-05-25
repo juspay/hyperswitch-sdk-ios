@@ -38,12 +38,24 @@ public extension PaymentSheet {
 
         public var theme: Theme?
 
+        /// The height of input fields in PaymentSheet
+        public var inputHeight: CGFloat?
+
+        /// The gap/spacing between components in PaymentSheet
+        public var gap: CGFloat?
+
         public enum Theme: String, Codable {
             case `default` = "Default"
             case light = "Light"
             case dark = "Dark"
             case minimal = "Minimal"
             case flatMinimal = "FlatMinimal"
+            case brutal = "Brutal"
+            case glass = "Glass"
+            case skeu = "Skeu"
+            case clay = "Clay"
+            case charcoal = "Charcoal"
+            case soft = "Soft"
 
             var themeLabel: String {
                 return self.rawValue
@@ -150,6 +162,24 @@ public extension PaymentSheet {
 
             /// The color used to indicate Loader Foreground Color
             public var loaderForeground: UIColor?
+
+            /// The color used for the overlay/scrim behind modal sheets
+            public var overlay: UIColor?
+
+            /// The background color of the selected component (e.g. selected payment method tile)
+            public var selectedComponentBackground: UIColor?
+
+            /// The border color of the selected component
+            public var selectedComponentBorder: UIColor?
+
+            /// The border width of the selected component
+            public var selectedComponentBorderWidth: CGFloat?
+
+            /// The divider color inside the selected component
+            public var selectedComponentDivider: UIColor?
+
+            /// The text color inside the selected component
+            public var selectedComponentText: UIColor?
         }
 
         // MARK: Shadow
