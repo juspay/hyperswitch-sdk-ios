@@ -14,6 +14,10 @@ class PaypalButtonView: UIView {
         didSet { updateButton() }
     }
 
+    @objc dynamic var buttonSize: String = "medium" {
+        didSet { updateButton() }
+    }
+
     @objc dynamic var borderRadius: Double = 0 {
         didSet { updateButton() }
     }
@@ -40,7 +44,7 @@ class PaypalButtonView: UIView {
         let button = PayPalButton(
             color: color,
             edges: edges,
-            size: .collapsed,
+            size: mapSize(buttonSize),
             label: label
         )
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -73,6 +77,14 @@ class PaypalButtonView: UIView {
     private func updateButton() {
         setupButton()
         setNeedsLayout()
+    }
+
+    private func mapSize(_ value: String) -> PaymentButtonSize {
+        switch value.lowercased() {
+        case "small": return .collapsed
+        case "large": return .full
+        default: return .expanded
+        }
     }
 
     private func mapColor(_ value: String) -> PayPalButton.Color {

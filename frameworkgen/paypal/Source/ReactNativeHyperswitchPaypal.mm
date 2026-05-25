@@ -12,6 +12,7 @@ RCT_EXTERN_METHOD(launchPayPal:(NSString *)requestObj
 
 RCT_EXPORT_VIEW_PROPERTY(buttonColor, NSString)
 RCT_EXPORT_VIEW_PROPERTY(buttonLabel, NSString)
+RCT_EXPORT_VIEW_PROPERTY(buttonSize, NSString)
 RCT_EXPORT_VIEW_PROPERTY(borderRadius, double)
 
 @end
