@@ -267,8 +267,8 @@ internal class HyperModule: RCTEventEmitter {
     @objc
     private func openIframeBridge(_ url: String, _ timeoutMs: NSNumber, _ callback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
-            let ddcwv = DeviceDataCollectionWebView(url: url, timeoutMs: timeoutMs, callback: callback)
-            ddcwv.startFlow()
+            let headlessWebView = HeadlessWebView(url: url, timeoutMs: timeoutMs, callback: callback)
+            headlessWebView.startFlow()
         }
     }
 

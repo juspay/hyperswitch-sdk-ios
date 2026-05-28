@@ -1,5 +1,5 @@
 //
-//  DeviceDataCollectionWebView.swift
+//  HeadlessWebView.swift
 //  hyperswitch
 //
 //  Created by Harshit Srivastava on 25/05/26.
@@ -7,14 +7,14 @@
 
 import WebKit
 
-final internal class DeviceDataCollectionWebView: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
+final internal class HeadlessWebView: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {
 
     private let url: String
     private let timeoutMs: NSNumber
     private let callback: RCTResponseSenderBlock
     private var webView: WKWebView?
     private var timeoutWorkItem: DispatchWorkItem?
-    private var selfRetain: DeviceDataCollectionWebView?
+    private var selfRetain: HeadlessWebView?
     private var callbackInvoked = false
 
     init(url: String, timeoutMs: NSNumber, callback: @escaping RCTResponseSenderBlock) {

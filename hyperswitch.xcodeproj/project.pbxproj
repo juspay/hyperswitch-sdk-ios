@@ -77,7 +77,7 @@
 		79052A252C8923360011804E /* Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A232C8922E90011804E /* Version.swift */; };
 		79052A272C89237A0011804E /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A262C89237A0011804E /* Extensions.swift */; };
 		79052A4A2C9057D60011804E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79052A492C9057D60011804E /* AppDelegate.swift */; };
-		790B67122FC4BE2C003FB459 /* DeviceDataCollectionWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790B67112FC4BE2C003FB459 /* DeviceDataCollectionWebView.swift */; };
+		790B67122FC4BE2C003FB459 /* HeadlessWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790B67112FC4BE2C003FB459 /* HeadlessWebView.swift */; };
 		790BA8272B99DB5E006678FD /* PaymentSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790BA8262B99DB5E006678FD /* PaymentSession.swift */; };
 		790F847F2D8C311900178A09 /* LogBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790F847D2D8C311900178A09 /* LogBuilder.swift */; };
 		790F84822D8C31E800178A09 /* LogPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790F84812D8C31E500178A09 /* LogPayload.swift */; };
@@ -270,7 +270,7 @@
 		79052A232C8922E90011804E /* Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Version.swift; sourceTree = "<group>"; };
 		79052A262C89237A0011804E /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		79052A492C9057D60011804E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		790B67112FC4BE2C003FB459 /* DeviceDataCollectionWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceDataCollectionWebView.swift; sourceTree = "<group>"; };
+		790B67112FC4BE2C003FB459 /* HeadlessWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadlessWebView.swift; sourceTree = "<group>"; };
 		790BA8262B99DB5E006678FD /* PaymentSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSession.swift; sourceTree = "<group>"; };
 		790F847D2D8C311900178A09 /* LogBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogBuilder.swift; sourceTree = "<group>"; };
 		790F84812D8C31E500178A09 /* LogPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogPayload.swift; sourceTree = "<group>"; };
@@ -507,7 +507,7 @@
 		790B67132FC4CBAA003FB459 /* DeviceDataCollection */ = {
 			isa = PBXGroup;
 			children = (
-				790B67112FC4BE2C003FB459 /* DeviceDataCollectionWebView.swift */,
+				790B67112FC4BE2C003FB459 /* HeadlessWebView.swift */,
 			);
 			path = DeviceDataCollection;
 			sourceTree = "<group>";
@@ -639,7 +639,6 @@
 		79EAB09E2C81F0B9006B40AD /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				790B67132FC4CBAA003FB459 /* DeviceDataCollection */,
 				7954A4452C23A42200FEC02D /* ApplePay */,
 				DC5D0117294738870017C67A /* NativeModule */,
 				790BA8252B99DB37006678FD /* HyperSession */,
@@ -649,6 +648,7 @@
 				DC4AC9F3296D737300E0D2A6 /* HyperPaymentCardTextField */,
 				792D69F42B95E91D001598CD /* HyperExpressCheckout */,
 				4E0A93E52CA2F3E000E3A767 /* HyperPaymentMethodManagement */,
+				790B67132FC4CBAA003FB459 /* DeviceDataCollection */,
 				DC5D012C29486B560017C67A /* Resources */,
 			);
 			path = Core;
@@ -857,9 +857,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -874,9 +878,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -955,9 +963,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1024,7 +1036,7 @@
 				79E8E4BC2EB2990500FA3886 /* TransactionError.swift in Sources */,
 				75AA28E62D477FF200CD88A6 /* HyperNetworking.swift in Sources */,
 				66486F94294355BD00150E4F /* ContentView.swift in Sources */,
-				790B67122FC4BE2C003FB459 /* DeviceDataCollectionWebView.swift in Sources */,
+				790B67122FC4BE2C003FB459 /* HeadlessWebView.swift in Sources */,
 				792D69F62B95E942001598CD /* ExpressCheckoutLauncher.swift in Sources */,
 				4E69679B2CB7CF71000DBE0A /* PMMViewController.swift in Sources */,
 				DC5D011E294844900017C67A /* ViewController.swift in Sources */,
