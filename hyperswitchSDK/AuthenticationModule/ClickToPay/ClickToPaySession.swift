@@ -20,13 +20,13 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     private let customParams: [String: Any]?
 
     private var webView: WKWebView?
+    private var dctpWebView: WKWebView?
     private weak var viewController: UIViewController?
 
     private var popupWebView: WKWebView?
     private var popupWebViewController: UIViewController?
 
     private var pendingRequests: [String: CheckedContinuation<String, Error>] = [:]
-    private var sdkInitContinuation: CheckedContinuation<Void, Error>?
 
     private let pendingRequestsQueue = DispatchQueue(label: "io.hyperswitch.c2p.pendingRequests")
 
@@ -40,14 +40,26 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     private var hyperLoaderUrl: String {
         SDKEnvironment.getEnvironment(publishableKey) == .PROD
-            ? "https://checkout.hyperswitch.io/web/2025.11.28.09/v1/HyperLoader.js"
-            : "https://beta.hyperswitch.io/web/2025.11.28.09/v1/HyperLoader.js"
+            ? "https://checkout.hyperswitch.io/web/2025.11.28.12/v1/HyperLoader.js"
+            : "https://beta.hyperswitch.io/web/2025.11.28.12/v1/HyperLoader.js"
     }
 
     private var baseUrl: String {
         SDKEnvironment.getEnvironment(publishableKey) == .PROD
             ? "https://secure.checkout.visa.com"
             : "https://sandbox.secure.checkout.visa.com"
+    }
+
+    private var visaDirectUrl: String {
+        SDKEnvironment.getEnvironment(publishableKey) == .PROD
+            ? "https://assets.secure.checkout.visa.com/checkout-widget/resources/js/src-i-adapter/visaSdk.js?v2"
+            : "https://sandbox-assets.secure.checkout.visa.com/checkout-widget/resources/js/src-i-adapter/visaSdk.js?v2"
+    }
+
+    private var masterCardDirectUrl: String {
+        SDKEnvironment.getEnvironment(publishableKey) == .PROD
+            ? "https://src.mastercard.com/sdk/srcsdk.mastercard.js"
+            : "https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js"
     }
 
     private func logger(type: String, eventName: EventName, category: LogCategory, value: String) {
@@ -71,15 +83,19 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     private func attachWebView() {
-        if let webView = webView {
-            if let viewController = viewController {
-                viewController.view.addSubview(webView)
-            } else {
-                let scenes = UIApplication.shared.connectedScenes
-                let windowScene = scenes.first as? UIWindowScene
-                windowScene?.windows.forEach { window in
-                    window.addSubview(webView)
-                }
+        attach(webView: webView)
+        attach(webView: dctpWebView)
+    }
+
+    private func attach(webView: WKWebView?) {
+        guard let webView = webView else { return }
+        if let viewController = viewController {
+            viewController.view.addSubview(webView)
+        } else {
+            let scenes = UIApplication.shared.connectedScenes
+            let windowScene = scenes.first as? UIWindowScene
+            windowScene?.windows.forEach { window in
+                window.addSubview(webView)
             }
         }
     }
@@ -110,19 +126,66 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             value: "viewController \(String(describing: viewController))"
         )
 
-        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+        let uctpRequestId = UUID().uuidString
+        let dctpRequestId = UUID().uuidString
+
+        async let uctpReady: String = withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
             pendingRequestsQueue.async { [weak self] in
-                self?.sdkInitContinuation = continuation
+                self?.pendingRequests[uctpRequestId] = continuation
             }
             DispatchQueue.main.async { [weak self] in
-                self?.setupWebView()
+                self?.setupWebView(requestId: uctpRequestId)
             }
         }
+
+        async let dctpReady: String = withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
+            pendingRequestsQueue.async { [weak self] in
+                self?.pendingRequests[dctpRequestId] = continuation
+            }
+            DispatchQueue.main.async { [weak self] in
+                self?.setupDCTPWebView(requestId: dctpRequestId)
+            }
+        }
+
+        let (uctpResponse, dctpResponse) = try await (uctpReady, dctpReady)
+        try throwIfInitFailed(uctpResponse, source: "UCTP", returnEvent: .scriptLoadReturn)
+        try throwIfInitFailed(dctpResponse, source: "DCTP", returnEvent: .dctpScriptLoadReturn)
 
         logger(type: "DEBUG", eventName: .createWebViewReturned, category: .USER_EVENT, value: "")
     }
 
-    private func setupWebView() {
+    private func throwIfInitFailed(_ responseJson: String, source: String, returnEvent: EventName) throws {
+        guard let jsonData = responseJson.data(using: .utf8),
+            let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+            let data = json["data"] as? [String: Any]
+        else {
+            logger(
+                type: "ERROR",
+                eventName: returnEvent,
+                category: .USER_ERROR,
+                value: "\(source): Failed to parse SDK init response"
+            )
+            throw ClickToPayException(
+                message: "Failed to parse SDK init response",
+                type: .hyperInitializationError
+            )
+        }
+        if let error = data["error"] as? [String: Any] {
+            let message = error["message"] as? String ?? "Unknown SDK initialization error"
+            logger(
+                type: "ERROR",
+                eventName: returnEvent,
+                category: .USER_ERROR,
+                value: "\(source): \(message)"
+            )
+            throw ClickToPayException(
+                message: "SDK initialization failed: \(message)",
+                type: .hyperInitializationError
+            )
+        }
+    }
+
+    private func setupWebView(requestId: String) {
         // zoom disable script
         let source: String =
             "var meta = document.createElement('meta');" + "meta.name = 'viewport';"
@@ -150,29 +213,71 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
         attachWebView()
 
+        let baseHtml = initHtml(requestId: requestId)
+        logger(
+            type: "DEBUG",
+            eventName: .scriptLoadInit,
+            category: .USER_EVENT,
+            value: "hyperLoaderUrl: \(hyperLoaderUrl), baseUrl: \(baseUrl)"
+        )
+        webView?.loadHTMLString(baseHtml, baseURL: URL(string: baseUrl))
+    }
+
+    private func setupDCTPWebView(requestId: String) {
+        let contentController = WKUserContentController()
+        let weakHandler = WeakScriptMessageHandler(delegate: self)
+        contentController.add(weakHandler, name: "HSInterface")
+
+        let configuration = WKWebViewConfiguration()
+        configuration.userContentController = contentController
+        configuration.defaultWebpagePreferences.allowsContentJavaScript = true
+        configuration.preferences.javaScriptCanOpenWindowsAutomatically = true
+
+        dctpWebView = WKWebView(frame: .zero, configuration: configuration)
+        dctpWebView?.isHidden = false
+        dctpWebView?.alpha = 0.01
+        dctpWebView?.accessibilityElementsHidden = true
+
+        dctpWebView?.navigationDelegate = self
+        dctpWebView?.uiDelegate = self
+
+        attach(webView: dctpWebView)
+
+        let baseHtml = initHtml(requestId: requestId)
+        logger(
+            type: "DEBUG",
+            eventName: .dctpScriptLoadInit,
+            category: .USER_EVENT,
+            value: "hyperLoaderUrl: \(hyperLoaderUrl), baseUrl: \(baseUrl)"
+        )
+        dctpWebView?.loadHTMLString(baseHtml, baseURL: URL(string: baseUrl))
+    }
+
+    private func initHtml(requestId: String) -> String {
         let backendUrlParam = customBackendUrl.map { "customBackendUrl: \"\($0)\"," } ?? ""
         let logUrlParam = customLogUrl.map { "customLogUrl: \"\($0)\"," } ?? ""
 
-        let baseHtml = """
+        return """
                 <!DOCTYPE html>
                 <html lang="en">
-                  <head>
+                  <body>
                     <script>
+                      function postResult(payload) {
+                          window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                              requestId: "\(requestId)",
+                              data: payload
+                          }));
+                      }
+
                       function handleScriptError() {
                           console.error('Failed to load HyperLoader.js');
-                          window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                              "sdkInitialised": false,
-                              "error": "Script load failed"
-                          }));
+                          postResult({ error: { type: "ScriptLoadError", message: "Script load failed" } });
                       }
 
                       async function initHyper() {
                           try {
                               if (typeof Hyper === 'undefined') {
-                                  window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                                      "sdkInitialised": false,
-                                      "error": "Hyper is not defined"
-                                  }));
+                                  postResult({ error: { type: "HyperUndefinedError", message: "Hyper is not defined" } });
                                   return;
                               }
 
@@ -181,35 +286,24 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                                   \(logUrlParam)
                               });
 
-                              window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                                  "sdkInitialised": true
-                              }));
+                              postResult({ success: true });
                           } catch (error) {
                               console.error('Hyper initialization failed:', error);
-                              window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
-                                  "sdkInitialised": false,
-                                  "error": error.message
-                              }));
+                              postResult({ error: { type: error.type || "HyperInitializationError", message: error.message } });
                           }
                       }
                     </script>
+                    <script src="\(visaDirectUrl)"></script>
+                    <script src="\(masterCardDirectUrl)"></script>
                     <script
                       src="\(hyperLoaderUrl)"
                       onload="initHyper()"
                       onerror="handleScriptError()"
                       async="true"
                     ></script>
-                  </head>
-                  <body></body>
+                  </body>
                 </html>
             """
-        logger(
-            type: "DEBUG",
-            eventName: .scriptLoadInit,
-            category: .USER_EVENT,
-            value: "hyperLoaderUrl: \(hyperLoaderUrl), baseUrl: \(baseUrl)"
-        )
-        webView?.loadHTMLString(baseHtml, baseURL: URL(string: baseUrl))
     }
 
     internal func webView(
@@ -331,7 +425,9 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                                 request3DSAuthentication: \(request3DSAuthentication),
                             });
 
-                            const data = window.ClickToPaySession.error ? window.ClickToPaySession : { success: true }
+                            const data = window.ClickToPaySession.error
+                                ? window.ClickToPaySession
+                                : { success: true, token: window.ClickToPaySession.token }
                             window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
                                 requestId: "\(requestId)",
                                 data: data
@@ -389,6 +485,97 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             category: .USER_EVENT,
             value: ids
         )
+
+        guard let token = data["token"],
+            let tokenData = try? JSONSerialization.data(withJSONObject: token),
+            let tokenString = String(data: tokenData, encoding: .utf8)
+        else {
+            logger(
+                type: "ERROR",
+                eventName: .initClickToPaySessionReturned,
+                category: .USER_ERROR,
+                value: "Type: ERROR, Message: Missing token in UCTP response"
+            )
+            throw ClickToPayException(message: "Failed to parse response", type: .error)  //FIX_ME
+        }
+        try await initDCTPSession(token: tokenString, profileId: profileId, merchantId: merchantId)
+    }
+
+    private func initDCTPSession(token: String, profileId: String, merchantId: String) async throws {
+        logger(type: "DEBUG", eventName: .initClickToPayDCTPSessionInit, category: .USER_EVENT, value: "")
+        try checkSessionClosed()
+
+        let requestId = UUID().uuidString
+
+        let responseJson: String = try await withCheckedThrowingContinuation { continuation in
+            pendingRequestsQueue.async { [weak self] in
+                self?.pendingRequests[requestId] = continuation
+            }
+
+            let jsCode = """
+                    (async function() {
+                        try {
+                            const authenticationSession = window.hyperInstance.initAuthenticationSession({
+                                    clientSecret: "\(clientSecret)",
+                                    profileId: "\(profileId)",
+                                    authenticationId: "\(authenticationId)",
+                                    merchantId: "\(merchantId)",
+                                });
+                            window.DCTPSession = await authenticationSession.initClickToPayDCTPSession({
+                                token: \(token)
+                            });
+
+                            const data = window.DCTPSession && window.DCTPSession.error
+                                ? window.DCTPSession
+                                : { success: true }
+                            window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                requestId: "\(requestId)",
+                                data: data
+                            }));
+                        } catch (error) {
+                            window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
+                                requestId: "\(requestId)",
+                                data: { error: {
+                                        type: error.type || "InitClickToPayDCTPSessionError",
+                                        message: error.message
+                                    }}
+                            }));
+                        }
+                    })();
+                """
+
+            DispatchQueue.main.async { [weak self] in
+                self?.dctpWebView?.evaluateJavaScript(jsCode, completionHandler: nil)
+            }
+        }
+
+        guard let jsonData = responseJson.data(using: .utf8),
+            let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any],
+            let data = json["data"] as? [String: Any]
+        else {
+            logger(
+                type: "ERROR",
+                eventName: .initClickToPayDCTPSessionReturned,
+                category: .USER_ERROR,
+                value: "Type: ERROR, Message: Failed to parse response"
+            )
+            throw ClickToPayException(message: "Failed to parse response", type: .error)
+        }
+
+        if let error = data["error"] as? [String: Any] {
+            let typeString = error["type"] as? String ?? "ERROR"
+            let errorMessage = error["message"] as? String ?? "Unknown error"
+            let errorType = ClickToPayErrorType(caseInsensitive: typeString) ?? .error  //FIX_ME
+            logger(
+                type: "ERROR",
+                eventName: .initClickToPayDCTPSessionReturned,
+                category: .USER_ERROR,
+                value: "Type: \(typeString), Message: \(errorMessage)"
+            )
+            throw ClickToPayException(message: errorMessage, type: errorType)
+        }
+
+        logger(type: "DEBUG", eventName: .initClickToPayDCTPSessionReturned, category: .USER_EVENT, value: "")
     }
 
     internal func getActiveClickToPaySession(
@@ -499,7 +686,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let jsCode = """
                                (async function() {
                                     try {
-                                        const isCustomerPresent = await window.ClickToPaySession.isCustomerPresent({
+                                        const isCustomerPresent = await window.DCTPSession.isCustomerPresent({
                                             \(emailParam)
                                         });
                                         window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
@@ -521,7 +708,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                 """
 
             DispatchQueue.main.async { [weak self] in
-                self?.webView?.evaluateJavaScript(jsCode, completionHandler: nil)
+                self?.dctpWebView?.evaluateJavaScript(jsCode, completionHandler: nil)
             }
         }
 
@@ -1081,16 +1268,6 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                     )
                 )
             }
-
-            if let initContinuation = sdkInitContinuation {
-                sdkInitContinuation = nil
-                initContinuation.resume(
-                    throwing: ClickToPayException(
-                        message: "Session was closed during initialization",
-                        type: .error
-                    )
-                )
-            }
         }
 
         await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
@@ -1122,13 +1299,19 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
     /// Cleans up the main WebView resources
     private func cleanupMainWebView() {
+        cleanup(webView: webView)
+        webView = nil
+        cleanup(webView: dctpWebView)
+        dctpWebView = nil
+    }
+
+    private func cleanup(webView: WKWebView?) {
         webView?.configuration.userContentController.removeScriptMessageHandler(forName: "HSInterface")
         webView?.configuration.userContentController.removeAllUserScripts()
         webView?.stopLoading()
         webView?.removeFromSuperview()
         webView?.navigationDelegate = nil
         webView?.uiDelegate = nil
-        webView = nil
     }
 
     /// A weak wrapper for WKScriptMessageHandler to break the retain cycle
@@ -1202,6 +1385,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
         // Capture references before self is deallocated
         let mainWebView = webView
+        let dctp = dctpWebView
         let popup = popupWebView
         let popupVC = popupWebViewController
 
@@ -1213,6 +1397,14 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             mainWebView?.removeFromSuperview()
             mainWebView?.navigationDelegate = nil
             mainWebView?.uiDelegate = nil
+
+            // Clean up DCTP webView
+            dctp?.configuration.userContentController.removeScriptMessageHandler(forName: "HSInterface")
+            dctp?.configuration.userContentController.removeAllUserScripts()
+            dctp?.stopLoading()
+            dctp?.removeFromSuperview()
+            dctp?.navigationDelegate = nil
+            dctp?.uiDelegate = nil
 
             // Clean up popup webView
             if popupVC?.presentingViewController != nil {
@@ -1242,33 +1434,6 @@ extension ClickToPaySessionImpl: WKScriptMessageHandler {
         guard let jsonData = body.data(using: .utf8),
             let json = try? JSONSerialization.jsonObject(with: jsonData) as? [String: Any]
         else {
-            return
-        }
-
-        if let sdkInitialised = json["sdkInitialised"] as? Bool {
-            pendingRequestsQueue.async { [weak self] in
-                guard let self = self else { return }
-
-                if sdkInitialised {
-                    logger(type: "DEBUG", eventName: .scriptLoadReturn, category: .USER_EVENT, value: "")
-                    if let continuation = self.sdkInitContinuation {
-                        self.sdkInitContinuation = nil
-                        continuation.resume()
-                    }
-                } else {
-                    let errorMessage = json["error"] as? String ?? "Unknown SDK initialization error"
-                    logger(type: "ERROR", eventName: .scriptLoadReturn, category: .USER_ERROR, value: "")
-                    if let continuation = self.sdkInitContinuation {
-                        self.sdkInitContinuation = nil
-                        continuation.resume(
-                            throwing: ClickToPayException(
-                                message: "SDK initialization failed: \(errorMessage)",
-                                type: .hyperInitializationError
-                            )
-                        )
-                    }
-                }
-            }
             return
         }
 
