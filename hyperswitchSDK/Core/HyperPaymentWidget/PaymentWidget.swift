@@ -158,6 +158,15 @@ public class PaymentWidget: UIControl {
         )
     }
 
+    public func triggerBack() {
+        self.rootView?.bridge.enqueueJSCall(
+            "RCTDeviceEventEmitter",
+            method: "emit",
+            args: ["navigateBack", [:]],
+            completion: nil
+        )
+    }
+
     internal func handleShouldProceedWithPayment(payload: String, callback: @escaping (Bool) -> Void) {
         if shouldProceedWithPaymentCallback == nil {
             callback(true)
