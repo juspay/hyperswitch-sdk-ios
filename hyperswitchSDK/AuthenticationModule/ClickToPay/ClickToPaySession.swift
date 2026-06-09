@@ -39,27 +39,27 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     private var captureCorrelationIds = false
 
     private var hyperLoaderUrl: String {
-        SDKEnvironment.getEnvironment(publishableKey) == .PROD
-            ? "https://checkout.hyperswitch.io/web/2025.11.28.12/v1/HyperLoader.js"
-            : "https://beta.hyperswitch.io/web/2025.11.28.12/v1/HyperLoader.js"
+        SDKEnvironment.getEnvironment(publishableKey) == .SANDBOX
+            ? "https://beta.hyperswitch.io/web/2025.11.28.12/v1/HyperLoader.js"
+            : "https://checkout.hyperswitch.io/web/2025.11.28.12/v1/HyperLoader.js"
     }
 
     private var baseUrl: String {
-        SDKEnvironment.getEnvironment(publishableKey) == .PROD
-            ? "https://secure.checkout.visa.com"
-            : "https://sandbox.secure.checkout.visa.com"
+        SDKEnvironment.getEnvironment(publishableKey) == .SANDBOX
+            ? "https://sandbox.secure.checkout.visa.com"
+            : "https://secure.checkout.visa.com"
     }
 
     private var visaDirectUrl: String {
-        SDKEnvironment.getEnvironment(publishableKey) == .PROD
-            ? "https://assets.secure.checkout.visa.com/checkout-widget/resources/js/src-i-adapter/visaSdk.js?v2"
-            : "https://sandbox-assets.secure.checkout.visa.com/checkout-widget/resources/js/src-i-adapter/visaSdk.js?v2"
+        SDKEnvironment.getEnvironment(publishableKey) == .SANDBOX
+            ? "https://sandbox-assets.secure.checkout.visa.com/checkout-widget/resources/js/src-i-adapter/visaSdk.js?v2"
+            : "https://assets.secure.checkout.visa.com/checkout-widget/resources/js/src-i-adapter/visaSdk.js?v2"
     }
 
     private var masterCardDirectUrl: String {
-        SDKEnvironment.getEnvironment(publishableKey) == .PROD
-            ? "https://src.mastercard.com/sdk/srcsdk.mastercard.js"
-            : "https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js"
+        SDKEnvironment.getEnvironment(publishableKey) == .SANDBOX
+            ? "https://sandbox.src.mastercard.com/sdk/srcsdk.mastercard.js"
+            : "https://src.mastercard.com/sdk/srcsdk.mastercard.js"
     }
 
     private func logger(type: String, eventName: EventName, category: LogCategory, value: String) {
