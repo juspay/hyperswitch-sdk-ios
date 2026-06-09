@@ -50,6 +50,10 @@ extension PaymentSheet {
         public var displaySavedPaymentMethods: Bool?
 
         ///
+        /// toggle to always send customer acceptance
+        public var alwaysSendCustomerAcceptance: Bool? = false
+
+        ///
         /// toggle to disable Branding
         public var disableBranding: Bool?
 
