@@ -39,7 +39,10 @@ public extension PaymentSheet {
         public var shadow: Shadow?
         
         public var theme: Theme?
-        
+
+        /// The locale used to localize text in PaymentSheet (e.g., "en", "fr")
+        public var locale: String?
+
         public enum Theme: String, Codable {
             case `default` = "Default"
             case light = "Light"

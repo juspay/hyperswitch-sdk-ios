@@ -160,7 +160,7 @@ extension PaymentSheet.Appearance.Shadow: Codable {
 
 extension PaymentSheet.Appearance: Codable {
     enum CodingKeys: String, CodingKey {
-        case font, colors, primaryButton, cornerRadius, borderWidth, shadow, theme
+        case font, colors, primaryButton, cornerRadius, borderWidth, shadow, theme, locale
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -172,6 +172,7 @@ extension PaymentSheet.Appearance: Codable {
         try c.encodeIfPresent(borderWidth, forKey: .borderWidth)
         try c.encodeIfPresent(shadow, forKey: .shadow)
         try c.encodeIfPresent(theme, forKey: .theme)
+        try c.encodeIfPresent(locale, forKey: .locale)
     }
 
     public init(from decoder: Decoder) throws {
@@ -184,5 +185,6 @@ extension PaymentSheet.Appearance: Codable {
         borderWidth = try c.decodeIfPresent(CGFloat.self, forKey: .borderWidth)
         shadow = try c.decodeIfPresent(PaymentSheet.Appearance.Shadow.self, forKey: .shadow)
         theme = try c.decodeIfPresent(PaymentSheet.Appearance.Theme.self, forKey: .theme)
+        locale = try c.decodeIfPresent(String.self, forKey: .locale)
     }
 }
