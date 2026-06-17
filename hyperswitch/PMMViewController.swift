@@ -68,7 +68,7 @@ class PaymentMethodManagementViewController: UIViewController {
 
         var appearance = PaymentSheet.Appearance()
         appearance.colors.background = UIColor(red: 0.96, green: 0.97, blue: 0.98, alpha: 1.00)
-        appearance.primaryButton.cornerRadius = 32
+        appearance.primaryButton.shapes.borderRadius = 32
         configuration.appearance = appearance
 
         self.hyperViewModel.paymentSession?.presentPaymentSheet(

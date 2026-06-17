@@ -79,9 +79,9 @@ public class PaymentWidget: UIControl {
         let sdkParams = SDKParams.getSDKParams()
 
         var nativeConfig = try? configuration?.toDictionary()
-        nativeConfig?["hideConfirmButton"] = true
+        nativeConfig?["hideConfirmButton"] = true  // MARK: replace with `displayPayButton`
         nativeConfig?["subscribedEvents"] = subscribedEventNames
-        configurationDict?["hideConfirmButton"] = true
+        configurationDict?["hideConfirmButton"] = true  // MARK: replace with `displayPayButton`
         configurationDict?["subscribedEvents"] = subscribedEventNames
 
         let props: [String: Any] = [

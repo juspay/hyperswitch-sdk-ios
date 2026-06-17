@@ -2,160 +2,299 @@
 //  PaymentSheetConfiguration.swift
 //  Hyperswitch
 //
-//  Created by Balaganesh on 09/12/22.
+//  Created by Harshit Srivastava on 17/06/26.
 //
 
 import Foundation
-import PassKit
 import UIKit
 
 // MARK: - Configuration
 extension PaymentSheet {
 
     /// Configuration for PaymentSheet
-    public struct Configuration: Codable {
+    public struct Configuration: Encodable {
 
         /// Initializes a Configuration with default values
         public init() {}
 
-        /// If true, allows payment methods that do not move money at the end of the checkout. Defaults to false.
-        /// - Description: Some payment methods can't guarantee you will receive funds from your customer at the end of the checkout because they take time to settle (eg. most bank debits, like SEPA or ACH) or require customer action to complete (e.g. OXXO, Konbini, Boleto). If this is set to true, make sure your integration listens to webhooks for notifications on whether a payment has succeeded or not.
-        public var allowsDelayedPaymentMethods: Bool?
-
-        /// If `true`, allows payment methods that require a shipping address, like Afterpay and Affirm. Defaults to `false`.
-        /// Set this to `true` if you collect shipping addresses and set `Configuration.shippingDetails` or set `shipping` details directly on the PaymentIntent.
-        /// - Note: PaymentSheet considers this property `true` and allows payment methods that require a shipping address if `shipping` details are present on the PaymentIntent when PaymentSheet loads.
-        public var allowsPaymentMethodsRequiringShippingAddress: Bool?
-
-        /// The label to use for the primary button.
-        ///
-        /// If not set, Payment Sheet will display suitable default labels
-        /// for payment and setup intents.
-        public var primaryButtonLabel: String?
-
-        public var paymentSheetHeaderLabel: String?
-
-        public var savedPaymentSheetHeaderLabel: String?
-
-        /// Your customer-facing business name.
-        /// The default value is the name of your app, using CFBundleDisplayName or CFBundleName
-        public var merchantDisplayName: String?
-
-        ///
-        /// toggle to disable SaveCard CheckBox
-        public var displaySavedPaymentMethodsCheckbox: Bool?
-
-        ///
-        /// toggle to disable SavedCard Screen
-        public var displaySavedPaymentMethods: Bool?
-
-        ///
-        /// toggle to disable Branding
-        public var disableBranding: Bool?
-
-        ///
-        /// add custom placeholder text
-        public var placeholder: PlaceHolder = PlaceHolder()
-
-        ///
-        /// toggle to  disable Default Saved Payment Icon
-        public var displayDefaultSavedPaymentIcon: Bool?
-
-        /// A URL that redirects back to your app that PaymentSheet can use to auto-dismiss
-        /// web views used for additional authentication, e.g. 3DS2
-        public var returnURL: String?
-
-        /// DefaultView = `true` launches PaymentSheet with cardForm, never shows the loading state.
-        /// Default value is `false`
-        public var defaultView: Bool?
-
         /// Describes the appearance of PaymentSheet
         public var appearance: PaymentSheet.Appearance = PaymentSheet.Appearance()
 
-        /// PaymentSheet pre-populates fields with the values provided.
-        /// be attached to the payment method even if they are not collected by the PaymentSheet UI.
-        public var defaultBillingDetails: AddressDetails = AddressDetails()
+        /// Your customer-facing business name.
+        public var merchantDisplayName: String?
 
-        /// A closure that returns the customer's shipping details.
-        /// This is used to display a "Billing address is same as shipping" checkbox if `defaultBillingDetails` is not provided
-        public var shippingDetails: AddressDetails = AddressDetails()
+        /// If true, allows payment methods that do not move money at the end of the checkout. Defaults to false.
+        public var allowsDelayedPaymentMethods: Bool?
 
-        /// Optional configuration to display a custom message when a saved payment method is removed.
-        public var removeSavedPaymentMethodMessage: String?
+        /// If `true`, allows payment methods that require a shipping address, like Afterpay and Affirm. Defaults to `false`.
+        public var allowsPaymentMethodsRequiringShippingAddress: Bool?
 
-        /// By default, PaymentSheet will use a dynamic ordering that optimizes payment method display for the customer.
-        /// You can override the default order in which payment methods are displayed in PaymentSheet with a list of payment method types.
-        /// See https://docs.hyperswitch.io/api/payment_methods/object#payment_method_object-type for the list of valid types.  You may also pass external payment methods.
-        /// - Example: ["card", "external_paypal", "klarna"]
-        /// - Note: If you omit payment methods from this list, they’ll be automatically ordered by Hyperswitch after the ones you provide. Invalid payment methods are ignored.
-        public var paymentMethodOrder: [String]?
+        /// Toggle to show/hide the "save card" checkbox. Defaults to true.
+        public var displaySavedPaymentMethodsCheckbox: Bool?
 
-        /// Api key used to invoke netcetera sdk for redirection-less 3DS authentication.
+        /// Toggle to show/hide the saved-card screen. Defaults to true.
+        public var displaySavedPaymentMethods: Bool?
+
+        /// Toggle to show/hide the default saved-payment icon. Defaults to true.
+        public var displayDefaultSavedPaymentIcon: Bool?
+
+        /// Toggle to show/hide the pay button. Defaults to true for the full PaymentSheet.
+        public var displayPayButton: Bool?
+
+        /// Keep the pay button pinned to the bottom of the sheet. Defaults to false.
+        public var stickyPayButton: Bool?
+
+        /// Toggle to disable Hyperswitch branding.
+        public var disableBranding: Bool?
+
+        /// Pre-load the card element for faster first render. Defaults to false.
+        public var preloadCardElement: Bool?
+
+        /// The label to use for the primary button.
+        public var primaryButtonLabel: String?
+
+        /// Custom header label for the payment sheet.
+        public var paymentSheetHeaderLabel: String?
+
+        /// Custom header label for the saved-payment sheet.
+        public var savedPaymentSheetHeaderLabel: String?
+
+        /// API key used to invoke the Netcetera SDK for redirection-less 3DS authentication.
         public var netceteraSDKApiKey: String?
 
-        /// hide confirm button for external confirm action
-        public var hideConfirmButton: Bool?
+        /// Locale override (e.g. "en", "fr").
+        public var locale: String?
 
-        public struct PlaceHolder: Codable {
+        /// Customer the PaymentSheet operates on.
+        public var customer: Customer?
 
+        /// Custom placeholder text for card fields.
+        public var placeholder: PlaceHolder = PlaceHolder()
+
+        /// Billing details to pre-populate fields with.
+        public var billingDetails: AddressDetails = AddressDetails()
+
+        /// Shipping details.
+        public var shippingDetails: AddressDetails = AddressDetails()
+
+        /// Per-wallet button styling for the express/wallet buttons.
+        public var walletButtonsConfiguration: WalletButtonsConfiguration?
+
+        /// Whether redirection messaging is shown. Defaults to `.shown`.
+        public var redirectionInfo: RedirectionVisibility?
+
+        /// Always send a customer-acceptance object on confirm. Defaults to false.
+        public var alwaysSendCustomerAcceptance: Bool?
+
+        /// Per-payment-method custom messaging.
+        public var paymentMethodsConfig: [PaymentMethodConfig]?
+
+        /// Open the card scanner automatically when the card form appears. Defaults to false.
+        public var opensCardScannerAutomatically: Bool?
+
+        /// Override the order in which payment methods are displayed.
+        public var paymentMethodOrder: [String]?
+
+        /// Layout customization for the payment-method list.
+        public var paymentMethodLayout: PaymentMethodLayout?
+
+        /// Render card fields (number / expiry / cvc) as separate inputs. Defaults to false.
+        public var splitCardFields: Bool?
+
+        // MARK: - Placeholder
+
+        public struct PlaceHolder: Encodable {
             public init() {}
-
             public var cardNumber: String?
-
-            public var expiryDate: String?  //  MM/YY
-
+            public var expiryDate: String?  // MM/YY
             public var cvv: String?
         }
 
-        /// Billing details of a customer
-        public struct AddressDetails: Codable {
+        // MARK: - Customer
 
-            /// Initializes billing details
+        public struct Customer: Encodable {
+            public init() {}
+            public init(id: String?, ephemeralKeySecret: String?) {
+                self.id = id
+                self.ephemeralKeySecret = ephemeralKeySecret
+            }
+            public var id: String?
+            public var ephemeralKeySecret: String?
+        }
+
+        // MARK: - Address details
+
+        /// Billing/shipping details for a customer.
+        public struct AddressDetails: Encodable {
             public init() {}
 
-            /// The customer's billing address
+            /// The customer's address.
             public var address: Address = Address()
 
-            /// The customer's email
-            /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
+            /// The customer's email.
             public var email: String?
 
-            /// The customer's full name
-            /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
-            public var name: String?
-
-            /// The customer's phone number without formatting (e.g. 5551234567)
-            public var phone: String?
+            /// The customer's phone.
+            public var phone: Phone = Phone()
         }
 
         /// An address.
-        public struct Address: Codable {
-
-            /// Initializes an Address
+        public struct Address: Encodable {
             public init() {}
 
-            /// City, district, suburb, town, or village.
-            /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
+            public var firstName: String?
+            public var lastName: String?
             public var city: String?
-
             /// Two-letter country code (ISO 3166-1 alpha-2).
             public var country: String?
-
-            /// Address line 1 (e.g., street, PO Box, or company name).
-            /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
             public var line1: String?
-
-            /// Address line 2 (e.g., apartment, suite, unit, or building).
-            /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
             public var line2: String?
-
             /// ZIP or postal code.
-            /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
             public var postalCode: String?
-
-            /// State, county, province, or region.
-            /// - Note: The value set is displayed in the payment sheet as-is. Depending on the payment method, the customer may be required to edit this value.
             public var state: String?
+
+            // FIXME: `first_name`/`last_name` to camelCase in RN.
+            enum CodingKeys: String, CodingKey {
+                case firstName = "first_name"
+                case lastName = "last_name"
+                case city, country, line1, line2, postalCode, state
+            }
+        }
+
+        /// A phone number split into a national number and a dialing code.
+        public struct Phone: Encodable {
+            public init() {}
+            public var number: String?
+            public var code: String?
+        }
+
+        // MARK: - Payment method messaging
+
+        public struct PaymentMethodConfig: Encodable {
+            public init(paymentMethod: String, message: String? = nil) {
+                self.paymentMethod = paymentMethod
+                self.message = message
+            }
+            public var paymentMethod: String
+            public var message: String?
+        }
+
+        /// Visibility for redirection messaging.
+        public enum RedirectionVisibility: String, Encodable {
+            case shown, hidden
+        }
+
+        // MARK: - Wallet buttons
+
+        /// Per-wallet button styling for the express/wallet buttons.
+        public struct WalletButtonsConfiguration: Encodable {
+            public init() {}
+            public var applePay: ApplePay?
+            public var payPal: PayPal?
+
+            /// Visibility shared by all wallet buttons.
+            public enum Visibility: String, Encodable {
+                case shown, hidden
+            }
+
+            public struct ApplePay: Encodable {
+                public init() {}
+                public var visibility: Visibility?
+                public var buttonType: ButtonType?
+                public var buttonStyle: Style?
+
+                public enum ButtonType: String, Encodable {
+                    case buy, setUp, inStore, donate, checkout, book, subscribe, plain
+                }
+                public enum Theme: String, Encodable {
+                    case white, whiteOutline, black
+                }
+                public struct Style: Encodable {
+                    public init() {}
+                    public init(light: Theme?, dark: Theme?) {
+                        self.light = light
+                        self.dark = dark
+                    }
+                    public var light: Theme?
+                    public var dark: Theme?
+                }
+            }
+
+            public struct PayPal: Encodable {
+                public init() {}
+                public var visibility: Visibility?
+                public var buttonType: ButtonType?
+                public var buttonSize: ButtonSize?
+                public var buttonStyle: Style?
+
+                public enum ButtonType: String, Encodable {
+                    case paypal, checkout, buynow, pay
+                }
+                public enum ButtonSize: String, Encodable {
+                    case small, medium, large
+                }
+                public enum Theme: String, Encodable {
+                    case gold, blue, white, black, silver
+                }
+                public struct Style: Encodable {
+                    public init() {}
+                    public init(light: Theme?, dark: Theme?) {
+                        self.light = light
+                        self.dark = dark
+                    }
+                    public var light: Theme?
+                    public var dark: Theme?
+                }
+            }
+        }
+
+        // MARK: - Payment method layout
+
+        /// Layout customization for the payment-method list.
+        public struct PaymentMethodLayout: Encodable {
+            public init() {}
+
+            public var type: LayoutType?
+            public var showOneClickWalletsOnTop: Bool?
+            public var paymentMethodsArrangementForTabs: Arrangement?
+            public var defaultCollapsed: Bool?
+            public var radios: Bool?
+            public var spacedAccordionItems: Bool?
+            public var maxAccordionItems: Int?
+            public var cvcIcon: IconVisibility?
+            public var cardBrandIcon: CardBrandIcon?
+            public var showCheckedIconForSelection: Bool?
+            public var savedMethodCustomization: SavedMethodCustomization?
+
+            public enum LayoutType: String, Encodable {
+                case tabs, accordion, spacedAccordion
+            }
+            public enum Arrangement: String, Encodable {
+                case `default`, grid
+            }
+            public enum IconVisibility: String, Encodable {
+                case shown, hidden
+            }
+            public enum CardBrandIcon: String, Encodable {
+                case animated, hidden, standard, hideGeneric
+            }
+
+            public struct SavedMethodCustomization: Encodable {
+                public init() {}
+                public var hideCardExpiry: Bool?
+                public var hideCVCError: Bool?
+                public var cvcIcon: IconVisibility?
+                public var groupingBehavior: GroupingBehavior?
+                public var defaultCollapsed: Bool?
+                public var hiddenPaymentMethods: [String]?
+            }
+
+            public struct GroupingBehavior: Encodable {
+                public init() {}
+                public var displayInSeparateScreen: Bool?
+                public var displayInSeparateSection: Bool?
+                public var groupByPaymentMethods: Bool?
+            }
         }
     }
 }

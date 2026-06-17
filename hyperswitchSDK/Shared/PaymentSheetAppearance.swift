@@ -9,104 +9,50 @@ import UIKit
 
 public extension PaymentSheet {
 
-    /// Describes the appearance of PaymentSheet
-    struct Appearance {
+    /// Describes the appearance of PaymentSheet.
+    struct Appearance: Encodable {
 
         /// Creates a `PaymentSheet.Appearance` with default values
         public init() {}
 
+        /// The visual theme. Note: only `.default` auto-switches with the system
+        /// light/dark setting; a named theme pins the scheme.
+        public var theme: Theme?
+
+        /// Describes the colors in PaymentSheet (resolved per light/dark scheme)
+        public var colors: Colors = Colors()
+
+        /// The corner radius / border / shadow / spacing used across PaymentSheet
+        public var shapes: Shapes = Shapes() // FIXME: to be removed.
+
         /// Describes the appearance of fonts in PaymentSheet
         public var font: Font = Font()
-
-        /// Describes the colors in PaymentSheet
-        public var colors: Colors = Colors()
 
         /// Describes the appearance of the primary button (e.g., the "Pay" button)
         public var primaryButton: PrimaryButton = PrimaryButton()
 
-        /// The corner radius used for buttons, inputs, tabs in PaymentSheet
-        /// - Note: The behavior of this property is consistent with the behavior of corner radius on `CALayer`
-        public var cornerRadius: CGFloat?
+        /// Describes the appearance of payment-method logos / selection icons
+        public var logo: Logo?
 
-        /// The border used for inputs and tabs in PaymentSheet
-        /// - Note: The behavior of this property is consistent with the behavior of border width on `CALayer`
-        public var borderWidth: CGFloat?
-
-        /// The shadow used for inputs and tabs in PaymentSheet
-        /// - Note: Set this to `.disabled` to disable shadows
-        public var shadow: Shadow?
-
-        public var theme: Theme?
-
-        public enum Theme: String, Codable {
+        public enum Theme: String, Encodable {
             case `default` = "Default"
             case light = "Light"
             case dark = "Dark"
             case minimal = "Minimal"
             case flatMinimal = "FlatMinimal"
-
-            var themeLabel: String {
-                return self.rawValue
-            }
-        }
-
-        // MARK: Fonts
-
-        /// Describes the appearance of fonts in PaymentSheet
-        public struct Font {
-
-            /// Creates a `PaymentSheet.Appearance.Font` with default values
-            public init() {}
-
-            /// The scale factor for all font sizes in PaymentSheet.
-            /// Font sizes are multiplied by this value before being displayed. For example, setting this to 1.2 increases the size of all text by 20%.
-            /// - Note: This value must be greater than 0. The default value is 1.0.
-            /// - Note: This is used in conjunction with the Dynamic Type accessibility text size.
-            public var sizeScaleFactor: CGFloat?
-
-            /// The font family of this font is used throughout PaymentSheet. PaymentSheet uses this font at multiple weights (e.g., regular, medium, semibold) if they exist.
-            /// - Note: The size and weight of the font is ignored. To adjust font sizes, see `sizeScaleFactor`.
-            public var base: UIFont?
-
-            /// The size adjustment for all heading texts in PaymentSheet
-            /// Font sizes of all headings will be increased by this value from their respective default size
-            public var headingTextSizeAdjust: CGFloat?
-
-            /// The size for all sub heading texts in PaymentSheet
-            /// Font sizes of all sub headings will be increased by this value from their respective default size
-            public var subHeadingTextSizeAdjust: CGFloat?
-
-            /// The size for all placeholder texts in PaymentSheet
-            /// Font sizes of all placeholder texts will be increased by this value from their respective default size
-            public var placeholderTextSizeAdjust: CGFloat?
-
-            /// The size for all button texts in PaymentSheet
-            /// Font sizes of all button texts will be increased by this value from their respective default size
-            public var buttonTextSizeAdjust: CGFloat?
-
-            /// The size for all error texts in PaymentSheet
-            /// Font sizes of all error texts will be increased by this value from their respective default size
-            public var errorTextSizeAdjust: CGFloat?
-
-            /// The size for all link texts in PaymentSheet
-            /// Font sizes of all link texts will be increased by this value from their respective default size
-            public var linkTextSizeAdjust: CGFloat?
-
-            /// The size for all modal texts in PaymentSheet
-            /// Font sizes of all modal texts will be increased by this value from their respective default size
-            public var modalTextSizeAdjust: CGFloat?
-
-            /// The size for all card texts in PaymentSheet
-            /// Font sizes of all card texts will be increased by this value from their respective default size
-            public var cardTextSizeAdjust: CGFloat?
-
-            /// the font Attributes for PaymentSheetLite
-            public var family: String?
+            case brutal = "Brutal"
+            case glass = "Glass"
+            case skeu = "Skeu"
+            case clay = "Clay"
+            case charcoal = "Charcoal"
+            case soft = "Soft"
         }
 
         // MARK: Colors
 
-        /// Describes the colors in PaymentSheet
+        /// Describes the colors in PaymentSheet.
+        /// Each color may be a plain `UIColor` (applied to both schemes) or a dynamic
+        /// `UIColor` (resolved differently for light and dark).
         public struct Colors {
 
             /// Creates a `PaymentSheet.Appearance.Colors` with default values
@@ -127,29 +73,71 @@ public extension PaymentSheet {
             /// The color of the divider lines used inside inputs, tabs, and other components
             public var componentDivider: UIColor?
 
-            /// The default text color used in PaymentSheet, appearing over the background color
-            public var text: UIColor?
-
-            /// The color used for text of secondary importance. For example, this color is used for the label above input fields
-            public var textSecondary: UIColor?
-
             /// The color of text appearing over `componentBackground`
             public var componentText: UIColor?
 
+            /// The primary/default text color used in PaymentSheet
+            public var primaryText: UIColor?
+
+            /// The color used for text of secondary importance (e.g. labels above inputs)
+            public var secondaryText: UIColor?
+
             /// The color used for input placeholder text
-            public var componentPlaceholderText: UIColor?
+            public var placeholderText: UIColor?
 
             /// The color used for icons in PaymentSheet, such as the close or back icons
             public var icon: UIColor?
 
             /// The color used to indicate errors or destructive actions in PaymentSheet
-            public var danger: UIColor?
+            public var error: UIColor?
 
-            /// The color used to indicate Loader Background Color
+            /// The color used for the loader background
             public var loaderBackground: UIColor?
 
-            /// The color used to indicate Loader Foreground Color
+            /// The color used for the loader foreground
             public var loaderForeground: UIColor?
+
+            /// The color used for the modal/scrim overlay
+            public var overlay: UIColor?
+
+            /// The background color of a selected component
+            public var selectedComponentBackground: UIColor?
+
+            /// The border color of a selected component
+            public var selectedComponentBorder: UIColor?
+
+            /// The border width of a selected component
+            public var selectedComponentBorderWidth: CGFloat?
+
+            /// The divider color of a selected component
+            public var selectedComponentDivider: UIColor?
+
+            /// The text color of a selected component
+            public var selectedComponentText: UIColor?
+        }
+
+        // MARK: Shapes
+
+        /// Corner radius, border, shadow and spacing for inputs/tabs/components.
+        public struct Shapes: Encodable {  // FIXME: remove this struct.
+
+            /// Creates a `PaymentSheet.Appearance.Shapes` with default values
+            public init() {}
+
+            /// The corner radius used for buttons, inputs, tabs in PaymentSheet
+            public var borderRadius: CGFloat?
+
+            /// The border width used for inputs and tabs in PaymentSheet
+            public var borderWidth: CGFloat?
+
+            /// The shadow used for inputs and tabs in PaymentSheet
+            public var shadow: Shadow?
+
+            /// The height of inputs in points
+            public var inputHeight: CGFloat?
+
+            /// The spacing between components in points
+            public var gap: CGFloat?
         }
 
         // MARK: Shadow
@@ -164,75 +152,147 @@ public extension PaymentSheet {
             public static var disabled: Shadow?
 
             /// Color of the shadow
-            /// - Note: The behavior of this property is consistent with `CALayer.shadowColor`
             public var color: UIColor?
 
             /// Opacity or alpha of the shadow
-            /// - Note: The behavior of this property is consistent with `CALayer.shadowOpacity`
             public var opacity: CGFloat?
 
             /// Offset of the shadow
-            /// - Note: The behavior of this property is consistent with `CALayer.shadowOffset`
-            public var offset: CGSize?
+            public var offset: Offset?
 
-            /// Radius of the shadow
-            /// - Note: The behavior of this property is consistent with `CALayer.shadowRadius`
-            public var radius: CGFloat?
+            /// Blur radius of the shadow
+            public var blurRadius: CGFloat?
 
-            /// intensity of the shadow
-            /// - Note: The behavior of this property is consistent with `CALayer.shadowIntensity`
+            /// Intensity of the shadow
             public var intensity: CGFloat?
+        }
+
+        /// A 2D offset (used by `Shadow.offset`)
+        public struct Offset: Encodable {
+
+            /// Creates an `Offset` with default values
+            public init() {}
+
+            public init(x: CGFloat, y: CGFloat) {
+                self.x = x
+                self.y = y
+            }
+
+            public var x: CGFloat?
+            public var y: CGFloat?
+        }
+
+        // MARK: Fonts
+
+        /// Describes the appearance of fonts in PaymentSheet
+        public struct Font {
+
+            /// Creates a `PaymentSheet.Appearance.Font` with default values
+            public init() {}
+
+            /// The font used throughout PaymentSheet.
+            public var base: UIFont?
+
+            /// Explicit font-family override. Takes precedence over `base`
+            public var family: String?
+
+            /// The scale factor for all font sizes in PaymentSheet.
+            /// - Note: The default value is 1.0.
+            public var scale: CGFloat?
+
+            /// Size adjustment for all heading texts
+            public var headingTextSizeAdjust: CGFloat?
+
+            /// Size adjustment for all sub-heading texts
+            public var subHeadingTextSizeAdjust: CGFloat?
+
+            /// Size adjustment for all placeholder texts
+            public var placeholderTextSizeAdjust: CGFloat?
+
+            /// Size adjustment for all button texts
+            public var buttonTextSizeAdjust: CGFloat?
+
+            /// Size adjustment for all error texts
+            public var errorTextSizeAdjust: CGFloat?
+
+            /// Size adjustment for all link texts
+            public var linkTextSizeAdjust: CGFloat?
+
+            /// Size adjustment for all modal texts
+            public var modalTextSizeAdjust: CGFloat?
+
+            /// Size adjustment for all card texts
+            public var cardTextSizeAdjust: CGFloat?
         }
 
         // MARK: Primary Button
 
-        /// Describes the appearance of the primary button (e.g., the "Pay" button)
+        /// Describes the appearance of the primary button (e.g., the "Pay" button).
         public struct PrimaryButton {
 
             /// Creates a `PaymentSheet.Appearance.PrimaryButton` with default values
             public init() {}
 
             /// The background color of the primary button
-            /// - Note: If `nil`, `appearance.colors.primary` will be used as the primary button background color
-            public var backgroundColor: UIColor?
+            public var background: UIColor?
 
             /// The text color of the primary button
-            /// - Note: If `nil`, defaults to either white or black depending on the color of the button
-            public var textColor: UIColor?
-
-            /// The background color of the primary button when in a success state.
-            /// - Note: Only applies to PaymentSheet. The primary button transitions to the success state when payment succeeds.
-            public var successBackgroundColor: UIColor?
-
-            /// The text color of the primary button when in a success state.
-            /// - Note: Only applies to PaymentSheet. The primary button transitions to the success state when payment succeeds.
-            /// - Note: If `nil`, defaults to `textColor`
-            public var successTextColor: UIColor?
-
-            /// The corner radius of the primary button
-            /// - Note: If `nil`, `appearance.cornerRadius` will be used as the primary button corner radius
-            /// - Note: The behavior of this property is consistent with the behavior of corner radius on `CALayer`
-            public var cornerRadius: CGFloat?
+            public var text: UIColor?
 
             /// The border color of the primary button
-            /// - Note: The behavior of this property is consistent with the behavior of border color on `CALayer`
-            public var borderColor: UIColor?
+            public var border: UIColor?
 
-            /// The border width of the primary button
-            /// - Note: The behavior of this property is consistent with the behavior of border width on `CALayer`
-            public var borderWidth: CGFloat?
-
-            /// The font used for the text of the primary button
-            /// - Note: If `nil`, `appearance.font.base` will be used as the primary button font
-            /// - Note: `appearance.font.sizeScaleFactor` does not impact the size of this font
-            public var font: UIFont?
-
-            /// The shadow of the primary button
-            /// - Note: If `nil`, `appearance.shadow` will be used as the primary button shadow
-            public var shadow: Shadow?
+            /// The corner radius / border width / shadow of the primary button
+            public var shapes: Shapes = Shapes()
 
             /// The height of the primary button in points
             public var height: CGFloat?
+        }
+
+        // MARK: Logo
+
+        /// Describes the appearance of payment-method logos and the selection check icon.
+        public struct Logo {
+
+            /// Creates a `PaymentSheet.Appearance.Logo` with default values
+            public init() {}
+
+            /// The corner radius of the logo container
+            public var borderRadius: CGFloat?
+
+            /// The background color behind the logo (defaults to transparent on the RN side)
+            public var backgroundColor: UIColor?
+
+            /// The tint used when the payment method is selected
+            public var selected: UIColor?
+
+            /// The tint used when the payment method is not selected
+            public var unselected: UIColor?
+
+            /// The check icon shown for the selected payment method
+            public var checkedIconForSelection: CheckedIcon?
+        }
+
+        /// The check icon shown for a selected payment method.
+        public struct CheckedIcon {
+
+            /// Creates a `PaymentSheet.Appearance.CheckedIcon` with default values
+            public init() {}
+
+            /// The fill color of the check icon
+            public var color: UIColor?
+
+            /// The stroke color of the check icon
+            public var stroke: UIColor?
+
+            /// The size of the check icon in points
+            public var size: CGFloat?
+
+            /// The bottom offset of the check icon in points
+            public var bottom: CGFloat?
+
+            /// The right offset of the check icon in points
+            public var right: CGFloat?
         }
     }
 }
