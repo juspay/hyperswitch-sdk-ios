@@ -15,6 +15,13 @@ public final class Hyperswitch {
     }
 
     public func initPaymentSession(configuration: PaymentSessionConfiguration) -> PaymentSession {
-        PaymentSession(paymentSessionConfiguration: configuration, hyperswitchConfiguration: hyperswitchConfiguration)
+        let session = PaymentSession(
+            paymentSessionConfiguration: configuration,
+            hyperswitchConfiguration: hyperswitchConfiguration
+        )
+        #if canImport(React)
+        session.triggerPrefetch()
+        #endif
+        return session
     }
 }

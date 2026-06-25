@@ -32,6 +32,7 @@ internal extension PaymentSheet {
             "paymentSessionConfig": paymentSessionConfiguration as Any,
             "sdkParams": sdkParams,
             "configuration": configuration as Any,
+            "prefetchedApiData": resolvedPrefetchedApiData as Any,
         ]
         /// Get the root view from the RNViewManager with the "hyperSwitch" module and the props dictionary.
         let rootView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": props])
@@ -58,6 +59,7 @@ internal extension PaymentSheet {
             "sdkParams": sdkParams,
             "configuration": propsDict,
             "from": "rn",
+            "prefetchedApiData": resolvedPrefetchedApiData as Any,
         ]
 
         let rootView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": props])

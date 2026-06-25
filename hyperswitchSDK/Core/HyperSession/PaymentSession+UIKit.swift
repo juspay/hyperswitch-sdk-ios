@@ -15,6 +15,33 @@ extension PaymentSession {
     private static var completion: ((PaymentResult) -> Void)?
     internal static weak var activeSession: PaymentSession?  // NEW
 
+    internal func triggerPrefetch() {
+        isPrefetchTriggered = true
+        prefetchedData = nil
+
+        let sdkAuth = paymentSessionConfiguration.sdkAuthorization
+        PaymentSession.prefetchCallbacks[sdkAuth] = { [weak self] data in
+            self?.prefetchedData = data
+        }
+
+        RNHeadlessManager.sharedInstance.reinvalidateBridge()
+
+        let hyperswitchConfig = try? hyperswitchConfiguration?.toDictionary()
+        let paymentSessionConfig = try? paymentSessionConfiguration.toDictionary()
+        let sdkParams = SDKParams.getSDKParams()
+
+        let props: [String: Any] = [
+            "hyperswitchConfig": hyperswitchConfig as Any,
+            "paymentSessionConfig": paymentSessionConfig as Any,
+            "sdkParams": sdkParams,
+            "headlessType": "prefetch",
+        ]
+
+        let _ = RNHeadlessManager.sharedInstance.viewForModule(
+            "HyperHeadless", initialProperties: ["props": props]
+        )
+    }
+
     private static func safeResolve(
         _ callback: @escaping RCTResponseSenderBlock,
         _ result: [Any],
@@ -48,6 +75,8 @@ extension PaymentSession {
             paymentSheet.subscribedEvents = subscription.subscribedEventStrings()
             paymentSheet.paymentEventListener = builtListener
         }
+        paymentSheet.isPrefetchTriggered = isPrefetchTriggered
+        paymentSheet.prefetchedData = prefetchedData
         paymentSheet.present(from: viewController, completion: completion)
     }
 
@@ -70,6 +99,8 @@ extension PaymentSession {
             paymentSheet.subscribedEvents = subscription.subscribedEventStrings()
             paymentSheet.paymentEventListener = builtListener
         }
+        paymentSheet.isPrefetchTriggered = isPrefetchTriggered
+        paymentSheet.prefetchedData = prefetchedData
         paymentSheet.presentWithParams(from: viewController, props: params, completion: completion)
     }
 
@@ -80,7 +111,9 @@ extension PaymentSession {
         PaymentSession.hasResponded = false
         PaymentSession.headlessCompletion = func_
         PaymentSession.activeSession = self
-        RNHeadlessManager.sharedInstance.reinvalidateBridge()
+        if !(isPrefetchTriggered && prefetchedData == nil) {
+            RNHeadlessManager.sharedInstance.reinvalidateBridge()
+        }
         let hyperswitchConfiguration = try? hyperswitchConfiguration?.toDictionary()
         let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
         let sdkParams = SDKParams.getSDKParams()
@@ -97,6 +130,10 @@ extension PaymentSession {
                 "savedMethodCustomization": configurationDict
             ]
         ]
+
+        if let data = resolvedPrefetchedApiData {
+            props["prefetchedApiData"] = data
+        }
 
         let _ = RNHeadlessManager.sharedInstance.viewForModule("HyperHeadless", initialProperties: ["props": props])
     }
@@ -185,6 +222,8 @@ extension PaymentSession {
                             return
                         }
                         switch status {
+                        case "prefetch_complete":
+                            break
                         case "cancelled":
                             completion?(.canceled(data: status))
                         case "failed", "requires_payment_method":

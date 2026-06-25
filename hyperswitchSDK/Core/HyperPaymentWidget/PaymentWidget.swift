@@ -91,6 +91,7 @@ public class PaymentWidget: UIControl {
             "sdkParams": sdkParams,
             "configuration": configurationDict ?? nativeConfig as Any,
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
+            "prefetchedApiData": paymentSession.resolvedPrefetchedApiData as Any,
         ]
 
         self.rootView = RNViewManager.sharedInstance.widgetViewForModule(

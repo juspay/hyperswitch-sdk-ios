@@ -25,6 +25,16 @@ public class PaymentSession {
     internal var paymentSessionConfiguration: PaymentSessionConfiguration
     internal var hyperswitchConfiguration: HyperswitchConfiguration?
 
+    internal var isPrefetchTriggered: Bool = false
+    internal var prefetchedData: [String: Any]?
+
+    internal static var prefetchCallbacks: [String: ([String: Any]) -> Void] = [:]
+
+    internal var resolvedPrefetchedApiData: [String: Any]? {
+        if !isPrefetchTriggered { return nil }
+        return prefetchedData ?? [:]
+    }
+
     internal let updateIntentDidStart = PassthroughSubject<Void, Never>()
     internal let updateIntentDidComplete = PassthroughSubject<String, Never>()
     internal let updateIntentInitReturned = PassthroughSubject<String, Never>()
