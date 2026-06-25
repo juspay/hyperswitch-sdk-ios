@@ -53,6 +53,10 @@ public class PaymentSession {
         }
     }
 
+    deinit {
+        PaymentSession.prefetchCallbacks.removeValue(forKey: paymentSessionConfiguration.sdkAuthorization)
+    }
+
     public func updateIntent(
         authorizationProvider: @escaping (@escaping (String) -> Void) -> Void,
         completion: @escaping (UpdateIntentResult) -> Void

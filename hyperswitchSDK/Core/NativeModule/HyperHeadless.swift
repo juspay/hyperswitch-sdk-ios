@@ -42,10 +42,10 @@ internal class HyperHeadless: RCTEventEmitter {
     private func storePrefetchedApiData(_ rootTag: NSNumber, _ data: NSDictionary) {
         let dataDict = data as? [String: Any] ?? [:]
         let sdkAuth = dataDict["sdkAuthorization"] as? String
-        if let sdkAuth = sdkAuth {
-            PaymentSession.prefetchCallbacks.removeValue(forKey: sdkAuth)?(dataDict)
-        }
         DispatchQueue.main.async {
+            if let sdkAuth = sdkAuth {
+                PaymentSession.prefetchCallbacks.removeValue(forKey: sdkAuth)?(dataDict)
+            }
             RNViewManager.sharedInstance.bridge.enqueueJSCall(
                 "RCTDeviceEventEmitter",
                 method: "emit",
