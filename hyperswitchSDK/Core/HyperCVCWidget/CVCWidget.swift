@@ -12,10 +12,11 @@ public class CVCWidget: UIControl {
     private let configuration: PaymentSheet.Configuration?
     private var configurationDict: [String: Any]?
     private var widgetReactTag: NSNumber?
-    private var rootView: RCTRootView?
+    private var rootView: UIView?
     private var cvcCallback: ((PaymentResult) -> Void)?
     private var subscribedEventNames: [String]?
     private let hyperswitch: Hyperswitch
+    private let reactManager = RNViewManager.sharedInstance
 
     internal var paymentEventListener: PaymentEventListener?
 
@@ -77,12 +78,12 @@ public class CVCWidget: UIControl {
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
 
-        self.rootView = RNViewManager.sharedInstance.widgetViewForModule(
+        self.rootView = reactManager.widgetViewForModule(
             "hyperSwitch",
             initialProperties: ["props": props]
         )
         if let rootView = self.rootView {
-            self.widgetReactTag = rootView.reactTag
+            self.widgetReactTag = rootView.surfaceRootTag
 
             rootView.backgroundColor = .clear
 
@@ -98,6 +99,16 @@ public class CVCWidget: UIControl {
         }
     }
 
+    internal func awaitConfirmResult(_ handler: @escaping (PaymentResult) -> Void) {
+        cvcCallback = handler
+    }
+
+    internal func resolveConfirmResult(_ result: PaymentResult) {
+        let handler = cvcCallback
+        cvcCallback = nil
+        handler?(result)
+    }
+
     func confirm(sdkAuthorization: String, paymentToken: String) {
         let payload: [String: Any] = [
             "actionType": "CONFIRM_CVC_PAYMENT",
@@ -105,12 +116,7 @@ public class CVCWidget: UIControl {
             "sdkAuthorization": sdkAuthorization,
             "paymentToken": paymentToken,
         ]
-        self.rootView?.bridge.enqueueJSCall(
-            "RCTDeviceEventEmitter",
-            method: "emit",
-            args: ["triggerWidgetAction", payload],
-            completion: nil
-        )
+        reactManager.hyperModule.emit("triggerWidgetAction", payload)
     }
 
     internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {

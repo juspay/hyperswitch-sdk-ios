@@ -19,10 +19,10 @@ public class ExpressCheckoutLauncher {
 
     init() {}
 
-    static var configuration: PaymentSheet.Configuration?
-    static var sdkAuthorization: String?
-    static var completion: ((ExpressCheckoutResult) -> Void)?
-    static var themes: String?
+    var configuration: PaymentSheet.Configuration?
+    var sdkAuthorization: String?
+    var completion: ((ExpressCheckoutResult) -> Void)?
+    var themes: String?
 
     public convenience init(
         sdkAuthorization: String,
@@ -33,10 +33,10 @@ public class ExpressCheckoutLauncher {
 
         self.init()
 
-        ExpressCheckoutLauncher.configuration = configuration
-        ExpressCheckoutLauncher.sdkAuthorization = sdkAuthorization
-        ExpressCheckoutLauncher.themes = themes
-        ExpressCheckoutLauncher.completion = completion
+        self.configuration = configuration
+        self.sdkAuthorization = sdkAuthorization
+        self.themes = themes
+        self.completion = completion
 
         let props: [String: Any] = [
             "publishableKey": APIClient.shared.publishableKey as Any,
@@ -46,7 +46,7 @@ public class ExpressCheckoutLauncher {
             "paymentMethodData": "",
             "confirm": false,
         ]
-        //        HyperModule.shared?.confirmEC(data: props) //MARK: WIP
+        //        HyperModuleImpl.shared?.confirmEC(data: props) //MARK: WIP
     }
 
     public func launchPaymentSheet(paymentResult: NSMutableDictionary, callBack: @escaping RCTResponseSenderBlock) {
@@ -59,7 +59,7 @@ public class ExpressCheckoutLauncher {
 
             let props: [String: Any] = [
                 "type": "widgetPayment",
-                "sdkAuthorization": ExpressCheckoutLauncher.sdkAuthorization as Any,
+                "sdkAuthorization": self.sdkAuthorization as Any,
                 "publishableKey": APIClient.shared.publishableKey as Any,
                 "profileId": APIClient.shared.profileId as Any,
                 "hyperParams": hyperParams,
@@ -85,7 +85,7 @@ public class ExpressCheckoutLauncher {
 extension ExpressCheckoutLauncher: RNResponseHandler {
     func didReceiveResponse(response: String?, error: Error?) {
 
-        if let completion = ExpressCheckoutLauncher.completion {
+        if let completion = self.completion {
             if let error = error {
                 completion(.failed(error: error))
             } else if response == "cancelled" {
@@ -100,17 +100,16 @@ extension ExpressCheckoutLauncher: RNResponseHandler {
 extension ExpressCheckoutLauncher {
     public func confirm() {
 
-        ExpressCheckoutLauncher.completion = ExpressCheckoutLauncher.completion
         RNViewManager.sharedInstance.responseHandler = self
 
         var props: [String: Any] = [
             "publishableKey": APIClient.shared.publishableKey as Any,
             "profileId": APIClient.shared.profileId as Any,
-            "sdkAuthorization": ExpressCheckoutLauncher.sdkAuthorization as Any,
+            "sdkAuthorization": self.sdkAuthorization as Any,
             "paymentMethodType": "expressCheckout",
             "paymentMethodData": "",
             "confirm": true,
         ]
-        //        HyperModule.shared?.confirmEC(data: props) //MARK: WIP
+        //        HyperModuleImpl.shared?.confirmEC(data: props) //MARK: WIP
     }
 }
