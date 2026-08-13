@@ -830,7 +830,8 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             type: "DEBUG",
             eventName: .getUserTypeReturned,
             category: .USER_EVENT,
-            value: "statusCode: \(cardsStatusResponse.statusCode.rawValue)"
+            value:
+                "statusCode: \(cardsStatusResponse.statusCode.rawValue), maskedValidationChannels: MaskedValidationChannel(email=\(cardsStatusResponse.maskedValidationChannel?.email ?? ""), phoneNumber=\(cardsStatusResponse.maskedValidationChannel?.phoneNumber ?? "")"
         )
         return cardsStatusResponse
     }

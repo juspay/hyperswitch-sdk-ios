@@ -9,7 +9,7 @@ import Foundation
 
 // MARK: - Customer Presence Request
 
-/// Request to check if a customer has an existing Click to Pay profile
+/// Request to check if a customer has an existing Click to Pay profile.
 public struct CustomerPresenceRequest {
     public let email: String?
     public let mobileNumber: MobileNumber?
@@ -20,7 +20,7 @@ public struct CustomerPresenceRequest {
     }
 }
 
-/// Mobile number details for customer identification
+/// Mobile number details for customer identification.
 public struct MobileNumber {
     public let countryCode: String
     public let phoneNumber: String
@@ -33,39 +33,34 @@ public struct MobileNumber {
 
 // MARK: - Customer Presence Response
 
-/// Response indicating if customer has a Click to Pay profile
+/// Response indicating if the customer has a Click to Pay profile.
 public struct CustomerPresenceResponse: Codable {
     public let customerPresent: Bool
 }
 
 // MARK: - Cards Status Response
 
-/// Response containing the status of card retrieval
+/// Response containing the status of card retrieval.
 public struct CardsStatusResponse: Codable {
     public let statusCode: StatusCode
-    public let maskedValidationChannel: MaskedValidationChannel? = nil
-    public let supportedValidationChannel: [SupportedValidationChannel]? = nil
+    public let maskedValidationChannel: MaskedValidationChannel?
+    public let supportedValidationChannel: [SupportedValidationChannel]?
 
-    enum CodingKeys: String, CodingKey {
-        case statusCode
-        case maskedValidationChannel
-        case supportedValidationChannel
-    }
 }
 
 public struct MaskedValidationChannel: Codable {
-    let email: String?
-    let phoneNumber: String?
+    public let email: String?
+    public let phoneNumber: String?
 }
 
 public struct SupportedValidationChannel: Codable {
-    let validationChannelId: String?
-    let identityProvider: String?
-    let identityType: String?
-    let maskedValidationChannel: String?
+    public let validationChannelId: String?
+    public let identityProvider: String?
+    public let identityType: String?
+    public let maskedValidationChannel: String?
 }
 
-/// Status codes for card retrieval
+/// Status codes for card retrieval.
 public enum StatusCode: String, Codable, CaseIterable {
     case triggeredCustomerAuthentication = "TRIGGERED_CUSTOMER_AUTHENTICATION"
     case noCardsPresent = "NO_CARDS_PRESENT"
@@ -74,7 +69,7 @@ public enum StatusCode: String, Codable, CaseIterable {
 
 // MARK: - Recognized Card Models
 
-/// Represents a recognized card in Click to Pay
+/// Represents a recognized card in Click to Pay.
 public struct RecognizedCard: Codable {
     public let countryCode: String?
     public let dateOfCardCreated: String?
@@ -105,7 +100,7 @@ public struct DigitalCardFeatures: Codable {
     // Empty object in the JSON, but keeping as struct for future extensibility
 }
 
-/// Digital card metadata
+/// Digital card metadata.
 public struct DigitalCardData: Codable {
     public let status: String?
     public let presentationName: String?
@@ -118,10 +113,10 @@ public struct DigitalCardData: Codable {
 }
 
 public struct AuthenticationMethod: Codable {
-    public let authenticationMethodType: String
+    public let authenticationMethodType: String?
 }
 
-/// Masked billing address for a card
+/// Masked billing address for a card.
 public struct MaskedBillingAddress: Codable {
     public let addressId: String?
     public let name: String?
@@ -142,13 +137,13 @@ public enum CardType: String, Codable, CaseIterable {
 
 // MARK: - Sign Out Response
 
-public struct SignOutResponse {
+public struct SignOutResponse: Codable {
     public let recognized: Bool
 }
 
 // MARK: - Checkout Request
 
-/// Request to checkout with a selected card
+/// Request to checkout with a selected card.
 public struct CheckoutRequest: Codable {
     public let srcDigitalCardId: String
     public let rememberMe: Bool?
@@ -161,7 +156,7 @@ public struct CheckoutRequest: Codable {
 
 // MARK: - Checkout Response
 
-/// Response from checkout operation
+/// Response from a checkout operation.
 public struct CheckoutResponse: Codable {
     public let authenticationId: String?
     public let merchantId: String?
@@ -204,21 +199,21 @@ public struct CheckoutResponse: Codable {
     public let profileAcquirerId: String?
 }
 
-/// Authentication status enum
+/// Authentication status enum.
 public enum AuthenticationStatus: String, Codable {
     case success
     case failed
     case pending
 }
 
-/// Acquirer details for the transaction
+/// Acquirer details for the transaction.
 public struct AcquirerDetails: Codable {
     public let acquirerBin: String?
     public let acquirerMerchantId: String?
     public let merchantCountryCode: String?
 }
 
-/// Card Data
+/// Card data.
 public struct CardData: Codable {
     public let cardNumber: String?
     public let cardCvc: String?
@@ -227,7 +222,7 @@ public struct CardData: Codable {
     public let type: String
 }
 
-/// Network Token Data
+/// Network token data.
 public struct NetworkTokenData: Codable {
     public let networkToken: String?
     public let networkTokenCryptogram: String?
@@ -236,7 +231,7 @@ public struct NetworkTokenData: Codable {
     public let type: String
 }
 
-/// Payment Data
+/// Payment data.
 public enum PaymentData: Codable {
     case cardData(CardData)
     case networkTokenData(NetworkTokenData)
@@ -274,7 +269,7 @@ public enum PaymentData: Codable {
 
 // MARK: - Error Model
 
-/// Error types for Click to Pay operations
+/// Error types for Click to Pay operations.
 public enum ClickToPayErrorType: String, Codable, CaseIterable {
 
     init?(caseInsensitive rawValue: String) {
@@ -328,7 +323,7 @@ public enum ClickToPayErrorType: String, Codable, CaseIterable {
     case switchConsumer = "SWITCH_CONSUMER"
 }
 
-/// Click to Pay exception with error details
+/// Click to Pay exception with error details.
 public class ClickToPayException: Error, LocalizedError {
     public let message: String
     public let type: ClickToPayErrorType
