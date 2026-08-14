@@ -101,6 +101,9 @@ extension PaymentSheet {
         /// Render card fields (number / expiry / cvc) as separate inputs. Defaults to false.
         public var splitCardFields: Bool?
 
+        /// Hide the card nickname input field regardless of the mandate / save-card state. Defaults to false.
+        public var hideCardNicknameField: Bool?
+
         // MARK: - Placeholder
 
         public struct PlaceHolder: Encodable {
