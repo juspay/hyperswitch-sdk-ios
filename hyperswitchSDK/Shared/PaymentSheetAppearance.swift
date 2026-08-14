@@ -23,7 +23,7 @@ public extension PaymentSheet {
         public var colors: Colors = Colors()
 
         /// The corner radius / border / shadow / spacing used across PaymentSheet
-        public var shapes: Shapes = Shapes() // FIXME: to be removed.
+        public var shapes: Shapes = Shapes()  // FIXME: to be removed.
 
         /// Describes the appearance of fonts in PaymentSheet
         public var font: Font = Font()
