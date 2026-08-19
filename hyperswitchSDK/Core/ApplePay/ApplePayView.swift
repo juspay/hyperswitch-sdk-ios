@@ -14,51 +14,53 @@ internal class ApplePayView: UIView {
     private var button: PKPaymentButton?
     private var paymentHandler = ApplePayHandler()
 
+    private var needsButtonRebuild = true
+
     @objc internal var onPaymentResult: (() -> Void)?
 
     @objc internal var buttonStyle: String = "" {
         didSet {
-            setButton(setButtonType: buttonType, setButtonStyle: buttonStyle, setButtonCornerRadius: cornerRadius)
+            if oldValue != buttonStyle {
+                setButtonNeedsRebuild()
+            }
         }
     }
     @objc internal var buttonType: String = "" {
         didSet {
-            setButton(setButtonType: buttonType, setButtonStyle: buttonStyle, setButtonCornerRadius: cornerRadius)
+            if oldValue != buttonType {
+                setButtonNeedsRebuild()
+            }
         }
     }
-    @objc internal var color: String = "" {
+    @objc internal var cornerRadius: CGFloat = 4.0 {
         didSet {
-            setButton(setButtonType: buttonType, setButtonStyle: buttonStyle, setButtonCornerRadius: cornerRadius)
-        }
-    }
-    @objc internal var cornerRadius: CGFloat = 0.0 {
-        didSet {
-            setButton(setButtonType: buttonType, setButtonStyle: buttonStyle, setButtonCornerRadius: cornerRadius)
+            button?.cornerRadius = cornerRadius
         }
     }
 
     @objc override init(frame: CGRect) {
         super.init(frame: frame)
-
-        let cornerRadiusValue: CGFloat = 4.0
-        let buttonType = "plain"
-        let buttonStyle = "black"
-        setButton(setButtonType: buttonType, setButtonStyle: buttonStyle, setButtonCornerRadius: cornerRadiusValue)
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
 
-    private func setButton(setButtonType: String?, setButtonStyle: String?, setButtonCornerRadius cornerRadius: CGFloat?) {
-        for view in subviews {
-            view.removeFromSuperview()
-        }
+    private func setButtonNeedsRebuild() {
+        needsButtonRebuild = true
+        setNeedsLayout()
+    }
+
+    private func rebuildButtonIfNeeded() {
+        guard needsButtonRebuild else { return }
+        needsButtonRebuild = false
+
+        button?.removeFromSuperview()
 
         var type: PKPaymentButtonType
         var style: PKPaymentButtonStyle
 
-        switch setButtonType {
+        switch buttonType {
         case "buy":
             type = .buy
         case "setUp":
@@ -77,7 +79,7 @@ internal class ApplePayView: UIView {
             type = .plain
         }
 
-        switch setButtonStyle {
+        switch buttonStyle {
         case "white":
             style = .white
         case "whiteOutline":
@@ -86,19 +88,17 @@ internal class ApplePayView: UIView {
             style = .black
         }
 
+        let newButton: PKPaymentButton
         if #available(iOS 26.0, *) {  // TODO: temp fix need to clamp corner-radius to be < height/2
-            button = PKPaymentButton(type: type, style: style, disableCardArt: true)
+            newButton = PKPaymentButton(type: type, style: style, disableCardArt: true)
         } else {
-            button = PKPaymentButton(paymentButtonType: type, paymentButtonStyle: style)
+            newButton = PKPaymentButton(paymentButtonType: type, paymentButtonStyle: style)
         }
-        button?.addTarget(self, action: #selector(touchUpInside(_:)), for: .touchUpInside)
-        if let cornerRadius = cornerRadius {
-            button?.cornerRadius = cornerRadius
-        }
+        newButton.addTarget(self, action: #selector(touchUpInside(_:)), for: .touchUpInside)
+        newButton.cornerRadius = cornerRadius
 
-        if let buttonView = button {
-            addSubview(buttonView)
-        }
+        addSubview(newButton)
+        button = newButton
     }
 
     @objc private func touchUpInside(_ button: PKPaymentButton) {
@@ -107,6 +107,7 @@ internal class ApplePayView: UIView {
 
     internal override func layoutSubviews() {
         super.layoutSubviews()
+        rebuildButtonIfNeeded()
         button?.frame = bounds
     }
 }
