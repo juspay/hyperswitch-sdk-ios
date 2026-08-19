@@ -73,6 +73,8 @@ public class PaymentWidget: UIControl {
 
     private func commonInit() {
 
+        paymentSession.registerWidget(self)
+
         let hyperswitchConfiguration = try? paymentSession.hyperswitchConfiguration?.toDictionary()
         let paymentSessionConfiguration = try? paymentSession.paymentSessionConfiguration.toDictionary()
 
@@ -84,15 +86,17 @@ public class PaymentWidget: UIControl {
         configurationDict?["hideConfirmButton"] = true  // MARK: replace with `displayPayButton`
         configurationDict?["subscribedEvents"] = subscribedEventNames
 
-        let props: [String: Any] = [
+        var props: [String: Any] = [
             "type": "widgetPaymentSheet",
             "hyperswitchConfig": hyperswitchConfiguration as Any,
             "paymentSessionConfig": paymentSessionConfiguration as Any,
             "sdkParams": sdkParams,
             "configuration": configurationDict ?? nativeConfig as Any,
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
-            "prefetchedApiData": paymentSession.resolvedPrefetchedApiData as Any,
         ]
+        if let prefetchedData = paymentSession.prefetchedData {
+            props["prefetchedApiData"] = prefetchedData
+        }
 
         self.rootView = RNViewManager.sharedInstance.widgetViewForModule(
             "hyperSwitch",
@@ -130,12 +134,15 @@ public class PaymentWidget: UIControl {
 
         paymentSession.updateIntentDidComplete
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] sdkAuthorization in
+            .sink { [weak self] update in
                 guard let self = self else { return }
-                let payload: [String: Any] = [
+                var payload: [String: Any] = [
                     "rootTag": self.widgetReactTag ?? -1,
-                    "sdkAuthorization": sdkAuthorization,
+                    "sdkAuthorization": update.sdkAuthorization,
                 ]
+                if let data = update.prefetchedApiData {
+                    payload["prefetchedApiData"] = data
+                }
                 self.rootView?.bridge.enqueueJSCall(
                     "RCTDeviceEventEmitter",
                     method: "emit",
@@ -144,6 +151,10 @@ public class PaymentWidget: UIControl {
                 )
             }
             .store(in: &cancellables)
+    }
+
+    deinit {
+        paymentSession.unregisterWidget(self)
     }
 
     public func confirm() {
@@ -183,6 +194,8 @@ public class PaymentWidget: UIControl {
     }
 
     internal func handleConfirmPaymentResponse(_ result: PaymentResult) {
+        paymentSession.unregisterWidget(self)
+        paymentSession.handlePaymentResult(result)
         initCallback?(result)
         initCallback = nil
         cancellables.removeAll()

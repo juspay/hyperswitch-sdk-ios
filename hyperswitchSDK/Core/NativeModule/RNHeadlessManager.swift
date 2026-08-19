@@ -29,10 +29,25 @@ internal class RNHeadlessManager: NSObject {
         return rootView
     }
 
-    internal func reinvalidateBridge() {
-        self.bridgeHeadless.invalidate()
-        self.bridgeHeadless = RCTBridge.init(delegate: self, launchOptions: nil)
+    /// Unmounts one completed headless root without destroying the bridge or its JS module cache.
+    internal func releaseRootView(_ completedRootView: RCTRootView) {
+        guard rootView === completedRootView else { return }
+        rootView = nil
     }
+
+    internal func removePrefetchCache(sdkAuthorization: String) {
+        guard !sdkAuthorization.isEmpty else { return }
+        bridgeHeadless.enqueueJSCall(
+            "RCTDeviceEventEmitter",
+            method: "emit",
+            args: [
+                "clearPrefetchCache",
+                ["sdkAuthorization": sdkAuthorization],
+            ],
+            completion: nil
+        )
+    }
+
 }
 
 extension RNHeadlessManager: RCTBridgeDelegate {

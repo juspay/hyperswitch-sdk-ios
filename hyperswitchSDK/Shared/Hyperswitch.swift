@@ -14,13 +14,18 @@ public final class Hyperswitch {
         // Task {} Superposition
     }
 
-    public func initPaymentSession(configuration: PaymentSessionConfiguration) -> PaymentSession {
+    /// Creates a payment session and prefetches the data the payment flows need.
+    ///
+    /// Await this before presenting a sheet or building a widget — it is what makes the
+    /// subsequent flows API-call free. A prefetch miss is not an error: those flows fall back to
+    /// fetching for themselves, so the session is still returned.
+    public func initPaymentSession(configuration: PaymentSessionConfiguration) async -> PaymentSession {
         let session = PaymentSession(
             paymentSessionConfiguration: configuration,
             hyperswitchConfiguration: hyperswitchConfiguration
         )
         #if canImport(React)
-        session.triggerPrefetch()
+        await session.triggerPrefetch()
         #endif
         return session
     }

@@ -35,13 +35,16 @@ class HyperViewModel: ObservableObject {
                 }
                 self.paymentId = json["paymentId"] as? String
 
-                DispatchQueue.main.async {
-                    self.status = .success
-                    let hyperswitchConfiguration = HyperswitchConfiguration(publishableKey: publishableKey, profileId: profileId)
-                    let paymentSessionConfiguration = PaymentSessionConfiguration(sdkAuthorization: sdkAuthorization)
+                let hyperswitchConfiguration = HyperswitchConfiguration(publishableKey: publishableKey, profileId: profileId)
+                let paymentSessionConfiguration = PaymentSessionConfiguration(sdkAuthorization: sdkAuthorization)
 
-                    self.hyperswitch = Hyperswitch(configuration: hyperswitchConfiguration)
-                    self.paymentSession = self.hyperswitch?.initPaymentSession(configuration: paymentSessionConfiguration)
+                let hyperswitch = Hyperswitch(configuration: hyperswitchConfiguration)
+                let paymentSession = await hyperswitch.initPaymentSession(configuration: paymentSessionConfiguration)
+
+                DispatchQueue.main.async {
+                    self.hyperswitch = hyperswitch
+                    self.paymentSession = paymentSession
+                    self.status = .success
                 }
             } catch {
                 DispatchQueue.main.async {

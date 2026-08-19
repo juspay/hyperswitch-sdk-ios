@@ -38,38 +38,26 @@ internal class HyperHeadless: RCTEventEmitter {
         self.sendEvent(withName: "test", body: data)
     }
 
+    /// Receives the completed prefetch for one payment and resumes its awaiting session.
     @objc
-    private func storePrefetchedApiData(_ rootTag: NSNumber, _ data: NSDictionary) {
+    private func storePrefetchedApiData(_ data: NSDictionary) {
         let dataDict = data as? [String: Any] ?? [:]
-        let sdkAuth = dataDict["sdkAuthorization"] as? String
+        guard let sdkAuthorization = dataDict["sdkAuthorization"] as? String else { return }
         DispatchQueue.main.async {
-            if let sdkAuth = sdkAuth {
-                PaymentSession.prefetchCallbacks.removeValue(forKey: sdkAuth)?(dataDict)
-            }
-            RNViewManager.sharedInstance.bridge.enqueueJSCall(
-                "RCTDeviceEventEmitter",
-                method: "emit",
-                args: ["prefetchApiDataReady", dataDict],
-                completion: nil
-            )
-            RNHeadlessManager.sharedInstance.bridgeHeadless.enqueueJSCall(
-                "RCTDeviceEventEmitter",
-                method: "emit",
-                args: ["prefetchApiDataReady", dataDict],
-                completion: nil
-            )
+            PaymentSession.finishPrefetch(sdkAuthorization, data: dataDict)
         }
     }
 
     @objc
     private func getPaymentSession(
-        _ rootTag: NSNumber,
+        _ sdkAuthorization: String,
         _ rnMessage: NSDictionary,
         _ rnMessage2: NSDictionary,
         _ rnMessage3: NSArray,
         _ rnCallback: @escaping RCTResponseSenderBlock
     ) {
         PaymentSession.getPaymentSession(
+            sdkAuthorization: sdkAuthorization,
             getPaymentMethodData: rnMessage,
             getPaymentMethodData2: rnMessage2,
             getPaymentMethodDataArray: rnMessage3,
@@ -78,8 +66,14 @@ internal class HyperHeadless: RCTEventEmitter {
     }
 
     @objc
-    private func exitHeadless(_ rootTag: NSNumber, _ rnMessage: String) {
-        PaymentSession.exitHeadless(rnMessage: rnMessage)
+    private func exitHeadless(
+        _ sdkAuthorization: String,
+        _ rnMessage: String
+    ) {
+        PaymentSession.exitHeadless(
+            sdkAuthorization: sdkAuthorization,
+            rnMessage: rnMessage
+        )
     }
 
     private func paymentResult(from rnMessage: String) -> PaymentResult {

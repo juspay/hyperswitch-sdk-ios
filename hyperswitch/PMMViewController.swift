@@ -65,6 +65,7 @@ class PaymentMethodManagementViewController: UIViewController {
         configuration.primaryButtonLabel = "Purchase ($0.00)"
         configuration.paymentSheetHeaderLabel = "Add payment method"
         configuration.displaySavedPaymentMethods = false
+        configuration.stickyPayButton = true
 
         var appearance = PaymentSheet.Appearance()
         appearance.colors.background = UIColor(red: 0.96, green: 0.97, blue: 0.98, alpha: 1.00)

@@ -8,52 +8,145 @@
 import Foundation
 import React
 
+private struct PendingPrefetch {
+    let continuation: CheckedContinuation<[String: Any], Never>
+    let rootView: RCTRootView
+}
+
+/// Accessed only on the main queue. The authorization is the routing key for the one payment
+/// currently being prefetched; no separate request identifier or callback fan-out is needed.
+private var pendingPrefetches: [String: PendingPrefetch] = [:]
+
+private final class PendingSavedMethodsRequest {
+    weak var session: PaymentSession?
+    let sdkAuthorization: String
+    let completion: (PaymentSessionHandler) -> Void
+    var rootView: RCTRootView?
+    var confirmationStarted = false
+
+    init(
+        session: PaymentSession,
+        completion: @escaping (PaymentSessionHandler) -> Void
+    ) {
+        self.session = session
+        self.sdkAuthorization = session.paymentSessionConfiguration.sdkAuthorization
+        self.completion = completion
+    }
+
+    func releaseRootView() {
+        guard let rootView else { return }
+        RNHeadlessManager.sharedInstance.releaseRootView(rootView)
+        self.rootView = nil
+    }
+}
+
+/// These registries are main-queue confined. Different authorizations can run concurrently;
+/// duplicate work for one authorization is rejected instead of overwriting the first owner.
+private var pendingSavedMethodsRequests: [String: PendingSavedMethodsRequest] = [:]
+private var savedMethodConfirmations: [String: (PaymentResult) -> Void] = [:]
+
 extension PaymentSession {
 
-    private static var hasResponded: Bool = false
-    internal static var headlessCompletion: ((PaymentSessionHandler) -> Void)?
-    private static var completion: ((PaymentResult) -> Void)?
-    internal static weak var activeSession: PaymentSession?  // NEW
+    /// Matches the Android launcher and the JS-side fallbacks, so neither side waits on the other.
+    private static let prefetchTimeout: DispatchTimeInterval = .seconds(10)
+    private static let savedMethodsTimeout: DispatchTimeInterval = .seconds(30)
 
-    internal func triggerPrefetch() {
-        isPrefetchTriggered = true
-        prefetchedData = nil
-
-        let sdkAuth = paymentSessionConfiguration.sdkAuthorization
-        PaymentSession.prefetchCallbacks[sdkAuth] = { [weak self] data in
-            self?.prefetchedData = data
+    /// Runs the initial prefetch headless task and waits for its result.
+    ///
+    /// A prefetch miss is not fatal: the sheet and headless flows fall back to making the API
+    /// calls themselves, so a timeout resolves with no data rather than propagating an error.
+    /// Without the timeout a wedged bridge left `initPaymentSession` awaiting forever.
+    internal func triggerPrefetch() async {
+        let configuration = paymentSessionConfiguration
+        let data = await loadHeadlessData(
+            headlessType: "prefetch",
+            configuration: configuration
+        )
+        if paymentSessionConfiguration.sdkAuthorization == configuration.sdkAuthorization {
+            prefetchedData = data
         }
+    }
 
-        RNHeadlessManager.sharedInstance.reinvalidateBridge()
-
-        let hyperswitchConfig = try? hyperswitchConfiguration?.toDictionary()
-        let paymentSessionConfig = try? paymentSessionConfiguration.toDictionary()
-        let sdkParams = SDKParams.getSDKParams()
-
-        let props: [String: Any] = [
-            "hyperswitchConfig": hyperswitchConfig as Any,
-            "paymentSessionConfig": paymentSessionConfig as Any,
-            "sdkParams": sdkParams,
-            "headlessType": "prefetch",
-        ]
-
-        let _ = RNHeadlessManager.sharedInstance.viewForModule(
-            "HyperHeadless", initialProperties: ["props": props]
+    /// Fetches the new intent's data without mutating the active session.
+    internal func fetchIntentUpdate(
+        configuration: PaymentSessionConfiguration
+    ) async -> [String: Any]? {
+        await loadHeadlessData(
+            headlessType: "updateIntent",
+            configuration: configuration
         )
     }
 
-    private static func safeResolve(
-        _ callback: @escaping RCTResponseSenderBlock,
-        _ result: [Any],
-        _ resultHandler: @escaping (PaymentResult) -> Void
-    ) {
-        guard !PaymentSession.hasResponded else {
-            print("Warning: Attempt to resolve callback more than once")
-            resultHandler(.failed(error: NSError(domain: "Not Initialised", code: 0, userInfo: ["message": "An error has occurred."])))
-            return
+    private func loadHeadlessData(
+        headlessType: String,
+        configuration: PaymentSessionConfiguration
+    ) async -> [String: Any]? {
+        let sdkAuthorization = configuration.sdkAuthorization
+
+        guard !sdkAuthorization.isEmpty else { return nil }
+
+        let data: [String: Any] = await withCheckedContinuation { continuation in
+            DispatchQueue.main.async {
+                // sdkAuthorization identifies one payment. If a merchant initializes the exact
+                // same payment concurrently, let that unsupported duplicate fall back instead of
+                // adding callback lists and multi-owner lifecycle state.
+                guard pendingPrefetches[sdkAuthorization] == nil else {
+                    continuation.resume(returning: [:])
+                    return
+                }
+
+                let hyperswitchConfig = try? self.hyperswitchConfiguration?.toDictionary()
+                let paymentSessionConfig = try? configuration.toDictionary()
+                let sdkParams = SDKParams.getSDKParams()
+
+                let props: [String: Any] = [
+                    "hyperswitchConfig": hyperswitchConfig as Any,
+                    "paymentSessionConfig": paymentSessionConfig as Any,
+                    "sdkParams": sdkParams,
+                    "headlessType": headlessType,
+                ]
+
+                let rootView = RNHeadlessManager.sharedInstance.viewForModule(
+                    "HyperHeadless", initialProperties: ["props": props]
+                )
+                pendingPrefetches[sdkAuthorization] = PendingPrefetch(
+                    continuation: continuation,
+                    rootView: rootView
+                )
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + PaymentSession.prefetchTimeout) {
+                    guard PaymentSession.finishPrefetch(sdkAuthorization, data: [:]) else { return }
+                    print("[Hyperswitch] Prefetch timed out; falling back to on-demand API calls")
+                }
+            }
         }
-        PaymentSession.hasResponded = true
-        callback(result)
+
+        return data.isEmpty ? nil : data
+    }
+
+    internal func clearPrefetch(for sdkAuthorization: String) {
+        guard !sdkAuthorization.isEmpty else { return }
+        if paymentSessionConfiguration.sdkAuthorization == sdkAuthorization {
+            prefetchedData = nil
+        }
+        RNHeadlessManager.sharedInstance.removePrefetchCache(
+            sdkAuthorization: sdkAuthorization
+        )
+    }
+
+    /// Completes the one native waiter for this payment and releases only its temporary root.
+    @discardableResult
+    internal static func finishPrefetch(
+        _ sdkAuthorization: String,
+        data: [String: Any]
+    ) -> Bool {
+        dispatchPrecondition(condition: .onQueue(.main))
+        guard let pending = pendingPrefetches.removeValue(forKey: sdkAuthorization) else {
+            return false
+        }
+        RNHeadlessManager.sharedInstance.releaseRootView(pending.rootView)
+        pending.continuation.resume(returning: data)
+        return true
     }
 
     public func presentPaymentSheet(
@@ -62,6 +155,7 @@ extension PaymentSession {
         subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil,
         completion: @escaping (PaymentResult) -> Void
     ) {
+        let sdkAuthorization = paymentSessionConfiguration.sdkAuthorization
         let paymentSheet = PaymentSheet(
             paymentSessionConfiguration: paymentSessionConfiguration,
             hyperswitchConfiguration: hyperswitchConfiguration ?? nil,
@@ -75,9 +169,11 @@ extension PaymentSession {
             paymentSheet.subscribedEvents = subscription.subscribedEventStrings()
             paymentSheet.paymentEventListener = builtListener
         }
-        paymentSheet.isPrefetchTriggered = isPrefetchTriggered
         paymentSheet.prefetchedData = prefetchedData
-        paymentSheet.present(from: viewController, completion: completion)
+        paymentSheet.present(from: viewController) { [weak self] result in
+            self?.handlePaymentResult(result, sdkAuthorization: sdkAuthorization)
+            completion(result)
+        }
     }
 
     // MARK: for external frameworks
@@ -87,6 +183,7 @@ extension PaymentSession {
         subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil,
         completion: @escaping (PaymentResult) -> Void
     ) {
+        let sdkAuthorization = paymentSessionConfiguration.sdkAuthorization
         let paymentSheet = PaymentSheet(
             paymentSessionConfiguration: paymentSessionConfiguration,
             hyperswitchConfiguration: hyperswitchConfiguration ?? nil
@@ -99,53 +196,90 @@ extension PaymentSession {
             paymentSheet.subscribedEvents = subscription.subscribedEventStrings()
             paymentSheet.paymentEventListener = builtListener
         }
-        paymentSheet.isPrefetchTriggered = isPrefetchTriggered
         paymentSheet.prefetchedData = prefetchedData
-        paymentSheet.presentWithParams(from: viewController, props: params, completion: completion)
+        paymentSheet.presentWithParams(from: viewController, props: params) { [weak self] result in
+            self?.handlePaymentResult(result, sdkAuthorization: sdkAuthorization)
+            completion(result)
+        }
     }
 
     public func getCustomerSavedPaymentMethods(
         _ func_: @escaping (PaymentSessionHandler) -> Void,
         configuration: SavedPaymentMethodsConfiguration? = nil
     ) {
-        PaymentSession.hasResponded = false
-        PaymentSession.headlessCompletion = func_
-        PaymentSession.activeSession = self
-        if !(isPrefetchTriggered && prefetchedData == nil) {
-            RNHeadlessManager.sharedInstance.reinvalidateBridge()
-        }
-        let hyperswitchConfiguration = try? hyperswitchConfiguration?.toDictionary()
-        let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
-        let sdkParams = SDKParams.getSDKParams()
-        let configurationDict = try? configuration.toDictionary()
+        DispatchQueue.main.async {
+            let sdkAuthorization = self.paymentSessionConfiguration.sdkAuthorization
+            guard !sdkAuthorization.isEmpty else {
+                func_(PaymentSession.failedSavedMethodsHandler(
+                    code: "INVALID_SDK_AUTHORIZATION",
+                    message: "sdkAuthorization must not be empty"
+                ))
+                return
+            }
+            guard pendingSavedMethodsRequests[sdkAuthorization] == nil else {
+                func_(PaymentSession.failedSavedMethodsHandler(
+                    code: "ALREADY_IN_PROGRESS",
+                    message: "Saved payment methods request already in progress"
+                ))
+                return
+            }
 
-        var props: [String: Any] = [
-            "hyperswitchConfig": hyperswitchConfiguration as Any,
-            "paymentSessionConfig": paymentSessionConfiguration as Any,
-            "sdkParams": sdkParams,
-        ]
+            let request = PendingSavedMethodsRequest(session: self, completion: func_)
+            pendingSavedMethodsRequests[sdkAuthorization] = request
 
-        props["configuration"] = [
-            "paymentMethodLayout": [
-                "savedMethodCustomization": configurationDict
+            let hyperswitchConfiguration = try? self.hyperswitchConfiguration?.toDictionary()
+            let paymentSessionConfiguration = try? self.paymentSessionConfiguration.toDictionary()
+            let sdkParams = SDKParams.getSDKParams()
+            let configurationDict = try? configuration.toDictionary()
+
+            var props: [String: Any] = [
+                "hyperswitchConfig": hyperswitchConfiguration as Any,
+                "paymentSessionConfig": paymentSessionConfiguration as Any,
+                "sdkParams": sdkParams,
             ]
-        ]
 
-        if let data = resolvedPrefetchedApiData {
-            props["prefetchedApiData"] = data
+            props["configuration"] = [
+                "paymentMethodLayout": [
+                    "savedMethodCustomization": configurationDict
+                ]
+            ]
+
+            request.rootView = RNHeadlessManager.sharedInstance.viewForModule(
+                "HyperHeadless",
+                initialProperties: ["props": props]
+            )
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + PaymentSession.savedMethodsTimeout) {
+                guard pendingSavedMethodsRequests[sdkAuthorization] === request else { return }
+                pendingSavedMethodsRequests.removeValue(forKey: sdkAuthorization)
+                request.releaseRootView()
+                request.completion(PaymentSession.failedSavedMethodsHandler(
+                    code: "HEADLESS_TIMEOUT",
+                    message: "Saved payment methods request timed out"
+                ))
+            }
         }
-
-        let _ = RNHeadlessManager.sharedInstance.viewForModule("HyperHeadless", initialProperties: ["props": props])
     }
 
     internal static func getPaymentSession(
+        sdkAuthorization: String,
         getPaymentMethodData: NSDictionary,
         getPaymentMethodData2: NSDictionary,
         getPaymentMethodDataArray: NSArray,
         callback: @escaping RCTResponseSenderBlock
     ) {
         DispatchQueue.main.async {
-            PaymentSession.hasResponded = false
+            guard let request = pendingSavedMethodsRequests.removeValue(
+                forKey: sdkAuthorization
+            ) else { return }
+            guard request.session?.paymentSessionConfiguration.sdkAuthorization == sdkAuthorization else {
+                request.releaseRootView()
+                request.completion(failedSavedMethodsHandler(
+                    code: "STALE_PAYMENT_SESSION_HANDLER",
+                    message: "Saved payment methods handler belongs to the previous payment intent"
+                ))
+                return
+            }
             let handler = PaymentSessionHandler(
                 getCustomerDefaultSavedPaymentMethodData: {
                     return decodePaymentMethodData(getPaymentMethodData)
@@ -177,77 +311,230 @@ extension PaymentSession {
 
                 },
                 confirmWithCustomerDefaultPaymentMethod: { cvc, resultHandler in
-                    if let paymentToken = getPaymentMethodData["payment_token"] as? String {
-                        self.completion = resultHandler
-                        var map = [String: Any]()
-                        map["paymentToken"] = paymentToken
-                        map["cvc"] = cvc
-                        self.safeResolve(callback, [map], resultHandler)
+                    DispatchQueue.main.async {
+                        if let paymentToken = getPaymentMethodData["payment_token"] as? String {
+                            guard self.beginSavedMethodConfirmation(
+                                sdkAuthorization: sdkAuthorization,
+                                request: request,
+                                resultHandler: resultHandler
+                            ) else { return }
+                            self.resolveSavedMethodJSCallback(
+                                callback: callback,
+                                paymentToken: paymentToken,
+                                cvc: cvc
+                            )
+                        } else {
+                            self.finishSavedMethodDirectly(
+                                request: request,
+                                resultHandler: resultHandler,
+                                result: self.savedMethodsFailure(
+                                    code: "MISSING_PAYMENT_TOKEN",
+                                    message: "Saved payment method has no payment token"
+                                )
+                            )
+                        }
                     }
                 },
                 confirmWithCustomerLastUsedPaymentMethod: { cvc, resultHandler in
-                    if let paymentToken = getPaymentMethodData2["payment_token"] as? String {
-                        cvc.confirm(
-                            sdkAuthorization: PaymentSession.activeSession?.paymentSessionConfiguration.sdkAuthorization ?? "",
-                            paymentToken: paymentToken
-                        )
-                        self.completion = resultHandler
-                        //                        var map = [String: Any]()
-                        //                        map["paymentToken"] = paymentToken
-                        //                        map["cvc"] = cvc
-                        //                        self.safeResolve(callback, [map], resultHandler)
+                    DispatchQueue.main.async {
+                        if let paymentToken = getPaymentMethodData2["payment_token"] as? String {
+                            guard self.beginSavedMethodConfirmation(
+                                sdkAuthorization: sdkAuthorization,
+                                request: request,
+                                resultHandler: resultHandler
+                            ) else { return }
+                            cvc.confirm(
+                                sdkAuthorization: sdkAuthorization,
+                                paymentToken: paymentToken
+                            )
+                        } else {
+                            self.finishSavedMethodDirectly(
+                                request: request,
+                                resultHandler: resultHandler,
+                                result: self.savedMethodsFailure(
+                                    code: "MISSING_PAYMENT_TOKEN",
+                                    message: "Saved payment method has no payment token"
+                                )
+                            )
+                        }
                     }
                 },
                 confirmWithCustomerPaymentToken: { paymentToken, cvc, resultHandler in
-                    self.completion = resultHandler
-                    var map = [String: Any]()
-                    map["paymentToken"] = paymentToken
-                    map["cvc"] = cvc
-                    self.safeResolve(callback, [map], resultHandler)
+                    DispatchQueue.main.async {
+                        guard self.beginSavedMethodConfirmation(
+                            sdkAuthorization: sdkAuthorization,
+                            request: request,
+                            resultHandler: resultHandler
+                        ) else { return }
+                        self.resolveSavedMethodJSCallback(
+                            callback: callback,
+                            paymentToken: paymentToken,
+                            cvc: cvc
+                        )
+                    }
                 }
             )
-            self.headlessCompletion?(handler)
+            request.completion(handler)
         }
     }
 
-    internal static func exitHeadless(rnMessage: String) {
+    internal static func exitHeadless(
+        sdkAuthorization: String,
+        rnMessage: String
+    ) {
         DispatchQueue.main.async {
-            if let data = rnMessage.data(using: .utf8) {
-                do {
-                    if let message = try JSONSerialization.jsonObject(with: data, options: []) as? [String: String] {
-                        guard let status = message["status"] else {
-                            completion?(
-                                .failed(error: NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."]))
-                            )
-                            return
-                        }
-                        switch status {
-                        case "prefetch_complete":
-                            break
-                        case "cancelled":
-                            completion?(.canceled(data: status))
-                        case "failed", "requires_payment_method":
-                            let domain = (message["code"]) != "" ? message["code"] : "UNKNOWN_ERROR"
-                            let errorMessage = message["message"] ?? "An error has occurred."
-                            let userInfo = ["message": errorMessage]
-                            completion?(.failed(error: NSError(domain: domain ?? "UNKNOWN_ERROR", code: 0, userInfo: userInfo)))
-                        default:
-                            completion?(.completed(data: status))
-                        }
-                    } else {
-                        let domain = "UNKNOWN_ERROR"
-                        let errorMessage = "An error has occurred."
-                        let userInfo = ["message": errorMessage]
-                        self.completion?(.failed(error: NSError(domain: domain, code: 0, userInfo: userInfo)))
-                    }
-                } catch {
-                    let domain = "UNKNOWN_ERROR"
-                    let errorMessage = "An error has occurred."
-                    let userInfo = ["message": errorMessage]
-                    self.completion?(.failed(error: NSError(domain: domain, code: 0, userInfo: userInfo)))
-                }
-            }
+            guard let completion = savedMethodConfirmations.removeValue(
+                forKey: sdkAuthorization
+            ) else { return }
+            completion(paymentResult(from: rnMessage))
         }
+    }
+
+    private static func beginSavedMethodConfirmation(
+        sdkAuthorization: String,
+        request: PendingSavedMethodsRequest,
+        resultHandler: @escaping (PaymentResult) -> Void
+    ) -> Bool {
+        guard
+            !request.confirmationStarted,
+            savedMethodConfirmations[sdkAuthorization] == nil
+        else {
+            resultHandler(savedMethodsFailure(
+                code: "ALREADY_IN_PROGRESS",
+                message: "Payment confirmation already in progress"
+            ))
+            return false
+        }
+        if rejectStaleSavedMethodsRequest(
+            sdkAuthorization: sdkAuthorization,
+            request: request,
+            resultHandler: resultHandler
+        ) {
+            return false
+        }
+        request.confirmationStarted = true
+        savedMethodConfirmations[sdkAuthorization] = { result in
+            request.session?.handlePaymentResult(
+                result,
+                sdkAuthorization: sdkAuthorization
+            )
+            request.releaseRootView()
+            resultHandler(result)
+        }
+        return true
+    }
+
+    private static func resolveSavedMethodJSCallback(
+        callback: @escaping RCTResponseSenderBlock,
+        paymentToken: String,
+        cvc: String?
+    ) {
+        var map = [String: Any]()
+        map["paymentToken"] = paymentToken
+        map["cvc"] = cvc
+        callback([map])
+    }
+
+    private static func finishSavedMethodDirectly(
+        request: PendingSavedMethodsRequest,
+        resultHandler: @escaping (PaymentResult) -> Void,
+        result: PaymentResult
+    ) {
+        guard !request.confirmationStarted else {
+            resultHandler(savedMethodsFailure(
+                code: "ALREADY_USED",
+                message: "This saved payment methods handler has already completed"
+            ))
+            return
+        }
+        if rejectStaleSavedMethodsRequest(
+            sdkAuthorization: request.sdkAuthorization,
+            request: request,
+            resultHandler: resultHandler
+        ) {
+            return
+        }
+        request.confirmationStarted = true
+        request.session?.handlePaymentResult(
+            result,
+            sdkAuthorization: request.sdkAuthorization
+        )
+        request.releaseRootView()
+        resultHandler(result)
+    }
+
+    private static func rejectStaleSavedMethodsRequest(
+        sdkAuthorization: String,
+        request: PendingSavedMethodsRequest,
+        resultHandler: @escaping (PaymentResult) -> Void
+    ) -> Bool {
+        guard request.session?.paymentSessionConfiguration.sdkAuthorization == sdkAuthorization
+        else {
+            request.confirmationStarted = true
+            let result = savedMethodsFailure(
+                code: "STALE_PAYMENT_SESSION_HANDLER",
+                message: "Saved payment methods handler belongs to the previous payment intent"
+            )
+            request.session?.handlePaymentResult(
+                result,
+                sdkAuthorization: request.sdkAuthorization
+            )
+            request.releaseRootView()
+            resultHandler(result)
+            return true
+        }
+        return false
+    }
+
+    private static func savedMethodsFailure(
+        code: String,
+        message: String
+    ) -> PaymentResult {
+        .failed(error: NSError(
+            domain: code,
+            code: 0,
+            userInfo: [NSLocalizedDescriptionKey: message]
+        ))
+    }
+
+    private static func paymentResult(from rnMessage: String) -> PaymentResult {
+        guard
+            let data = rnMessage.data(using: .utf8),
+            let message = try? JSONSerialization.jsonObject(with: data) as? [String: String],
+            let status = message["status"]
+        else {
+            return savedMethodsFailure(
+                code: "UNKNOWN_ERROR",
+                message: "An error has occurred."
+            )
+        }
+        switch status {
+        case "cancelled":
+            return .canceled(data: status)
+        case "failed", "requires_payment_method":
+            return savedMethodsFailure(
+                code: message["code"].flatMap { $0.isEmpty ? nil : $0 } ?? "UNKNOWN_ERROR",
+                message: message["message"] ?? "An error has occurred."
+            )
+        default:
+            return .completed(data: status)
+        }
+    }
+
+    private static func failedSavedMethodsHandler(
+        code: String,
+        message: String
+    ) -> PaymentSessionHandler {
+        let error = PMError(code: code, message: message)
+        let result = savedMethodsFailure(code: code, message: message)
+        return PaymentSessionHandler(
+            getCustomerDefaultSavedPaymentMethodData: { .failure(error) },
+            getCustomerLastUsedPaymentMethodData: { .failure(error) },
+            getCustomerSavedPaymentMethodData: { .failure(error) },
+            confirmWithCustomerDefaultPaymentMethod: { _, callback in callback(result) },
+            confirmWithCustomerLastUsedPaymentMethod: { _, callback in callback(result) },
+            confirmWithCustomerPaymentToken: { _, _, callback in callback(result) }
+        )
     }
 
     private static func decodePaymentMethodData(_ readableMap: NSDictionary) -> Result<PaymentMethod, PMError> {

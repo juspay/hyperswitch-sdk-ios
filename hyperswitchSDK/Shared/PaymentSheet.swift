@@ -30,11 +30,5 @@ public class PaymentSheet {
     internal var subscribedEvents: [String]?
     internal var paymentEventListener: PaymentEventListener?
     internal var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
-    internal var isPrefetchTriggered: Bool = false
     internal var prefetchedData: [String: Any]?
-
-    internal var resolvedPrefetchedApiData: [String: Any]? {
-        if !isPrefetchTriggered { return nil }
-        return prefetchedData ?? [:]
-    }
 }

@@ -26,14 +26,16 @@ internal extension PaymentSheet {
         let sdkParams = SDKParams.getSDKParams()
 
         /// Create a dictionary of props to be sent to React Native with configuration, type, sdkAuthorization, publishable key, hyperParams, custom backend URL, themes, and custom parameters.
-        let props: [String: Any] = [
+        var props: [String: Any] = [
             "type": "payment",
             "hyperswitchConfig": hyperswitchConfiguration as Any,
             "paymentSessionConfig": paymentSessionConfiguration as Any,
             "sdkParams": sdkParams,
             "configuration": configuration as Any,
-            "prefetchedApiData": resolvedPrefetchedApiData as Any,
         ]
+        if let prefetchedData {
+            props["prefetchedApiData"] = prefetchedData
+        }
         /// Get the root view from the RNViewManager with the "hyperSwitch" module and the props dictionary.
         let rootView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": props])
 
@@ -52,15 +54,17 @@ internal extension PaymentSheet {
         var propsDict = props
         propsDict["subscribedEvents"] = subscribedEvents
 
-        let props: [String: Any] = [
+        var props: [String: Any] = [
             "type": "payment",
             "hyperswitchConfig": hyperswitchConfiguration as Any,
             "paymentSessionConfig": paymentSessionConfiguration as Any,
             "sdkParams": sdkParams,
             "configuration": propsDict,
             "from": "rn",
-            "prefetchedApiData": resolvedPrefetchedApiData as Any,
         ]
+        if let prefetchedData {
+            props["prefetchedApiData"] = prefetchedData
+        }
 
         let rootView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": props])
 

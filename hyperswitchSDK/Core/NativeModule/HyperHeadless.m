@@ -9,8 +9,8 @@
 
 @interface RCT_EXTERN_MODULE(HyperHeadless, RCTEventEmitter)
 
-RCT_EXTERN_METHOD(getPaymentSession: (nonnull NSNumber *)rootTag :(NSDictionary)rnMessage :(NSDictionary)rnMessage2 :(NSArray)rnMessage3 :(RCTResponseSenderBlock)rnCallback)
-RCT_EXTERN_METHOD(exitHeadless: (nonnull NSNumber *)rootTag: (NSString)rnMessage)
-RCT_EXTERN_METHOD(storePrefetchedApiData: (nonnull NSNumber *)rootTag :(NSDictionary)data)
+RCT_EXTERN_METHOD(getPaymentSession: (NSString)sdkAuthorization :(NSDictionary)rnMessage :(NSDictionary)rnMessage2 :(NSArray)rnMessage3 :(RCTResponseSenderBlock)rnCallback)
+RCT_EXTERN_METHOD(exitHeadless: (NSString)sdkAuthorization :(NSString)rnMessage)
+RCT_EXTERN_METHOD(storePrefetchedApiData: (NSDictionary)data)
 
 @end
