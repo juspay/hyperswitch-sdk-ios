@@ -16,14 +16,14 @@ import WebKit
 }
 
 internal class PaymentMethodManagementWidget: UIControl {
-    internal static var onAddPaymentMethod: (() -> Void)?
     private var completion: ((PaymentMethodManagementResult) -> Void)?
+    private let reactManager = RNViewManager.sharedInstance
 
     // Initialize the widget with the ephemeral key and configuration.
     public init(onAddPaymentMethod: (() -> Void)?, completion: @escaping (PaymentMethodManagementResult) -> Void) {
-        PaymentMethodManagementWidget.onAddPaymentMethod = onAddPaymentMethod
         self.completion = completion
         super.init(frame: .zero)
+        reactManager.hyperModule.onAddPaymentMethod = onAddPaymentMethod
         commonInit()
     }
 
@@ -56,10 +56,10 @@ internal class PaymentMethodManagementWidget: UIControl {
             "customParams": APIClient.shared.customParams as Any,
         ]
 
-        RNViewManager.sharedInstance.responseHandler = self
+        reactManager.responseHandler = self
 
         // Get the React Native view from RNViewManager.
-        let rootView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": props])
+        let rootView = reactManager.viewForModule("hyperSwitch", initialProperties: ["props": props])
 
         rootView.frame = self.bounds
 

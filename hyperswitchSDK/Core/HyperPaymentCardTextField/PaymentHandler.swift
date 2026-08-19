@@ -26,8 +26,9 @@ public class PaymentHandler: NSObject {
     ) {
         self.completion = completion
 
-        RNViewManager.sharedInstance.responseHandler = self
-        HyperModule.shared?.confirm(data: paymentParams.description())
+        let reactManager = RNViewManager.sharedInstance
+        reactManager.responseHandler = self
+        reactManager.hyperModule.confirm(data: paymentParams.description())
     }
     public typealias PaymentHandlerActionPaymentIntentCompletionBlock = (
         PaymentHandlerActionStatus, PaymentIntent?, NSError?

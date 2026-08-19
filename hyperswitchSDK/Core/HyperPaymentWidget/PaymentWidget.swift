@@ -14,11 +14,12 @@ public class PaymentWidget: UIControl {
     private let configuration: PaymentSheet.Configuration?
     private var configurationDict: [String: Any]?
     private var widgetReactTag: NSNumber?
-    private var rootView: RCTRootView?
+    private var rootView: UIView?
     private var initCallback: ((PaymentResult) -> Void)?
     private var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
     private var cancellables = Set<AnyCancellable>()
     private var subscribedEventNames: [String]?
+    private let reactManager = RNViewManager.sharedInstance
     internal var paymentEventListener: PaymentEventListener?
 
     public init(
@@ -93,12 +94,12 @@ public class PaymentWidget: UIControl {
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
 
-        self.rootView = RNViewManager.sharedInstance.widgetViewForModule(
+        self.rootView = reactManager.widgetViewForModule(
             "hyperSwitch",
             initialProperties: ["props": props]
         )
         if let rootView = self.rootView {
-            self.widgetReactTag = rootView.reactTag
+            self.widgetReactTag = rootView.surfaceRootTag
 
             rootView.backgroundColor = .clear
 
@@ -118,12 +119,7 @@ public class PaymentWidget: UIControl {
             .sink { [weak self] in
                 guard let self = self else { return }
                 let payload: [String: Any] = ["rootTag": self.widgetReactTag ?? -1]
-                self.rootView?.bridge.enqueueJSCall(
-                    "RCTDeviceEventEmitter",
-                    method: "emit",
-                    args: ["updateIntentInit", payload],
-                    completion: nil
-                )
+                self.reactManager.hyperModule.emit("updateIntentInit", payload)
             }
             .store(in: &cancellables)
 
@@ -135,12 +131,7 @@ public class PaymentWidget: UIControl {
                     "rootTag": self.widgetReactTag ?? -1,
                     "sdkAuthorization": sdkAuthorization,
                 ]
-                self.rootView?.bridge.enqueueJSCall(
-                    "RCTDeviceEventEmitter",
-                    method: "emit",
-                    args: ["updateIntentComplete", payload],
-                    completion: nil
-                )
+                self.reactManager.hyperModule.emit("updateIntentComplete", payload)
             }
             .store(in: &cancellables)
     }
@@ -150,12 +141,7 @@ public class PaymentWidget: UIControl {
             "rootTag": self.widgetReactTag ?? -1,
             "actionType": "CONFIRM_PAYMENT_ACTION",
         ]
-        self.rootView?.bridge.enqueueJSCall(
-            "RCTDeviceEventEmitter",
-            method: "emit",
-            args: ["triggerWidgetAction", payload],
-            completion: nil
-        )
+        reactManager.hyperModule.emit("triggerWidgetAction", payload)
     }
 
     internal func handleShouldProceedWithPayment(payload: String, callback: @escaping (Bool) -> Void) {

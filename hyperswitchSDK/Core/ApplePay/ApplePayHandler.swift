@@ -194,6 +194,7 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
                 ]
             ]
         )
+        self.callback = nil
         completion(PKPaymentAuthorizationResult(status: paymentStatus ?? .failure, errors: errors))
     }
     /// Handle completion of the payment authorization flow
