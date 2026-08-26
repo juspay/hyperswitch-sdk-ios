@@ -2,43 +2,71 @@
 //  RNViewManager.swift
 //  Hyperswitch
 //
-//  Created by Shivam Shashank on 09/11/22.
+//  Created by Harshit Srivastava on 01/08/26.
 //
 
 import Foundation
 import React
+import React_RCTAppDelegate
+import ReactAppDependencyProvider
 
-internal class RNViewManager: NSObject {
+internal protocol ReactHostManager: AnyObject {
+    var hyperModule: HyperModuleImpl { get }
+    var headlessModule: HyperHeadlessImpl { get }
+    var responseHandler: RNResponseHandler? { get set }
+    var rootView: UIView? { get }
+}
 
-    internal var responseHandler: RNResponseHandler?
-    internal var rootView: RCTRootView?
-
-    internal lazy var bridge: RCTBridge = {
-        RCTBridge.init(delegate: self, launchOptions: nil)
-    }()
-
-    internal static let sharedInstance = RNViewManager()
-
-    internal func viewForModule(_ moduleName: String, initialProperties: [String: Any]?) -> RCTRootView {
-        let rootView: RCTRootView = RCTRootView(
-            bridge: self.bridge,
-            moduleName: moduleName,
-            initialProperties: initialProperties
-        )
-        self.rootView = rootView
-        return rootView
+extension UIView {
+    internal var surfaceRootTag: NSNumber? {
+        guard let rootView = self as? RCTSurfaceHostingProxyRootView else { return nil }
+        return NSNumber(value: rootView.surface.rootTag)
     }
-    internal func widgetViewForModule(_ moduleName: String, initialProperties: [String: Any]?) -> RCTRootView {
-        return RCTRootView(
-            bridge: self.bridge,
-            moduleName: moduleName,
-            initialProperties: initialProperties
-        )
+
+    internal func nearestAncestor(where predicate: (UIView) -> Bool) -> UIView? {
+        var current: UIView? = self
+        while let view = current {
+            if predicate(view) {
+                return view
+            }
+            current = view.superview
+        }
+        return nil
+    }
+
+    internal func nearestAncestor<T>(ofType type: T.Type) -> T? {
+        return nearestAncestor(where: { $0 is T }) as? T
     }
 }
 
-extension RNViewManager: RCTBridgeDelegate {
-    func sourceURL(for bridge: RCTBridge) -> URL? {
+internal class RNFactoryDelegate: RCTDefaultReactNativeFactoryDelegate {
+
+    internal weak var manager: ReactHostManager?
+
+    @objc(getModuleInstanceFromClass:)
+    internal func getModuleInstanceFromClass(_ moduleClass: AnyClass) -> AnyObject? {
+        guard let manager = manager else { return nil }
+        if let shimType = moduleClass as? (NSObject & HyperModuleShim).Type {
+            let shim = shimType.init()
+            manager.hyperModule.attach(to: shim)
+            return shim
+        }
+        if let shimType = moduleClass as? (NSObject & HyperHeadlessShim).Type {
+            let shim = shimType.init()
+            manager.headlessModule.attach(to: shim)
+            return shim
+        }
+        return nil
+    }
+}
+
+internal class RNViewManagerDelegate: RNFactoryDelegate {
+
+    override func sourceURL(for bridge: RCTBridge) -> URL? {
+        return bundleURL()
+    }
+
+    override func bundleURL() -> URL? {
         switch Helper.getInfoPlist("HyperswitchSource") {
         case "LocalHosted":
             return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
@@ -51,5 +79,45 @@ extension RNViewManager: RCTBridgeDelegate {
             return Bundle(for: RNViewManager.self).url(forResource: "hyperswitch", withExtension: "bundle")
             #endif
         }
+    }
+}
+
+internal class RNViewManager: NSObject, ReactHostManager {
+
+    internal let hyperModule = HyperModuleImpl()
+    internal let headlessModule = HyperHeadlessImpl()
+    internal var responseHandler: RNResponseHandler?
+    internal private(set) var rootView: UIView?
+
+    private let delegate: RNViewManagerDelegate
+
+    internal lazy var factory: RCTReactNativeFactory = {
+        RCTReactNativeFactory(delegate: self.delegate)
+    }()
+
+    internal static let sharedInstance = RNViewManager()
+
+    internal override init() {
+        self.delegate = RNViewManagerDelegate()
+        super.init()
+        self.delegate.dependencyProvider = RCTAppDependencyProvider()
+        self.delegate.manager = self
+        self.hyperModule.host = self
+    }
+
+    internal func viewForModule(_ moduleName: String, initialProperties: [String: Any]?) -> UIView {
+        let rootView = factory.rootViewFactory.view(
+            withModuleName: moduleName,
+            initialProperties: initialProperties
+        )
+        self.rootView = rootView
+        return rootView
+    }
+
+    internal func widgetViewForModule(_ moduleName: String, initialProperties: [String: Any]?) -> UIView {
+        return factory.rootViewFactory.view(
+            withModuleName: moduleName,
+            initialProperties: initialProperties
+        )
     }
 }

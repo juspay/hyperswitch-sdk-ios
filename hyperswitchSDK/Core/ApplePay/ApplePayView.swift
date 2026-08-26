@@ -1,54 +1,43 @@
 //
-//  ApplePayViewManager.swift
+//  ApplePayView.swift
 //  Hyperswitch
 //
 //  Created by Harshit Srivastava on 20/06/24.
 //
 
 import PassKit
-import React
 import UIKit
 
-@objc(ApplePayViewManager)
-internal class ApplePayViewManager: RCTViewManager {
-
-    override func view() -> (ApplePayView) {
-        return ApplePayView()
-    }
-
-    @objc override static func requiresMainQueueSetup() -> Bool {
-        return false
-    }
-}
-
+@objc(HSApplePayView)
 internal class ApplePayView: UIView {
 
     private var button: PKPaymentButton?
     private var paymentHandler = ApplePayHandler()
-    @objc private var onPaymentResultCallback: RCTDirectEventBlock?
 
-    @objc var buttonStyle: String = "" {
+    @objc internal var onPaymentResult: (() -> Void)?
+
+    @objc internal var buttonStyle: String = "" {
         didSet {
             setButton(setButtonType: buttonType, setButtonStyle: buttonStyle, setButtonCornerRadius: cornerRadius)
         }
     }
-    @objc var buttonType: String = "" {
+    @objc internal var buttonType: String = "" {
         didSet {
             setButton(setButtonType: buttonType, setButtonStyle: buttonStyle, setButtonCornerRadius: cornerRadius)
         }
     }
-    @objc var color: String = "" {
+    @objc internal var color: String = "" {
         didSet {
             setButton(setButtonType: buttonType, setButtonStyle: buttonStyle, setButtonCornerRadius: cornerRadius)
         }
     }
-    @objc var cornerRadius: CGFloat = 0.0 {
+    @objc internal var cornerRadius: CGFloat = 0.0 {
         didSet {
             setButton(setButtonType: buttonType, setButtonStyle: buttonStyle, setButtonCornerRadius: cornerRadius)
         }
     }
 
-    override init(frame: CGRect) {
+    @objc override init(frame: CGRect) {
         super.init(frame: frame)
 
         let cornerRadiusValue: CGFloat = 4.0
@@ -113,10 +102,7 @@ internal class ApplePayView: UIView {
     }
 
     @objc private func touchUpInside(_ button: PKPaymentButton) {
-        if let onPaymentResultCallback = onPaymentResultCallback {
-            onPaymentResultCallback(nil)
-        }
-
+        onPaymentResult?()
     }
 
     internal override func layoutSubviews() {

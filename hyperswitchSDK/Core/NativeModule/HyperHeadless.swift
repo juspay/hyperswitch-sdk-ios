@@ -2,105 +2,155 @@
 //  HyperHeadless.swift
 //  Hyperswitch
 //
-//  Created by Shivam Shashank on 06/03/24.
+//  Created by Harshit Srivastava on 01/08/26.
 //
 
 import Foundation
-import React
+import UIKit
 import WebKit
 
-@objc(HyperHeadless)
-internal class HyperHeadless: RCTEventEmitter {
+@objc(HyperHeadlessShim)
+internal protocol HyperHeadlessShim: NSObjectProtocol {
+    @objc(attachImpl:)
+    func attach(impl: HyperHeadlessImpl)
+    @objc(viewForRootTag:)
+    func view(forRootTag rootTag: NSNumber) -> UIView?
+}
 
-    internal static var shared: HyperHeadless?
+@objc(HyperHeadlessImpl)
+internal class HyperHeadlessImpl: NSObject {
 
-    private var setNativeProps: RCTResponseSenderBlock?
-    private var confirmWithDefault: RCTResponseSenderBlock?
-    private var defaultPMData: ((NSDictionary?) -> Void)?
+    private weak var activeSession: PaymentSession?
+    private var headlessCompletion: ((PaymentSessionHandler) -> Void)?
+    private var completion: ((PaymentResult) -> Void)?
+    private var hasResponded = false
 
-    internal override init() {
-        super.init()
-        HyperHeadless.shared = self
+    private weak var shim: HyperHeadlessShim?
+
+    internal func attach(to shim: HyperHeadlessShim) {
+        shim.attach(impl: self)
+        DispatchQueue.main.async {
+            self.shim = shim
+        }
     }
 
-    @objc
-    internal override static func requiresMainQueueSetup() -> Bool {
-        return true
+    internal func begin(session: PaymentSession, completion: @escaping (PaymentSessionHandler) -> Void) {
+        hasResponded = false
+        headlessCompletion = completion
+        activeSession = session
     }
 
-    @objc
-    internal override func supportedEvents() -> [String] {
-        return ["test"]
+    private func safeResolve(
+        _ callback: @escaping ([Any]?) -> Void,
+        _ result: [Any],
+        _ resultHandler: @escaping (PaymentResult) -> Void
+    ) {
+        guard !hasResponded else {
+            print("Warning: Attempt to resolve callback more than once")
+            resultHandler(.failed(error: NSError(domain: "Not Initialised", code: 0, userInfo: ["message": "An error has occurred."])))
+            return
+        }
+        hasResponded = true
+        callback(result)
     }
 
-    @objc
-    private func confirm(data: [String: Any]) {
-        self.sendEvent(withName: "test", body: data)
-    }
-
-    @objc
-    private func getPaymentSession(
+    @objc(getPaymentSession:paymentIntentData:defaultPaymentMethod:savedPaymentMethods:callback:)
+    internal func getPaymentSession(
         _ rootTag: NSNumber,
         _ rnMessage: NSDictionary,
         _ rnMessage2: NSDictionary,
         _ rnMessage3: NSArray,
-        _ rnCallback: @escaping RCTResponseSenderBlock
+        _ rnCallback: @escaping ([Any]?) -> Void
     ) {
-        PaymentSession.getPaymentSession(
-            getPaymentMethodData: rnMessage,
-            getPaymentMethodData2: rnMessage2,
-            getPaymentMethodDataArray: rnMessage3,
-            callback: rnCallback
-        )
-    }
+        DispatchQueue.main.async {
+            self.hasResponded = false
+            let handler = PaymentSessionHandler(
+                getCustomerDefaultSavedPaymentMethodData: {
+                    return HyperHeadlessImpl.decodePaymentMethodData(rnMessage)
+                },
+                getCustomerLastUsedPaymentMethodData: {
+                    return HyperHeadlessImpl.decodePaymentMethodData(rnMessage2)
+                },
+                getCustomerSavedPaymentMethodData: {
+                    var array = [PaymentMethod]()
+                    for i in 0..<rnMessage3.count {
+                        if let map = rnMessage3[i] as? NSDictionary {
+                            switch HyperHeadlessImpl.decodePaymentMethodData(map) {
+                            case .success(let paymentMethod):
+                                array.append(paymentMethod)
+                            case .failure(_):
+                                continue
+                            }
+                        }
+                    }
+                    if array.isEmpty {
+                        return .failure(
+                            PMError(
+                                code: "01",
+                                message: "No default type found"
+                            )
+                        )
+                    }
+                    return .success(array)
 
-    @objc
-    private func exitHeadless(_ rootTag: NSNumber, _ rnMessage: String) {
-        PaymentSession.exitHeadless(rnMessage: rnMessage)
-    }
-
-    private func paymentResult(from rnMessage: String) -> PaymentResult {
-        guard let data = rnMessage.data(using: .utf8) else {
-            return .failed(
-                error: NSError(
-                    domain: "UNKNOWN_ERROR",
-                    code: 0,
-                    userInfo: ["message": "An error has occurred."]
-                )
+                },
+                confirmWithCustomerDefaultPaymentMethod: { cvc, resultHandler in
+                    if let paymentToken = rnMessage["payment_token"] as? String {
+                        self.completion = resultHandler
+                        var map = [String: Any]()
+                        map["paymentToken"] = paymentToken
+                        map["cvc"] = cvc
+                        self.safeResolve(rnCallback, [map], resultHandler)
+                    }
+                },
+                confirmWithCustomerLastUsedPaymentMethod: { cvc, resultHandler in
+                    if let paymentToken = rnMessage2["payment_token"] as? String {
+                        cvc.awaitConfirmResult(resultHandler)
+                        cvc.confirm(
+                            sdkAuthorization: self.activeSession?.paymentSessionConfiguration.sdkAuthorization ?? "",
+                            paymentToken: paymentToken
+                        )
+                    }
+                },
+                confirmWithCustomerPaymentToken: { paymentToken, cvc, resultHandler in
+                    self.completion = resultHandler
+                    var map = [String: Any]()
+                    map["paymentToken"] = paymentToken
+                    map["cvc"] = cvc
+                    self.safeResolve(rnCallback, [map], resultHandler)
+                }
             )
+            self.headlessCompletion?(handler)
         }
+    }
 
-        do {
-            guard let jsonDictionary = try JSONSerialization.jsonObject(with: data, options: []) as? [String: String] else {
-                return .failed(
-                    error: NSError(
-                        domain: "UNKNOWN_ERROR",
-                        code: 0,
-                        userInfo: ["message": "An error has occurred."]
-                    )
-                )
+    @objc(exitHeadless:status:code:message:)
+    internal func exitHeadless(_ rootTag: NSNumber, _ status: String, _ code: String?, _ message: String?) {
+        DispatchQueue.main.async {
+            let result = PaymentResult.from(status: status, code: code, message: message)
+
+            if let widget = self.cvcWidget(forRootTag: rootTag) {
+                widget.resolveConfirmResult(result)
+                return
             }
+            self.completion?(result)
+        }
+    }
 
-            let status = jsonDictionary["status"]
+    private func cvcWidget(forRootTag rootTag: NSNumber) -> CVCWidget? {
+        return shim?.view(forRootTag: rootTag)?.nearestAncestor(ofType: CVCWidget.self)
+    }
 
-            if status == "failed" || status == "requires_payment_method" {
-                let error = NSError(
-                    domain: (jsonDictionary["code"] ?? "") != "" ? jsonDictionary["code"]! : "UNKNOWN_ERROR",
-                    code: 0,
-                    userInfo: ["message": jsonDictionary["message"] ?? "An error has occurred."]
-                )
-                return .failed(error: error)
-            } else if status == "cancelled" {
-                return .canceled(data: "cancelled")
-            } else {
-                return .completed(data: status ?? "failed")
-            }
-        } catch {
-            return .failed(
-                error: NSError(
-                    domain: "UNKNOWN_ERROR",
-                    code: 0,
-                    userInfo: ["message": "An error has occurred."]
+    private static func decodePaymentMethodData(_ readableMap: NSDictionary) -> Result<PaymentMethod, PMError> {
+        if let jsonData = try? JSONSerialization.data(withJSONObject: readableMap),
+            let paymentMethod = try? JSONDecoder().decode(PaymentMethod.self, from: jsonData)
+        {
+            return .success(paymentMethod)
+        } else {
+            return .failure(
+                PMError(
+                    code: readableMap["code"] as? String ?? "01",
+                    message: readableMap["message"] as? String ?? "No default type found"
                 )
             )
         }

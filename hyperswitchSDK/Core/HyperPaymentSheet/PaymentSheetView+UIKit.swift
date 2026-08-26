@@ -14,7 +14,7 @@ internal extension PaymentSheet {
     /// Method to present the payment sheet view with a given root view and completion handler.
     private func presentWithRootView(
         from presentingViewController: UIViewController,
-        rootView: RCTRootView,
+        rootView: UIView,
         completion: @escaping (PaymentResult) -> Void
     ) {
 

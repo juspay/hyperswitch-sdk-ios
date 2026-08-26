@@ -7,22 +7,51 @@
 
 import Foundation
 import React
+import React_RCTAppDelegate
+import ReactAppDependencyProvider
 
-internal class RNHeadlessManager: NSObject {
+internal class RNHeadlessManagerDelegate: RNFactoryDelegate {
 
+    override func sourceURL(for bridge: RCTBridge) -> URL? {
+        return bundleURL()
+    }
+
+    override func bundleURL() -> URL? {
+        switch Helper.getInfoPlist("HyperswitchSource") {
+        case "LocalHosted":
+            return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+        default:
+            return Bundle(for: RNHeadlessManager.self).url(forResource: "hyperswitch", withExtension: "bundle")
+        }
+    }
+}
+
+internal class RNHeadlessManager: NSObject, ReactHostManager {
+
+    internal let hyperModule = HyperModuleImpl()
+    internal let headlessModule = HyperHeadlessImpl()
     internal var responseHandler: RNResponseHandler?
-    internal var rootView: RCTRootView?
+    internal private(set) var rootView: UIView?
 
-    internal lazy var bridgeHeadless: RCTBridge = {
-        RCTBridge.init(delegate: self, launchOptions: nil)
+    private let delegate: RNHeadlessManagerDelegate
+
+    internal lazy var factory: RCTReactNativeFactory = {
+        RCTReactNativeFactory(delegate: self.delegate)
     }()
 
     internal static let sharedInstance = RNHeadlessManager()
 
-    internal func viewForModule(_ moduleName: String, initialProperties: [String: Any]?) -> RCTRootView {
-        let rootView: RCTRootView = RCTRootView(
-            bridge: self.bridgeHeadless,
-            moduleName: moduleName,
+    internal override init() {
+        self.delegate = RNHeadlessManagerDelegate()
+        super.init()
+        self.delegate.dependencyProvider = RCTAppDependencyProvider()
+        self.delegate.manager = self
+        self.hyperModule.host = self
+    }
+
+    internal func viewForModule(_ moduleName: String, initialProperties: [String: Any]?) -> UIView {
+        let rootView = factory.rootViewFactory.view(
+            withModuleName: moduleName,
             initialProperties: initialProperties
         )
         self.rootView = rootView
@@ -30,18 +59,7 @@ internal class RNHeadlessManager: NSObject {
     }
 
     internal func reinvalidateBridge() {
-        self.bridgeHeadless.invalidate()
-        self.bridgeHeadless = RCTBridge.init(delegate: self, launchOptions: nil)
-    }
-}
-
-extension RNHeadlessManager: RCTBridgeDelegate {
-    func sourceURL(for bridge: RCTBridge) -> URL? {
-        switch Helper.getInfoPlist("HyperswitchSource") {
-        case "LocalHosted":
-            return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
-        default:
-            return Bundle(for: RNHeadlessManager.self).url(forResource: "hyperswitch", withExtension: "bundle")
-        }
+        self.rootView = nil
+        self.factory = RCTReactNativeFactory(delegate: self.delegate)
     }
 }
