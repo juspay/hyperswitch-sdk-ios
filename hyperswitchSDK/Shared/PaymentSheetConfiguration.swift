@@ -264,6 +264,9 @@ extension PaymentSheet {
             public var cvcIcon: IconVisibility?
             public var cardBrandIcon: CardBrandIcon?
             public var showCheckedIconForSelection: Bool?
+            /// Text shown on the separator between the wallet buttons and the
+            /// remaining payment methods. Defaults to the localised "Or pay using".
+            public var separatorText: String?
             public var savedMethodCustomization: SavedMethodCustomization?
 
             public enum LayoutType: String, Encodable {
