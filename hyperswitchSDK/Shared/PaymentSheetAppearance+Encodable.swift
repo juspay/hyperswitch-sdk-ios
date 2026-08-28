@@ -74,8 +74,7 @@ extension PaymentSheet.Appearance.Font: Encodable {
 
     public func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: Keys.self)
-        // FIXME: Prefer an explicit family string; otherwise use the fontName.
-        try c.encodeIfPresent(family ?? base?.fontName, forKey: .family)
+        try c.encodeIfPresent(family ?? base?.familyName, forKey: .family)
         try c.encodeIfPresent(scale, forKey: .scale)
         try c.encodeIfPresent(headingTextSizeAdjust, forKey: .headingTextSizeAdjust)
         try c.encodeIfPresent(subHeadingTextSizeAdjust, forKey: .subHeadingTextSizeAdjust)
