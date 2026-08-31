@@ -64,6 +64,7 @@ struct SwiftUIView: View {
         configuration.savedPaymentSheetHeaderLabel = "Payment methods"
         configuration.paymentSheetHeaderLabel = "Select payment method"
         configuration.displaySavedPaymentMethods = true
+        configuration.hideCardNicknameField = false
 
         var appearance = PaymentSheet.Appearance()
         appearance.font.base = UIFont(name: "montserrat", size: UIFont.systemFontSize)

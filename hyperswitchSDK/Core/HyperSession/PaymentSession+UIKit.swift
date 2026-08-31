@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import React
+import UIKit
 
 private struct PendingPrefetch {
     let continuation: CheckedContinuation<[String: Any], Never>
@@ -231,6 +231,13 @@ extension PaymentSession {
             let paymentSessionConfiguration = try? self.paymentSessionConfiguration.toDictionary()
             let sdkParams = SDKParams.getSDKParams()
             let configurationDict = try? configuration.toDictionary()
+        let manager = RNHeadlessManager.sharedInstance
+        manager.headlessModule.begin(session: self, completion: func_)
+        manager.reinvalidateBridge()
+        let hyperswitchConfiguration = try? hyperswitchConfiguration?.toDictionary()
+        let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
+        let sdkParams = SDKParams.getSDKParams()
+        let configurationDict = try? configuration.toDictionary()
 
             var props: [String: Any] = [
                 "hyperswitchConfig": hyperswitchConfiguration as Any,
@@ -550,5 +557,6 @@ extension PaymentSession {
                 )
             )
         }
+        let _ = manager.viewForModule("HyperHeadless", initialProperties: ["props": props])
     }
 }

@@ -101,6 +101,9 @@ extension PaymentSheet {
         /// Render card fields (number / expiry / cvc) as separate inputs. Defaults to false.
         public var splitCardFields: Bool?
 
+        /// Hide the card nickname input field regardless of the mandate / save-card state. Defaults to false.
+        public var hideCardNicknameField: Bool?
+
         // MARK: - Placeholder
 
         public struct PlaceHolder: Encodable {
@@ -264,6 +267,9 @@ extension PaymentSheet {
             public var cvcIcon: IconVisibility?
             public var cardBrandIcon: CardBrandIcon?
             public var showCheckedIconForSelection: Bool?
+            /// Text shown on the separator between the wallet buttons and the
+            /// remaining payment methods. Defaults to the localised "Or pay using".
+            public var separatorText: String?
             public var savedMethodCustomization: SavedMethodCustomization?
 
             public enum LayoutType: String, Encodable {
