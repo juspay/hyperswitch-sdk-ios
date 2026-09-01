@@ -68,13 +68,12 @@ public final class HyperswitchCollect {
      * guarantees `completion` fires even when no surface is mounted.
      */
     public func tokenise(completion: @escaping (VaultTokeniseResult) -> Void) {
-        let requestId = TokeniseDispatcher.shared.register { json in
+        TokeniseDispatcher.shared.register { json in
             completion(VaultTokeniseResult.parse(json))
         }
         VaultReactNativeController.shared.emitDeviceEvent(
             name: VaultReactNativeController.tokeniseEventName,
             body: [
-                "requestId": requestId,
                 "sdkAuthorization": sdkAuthorization,
                 "environment": environment.jsName,
             ]

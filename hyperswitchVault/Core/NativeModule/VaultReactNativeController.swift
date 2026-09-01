@@ -14,15 +14,32 @@ import ReactAppDependencyProvider
 
 internal class VaultReactDelegate: RCTDefaultReactNativeFactoryDelegate {
 
+    /// The vault JS bundle is compiled for the Fabric renderer and expects the
+    /// bridgeless runtime (`nativeFabricUIManager` must exist). Always-on: the
+    /// vault SDK runs on the host workspace's RN distribution (0.86 pods),
+    /// the same way the main HyperswitchSDK does; `fabricEnabled` /
+    /// `bridgelessEnabled` / `turboModuleEnabled` all forward to this.
+    override func newArchEnabled() -> Bool {
+        return true
+    }
+
+    /// The superclass raises on an unimplemented sourceURL — keep this as
+    /// the single path.
     override func sourceURL(for bridge: RCTBridge) -> URL? {
         return bundleURL()
     }
 
+    /// Debug loads the vault JS from Metro (`yarn start`) with main module
+    /// "index" (index.js registers "hs-vault") — same flow as Android's
+    /// debug builds. Release ships the prebuilt bundle resource packaged in
+    /// the HyperswitchVault pod (see hyperswitch-vault-sdk-ios.podspec).
     override func bundleURL() -> URL? {
-        // `hyperswitch-vault.bundle` is shipped as a resource of the
-        // HyperswitchVault framework/pod (see ios/hyperswitch-vault-sdk-ios.podspec).
+#if DEBUG
+        return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+#else
         return Bundle(for: VaultReactNativeController.self)
             .url(forResource: "hyperswitch-vault", withExtension: "bundle")
+#endif
     }
 }
 

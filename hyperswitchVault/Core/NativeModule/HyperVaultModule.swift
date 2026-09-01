@@ -2,24 +2,14 @@
 //  HyperVaultModule.swift
 //  HyperswitchVault
 //
-//  Bridge for JS -> native vault field-state pushes (src/vault/fields/BaseTextInput.js).
+//  Swift backing for the new-arch HyperVaultModule TurboModule. Called from
+//  HyperVaultModule.mm, which forwards NativeHyperVaultModuleSpec here.
 //
 
 import Foundation
-import React
 
-@objc(HyperVaultModule)
-public final class HyperVaultModule: NSObject {
-
-    @objc
-    public static func requiresMainQueueSetup() -> Bool {
-        return false
-    }
-
-    @objc(updateFieldState:state:)
-    public func updateFieldState(_ rootTag: NSNumber, state: String) {
-        VaultStateStore.shared.update(rootTag: rootTag, json: state)
-    }
+@objc(HyperVaultModuleImpl)
+public final class HyperVaultModuleImpl: NSObject {
 
     /// Aggregated, redacted states pushed by the JS vault package, keyed by
     /// field type (updateVaultFieldStates contract, mirrors Android).
@@ -28,10 +18,15 @@ public final class HyperVaultModule: NSObject {
         VaultStateStore.shared.updateFieldStates(statesJson)
     }
 
+    @objc(updateFieldState:state:)
+    public func updateFieldState(_ rootTag: NSNumber, state: String) {
+        VaultStateStore.shared.update(rootTag: rootTag, json: state)
+    }
+
     /// The JS answer to a native tokenise() broadcast; resolves the pending
     /// collector completion via TokeniseDispatcher.
-    @objc(submitTokeniseResult:resultJson:)
-    public func submitTokeniseResult(_ requestId: NSNumber, resultJson: String) {
-        TokeniseDispatcher.shared.resolve(id: requestId.intValue, json: resultJson)
+    @objc(returnTokenizedValue:)
+    public func returnTokenizedValue(_ resultJson: String) {
+        TokeniseDispatcher.shared.resolve(resultJson)
     }
 }

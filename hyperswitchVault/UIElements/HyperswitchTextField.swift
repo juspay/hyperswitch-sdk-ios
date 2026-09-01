@@ -38,7 +38,27 @@ public class HyperswitchTextField: UIView {
             if let collector = configuration?.collector {
                 collector.observeTextField(self)
             }
+            /*
+             * The collector carries the sdkAuthorization/environment that the
+             * React surface reads via initialProps on mount. Re-assigning a
+             * configuration with a different collector therefore has to
+             * re-fire the mount, or the surface keeps the previous session's
+             * credentials.
+             */
+            if mounted, oldValue?.collector !== configuration?.collector {
+                remountSurface()
+            }
         }
+    }
+
+    /*
+     * A default intrinsic size so a bare `HyperswitchCardTextField()` /
+     * storyboard-placed instance is never 0x0. Merchants that wrap the field
+     * in their own constraints will override this — nil/UIView.noIntrinsicMetric
+     * would let Auto Layout collapse the hosted React surface anyway.
+     */
+    public override var intrinsicContentSize: CGSize {
+        CGSize(width: UIView.noIntrinsicMetric, height: 48)
     }
 
     public weak var delegate: VaultTextFieldDelegate?
@@ -107,6 +127,14 @@ public class HyperswitchTextField: UIView {
             "fieldName": mountedFieldName,
             "isRequired": configuration?.isRequired ?? true,
         ]
+
+        // ── session (library-owned, set via configuration.collector) ──
+        if let collector = configuration?.collector {
+            config["sessionConfig"] = [
+                "sdkAuthorization": collector.sdkAuthorization,
+                "environment": collector.environment.jsName,
+            ]
+        }
 
         var configurationDict = [String: Any]()
         if let appearance = configuration?.appearance {
