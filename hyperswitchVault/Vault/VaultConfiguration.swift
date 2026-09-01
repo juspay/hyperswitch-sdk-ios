@@ -11,8 +11,11 @@ public final class VaultConfiguration {
 
     public var isRequired: Bool = true
 
-    /// UI styling for the JS-rendered input box.
+    /// Theme tokens for the JS-rendered input — travels under `configuration.appearance`.
     public var appearance: VaultAppearance?
+
+    /// Per-field options — travels under `configuration.options`.
+    public var options: VaultFieldOptions?
 
     public convenience init(collector: HyperswitchCollect, fieldName: String) {
         self.init(collector: collector, fieldName: fieldName, isRequired: true)

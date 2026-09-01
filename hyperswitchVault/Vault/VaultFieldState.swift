@@ -1,12 +1,14 @@
 import Foundation
 
-/// Mirrors VGS `TextField.State`. Pushed from every JS-rendered vault field via
-/// HyperVaultModule, keyed by surface root tag.
+/**
+ * Redacted snapshot pushed from every JS-rendered vault field. The raw value
+ * never crosses the bridge — only flags and (for `card_number`) the PCI-safe
+ * 6-digit BIN required for brand lookup. There is no `value`/`text` member.
+ */
 public struct VaultFieldState: Equatable {
     public let fieldName: String?
     public let fieldType: String?
-    /// Current value (raw input, or the vault alias after tokenization).
-    public let text: String
+    public let bin: String?
     public let isEmpty: Bool
     public let isValid: Bool
     public let isRequired: Bool
@@ -16,7 +18,7 @@ public struct VaultFieldState: Equatable {
     internal init(
         fieldName: String?,
         fieldType: String?,
-        text: String,
+        bin: String?,
         isEmpty: Bool,
         isValid: Bool,
         isRequired: Bool,
@@ -25,7 +27,7 @@ public struct VaultFieldState: Equatable {
     ) {
         self.fieldName = fieldName
         self.fieldType = fieldType
-        self.text = text
+        self.bin = bin
         self.isEmpty = isEmpty
         self.isValid = isValid
         self.isRequired = isRequired
@@ -37,7 +39,7 @@ public struct VaultFieldState: Equatable {
         VaultFieldState(
             fieldName: name ?? fieldName,
             fieldType: fieldType,
-            text: text,
+            bin: bin,
             isEmpty: isEmpty,
             isValid: isValid,
             isRequired: isRequired,
@@ -54,14 +56,14 @@ public struct VaultFieldState: Equatable {
     }
 
     internal static func parse(_ obj: [String: Any]) -> VaultFieldState? {
-        let text = (obj["value"] as? String) ?? ""
         let fieldName = (obj["fieldName"] as? String).flatMap { $0.isEmpty ? nil : $0 }
+        let bin = (obj["bin"] as? String).flatMap { $0.isEmpty ? nil : $0 }
         return VaultFieldState(
             fieldName: fieldName,
             fieldType: obj["fieldType"] as? String,
-            text: text,
-            isEmpty: (obj["isEmpty"] as? Bool) ?? text.isEmpty,
-            isValid: (obj["isValid"] as? Bool) ?? !text.isEmpty,
+            bin: bin,
+            isEmpty: (obj["isEmpty"] as? Bool) ?? true,
+            isValid: (obj["isValid"] as? Bool) ?? false,
             isRequired: (obj["isRequired"] as? Bool) ?? false,
             isFocused: (obj["isFocused"] as? Bool) ?? false,
             isTokenized: (obj["isTokenized"] as? Bool) ?? false

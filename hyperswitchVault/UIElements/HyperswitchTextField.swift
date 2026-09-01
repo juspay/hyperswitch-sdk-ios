@@ -50,7 +50,6 @@ public class HyperswitchTextField: UIView {
 
     internal private(set) var rnRootTag: NSNumber?
     private var surface: UIView?
-    private var alias: String?
     private var appliedPlaceholder: String?
     private var mounted = false
     private var localFieldName: String?
@@ -83,31 +82,46 @@ public class HyperswitchTextField: UIView {
         if window != nil { mountSurfaceIfNeeded() }
     }
 
-    internal func setAlias(_ token: String) {
-        alias = token
-        remountSurface()
-    }
-
     internal var currentState: VaultFieldState? {
         state ?? rnRootTag.flatMap { VaultStateStore.shared.state(for: $0) }
     }
 
     // MARK: - Surface mounting
 
+    /**
+     * Initial-prop shape:
+     *
+     *     { type, config: { ...internal..., configuration: { appearance?, options? } } }
+     *
+     * Top level of `config` holds library-owned keys only (`fieldName`,
+     * `isRequired`). No raw card data — no `value`, no `readOnly` — ever
+     * enters the dictionary. The sensitive value lives only inside the RN
+     * surface.
+     *
+     * Every merchant-set customization lives under `configuration.appearance`
+     * and `configuration.options` — the same split the React Native vault's
+     * public API uses.
+     */
     private func initialProperties() -> [String: Any] {
         var config: [String: Any] = [
             "fieldName": mountedFieldName,
             "isRequired": configuration?.isRequired ?? true,
         ]
-        if let appliedPlaceholder = appliedPlaceholder {
-            config["placeholder"] = appliedPlaceholder
-        }
+
+        var configurationDict = [String: Any]()
         if let appearance = configuration?.appearance {
-            config["appearance"] = appearance.dict
+            configurationDict["appearance"] = appearance.dict
         }
-        if let alias = alias {
-            config["value"] = alias
-            config["readOnly"] = true
+        // The `placeholder` setter feeds into options; explicit `configuration.options` wins.
+        var options = configuration?.options ?? VaultFieldOptions()
+        if options.placeholder == nil, let appliedPlaceholder = appliedPlaceholder {
+            options.placeholder = appliedPlaceholder
+        }
+        if !options.dict.isEmpty {
+            configurationDict["options"] = options.dict
+        }
+        if !configurationDict.isEmpty {
+            config["configuration"] = configurationDict
         }
         return ["type": fieldType, "config": config]
     }
@@ -181,7 +195,7 @@ public class HyperswitchTextField: UIView {
                 delegate?.vaultTextFieldDidEndEditing(self)
             }
         }
-        if oldState?.text != state.text {
+        if oldState?.isEmpty != state.isEmpty || oldState?.isValid != state.isValid {
             delegate?.vaultTextFieldDidChange(self)
         }
     }

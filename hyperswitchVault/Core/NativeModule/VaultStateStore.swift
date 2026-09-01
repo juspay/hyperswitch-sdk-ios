@@ -59,8 +59,8 @@ internal final class VaultStateStore {
 
     // MARK: - FieldType-keyed channel (redacted states from the JS vault package)
 
-    /// Applies one aggregated push ([{fieldType, value(redacted), isEmpty,
-    /// isValid, isRequired, isFocused, isTokenized, ...}]).
+    /// Applies one aggregated push ([{fieldType, bin, isEmpty, isValid,
+    /// isRequired, isFocused, isTokenized, ...}]). No raw card data.
     func updateFieldStates(_ json: String) {
         guard let data = json.data(using: .utf8),
               let array = try? JSONSerialization.jsonObject(with: data) as? [[String: Any]]

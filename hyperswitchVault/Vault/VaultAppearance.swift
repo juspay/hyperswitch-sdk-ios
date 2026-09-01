@@ -1,124 +1,98 @@
 import UIKit
 
-/// Per-scheme color overrides (light/dark), mirrors the JS `appearance` config.
-public struct VaultColors {
-    public var background: UIColor?
-    public var border: UIColor?
-    public var borderFocused: UIColor?
-    public var text: UIColor?
-    public var hint: UIColor?
-    public var error: UIColor?
-
-    public init(
-        background: UIColor? = nil,
-        border: UIColor? = nil,
-        borderFocused: UIColor? = nil,
-        text: UIColor? = nil,
-        hint: UIColor? = nil,
-        error: UIColor? = nil
-    ) {
-        self.background = background
-        self.border = border
-        self.borderFocused = borderFocused
-        self.text = text
-        self.hint = hint
-        self.error = error
-    }
-
-    internal var dict: [String: Any] {
-        var out = [String: Any]()
-        if let v = background { out["background"] = v.hexString }
-        if let v = border { out["border"] = v.hexString }
-        if let v = borderFocused { out["borderFocused"] = v.hexString }
-        if let v = text { out["text"] = v.hexString }
-        if let v = hint { out["hint"] = v.hexString }
-        if let v = error { out["error"] = v.hexString }
-        return out
-    }
-}
-
-public struct VaultAppearanceColors {
-    public var light: VaultColors?
-    public var dark: VaultColors?
-
-    public init(light: VaultColors? = nil, dark: VaultColors? = nil) {
-        self.light = light
-        self.dark = dark
-    }
-
-    internal var dict: [String: Any] {
-        var out = [String: Any]()
-        if let v = light { out["light"] = v.dict }
-        if let v = dark { out["dark"] = v.dict }
-        return out
-    }
-}
-
-public struct VaultShadow {
-    public var color: UIColor?
-    public var opacity: CGFloat?
-    public var radius: CGFloat?
-    public var offset: CGSize?
-    public var elevation: CGFloat?
-
-    public init(
-        color: UIColor? = nil,
-        opacity: CGFloat? = nil,
-        radius: CGFloat? = nil,
-        offset: CGSize? = nil,
-        elevation: CGFloat? = nil
-    ) {
-        self.color = color
-        self.opacity = opacity
-        self.radius = radius
-        self.offset = offset
-        self.elevation = elevation
-    }
-
-    internal var dict: [String: Any] {
-        var out = [String: Any]()
-        if let v = color { out["color"] = v.hexString }
-        if let v = opacity { out["opacity"] = v }
-        if let v = radius { out["radius"] = v }
-        if let v = offset { out["offset"] = ["x": v.width, "y": v.height] }
-        if let v = elevation { out["elevation"] = v }
-        return out
-    }
-}
-
-/// Mirrors the hyperswitch appearance config passed to the `hs-vault` RN app.
+/**
+ * UI appearance of a vault field — the merchant-owned theme token bag that
+ * travels inside `configuration.appearance` of the React Native surface's
+ * initial props. Flat key set matching the React Native vault's `appearance`
+ * prop contract exactly (no translation layer on the JS side).
+ */
 public struct VaultAppearance {
-    public var colors: VaultAppearanceColors?
-    public var radius: CGFloat?
+
+    public enum BrandIconMode: String {
+        case auto = "auto"
+        case `static` = "static"
+        case hidden = "hidden"
+    }
+
+    public var primaryColor: UIColor?
+    public var textColor: UIColor?
+    public var errorColor: UIColor?
+    public var placeholderColor: UIColor?
+    public var backgroundColor: UIColor?
+    public var borderColor: UIColor?
+    public var borderRadius: CGFloat?
     public var borderWidth: CGFloat?
-    public var padding: CGFloat?
-    public var fontSize: CGFloat?
-    public var shadow: VaultShadow?
+    public var fontFamily: String?
+    public var inputHeight: CGFloat?
+    public var fontScale: CGFloat?
+    public var gap: CGFloat?
+    public var brandIconMode: BrandIconMode?
 
     public init(
-        colors: VaultAppearanceColors? = nil,
-        radius: CGFloat? = nil,
+        primaryColor: UIColor? = nil,
+        textColor: UIColor? = nil,
+        errorColor: UIColor? = nil,
+        placeholderColor: UIColor? = nil,
+        backgroundColor: UIColor? = nil,
+        borderColor: UIColor? = nil,
+        borderRadius: CGFloat? = nil,
         borderWidth: CGFloat? = nil,
-        padding: CGFloat? = nil,
-        fontSize: CGFloat? = nil,
-        shadow: VaultShadow? = nil
+        fontFamily: String? = nil,
+        inputHeight: CGFloat? = nil,
+        fontScale: CGFloat? = nil,
+        gap: CGFloat? = nil,
+        brandIconMode: BrandIconMode? = nil
     ) {
-        self.colors = colors
-        self.radius = radius
+        self.primaryColor = primaryColor
+        self.textColor = textColor
+        self.errorColor = errorColor
+        self.placeholderColor = placeholderColor
+        self.backgroundColor = backgroundColor
+        self.borderColor = borderColor
+        self.borderRadius = borderRadius
         self.borderWidth = borderWidth
-        self.padding = padding
-        self.fontSize = fontSize
-        self.shadow = shadow
+        self.fontFamily = fontFamily
+        self.inputHeight = inputHeight
+        self.fontScale = fontScale
+        self.gap = gap
+        self.brandIconMode = brandIconMode
     }
 
     internal var dict: [String: Any] {
         var out = [String: Any]()
-        if let v = colors { out["colors"] = v.dict }
-        if let v = radius { out["radius"] = v }
+        if let v = primaryColor { out["primaryColor"] = v.hexString }
+        if let v = textColor { out["textColor"] = v.hexString }
+        if let v = errorColor { out["errorColor"] = v.hexString }
+        if let v = placeholderColor { out["placeholderColor"] = v.hexString }
+        if let v = backgroundColor { out["backgroundColor"] = v.hexString }
+        if let v = borderColor { out["borderColor"] = v.hexString }
+        if let v = borderRadius { out["borderRadius"] = v }
         if let v = borderWidth { out["borderWidth"] = v }
-        if let v = padding { out["padding"] = v }
-        if let v = fontSize { out["fontSize"] = v }
-        if let v = shadow { out["shadow"] = v.dict }
+        if let v = fontFamily { out["fontFamily"] = v }
+        if let v = inputHeight { out["inputHeight"] = v }
+        if let v = fontScale { out["fontScale"] = v }
+        if let v = gap { out["gap"] = v }
+        if let v = brandIconMode { out["brandIconMode"] = v.rawValue }
+        return out
+    }
+
+    /// Returns a copy with each unset member taken from `base`.
+    public func merged(over base: VaultAppearance?) -> VaultAppearance {
+        guard let base else { return self }
+        var out = self
+        if out.primaryColor == nil { out.primaryColor = base.primaryColor }
+        if out.textColor == nil { out.textColor = base.textColor }
+        if out.errorColor == nil { out.errorColor = base.errorColor }
+        if out.placeholderColor == nil { out.placeholderColor = base.placeholderColor }
+        if out.backgroundColor == nil { out.backgroundColor = base.backgroundColor }
+        if out.borderColor == nil { out.borderColor = base.borderColor }
+        if out.borderRadius == nil { out.borderRadius = base.borderRadius }
+        if out.borderWidth == nil { out.borderWidth = base.borderWidth }
+        if out.fontFamily == nil { out.fontFamily = base.fontFamily }
+        if out.inputHeight == nil { out.inputHeight = base.inputHeight }
+        if out.fontScale == nil { out.fontScale = base.fontScale }
+        if out.gap == nil { out.gap = base.gap }
+        if out.brandIconMode == nil { out.brandIconMode = base.brandIconMode }
         return out
     }
 }
