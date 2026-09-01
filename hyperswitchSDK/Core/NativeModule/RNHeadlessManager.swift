@@ -1,75 +1,47 @@
 //
-//  RNHeadlessManager.swift
-//  Hyperswitch
+/*
+ RNHeadlessManager.swift
+ Hyperswitch
+ */
 //
 //  Created by Shivam Shashank on 09/11/22.
 //
 
 import Foundation
 import React
-import React_RCTAppDelegate
-import ReactAppDependencyProvider
 
-internal class RNHeadlessManagerDelegate: RNFactoryDelegate {
+/// Tracks the temporary off-screen root views used for headless work.
+/// Headless roots mount on the SAME ReactHost as visible UI (RNViewManager),
+/// so the JS module cache (PrefetchCache) is shared between headless tasks and
+/// sheets/widgets — no second JS runtime, no native data handoff.
+///
+/// There is intentionally no factory/bridge of its own and no reinvalidateBridge:
+/// recreating a ReactHost here would tear down the shared UI runtime.
+internal class RNHeadlessManager: NSObject {
 
-    override func sourceURL(for bridge: RCTBridge) -> URL? {
-        return bundleURL()
-    }
-
-    override func bundleURL() -> URL? {
-        switch Helper.getInfoPlist("HyperswitchSource") {
-        case "LocalHosted":
-            return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
-        default:
-            return Bundle(for: RNHeadlessManager.self).url(forResource: "hyperswitch", withExtension: "bundle")
-        }
-    }
-}
-
-internal class RNHeadlessManager: NSObject, ReactHostManager {
-
-    internal let hyperModule = HyperModuleImpl()
-    internal let headlessModule = HyperHeadlessImpl()
     internal var responseHandler: RNResponseHandler?
     internal private(set) var rootView: UIView?
 
-    private let delegate: RNHeadlessManagerDelegate
-
-    internal lazy var factory: RCTReactNativeFactory = {
-        RCTReactNativeFactory(delegate: self.delegate)
-    }()
-
     internal static let sharedInstance = RNHeadlessManager()
 
-    internal override init() {
-        self.delegate = RNHeadlessManagerDelegate()
-        super.init()
-        self.delegate.dependencyProvider = RCTAppDependencyProvider()
-        self.delegate.manager = self
-        self.hyperModule.host = self
-    }
-
     internal func viewForModule(_ moduleName: String, initialProperties: [String: Any]?) -> UIView {
-        let rootView = factory.rootViewFactory.view(
-            withModuleName: moduleName,
+        let rootView = RNViewManager.sharedInstance.widgetViewForModule(
+            moduleName,
             initialProperties: initialProperties
         )
         self.rootView = rootView
         return rootView
     }
 
-    internal func reinvalidateBridge() {
-        self.rootView = nil
-        self.factory = RCTReactNativeFactory(delegate: self.delegate)
-    /// Unmounts one completed headless root without destroying the bridge or its JS module cache.
-    internal func releaseRootView(_ completedRootView: RCTRootView) {
+    /// Unmounts one completed headless root without disturbing shared JS module state.
+    internal func releaseRootView(_ completedRootView: UIView) {
         guard rootView === completedRootView else { return }
         rootView = nil
     }
 
     internal func removePrefetchCache(sdkAuthorization: String) {
         guard !sdkAuthorization.isEmpty else { return }
-        bridgeHeadless.enqueueJSCall(
+        RNViewManager.sharedInstance.factory.bridge?.enqueueJSCall(
             "RCTDeviceEventEmitter",
             method: "emit",
             args: [
@@ -78,17 +50,5 @@ internal class RNHeadlessManager: NSObject, ReactHostManager {
             ],
             completion: nil
         )
-    }
-
-}
-
-extension RNHeadlessManager: RCTBridgeDelegate {
-    func sourceURL(for bridge: RCTBridge) -> URL? {
-        switch Helper.getInfoPlist("HyperswitchSource") {
-        case "LocalHosted":
-            return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
-        default:
-            return Bundle(for: RNHeadlessManager.self).url(forResource: "hyperswitch", withExtension: "bundle")
-        }
     }
 }

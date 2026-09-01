@@ -30,5 +30,4 @@ public class PaymentSheet {
     internal var subscribedEvents: [String]?
     internal var paymentEventListener: PaymentEventListener?
     internal var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
-    internal var prefetchedData: [String: Any]?
 }

@@ -10,7 +10,7 @@ import UIKit
 
 private struct PendingPrefetch {
     let continuation: CheckedContinuation<[String: Any], Never>
-    let rootView: RCTRootView
+    let rootView: UIView
 }
 
 /// Accessed only on the main queue. The authorization is the routing key for the one payment
@@ -21,7 +21,7 @@ private final class PendingSavedMethodsRequest {
     weak var session: PaymentSession?
     let sdkAuthorization: String
     let completion: (PaymentSessionHandler) -> Void
-    var rootView: RCTRootView?
+    var rootView: UIView?
     var confirmationStarted = false
 
     init(
@@ -43,12 +43,12 @@ private final class PendingSavedMethodsRequest {
 /// These registries are main-queue confined. Different authorizations can run concurrently;
 /// duplicate work for one authorization is rejected instead of overwriting the first owner.
 private var pendingSavedMethodsRequests: [String: PendingSavedMethodsRequest] = [:]
-private var savedMethodConfirmations: [String: (PaymentResult) -> Void] = [:]
+private var headlessConfirmations: [String: (PaymentResult) -> Void] = [:]
 
 extension PaymentSession {
 
     /// Matches the Android launcher and the JS-side fallbacks, so neither side waits on the other.
-    private static let prefetchTimeout: DispatchTimeInterval = .seconds(10)
+    private static let prefetchTimeout: DispatchTimeInterval = .seconds(30)
     private static let savedMethodsTimeout: DispatchTimeInterval = .seconds(30)
 
     /// Runs the initial prefetch headless task and waits for its result.
@@ -58,12 +58,19 @@ extension PaymentSession {
     /// Without the timeout a wedged bridge left `initPaymentSession` awaiting forever.
     internal func triggerPrefetch() async {
         let configuration = paymentSessionConfiguration
+        /* The fetched payload lives only in the JS PrefetchCache; this waits purely so the
+           cache is warm before the merchant is allowed to present UI. */
         let data = await loadHeadlessData(
             headlessType: "prefetch",
             configuration: configuration
         )
-        if paymentSessionConfiguration.sdkAuthorization == configuration.sdkAuthorization {
-            prefetchedData = data
+        if data == nil,
+           paymentSessionConfiguration.sdkAuthorization == configuration.sdkAuthorization {
+            /* A failed re-validation must not leave an earlier (e.g. cancelled) attempt's
+               entry behind: the sheet would mount with minutes-old session tokens instead
+               of fetching for itself. Same-auth guard keeps a late-finishing prefetch of
+               an old session from wiping a newer session's entry. */
+            clearPrefetch(for: configuration.sdkAuthorization)
         }
     }
 
@@ -87,9 +94,9 @@ extension PaymentSession {
 
         let data: [String: Any] = await withCheckedContinuation { continuation in
             DispatchQueue.main.async {
-                // sdkAuthorization identifies one payment. If a merchant initializes the exact
-                // same payment concurrently, let that unsupported duplicate fall back instead of
-                // adding callback lists and multi-owner lifecycle state.
+                /* sdkAuthorization identifies one payment. If a merchant initializes the exact
+                   same payment concurrently, let that unsupported duplicate fall back instead of
+                   adding callback lists and multi-owner lifecycle state. */
                 guard pendingPrefetches[sdkAuthorization] == nil else {
                     continuation.resume(returning: [:])
                     return
@@ -126,9 +133,6 @@ extension PaymentSession {
 
     internal func clearPrefetch(for sdkAuthorization: String) {
         guard !sdkAuthorization.isEmpty else { return }
-        if paymentSessionConfiguration.sdkAuthorization == sdkAuthorization {
-            prefetchedData = nil
-        }
         RNHeadlessManager.sharedInstance.removePrefetchCache(
             sdkAuthorization: sdkAuthorization
         )
@@ -169,7 +173,6 @@ extension PaymentSession {
             paymentSheet.subscribedEvents = subscription.subscribedEventStrings()
             paymentSheet.paymentEventListener = builtListener
         }
-        paymentSheet.prefetchedData = prefetchedData
         paymentSheet.present(from: viewController) { [weak self] result in
             self?.handlePaymentResult(result, sdkAuthorization: sdkAuthorization)
             completion(result)
@@ -196,7 +199,6 @@ extension PaymentSession {
             paymentSheet.subscribedEvents = subscription.subscribedEventStrings()
             paymentSheet.paymentEventListener = builtListener
         }
-        paymentSheet.prefetchedData = prefetchedData
         paymentSheet.presentWithParams(from: viewController, props: params) { [weak self] result in
             self?.handlePaymentResult(result, sdkAuthorization: sdkAuthorization)
             completion(result)
@@ -231,13 +233,9 @@ extension PaymentSession {
             let paymentSessionConfiguration = try? self.paymentSessionConfiguration.toDictionary()
             let sdkParams = SDKParams.getSDKParams()
             let configurationDict = try? configuration.toDictionary()
-        let manager = RNHeadlessManager.sharedInstance
-        manager.headlessModule.begin(session: self, completion: func_)
-        manager.reinvalidateBridge()
-        let hyperswitchConfiguration = try? hyperswitchConfiguration?.toDictionary()
-        let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
-        let sdkParams = SDKParams.getSDKParams()
-        let configurationDict = try? configuration.toDictionary()
+            /* The impl that the mounted headless root's TurboModule calls back into lives on
+               RNViewManager's shared ReactHost — begin the session there before mounting. */
+            RNViewManager.sharedInstance.headlessModule.begin(session: self, completion: func_)
 
             var props: [String: Any] = [
                 "hyperswitchConfig": hyperswitchConfiguration as Any,
@@ -390,7 +388,7 @@ extension PaymentSession {
         rnMessage: String
     ) {
         DispatchQueue.main.async {
-            guard let completion = savedMethodConfirmations.removeValue(
+            guard let completion = headlessConfirmations.removeValue(
                 forKey: sdkAuthorization
             ) else { return }
             completion(paymentResult(from: rnMessage))
@@ -404,7 +402,7 @@ extension PaymentSession {
     ) -> Bool {
         guard
             !request.confirmationStarted,
-            savedMethodConfirmations[sdkAuthorization] == nil
+            headlessConfirmations[sdkAuthorization] == nil
         else {
             resultHandler(savedMethodsFailure(
                 code: "ALREADY_IN_PROGRESS",
@@ -420,7 +418,7 @@ extension PaymentSession {
             return false
         }
         request.confirmationStarted = true
-        savedMethodConfirmations[sdkAuthorization] = { result in
+        headlessConfirmations[sdkAuthorization] = { result in
             request.session?.handlePaymentResult(
                 result,
                 sdkAuthorization: sdkAuthorization
@@ -557,6 +555,5 @@ extension PaymentSession {
                 )
             )
         }
-        let _ = manager.viewForModule("HyperHeadless", initialProperties: ["props": props])
     }
 }

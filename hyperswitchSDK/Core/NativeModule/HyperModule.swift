@@ -62,7 +62,7 @@ internal class HyperModuleImpl: NSObject {
             self.shim?.emitEvent(name: name, payload: payload)
         }
     }
-      internal override func supportedEvents() -> [String] {
+    internal func supportedEvents() -> [String] {
         return [
             "confirm", "confirmEC", "triggerWidgetAction", "updateIntentInit", "updateIntentComplete",
             "clearPrefetchCache",

@@ -60,22 +60,27 @@ RCT_EXPORT_MODULE()
 
 #pragma mark - NativeHyperHeadlessSpec
 
-- (void)getPaymentSession:(NSInteger)rootTag
+- (void)getPaymentSession:(NSString *)sdkAuthorization
         paymentIntentData:(NSDictionary *)paymentIntentData
      defaultPaymentMethod:(NSDictionary *)defaultPaymentMethod
       savedPaymentMethods:(NSArray *)savedPaymentMethods
                  callback:(RCTResponseSenderBlock)callback
 {
-  [_impl getPaymentSession:@(rootTag)
+  [_impl getPaymentSession:sdkAuthorization
          paymentIntentData:paymentIntentData
       defaultPaymentMethod:defaultPaymentMethod
        savedPaymentMethods:savedPaymentMethods
                   callback:callback];
 }
 
-- (void)exitHeadless:(NSInteger)rootTag result:(JS::NativeHyperHeadless::PaymentExitResult &)result
+- (void)exitHeadless:(NSString *)sdkAuthorization rootTag:(NSInteger)rootTag result:(JS::NativeHyperHeadless::PaymentExitResult &)result
 {
-  [_impl exitHeadless:@(rootTag) status:result.status() code:result.code() message:result.message()];
+  [_impl exitHeadless:sdkAuthorization rootTag:@(rootTag) status:result.status() code:result.code() message:result.message()];
+}
+
+- (void)completePrefetch:(NSDictionary *)data
+{
+  [_impl completePrefetch:data];
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:

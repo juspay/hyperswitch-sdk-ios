@@ -40,6 +40,17 @@ internal class HyperHeadlessImpl: NSObject {
         activeSession = session
     }
 
+    /// Completion signal for one payment's prefetch. The payload itself lives only in the
+    /// JS PrefetchCache (shared VM); native just resumes the awaiting session.
+    @objc(completePrefetch:)
+    internal func completePrefetch(_ data: NSDictionary) {
+        let dataDict = data as? [String: Any] ?? [:]
+        guard let sdkAuthorization = dataDict["sdkAuthorization"] as? String else { return }
+        DispatchQueue.main.async {
+            PaymentSession.finishPrefetch(sdkAuthorization, data: dataDict)
+        }
+    }
+
     private func safeResolve(
         _ callback: @escaping ([Any]?) -> Void,
         _ result: [Any],
@@ -54,9 +65,11 @@ internal class HyperHeadlessImpl: NSObject {
         callback(result)
     }
 
+    /* Headless requests are keyed by sdkAuthorization; the native request handler itself is
+       single in-flight (like Android's auth-keyed SavedMethodsRequestRegistry). */
     @objc(getPaymentSession:paymentIntentData:defaultPaymentMethod:savedPaymentMethods:callback:)
     internal func getPaymentSession(
-        _ rootTag: NSNumber,
+        _ sdkAuthorization: String,
         _ rnMessage: NSDictionary,
         _ rnMessage2: NSDictionary,
         _ rnMessage3: NSArray,
@@ -124,8 +137,11 @@ internal class HyperHeadlessImpl: NSObject {
         }
     }
 
-    @objc(exitHeadless:status:code:message:)
-    internal func exitHeadless(_ rootTag: NSNumber, _ status: String, _ code: String?, _ message: String?) {
+    /* The codegen adapter decomposes the typed PaymentExitResult object into these flat
+       params (same shape as spec's PaymentExitResult). rootTag routes the result to the
+       CVC widget view when one is mounted for this headless root. */
+    @objc(exitHeadless:rootTag:status:code:message:)
+    internal func exitHeadless(_ sdkAuthorization: String, _ rootTag: NSNumber, _ status: String, _ code: String?, _ message: String?) {
         DispatchQueue.main.async {
             let result = PaymentResult.from(status: status, code: code, message: message)
 

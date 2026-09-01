@@ -22,15 +22,12 @@ public enum UpdateIntentResult {
 
 internal struct UpdateIntentPayload {
     let sdkAuthorization: String
-    let prefetchedApiData: [String: Any]?
 }
 
 public class PaymentSession {
 
     internal var paymentSessionConfiguration: PaymentSessionConfiguration
     internal var hyperswitchConfiguration: HyperswitchConfiguration?
-
-    internal var prefetchedData: [String: Any]?
 
     internal let updateIntentDidStart = PassthroughSubject<Void, Never>()
     internal let updateIntentDidComplete = PassthroughSubject<UpdateIntentPayload, Never>()
@@ -155,11 +152,8 @@ public class PaymentSession {
     ) {
         let sdkAuthorization = newSessionConfiguration.sdkAuthorization
         guard targetCount > 0 else {
-            if let newPrefetchedData {
-                commitIntentUpdate(
-                    configuration: newSessionConfiguration,
-                    data: newPrefetchedData
-                )
+            if newPrefetchedData != nil {
+                commitIntentUpdate(configuration: newSessionConfiguration)
                 finishIntentUpdate(completion: completion, result: .success)
             } else {
                 clearUnappliedPrefetch(sdkAuthorization: sdkAuthorization)
@@ -178,14 +172,11 @@ public class PaymentSession {
             .sink { [weak self] results in
                 guard let self = self else { return }
                 let parsedResults = results.map(self.parseUpdateIntentResult)
-                if let newPrefetchedData, parsedResults.contains(where: { result in
+                if newPrefetchedData != nil, parsedResults.contains(where: { result in
                     if case .success = result { return true }
                     return false
                 }) {
-                    self.commitIntentUpdate(
-                        configuration: newSessionConfiguration,
-                        data: newPrefetchedData
-                    )
+                    self.commitIntentUpdate(configuration: newSessionConfiguration)
                 } else {
                     self.clearUnappliedPrefetch(sdkAuthorization: sdkAuthorization)
                 }
@@ -199,8 +190,7 @@ public class PaymentSession {
             .store(in: &cancellables)
 
         updateIntentDidComplete.send(UpdateIntentPayload(
-            sdkAuthorization: sdkAuthorization,
-            prefetchedApiData: newPrefetchedData
+            sdkAuthorization: sdkAuthorization
         ))
     }
 
@@ -227,13 +217,9 @@ public class PaymentSession {
         ))
     }
 
-    private func commitIntentUpdate(
-        configuration: PaymentSessionConfiguration,
-        data: [String: Any]
-    ) {
+    private func commitIntentUpdate(configuration: PaymentSessionConfiguration) {
         let previousAuthorization = paymentSessionConfiguration.sdkAuthorization
         paymentSessionConfiguration = configuration
-        prefetchedData = data
         #if canImport(React)
         if previousAuthorization != configuration.sdkAuthorization {
             clearPrefetch(for: previousAuthorization)
@@ -258,8 +244,6 @@ public class PaymentSession {
             clearPrefetch(
                 for: sdkAuthorization ?? paymentSessionConfiguration.sdkAuthorization
             )
-            #else
-            prefetchedData = nil
             #endif
             return
         }

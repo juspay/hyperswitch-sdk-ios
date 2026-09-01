@@ -95,9 +95,6 @@ public class PaymentWidget: UIControl {
             "configuration": configurationDict ?? nativeConfig as Any,
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
-        if let prefetchedData = paymentSession.prefetchedData {
-            props["prefetchedApiData"] = prefetchedData
-        }
 
         self.rootView = reactManager.widgetViewForModule(
             "hyperSwitch",
@@ -132,13 +129,12 @@ public class PaymentWidget: UIControl {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] update in
                 guard let self = self else { return }
-                var payload: [String: Any] = [
+                // Payload is intentionally sdkAuthorization-only: JS resolves the fresh
+                // intent data from its own PrefetchCache on the shared bridge.
+                let payload: [String: Any] = [
                     "rootTag": self.widgetReactTag ?? -1,
                     "sdkAuthorization": update.sdkAuthorization,
                 ]
-                if let data = update.prefetchedApiData {
-                    payload["prefetchedApiData"] = data
-                }
                 self.reactManager.hyperModule.emit("updateIntentComplete", payload)
             }
             .store(in: &cancellables)
