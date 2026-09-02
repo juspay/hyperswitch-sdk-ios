@@ -60,8 +60,17 @@ internal final class VaultReactNativeController {
 
     private init() {
         delegate = VaultReactDelegate()
+        /*
+         * The vault is a standalone library consumed by arbitrary hosts —
+         * the host workspace's generated RCTAppDependencyProvider enumerates
+         * EVERY codegen component declared in that workspace (including
+         * main-SDK pieces like ApplePayView), and its registry dictionary
+         * crashes when a listed class was never linked into this binary.
+         * VaultDependencyProvider registers only classes this host actually
+         * provides.
+         */
         #if canImport(ReactAppDependencyProvider)
-        delegate.dependencyProvider = RCTAppDependencyProvider()
+        delegate.dependencyProvider = VaultDependencyProvider()
         #endif
     }
 

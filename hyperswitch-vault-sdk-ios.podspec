@@ -16,6 +16,9 @@ Pod::Spec.new do |s|
 
   s.subspec 'core' do |core|
     core.source_files = 'hyperswitchVault/**/*.{m,mm,h,swift}'
+    # Public so the pod's Swift sources can see VaultDependencyProvider() and
+    # wire it on the factory delegate.
+    core.public_header_files = 'hyperswitchVault/Core/NativeModule/VaultDependencyProvider.h'
     core.resources = ['hyperswitchVault/Core/Resources/hyperswitch-vault.bundle']
     #
     # Same React Native distribution the main HyperswitchSDK workspace uses:
