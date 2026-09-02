@@ -40,16 +40,43 @@ private final class PendingSavedMethodsRequest {
     }
 }
 
+/* Time-boxed confirmation registration, same as the prefetch and saved-methods requests:
+   a dead runtime must not lock the authorization's slot forever — the entry settles as
+   a failure when its timer fires. */
+private final class PendingConfirmation {
+    let completion: (PaymentResult) -> Void
+    private var timeoutTask: DispatchWorkItem?
+
+    init(completion: @escaping (PaymentResult) -> Void) {
+        self.completion = completion
+    }
+
+    func scheduleTimeout(
+        timeout: TimeInterval,
+        onTimeout: @escaping () -> Void
+    ) {
+        let task = DispatchWorkItem(block: onTimeout)
+        timeoutTask = task
+        DispatchQueue.main.asyncAfter(deadline: .now() + timeout, execute: task)
+    }
+
+    func cancelTimeout() {
+        timeoutTask?.cancel()
+        timeoutTask = nil
+    }
+}
+
 /// These registries are main-queue confined. Different authorizations can run concurrently;
 /// duplicate work for one authorization is rejected instead of overwriting the first owner.
 private var pendingSavedMethodsRequests: [String: PendingSavedMethodsRequest] = [:]
-private var headlessConfirmations: [String: (PaymentResult) -> Void] = [:]
+private var headlessConfirmations: [String: PendingConfirmation] = [:]
 
 extension PaymentSession {
 
-    /// Matches the Android launcher and the JS-side fallbacks, so neither side waits on the other.
+    /* SDK-side last-resort budgets; JS has no budget of its own. Same 30s window as Android. */
     private static let prefetchTimeout: DispatchTimeInterval = .seconds(30)
     private static let savedMethodsTimeout: DispatchTimeInterval = .seconds(30)
+    private static let confirmationTimeout: TimeInterval = 30
 
     /// Runs the initial prefetch headless task and waits for its result.
     ///
@@ -79,8 +106,8 @@ extension PaymentSession {
     }
 
     /// Fetches the new intent's data without mutating the active session. The `try?`
-    /// collapses both failure kinds (duplicate, empty result) into nil: updateIntent
-    /// treats a missing prefetch as a silent fallback, never a loud failure.
+    /// collapses both failure kinds (duplicate, empty result) into nil — and the
+    /// updateIntent gate reports that nil as PREFETCH_FAILED by design.
     internal func fetchIntentUpdate(
         configuration: PaymentSessionConfiguration
     ) async -> [String: Any]? {
@@ -398,10 +425,11 @@ extension PaymentSession {
         result: PaymentResult
     ) -> Bool {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard let completion = headlessConfirmations.removeValue(
+        guard let pending = headlessConfirmations.removeValue(
             forKey: sdkAuthorization
         ) else { return false }
-        completion(result)
+        pending.cancelTimeout()
+        pending.completion(result)
         return true
     }
 
@@ -410,13 +438,24 @@ extension PaymentSession {
         request: PendingSavedMethodsRequest,
         resultHandler: @escaping (PaymentResult) -> Void
     ) -> Bool {
+        /* Headless confirms cannot be JS-guarded: the headless root's nativeProp is frozen
+           at launch (its clientSecret is used verbatim at confirm time) — only native, which
+           owns the current authorization, can reject a superseded-intent handler. */
+        guard request.session?.paymentSessionConfiguration.sdkAuthorization == request.sdkAuthorization
+        else {
+            resultHandler(savedMethodsFailure(
+                code: "STALE_PAYMENT_SESSION_HANDLER",
+                message: "Saved payment methods handler belongs to a previous payment intent; call getCustomerSavedPaymentMethods again"
+            ))
+            return false
+        }
         /* Confirm channels are single-shot: the codegen callback is consumed by the
            first confirm and the registry entry by its result. A post-terminal retry
-           on the same handler is ALREADY_USED — only an in-flight duplicate is
+           on the same handler is HANDLER_ALREADY_USED — only an in-flight duplicate is
            ALREADY_IN_PROGRESS. */
         if request.confirmationStarted, headlessConfirmations[sdkAuthorization] == nil {
             resultHandler(savedMethodsFailure(
-                code: "ALREADY_USED",
+                code: "HANDLER_ALREADY_USED",
                 message: "This saved payment methods handler has already completed"
             ))
             return false
@@ -432,13 +471,22 @@ extension PaymentSession {
             return false
         }
         request.confirmationStarted = true
-        headlessConfirmations[sdkAuthorization] = { result in
+        let pending = PendingConfirmation { result in
             request.session?.handlePaymentResult(
                 result,
                 sdkAuthorization: sdkAuthorization
             )
             request.releaseRootView()
             resultHandler(result)
+        }
+        headlessConfirmations[sdkAuthorization] = pending
+        pending.scheduleTimeout(timeout: PaymentSession.confirmationTimeout) {
+            headlessConfirmations.removeValue(forKey: sdkAuthorization)?.completion(
+                savedMethodsFailure(
+                    code: "CONFIRM_RESULT_TIMEOUT",
+                    message: "Confirmation did not complete in time"
+                )
+            )
         }
         return true
     }
@@ -457,8 +505,9 @@ extension PaymentSession {
     /* The emit could not reach JS: roll the registration back so the entry doesn't
        wedge every later confirm on this authorization with ALREADY_IN_PROGRESS. */
     private static func rollbackSavedMethodConfirmation(sdkAuthorization: String) {
-        if let completion = headlessConfirmations.removeValue(forKey: sdkAuthorization) {
-            completion(.failed(error: NSError(
+        if let pending = headlessConfirmations.removeValue(forKey: sdkAuthorization) {
+            pending.cancelTimeout()
+            pending.completion(.failed(error: NSError(
                 domain: "RUNTIME_UNAVAILABLE",
                 code: 0,
                 userInfo: [NSLocalizedDescriptionKey: "React runtime is not available"]
@@ -473,7 +522,7 @@ extension PaymentSession {
     ) {
         guard !request.confirmationStarted else {
             resultHandler(savedMethodsFailure(
-                code: "ALREADY_USED",
+                code: "HANDLER_ALREADY_USED",
                 message: "This saved payment methods handler has already completed"
             ))
             return

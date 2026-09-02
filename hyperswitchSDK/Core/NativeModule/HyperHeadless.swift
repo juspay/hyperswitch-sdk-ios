@@ -61,22 +61,13 @@ internal class HyperHeadlessImpl: NSObject {
 
     /* The codegen adapter decomposes the typed PaymentExitResult object into these flat
        params (same shape as spec's PaymentExitResult). Registered confirmations consume
-       first (keyed by sdkAuthorization); a mounted CVC widget matches by rootTag next. */
+       by sdkAuthorization; rootTag rides the wire but is unused here (the auth-keyed
+       registry is the single completion channel). */
     @objc(exitHeadless:rootTag:status:code:message:)
     internal func exitHeadless(_ sdkAuthorization: String, _ rootTag: NSNumber, _ status: String, _ code: String?, _ message: String?) {
         DispatchQueue.main.async {
             let result = PaymentResult.from(status: status, code: code, message: message)
-            if PaymentSession.exitHeadless(sdkAuthorization: sdkAuthorization, result: result) {
-                return
-            }
-            if let widget = self.cvcWidget(forRootTag: rootTag) {
-                widget.resolveConfirmResult(result)
-                return
-            }
+            _ = PaymentSession.exitHeadless(sdkAuthorization: sdkAuthorization, result: result)
         }
-    }
-
-    private func cvcWidget(forRootTag rootTag: NSNumber) -> CVCWidget? {
-        return shim?.view(forRootTag: rootTag)?.nearestAncestor(ofType: CVCWidget.self)
     }
 }
