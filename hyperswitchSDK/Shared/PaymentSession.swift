@@ -99,12 +99,17 @@ public class PaymentSession {
             return
         }
 
+        /* A registered widget that never responds must not wedge the update-intent lock:
+           on timeout, proceed with an empty result set (graceful degrade). */
         updateIntentInitReturned
             .prefix(targetCount)
             .collect()
+            .timeout(.seconds(30), scheduler: DispatchQueue.main)
+            .replaceError(with: [])
             .receive(on: DispatchQueue.main)
             .sink { _ in requestAuthorization() }
             .store(in: &cancellables)
+
         updateIntentDidStart.send(())
     }
 
@@ -165,14 +170,27 @@ public class PaymentSession {
             return
         }
 
+        /* On timeout, deliver an empty result set: the sink treats it as a failed update,
+           clears the unapplied prefetch, and releases updateIntentInProgress. */
+        /* A failed prefetch must reach the caller WITHOUT broadcasting to widgets:
+           a broadcast would switch the JS widgets to the new intent while the native
+           session stays on the old authorization — split-brain state. */
+        guard newPrefetchedData != nil else {
+            clearUnappliedPrefetch(sdkAuthorization: sdkAuthorization)
+            finishIntentUpdate(completion: completion, result: prefetchFailedUpdateResult())
+            return
+        }
+
         updateIntentCompleteReturned
             .prefix(targetCount)
             .collect()
+            .timeout(.seconds(30), scheduler: DispatchQueue.main)
+            .replaceError(with: [])
             .receive(on: DispatchQueue.main)
             .sink { [weak self] results in
                 guard let self = self else { return }
                 let parsedResults = results.map(self.parseUpdateIntentResult)
-                if newPrefetchedData != nil, parsedResults.contains(where: { result in
+                if parsedResults.contains(where: { result in
                     if case .success = result { return true }
                     return false
                 }) {
@@ -182,9 +200,7 @@ public class PaymentSession {
                 }
                 self.finishIntentUpdate(
                     completion: completion,
-                    result: newPrefetchedData == nil
-                        ? self.prefetchFailedUpdateResult()
-                        : self.aggregateUpdateIntentResults(parsedResults)
+                    result: self.aggregateUpdateIntentResults(parsedResults)
                 )
             }
             .store(in: &cancellables)

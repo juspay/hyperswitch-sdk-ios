@@ -41,14 +41,11 @@ internal class RNHeadlessManager: NSObject {
 
     internal func removePrefetchCache(sdkAuthorization: String) {
         guard !sdkAuthorization.isEmpty else { return }
-        RNViewManager.sharedInstance.factory.bridge?.enqueueJSCall(
-            "RCTDeviceEventEmitter",
-            method: "emit",
-            args: [
-                "clearPrefetchCache",
-                ["sdkAuthorization": sdkAuthorization],
-            ],
-            completion: nil
+        /* Must go through the module's codegen event channel: the RCTBridge compat layer is
+           nil on the bridgeless runtime, so enqueueJSCall would silently drop the event. */
+        RNViewManager.sharedInstance.hyperModule.emit(
+            "clearPrefetchCache",
+            ["sdkAuthorization": sdkAuthorization]
         )
     }
 }

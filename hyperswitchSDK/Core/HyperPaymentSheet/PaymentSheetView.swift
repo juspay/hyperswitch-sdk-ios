@@ -26,7 +26,7 @@ internal extension PaymentSheet {
         let sdkParams = SDKParams.getSDKParams()
 
         /// Create a dictionary of props to be sent to React Native with configuration, type, sdkAuthorization, publishable key, hyperParams, custom backend URL, themes, and custom parameters.
-        var props: [String: Any] = [
+        let props: [String: Any] = [
             "type": "payment",
             "hyperswitchConfig": hyperswitchConfiguration as Any,
             "paymentSessionConfig": paymentSessionConfiguration as Any,
@@ -51,7 +51,7 @@ internal extension PaymentSheet {
         var propsDict = props
         propsDict["subscribedEvents"] = subscribedEvents
 
-        var props: [String: Any] = [
+        let props: [String: Any] = [
             "type": "payment",
             "hyperswitchConfig": hyperswitchConfiguration as Any,
             "paymentSessionConfig": paymentSessionConfiguration as Any,

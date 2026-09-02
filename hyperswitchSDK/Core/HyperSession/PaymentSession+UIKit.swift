@@ -8,8 +8,16 @@
 import Foundation
 import UIKit
 
+/* `requested` distinguishes a real fetch attempt from a suppressed duplicate init:
+   a duplicate must not read as a failed prefetch (the caller would clear the cache entry
+   the original in-flight request is about to write — a race on the same authorization). */
+internal struct HeadlessFetchResult {
+    let requested: Bool
+    let data: [String: Any]?
+}
+
 private struct PendingPrefetch {
-    let continuation: CheckedContinuation<[String: Any], Never>
+    let continuation: CheckedContinuation<HeadlessFetchResult, Never>
     let rootView: UIView
 }
 
@@ -60,11 +68,13 @@ extension PaymentSession {
         let configuration = paymentSessionConfiguration
         /* The fetched payload lives only in the JS PrefetchCache; this waits purely so the
            cache is warm before the merchant is allowed to present UI. */
-        let data = await loadHeadlessData(
+        let fetch = await loadHeadlessData(
             headlessType: "prefetch",
             configuration: configuration
         )
-        if data == nil,
+        /* A suppressed duplicate is not a failure: the original request owns the entry and
+           will write it — clearing here would race that write. */
+        if fetch.requested, fetch.data == nil,
            paymentSessionConfiguration.sdkAuthorization == configuration.sdkAuthorization {
             /* A failed re-validation must not leave an earlier (e.g. cancelled) attempt's
                entry behind: the sheet would mount with minutes-old session tokens instead
@@ -81,24 +91,26 @@ extension PaymentSession {
         await loadHeadlessData(
             headlessType: "updateIntent",
             configuration: configuration
-        )
+        ).data
     }
 
-    private func loadHeadlessData(
+        private func loadHeadlessData(
         headlessType: String,
         configuration: PaymentSessionConfiguration
-    ) async -> [String: Any]? {
+    ) async -> HeadlessFetchResult {
         let sdkAuthorization = configuration.sdkAuthorization
 
-        guard !sdkAuthorization.isEmpty else { return nil }
+        guard !sdkAuthorization.isEmpty else {
+            return HeadlessFetchResult(requested: false, data: nil)
+        }
 
-        let data: [String: Any] = await withCheckedContinuation { continuation in
+        let result: HeadlessFetchResult = await withCheckedContinuation { continuation in
             DispatchQueue.main.async {
                 /* sdkAuthorization identifies one payment. If a merchant initializes the exact
                    same payment concurrently, let that unsupported duplicate fall back instead of
                    adding callback lists and multi-owner lifecycle state. */
                 guard pendingPrefetches[sdkAuthorization] == nil else {
-                    continuation.resume(returning: [:])
+                    continuation.resume(returning: HeadlessFetchResult(requested: false, data: nil))
                     return
                 }
 
@@ -128,7 +140,7 @@ extension PaymentSession {
             }
         }
 
-        return data.isEmpty ? nil : data
+        return HeadlessFetchResult(requested: result.requested, data: result.data?.isEmpty == true ? nil : result.data)
     }
 
     internal func clearPrefetch(for sdkAuthorization: String) {
@@ -145,11 +157,11 @@ extension PaymentSession {
         data: [String: Any]
     ) -> Bool {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard let pending = pendingPrefetches.removeValue(forKey: sdkAuthorization) else {
+        guard         let pending = pendingPrefetches.removeValue(forKey: sdkAuthorization) else {
             return false
         }
         RNHeadlessManager.sharedInstance.releaseRootView(pending.rootView)
-        pending.continuation.resume(returning: data)
+        pending.continuation.resume(returning: HeadlessFetchResult(requested: true, data: data))
         return true
     }
 
@@ -233,9 +245,6 @@ extension PaymentSession {
             let paymentSessionConfiguration = try? self.paymentSessionConfiguration.toDictionary()
             let sdkParams = SDKParams.getSDKParams()
             let configurationDict = try? configuration.toDictionary()
-            /* The impl that the mounted headless root's TurboModule calls back into lives on
-               RNViewManager's shared ReactHost — begin the session there before mounting. */
-            RNViewManager.sharedInstance.headlessModule.begin(session: self, completion: func_)
 
             var props: [String: Any] = [
                 "hyperswitchConfig": hyperswitchConfiguration as Any,
@@ -383,16 +392,17 @@ extension PaymentSession {
         }
     }
 
+    @discardableResult
     internal static func exitHeadless(
         sdkAuthorization: String,
-        rnMessage: String
-    ) {
-        DispatchQueue.main.async {
-            guard let completion = headlessConfirmations.removeValue(
-                forKey: sdkAuthorization
-            ) else { return }
-            completion(paymentResult(from: rnMessage))
-        }
+        result: PaymentResult
+    ) -> Bool {
+        dispatchPrecondition(condition: .onQueue(.main))
+        guard let completion = headlessConfirmations.removeValue(
+            forKey: sdkAuthorization
+        ) else { return false }
+        completion(result)
+        return true
     }
 
     private static func beginSavedMethodConfirmation(
@@ -500,30 +510,6 @@ extension PaymentSession {
             code: 0,
             userInfo: [NSLocalizedDescriptionKey: message]
         ))
-    }
-
-    private static func paymentResult(from rnMessage: String) -> PaymentResult {
-        guard
-            let data = rnMessage.data(using: .utf8),
-            let message = try? JSONSerialization.jsonObject(with: data) as? [String: String],
-            let status = message["status"]
-        else {
-            return savedMethodsFailure(
-                code: "UNKNOWN_ERROR",
-                message: "An error has occurred."
-            )
-        }
-        switch status {
-        case "cancelled":
-            return .canceled(data: status)
-        case "failed", "requires_payment_method":
-            return savedMethodsFailure(
-                code: message["code"].flatMap { $0.isEmpty ? nil : $0 } ?? "UNKNOWN_ERROR",
-                message: message["message"] ?? "An error has occurred."
-            )
-        default:
-            return .completed(data: status)
-        }
     }
 
     private static func failedSavedMethodsHandler(
