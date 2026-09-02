@@ -14,6 +14,23 @@ import ReactAppDependencyProvider
 
 internal class VaultReactDelegate: RCTDefaultReactNativeFactoryDelegate {
 
+    internal weak var manager: VaultReactNativeController?
+
+    /// The factory calls this whenever the runtime instantiates a TurboModule
+    /// class; we hand it our own instance, pre-attached to the Impl singleton
+    /// (twin of the main SDK's RNFactoryDelegate.getModuleInstanceFromClass:),
+    /// giving native → JS emission a stable handle for the whole runtime life.
+    @objc(getModuleInstanceFromClass:)
+    internal func getModuleInstanceFromClass(_ moduleClass: AnyClass) -> AnyObject? {
+        guard let manager = manager else { return nil }
+        if let shimType = moduleClass as? (NSObject & HyperVaultModuleShim).Type {
+            let shim = shimType.init()
+            manager.hyperVaultModule.attach(to: shim)
+            return shim
+        }
+        return nil
+    }
+
     /// The vault JS bundle is compiled for the Fabric renderer and expects the
     /// bridgeless runtime (`nativeFabricUIManager` must exist). Always-on: the
     /// vault SDK runs on the host workspace's RN distribution (0.86 pods),
@@ -49,8 +66,9 @@ internal final class VaultReactNativeController {
 
     internal let moduleName = "hs-vault"
 
-    /// Event name for tokenise broadcasts; mirrors src/vault/registry.js.
-    static let tokeniseEventName = "hsVaultTokenise"
+    /// The singleton Swift backing for the codegen HyperVaultModule TurboModule.
+    /// Native → JS emission (onVaultTokenise) goes through its attached shim.
+    internal let hyperVaultModule = HyperVaultModuleImpl()
 
     private let delegate: VaultReactDelegate
 
@@ -60,6 +78,7 @@ internal final class VaultReactNativeController {
 
     private init() {
         delegate = VaultReactDelegate()
+        delegate.manager = self
         /*
          * The vault is a standalone library consumed by arbitrary hosts —
          * the host workspace's generated RCTAppDependencyProvider enumerates
@@ -82,9 +101,18 @@ internal final class VaultReactNativeController {
         )
     }
 
-    /// Broadcasts an event to every vault JS surface on this runtime.
-    internal func emitDeviceEvent(name: String, body: Any? = nil) {
-        factory.bridge?.eventDispatcher().sendDeviceEvent(withName: name, body: body)
+    /// Broadcasts a typed tokenise request to the JS vault surfaces on this
+    /// runtime; a mounted JS surface claims the event, runs the vault confirm,
+    /// and answers through HyperVaultModule.returnTokenizedValue with the
+    /// vaultSubmitResult JSON.
+    ///
+    /// Routed through the codegen HyperVaultModule's typed `onVaultTokenise`
+    /// EventEmitter — the vault twin of the main SDK's
+    /// HyperModule.triggerWidgetAction channel. The payload type lives in
+    /// VaultTokeniseRequest (JS: src/specs/NativeHyperVaultModule.ts,
+    /// Kotlin: VaultTokeniseRequest.kt).
+    internal func emitTokenise(_ request: VaultTokeniseRequest) {
+        hyperVaultModule.emitVaultTokenise(request)
     }
 }
 

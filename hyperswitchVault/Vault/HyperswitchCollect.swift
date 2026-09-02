@@ -52,10 +52,7 @@ public final class HyperswitchCollect {
      * native layer (updateFieldState) is untouched.
      */
     public func tokenise() {
-        VaultReactNativeController.shared.emitDeviceEvent(
-            name: VaultReactNativeController.tokeniseEventName,
-            body: nil
-        )
+        VaultReactNativeController.shared.emitTokenise(VaultTokeniseRequest())
     }
 
     /**
@@ -71,12 +68,11 @@ public final class HyperswitchCollect {
         TokeniseDispatcher.shared.register { json in
             completion(VaultTokeniseResult.parse(json))
         }
-        VaultReactNativeController.shared.emitDeviceEvent(
-            name: VaultReactNativeController.tokeniseEventName,
-            body: [
-                "sdkAuthorization": sdkAuthorization,
-                "environment": environment.jsName,
-            ]
+        VaultReactNativeController.shared.emitTokenise(
+            VaultTokeniseRequest(
+                sdkAuthorization: sdkAuthorization,
+                environment: environment.jsName
+            )
         )
     }
 

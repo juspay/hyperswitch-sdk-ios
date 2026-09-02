@@ -2,17 +2,22 @@
 //  HyperVaultModule.mm
 //  HyperswitchVault
 //
-//  Bridge between JS vault field widgets (client-core, New Arch surface)
-//  and the native vault pod (VaultStateStore + TokeniseDispatcher).
+//  Codegen TurboModule for the vault: JS → native methods forward to the
+//  Swift backing (HyperVaultModuleImpl); native → JS goes through the
+//  codegen-typed EventEmitter `onVaultTokenise` — the vault twin of the
+//  main SDK's HyperModule (triggerWidgetAction / confirmCVC channel).
 //
-//  Plain RCTBridgeModule — works on both the Old Arch (via the bridge) and
-//  the New Arch (via the TurboModule interop, which exposes every
-//  RCTBridgeModule as a TurboModule with the same name). No codegen spec
-//  is required for three-method, no-return shape — the methods are called
-//  from JS with the exact signatures exported below.
+//  Bridgeless-only: the vault runtime is hard-pinned to the new
+//  architecture (VaultReactDelegate.newArchEnabled == YES).
 //
 
 #import <React/RCTBridgeModule.h>
+
+#if __has_include(<ReactCodegen/HyperswitchClientCoreSpec/HyperswitchClientCoreSpec.h>)
+#import <ReactCodegen/HyperswitchClientCoreSpec/HyperswitchClientCoreSpec.h>
+#else
+#import "HyperswitchClientCoreSpec/HyperswitchClientCoreSpec.h"
+#endif
 
 #if __has_include("HyperswitchVault-Swift.h")
 #import "HyperswitchVault-Swift.h"
@@ -20,43 +25,69 @@
 #import <HyperswitchVault/HyperswitchVault-Swift.h>
 #endif
 
-@interface HyperVaultModule : NSObject <RCTBridgeModule>
+@interface HyperVaultModule : NativeHyperVaultModuleSpecBase <NativeHyperVaultModuleSpec, HyperVaultModuleShim>
 @end
 
 @implementation HyperVaultModule {
   HyperVaultModuleImpl *_impl;
 }
 
-RCT_EXPORT_MODULE(HyperVaultModule)
+RCT_EXPORT_MODULE()
 
 + (BOOL)requiresMainQueueSetup
 {
-  return NO;
+  return YES;
 }
 
-- (instancetype)init
+- (dispatch_queue_t)methodQueue
 {
-  self = [super init];
-  if (self) {
-    _impl = [[HyperVaultModuleImpl alloc] init];
+  return dispatch_get_main_queue();
+}
+
+#pragma mark - HyperVaultModuleShim
+
+- (void)attachImpl:(HyperVaultModuleImpl *)impl
+{
+  _impl = impl;
+}
+
+- (void)emitVaultTokeniseEventWithSdkAuthorization:(NSString *)sdkAuthorization
+                                        environment:(NSString *)environment
+{
+  if (!_eventEmitterCallback) {
+    return;
   }
-  return self;
+  NSMutableDictionary<NSString *, id> *payload = [NSMutableDictionary new];
+  if (sdkAuthorization != nil) {
+    payload[@"sdkAuthorization"] = sdkAuthorization;
+  }
+  if (environment != nil) {
+    payload[@"environment"] = environment;
+  }
+  [self emitOnVaultTokenise:payload];
 }
 
-RCT_EXPORT_METHOD(updateFieldState:(nonnull NSNumber *)rootTag
-                             state:(nonnull NSString *)state)
+#pragma mark - NativeHyperVaultModuleSpec
+
+- (void)updateFieldState:(double)rootTag state:(NSString *)state
 {
-  [_impl updateFieldState:rootTag state:state];
+  [_impl updateFieldState:@(rootTag) state:state];
 }
 
-RCT_EXPORT_METHOD(updateVaultFieldStates:(nonnull NSString *)statesJson)
+- (void)updateVaultFieldStates:(NSString *)statesJson
 {
   [_impl updateVaultFieldStates:statesJson];
 }
 
-RCT_EXPORT_METHOD(returnTokenizedValue:(nonnull NSString *)resultJson)
+- (void)returnTokenizedValue:(NSString *)resultJson
 {
   [_impl returnTokenizedValue:resultJson];
+}
+
+- (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
+    (const facebook::react::ObjCTurboModule::InitParams &)params
+{
+  return std::make_shared<facebook::react::NativeHyperVaultModuleSpecJSI>(params);
 }
 
 @end

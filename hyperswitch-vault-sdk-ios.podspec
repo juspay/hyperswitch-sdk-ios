@@ -30,12 +30,14 @@ Pod::Spec.new do |s|
     #
     # Unpinned on purpose: the vault rides on whatever React version the
     # consuming app's RN workspace resolves. RNSVG is the one native field
-    # dependency (card brand icons). HyperVaultModule stays a plain
-    # RCTBridgeModule — the bridgeless runtime surfaces it to the codegen
-    # spec as a TurboModule, so no codegen spec needed.
+    # dependency (card brand icons). HyperVaultModule subclasses the codegen
+    # NativeHyperVaultModuleSpecBase (typed onVaultTokenise EventEmitter — the
+    # vault twin of the main SDK's HyperModule.triggerWidgetAction channel),
+    # so the pod links the workspace's generated ReactCodegen pod.
     core.dependency 'React-Core'
     core.dependency 'React-RCTAppDelegate'
     core.dependency 'ReactAppDependencyProvider'
+    core.dependency 'ReactCodegen'
     core.dependency 'RNSVG'
   end
 
