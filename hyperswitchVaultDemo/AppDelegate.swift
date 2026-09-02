@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    private var collect: HyperswitchCollect!
+    private var collect: HyperswitchVault!
     private let statesView = UILabel()
     private let tokeniseButton = UIButton(type: .system)
     private var fields: [(field: HyperswitchTextField, name: String)] = []
@@ -110,7 +110,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     /// mockServer.js talks to the integration env (`integ.hyperswitch.io`), whose
     /// vault host is `dev.hyperswitch.io/api` (= `.integration`).
     private func onAuthorizationReady(_ sdkAuthorization: String) {
-        let collect = HyperswitchCollect(sdkAuthorization: sdkAuthorization, environment: .integration)
+        let collect = HyperswitchVault(sdkAuthorization: sdkAuthorization, environment: .integration)
         self.collect = collect
 
         for (field, name) in fields {

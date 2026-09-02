@@ -1,7 +1,7 @@
 import Foundation
 
 /**
- * Outcome of HyperswitchCollect.tokenise(completion:).
+ * Outcome of HyperswitchVault.tokenise(completion:).
  *
  * Mirrors the JS vault package's `vaultSubmitResult` serialization
  * ({status, token?, error?}) one-to-one, so a natively-driven tokenise and a

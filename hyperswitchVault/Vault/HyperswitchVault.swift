@@ -1,13 +1,13 @@
 import UIKit
 
 /**
- * HyperswitchCollect
+ * HyperswitchVault
  *
  * VGS-compatible entry point of the Hyperswitch Vault iOS SDK
  * (pod `hyperswitch-vault-sdk-ios`).
  *
  * ```swift
- * let collect = HyperswitchCollect(sdkAuthorization: "sdk_...", environment: .sandbox)
+ * let collect = HyperswitchVault(sdkAuthorization: "sdk_...", environment: .sandbox)
  * cardField.configuration = VaultConfiguration(collector: collect, fieldName: "card_number")
  * expDateField.configuration = VaultConfiguration(collector: collect, fieldName: "exp_date")
  * cvcField.configuration = VaultConfiguration(collector: collect, fieldName: "cvc")
@@ -18,7 +18,7 @@ import UIKit
  * this class orchestrates the VGS-shaped API: observing, state tracking,
  * tokenization. Raw card values never cross the bridge into native.
  */
-public final class HyperswitchCollect {
+public final class HyperswitchVault {
 
     /// Hyperswitch Vault SDK authorization token (identifies the vault).
     public let sdkAuthorization: String

@@ -3,7 +3,7 @@
 //  HyperswitchVault
 //
 //  Latest known state of each mounted vault field (keyed by surface root tag),
-//  pushed from JS via HyperVaultModule, consumed by HyperswitchCollect.
+//  pushed from JS via HyperVaultModule, consumed by HyperswitchVault.
 //
 
 import Foundation

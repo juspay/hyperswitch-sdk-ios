@@ -22,10 +22,10 @@ public extension VaultTextFieldDelegate {
  */
 public class HyperswitchTextField: UIView {
 
-    /// Initial-prop `type` of the `hs-vault` RN component.
-    open var fieldType: String { "infoInput" }
-
-    /// Default name the value is submitted under if no configuration set.
+    /// FIELD-TYPE of this input — the single naming scheme shared by the
+    /// surface-prop `type` AND the native state-store key ("card_number",
+    /// "exp_date", "cvc", …; JS decodes the same strings, see
+    /// VaultFieldTypes.fieldTypeFromString).
     open var defaultFieldName: String { "info" }
 
     public var placeholder: String? {
@@ -151,7 +151,7 @@ public class HyperswitchTextField: UIView {
         if !configurationDict.isEmpty {
             config["configuration"] = configurationDict
         }
-        return ["type": fieldType, "config": config]
+        return ["type": defaultFieldName, "config": config]
     }
 
     private func mountSurfaceIfNeeded() {

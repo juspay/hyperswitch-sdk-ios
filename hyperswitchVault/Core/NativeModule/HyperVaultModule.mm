@@ -34,6 +34,24 @@
 
 RCT_EXPORT_MODULE()
 
+/*
+ * Guarantee a live `_impl` from birth: the Impl's methods only touch
+ * singletons (VaultStateStore.shared / TokeniseDispatcher.shared), so this
+ * fallback is fully functional for JS → native calls even if the factory
+ * path (VaultReactDelegate.getModuleInstanceFromClass:) never attaches the
+ * Impl singleton — e.g. an instance created by another runtime scanning
+ * this RCT_EXPORT_MODULE'ed class. The pre-turbo bridge module did the
+ * same; attachImpl: still swaps in the singleton for the emit wiring.
+ */
+- (instancetype)init
+{
+  self = [super init];
+  if (self) {
+    _impl = [[HyperVaultModuleImpl alloc] init];
+  }
+  return self;
+}
+
 + (BOOL)requiresMainQueueSetup
 {
   return YES;
@@ -48,7 +66,9 @@ RCT_EXPORT_MODULE()
 
 - (void)attachImpl:(HyperVaultModuleImpl *)impl
 {
-  _impl = impl;
+  if (impl != nil) {
+    _impl = impl;
+  }
 }
 
 - (void)emitVaultTokeniseEventWithSdkAuthorization:(NSString *)sdkAuthorization
@@ -69,7 +89,7 @@ RCT_EXPORT_MODULE()
 
 #pragma mark - NativeHyperVaultModuleSpec
 
-- (void)updateFieldState:(double)rootTag state:(NSString *)state
+- (void)updateFieldState:(NSInteger)rootTag state:(NSString *)state
 {
   [_impl updateFieldState:@(rootTag) state:state];
 }
