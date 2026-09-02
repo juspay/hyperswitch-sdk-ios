@@ -33,7 +33,9 @@ public class PaymentSession {
     internal let updateIntentDidComplete = PassthroughSubject<UpdateIntentPayload, Never>()
     internal let updateIntentInitReturned = PassthroughSubject<String, Never>()
     internal let updateIntentCompleteReturned = PassthroughSubject<String, Never>()
-    private var cancellables = Set<AnyCancellable>()
+    /* per-updateIntent subscriptions; drained at finish so they don't accumulate
+       (+2 per call). */
+    private var updateIntentCancellables = Set<AnyCancellable>()
     private var activeWidgetIds = Set<ObjectIdentifier>()
     private let activeWidgetLock = NSLock()
     private var updateIntentInProgress = false
@@ -108,7 +110,7 @@ public class PaymentSession {
             .replaceError(with: [])
             .receive(on: DispatchQueue.main)
             .sink { _ in requestAuthorization() }
-            .store(in: &cancellables)
+            .store(in: &updateIntentCancellables)
 
         updateIntentDidStart.send(())
     }
@@ -146,6 +148,7 @@ public class PaymentSession {
         updateIntentLock.lock()
         updateIntentInProgress = false
         updateIntentLock.unlock()
+        updateIntentCancellables.removeAll()
         completion(result)
     }
 
@@ -190,6 +193,17 @@ public class PaymentSession {
             .sink { [weak self] results in
                 guard let self = self else { return }
                 let parsedResults = results.map(self.parseUpdateIntentResult)
+                /* An empty collection only arises from the timeout fallback: no widget
+                   acknowledged the new intent, so nothing was committed — the merchant
+                   must hear a failure, not a silent success. */
+                guard !parsedResults.isEmpty else {
+                    self.clearUnappliedPrefetch(sdkAuthorization: sdkAuthorization)
+                    self.finishIntentUpdate(
+                        completion: completion,
+                        result: updateTimeoutResult()
+                    )
+                    return
+                }
                 if parsedResults.contains(where: { result in
                     if case .success = result { return true }
                     return false
@@ -203,7 +217,7 @@ public class PaymentSession {
                     result: self.aggregateUpdateIntentResults(parsedResults)
                 )
             }
-            .store(in: &cancellables)
+            .store(in: &updateIntentCancellables)
 
         updateIntentDidComplete.send(UpdateIntentPayload(
             sdkAuthorization: sdkAuthorization
@@ -230,6 +244,14 @@ public class PaymentSession {
             domain: "PREFETCH_FAILED",
             code: 0,
             userInfo: [NSLocalizedDescriptionKey: "No API data was returned for the updated payment intent."]
+        ))
+    }
+
+    private func updateTimeoutResult() -> UpdateIntentResult {
+        .failure(NSError(
+            domain: "UPDATE_INTENT_TIMEOUT",
+            code: 0,
+            userInfo: [NSLocalizedDescriptionKey: "Widgets did not acknowledge the updated payment intent in time."]
         ))
     }
 

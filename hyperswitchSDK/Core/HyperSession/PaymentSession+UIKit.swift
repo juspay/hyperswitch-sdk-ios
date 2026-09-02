@@ -94,7 +94,7 @@ extension PaymentSession {
         ).data
     }
 
-        private func loadHeadlessData(
+    private func loadHeadlessData(
         headlessType: String,
         configuration: PaymentSessionConfiguration
     ) async -> HeadlessFetchResult {
@@ -157,7 +157,7 @@ extension PaymentSession {
         data: [String: Any]
     ) -> Bool {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard         let pending = pendingPrefetches.removeValue(forKey: sdkAuthorization) else {
+        guard let pending = pendingPrefetches.removeValue(forKey: sdkAuthorization) else {
             return false
         }
         RNHeadlessManager.sharedInstance.releaseRootView(pending.rootView)
@@ -286,14 +286,9 @@ extension PaymentSession {
             guard let request = pendingSavedMethodsRequests.removeValue(
                 forKey: sdkAuthorization
             ) else { return }
-            guard request.session?.paymentSessionConfiguration.sdkAuthorization == sdkAuthorization else {
-                request.releaseRootView()
-                request.completion(failedSavedMethodsHandler(
-                    code: "STALE_PAYMENT_SESSION_HANDLER",
-                    message: "Saved payment methods handler belongs to the previous payment intent"
-                ))
-                return
-            }
+            /* Staleness (request filed for a superseded intent) is rejected by
+               the JS-side guards before a response reaches native; whatever
+               arrives here is delivered as-is. */
             let handler = PaymentSessionHandler(
                 getCustomerDefaultSavedPaymentMethodData: {
                     return decodePaymentMethodData(getPaymentMethodData)
@@ -357,10 +352,14 @@ extension PaymentSession {
                                 request: request,
                                 resultHandler: resultHandler
                             ) else { return }
-                            cvc.confirm(
+                            if !cvc.confirm(
                                 sdkAuthorization: sdkAuthorization,
                                 paymentToken: paymentToken
-                            )
+                            ) {
+                                self.rollbackSavedMethodConfirmation(
+                                    sdkAuthorization: sdkAuthorization
+                                )
+                            }
                         } else {
                             self.finishSavedMethodDirectly(
                                 request: request,
@@ -410,6 +409,17 @@ extension PaymentSession {
         request: PendingSavedMethodsRequest,
         resultHandler: @escaping (PaymentResult) -> Void
     ) -> Bool {
+        /* Confirm channels are single-shot: the codegen callback is consumed by the
+           first confirm and the registry entry by its result. A post-terminal retry
+           on the same handler is ALREADY_USED — only an in-flight duplicate is
+           ALREADY_IN_PROGRESS. */
+        if request.confirmationStarted, headlessConfirmations[sdkAuthorization] == nil {
+            resultHandler(savedMethodsFailure(
+                code: "ALREADY_USED",
+                message: "This saved payment methods handler has already completed"
+            ))
+            return false
+        }
         guard
             !request.confirmationStarted,
             headlessConfirmations[sdkAuthorization] == nil
@@ -418,13 +428,6 @@ extension PaymentSession {
                 code: "ALREADY_IN_PROGRESS",
                 message: "Payment confirmation already in progress"
             ))
-            return false
-        }
-        if rejectStaleSavedMethodsRequest(
-            sdkAuthorization: sdkAuthorization,
-            request: request,
-            resultHandler: resultHandler
-        ) {
             return false
         }
         request.confirmationStarted = true
@@ -450,6 +453,18 @@ extension PaymentSession {
         callback([map])
     }
 
+    /* The emit could not reach JS: roll the registration back so the entry doesn't
+       wedge every later confirm on this authorization with ALREADY_IN_PROGRESS. */
+    private static func rollbackSavedMethodConfirmation(sdkAuthorization: String) {
+        if let completion = headlessConfirmations.removeValue(forKey: sdkAuthorization) {
+            completion(.failed(error: NSError(
+                domain: "RUNTIME_UNAVAILABLE",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey: "React runtime is not available"]
+            )))
+        }
+    }
+
     private static func finishSavedMethodDirectly(
         request: PendingSavedMethodsRequest,
         resultHandler: @escaping (PaymentResult) -> Void,
@@ -462,13 +477,6 @@ extension PaymentSession {
             ))
             return
         }
-        if rejectStaleSavedMethodsRequest(
-            sdkAuthorization: request.sdkAuthorization,
-            request: request,
-            resultHandler: resultHandler
-        ) {
-            return
-        }
         request.confirmationStarted = true
         request.session?.handlePaymentResult(
             result,
@@ -476,29 +484,6 @@ extension PaymentSession {
         )
         request.releaseRootView()
         resultHandler(result)
-    }
-
-    private static func rejectStaleSavedMethodsRequest(
-        sdkAuthorization: String,
-        request: PendingSavedMethodsRequest,
-        resultHandler: @escaping (PaymentResult) -> Void
-    ) -> Bool {
-        guard request.session?.paymentSessionConfiguration.sdkAuthorization == sdkAuthorization
-        else {
-            request.confirmationStarted = true
-            let result = savedMethodsFailure(
-                code: "STALE_PAYMENT_SESSION_HANDLER",
-                message: "Saved payment methods handler belongs to the previous payment intent"
-            )
-            request.session?.handlePaymentResult(
-                result,
-                sdkAuthorization: request.sdkAuthorization
-            )
-            request.releaseRootView()
-            resultHandler(result)
-            return true
-        }
-        return false
     }
 
     private static func savedMethodsFailure(

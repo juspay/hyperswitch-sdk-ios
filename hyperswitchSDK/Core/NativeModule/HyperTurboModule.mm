@@ -58,10 +58,10 @@ RCT_EXPORT_MODULE()
   return [[_surfacePresenter surfaceForRootTag:rootTag.intValue] view];
 }
 
-- (void)emitEventWithName:(NSString *)name payload:(NSDictionary<NSString *, id> *)payload
+- (BOOL)emitEventWithName:(NSString *)name payload:(NSDictionary<NSString *, id> *)payload
 {
   if (!_eventEmitterCallback) {
-    return;
+    return NO;
   }
   if ([name isEqualToString:@"confirm"]) {
     [self emitConfirm:payload];
@@ -78,6 +78,7 @@ RCT_EXPORT_MODULE()
   } else if ([name isEqualToString:@"clearPrefetchCache"]) {
     [self emitClearPrefetchCache:payload];
   }
+  return YES;
 }
 
 #pragma mark - NativeHyperModuleSpec

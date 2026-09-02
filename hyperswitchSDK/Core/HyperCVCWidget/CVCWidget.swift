@@ -109,14 +109,17 @@ public class CVCWidget: UIControl {
         handler?(result)
     }
 
-    func confirm(sdkAuthorization: String, paymentToken: String) {
+    /* Returns false when the JS emitter is detached: the confirm can never start,
+       so the caller must roll its confirmation registration back. */
+    @discardableResult
+    func confirm(sdkAuthorization: String, paymentToken: String) -> Bool {
         let payload: [String: Any] = [
             "actionType": "CONFIRM_CVC_PAYMENT",
             "rootTag": self.widgetReactTag ?? -1,
             "sdkAuthorization": sdkAuthorization,
             "paymentToken": paymentToken,
         ]
-        reactManager.hyperModule.emit("triggerWidgetAction", payload)
+        return reactManager.hyperModule.emitChecked("triggerWidgetAction", payload)
     }
 
     internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {

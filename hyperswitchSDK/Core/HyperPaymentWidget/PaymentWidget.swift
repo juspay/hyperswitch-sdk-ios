@@ -87,7 +87,7 @@ public class PaymentWidget: UIControl {
         configurationDict?["hideConfirmButton"] = true  // MARK: replace with `displayPayButton`
         configurationDict?["subscribedEvents"] = subscribedEventNames
 
-        var props: [String: Any] = [
+        let props: [String: Any] = [
             "type": "widgetPaymentSheet",
             "hyperswitchConfig": hyperswitchConfiguration as Any,
             "paymentSessionConfig": paymentSessionConfiguration as Any,
