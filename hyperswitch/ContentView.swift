@@ -19,6 +19,7 @@ struct ContentView: View {
                 Text("3DS").tag(3)
                 Text("C2P").tag(4)
                 Text("Widget").tag(5)
+                Text("PoC").tag(6)  // POC ONLY — DELETE AFTER DEMO
             }.pickerStyle(SegmentedPickerStyle())
 
             switch selectedSegment {
@@ -34,6 +35,8 @@ struct ContentView: View {
                 ClickToPayView()
             case 5:
                 WidgetView()
+            case 6:
+                PocSharedStateView()  // POC ONLY — DELETE AFTER DEMO
             default:
                 UIKitView()
             }
@@ -93,5 +96,17 @@ struct WidgetView: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: WidgetViewController, context: Context) {
+    }
+}
+
+// POC ONLY — DELETE AFTER DEMO
+struct PocSharedStateView: UIViewControllerRepresentable {
+    typealias UIViewControllerType = PocSharedStateViewController
+
+    func makeUIViewController(context: Context) -> PocSharedStateViewController {
+        return PocSharedStateViewController()
+    }
+
+    func updateUIViewController(_ uiViewController: PocSharedStateViewController, context: Context) {
     }
 }
