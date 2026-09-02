@@ -8,16 +8,8 @@
 import Foundation
 import UIKit
 
-/* `requested` distinguishes a real fetch attempt from a suppressed duplicate init:
-   a duplicate must not read as a failed prefetch (the caller would clear the cache entry
-   the original in-flight request is about to write — a race on the same authorization). */
-internal struct HeadlessFetchResult {
-    let requested: Bool
-    let data: [String: Any]?
-}
-
 private struct PendingPrefetch {
-    let continuation: CheckedContinuation<HeadlessFetchResult, Never>
+    let continuation: CheckedContinuation<[String: Any]?, Error>
     let rootView: UIView
 }
 
@@ -64,53 +56,64 @@ extension PaymentSession {
     /// A prefetch miss is not fatal: the sheet and headless flows fall back to making the API
     /// calls themselves, so a timeout resolves with no data rather than propagating an error.
     /// Without the timeout a wedged bridge left `initPaymentSession` awaiting forever.
-    internal func triggerPrefetch() async {
+    /// - Throws: SESSION_INIT_IN_PROGRESS when the same sdkAuthorization is being fetched in
+    ///   another in-progress session: retry once it completes, or keep the session you have.
+    internal func triggerPrefetch() async throws {
         let configuration = paymentSessionConfiguration
         /* The fetched payload lives only in the JS PrefetchCache; this waits purely so the
-           cache is warm before the merchant is allowed to present UI. */
-        let fetch = await loadHeadlessData(
+           cache is warm before the merchant is allowed to present UI. A duplicate init throws
+           out of loadHeadlessData — the in-flight request owns the entry; nothing here runs. */
+        let data = try await loadHeadlessData(
             headlessType: "prefetch",
             configuration: configuration
         )
-        /* A suppressed duplicate is not a failure: the original request owns the entry and
-           will write it — clearing here would race that write. */
-        if fetch.requested, fetch.data == nil,
+        if data == nil, !configuration.sdkAuthorization.isEmpty,
            paymentSessionConfiguration.sdkAuthorization == configuration.sdkAuthorization {
             /* A failed re-validation must not leave an earlier (e.g. cancelled) attempt's
                entry behind: the sheet would mount with minutes-old session tokens instead
                of fetching for itself. Same-auth guard keeps a late-finishing prefetch of
-               an old session from wiping a newer session's entry. */
+               an old session from wiping a newer session's entry. Empty-auth stays silent
+               (prefetch miss is not an error). */
             clearPrefetch(for: configuration.sdkAuthorization)
         }
     }
 
-    /// Fetches the new intent's data without mutating the active session.
+    /// Fetches the new intent's data without mutating the active session. The `try?`
+    /// collapses both failure kinds (duplicate, empty result) into nil: updateIntent
+    /// treats a missing prefetch as a silent fallback, never a loud failure.
     internal func fetchIntentUpdate(
         configuration: PaymentSessionConfiguration
     ) async -> [String: Any]? {
-        await loadHeadlessData(
+        try? await loadHeadlessData(
             headlessType: "updateIntent",
             configuration: configuration
-        ).data
+        )
     }
 
     private func loadHeadlessData(
         headlessType: String,
         configuration: PaymentSessionConfiguration
-    ) async -> HeadlessFetchResult {
+    ) async throws -> [String: Any]? {
         let sdkAuthorization = configuration.sdkAuthorization
 
         guard !sdkAuthorization.isEmpty else {
-            return HeadlessFetchResult(requested: false, data: nil)
+            return nil
         }
 
-        let result: HeadlessFetchResult = await withCheckedContinuation { continuation in
+        return try await withCheckedThrowingContinuation { continuation in
             DispatchQueue.main.async {
-                /* sdkAuthorization identifies one payment. If a merchant initializes the exact
-                   same payment concurrently, let that unsupported duplicate fall back instead of
-                   adding callback lists and multi-owner lifecycle state. */
+                /* sdkAuthorization identifies one payment: the in-flight request owns the
+                   entry and its cache write. A concurrent duplicate (merchant init'd the
+                   same intent twice) must not clear, wait, or silently fall back — it throws
+                   SESSION_INIT_IN_PROGRESS loudly. */
                 guard pendingPrefetches[sdkAuthorization] == nil else {
-                    continuation.resume(returning: HeadlessFetchResult(requested: false, data: nil))
+                    continuation.resume(throwing: NSError(
+                        domain: "SESSION_INIT_IN_PROGRESS",
+                        code: 0,
+                        userInfo: [NSLocalizedDescriptionKey:
+                            "sdkAuthorization '\(sdkAuthorization)' is already in use by an in-progress session"
+                        ]
+                    ))
                     return
                 }
 
@@ -139,8 +142,6 @@ extension PaymentSession {
                 }
             }
         }
-
-        return HeadlessFetchResult(requested: result.requested, data: result.data?.isEmpty == true ? nil : result.data)
     }
 
     internal func clearPrefetch(for sdkAuthorization: String) {
@@ -161,7 +162,7 @@ extension PaymentSession {
             return false
         }
         RNHeadlessManager.sharedInstance.releaseRootView(pending.rootView)
-        pending.continuation.resume(returning: HeadlessFetchResult(requested: true, data: data))
+        pending.continuation.resume(returning: data.isEmpty ? nil : data)
         return true
     }
 

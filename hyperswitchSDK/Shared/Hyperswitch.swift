@@ -19,13 +19,16 @@ public final class Hyperswitch {
     /// Await this before presenting a sheet or building a widget — it is what makes the
     /// subsequent flows API-call free. A prefetch miss is not an error: those flows fall back to
     /// fetching for themselves, so the session is still returned.
-    public func initPaymentSession(configuration: PaymentSessionConfiguration) async -> PaymentSession {
+    ///
+    /// - Throws: `SESSION_INIT_IN_PROGRESS` when another session for the same sdkAuthorization
+    ///   is already fetching: retry once it completes, or keep the session you already have.
+    public func initPaymentSession(configuration: PaymentSessionConfiguration) async throws -> PaymentSession {
         let session = PaymentSession(
             paymentSessionConfiguration: configuration,
             hyperswitchConfiguration: hyperswitchConfiguration
         )
         #if canImport(React)
-        await session.triggerPrefetch()
+        try await session.triggerPrefetch()
         #endif
         return session
     }
