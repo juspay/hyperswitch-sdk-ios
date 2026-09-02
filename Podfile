@@ -39,10 +39,28 @@ target 'hyperswitch' do
         end
       end
     end
+
   end
 end
 
 target 'hyperswitchAppClip' do  ## for testing attach local pods ##
   use_frameworks!
-  pod 'HyperswitchScanCard', :path =>  "frameworkgen/scanCard" 
+  pod 'HyperswitchScanCard', :path =>  "frameworkgen/scanCard"
+end
+
+target 'hyperswitchVaultDemo' do  ## native demo app for the vault SDK (ios equivalent of android/vault-demo) ##
+  use_frameworks!
+  #
+  # The vault rides the SAME RN 0.86 workspace pods the main 'hyperswitch'
+  # target builds (React-Core-prebuilt + prebuilt hermes) — no separate
+  # vendored RN stack. Do NOT use_native_modules! here: that would pull the
+  # whole client-core module graph (inappbrowser / 3ds / scancard …) into
+  # this target; the vault runtime only needs the React core and RNSVG.
+  use_react_native!(
+    :path => '../node_modules/react-native',
+    :hermes_enabled => true,
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+  pod 'RNSVG', :path => '../node_modules/react-native-svg'
+  pod 'hyperswitch-vault-sdk-ios', :path => '.'
 end
