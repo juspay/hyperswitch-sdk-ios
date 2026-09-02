@@ -38,6 +38,14 @@ public struct VaultFieldOptions {
     public var brandIconMode: VaultAppearance.BrandIconMode?
     /// CVC field only.
     public var cvcIcon: CvcIcon?
+    /**
+     * Renders the field as a bare input — no label, icons, box or inline
+     * error UI. Wins over the other options; accessibility text and masking
+     * survive. Technical details in the RN vault's field-options docs.
+     */
+    public var unstyled: Bool?
+    /// Per-slot styles; a style never turns an element on.
+    public var styles: VaultFieldStyles?
 
     public init(
         placeholder: String? = nil,
@@ -48,7 +56,9 @@ public struct VaultFieldOptions {
         accessibilityHint: String? = nil,
         testID: String? = nil,
         brandIconMode: VaultAppearance.BrandIconMode? = nil,
-        cvcIcon: CvcIcon? = nil
+        cvcIcon: CvcIcon? = nil,
+        unstyled: Bool? = nil,
+        styles: VaultFieldStyles? = nil
     ) {
         self.placeholder = placeholder
         self.label = label
@@ -59,6 +69,8 @@ public struct VaultFieldOptions {
         self.testID = testID
         self.brandIconMode = brandIconMode
         self.cvcIcon = cvcIcon
+        self.unstyled = unstyled
+        self.styles = styles
     }
 
     internal var dict: [String: Any] {
@@ -72,6 +84,8 @@ public struct VaultFieldOptions {
         if let v = testID { out["testID"] = v }
         if let v = brandIconMode { out["brandIconMode"] = v.rawValue }
         if let v = cvcIcon { out["cvcIcon"] = v.rawValue }
+        if let v = unstyled { out["unstyled"] = v }
+        if let v = styles, !v.isEmpty { out["styles"] = v.dict }
         return out
     }
 
@@ -88,6 +102,9 @@ public struct VaultFieldOptions {
         if out.testID == nil { out.testID = base.testID }
         if out.brandIconMode == nil { out.brandIconMode = base.brandIconMode }
         if out.cvcIcon == nil { out.cvcIcon = base.cvcIcon }
+        if out.unstyled == nil { out.unstyled = base.unstyled }
+        let mergedStyles = out.styles?.merged(over: base.styles) ?? base.styles
+        out.styles = mergedStyles
         return out
     }
 }

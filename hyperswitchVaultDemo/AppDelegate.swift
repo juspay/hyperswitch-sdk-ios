@@ -41,7 +41,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         tokeniseButton.setTitle("Tokenise", for: .normal)
         tokeniseButton.addTarget(self, action: #selector(tokeniseTapped), for: .touchUpInside)
-        tokeniseButton.isEnabled = false
         container.addArrangedSubview(tokeniseButton)
 
         statesView.font = .systemFont(ofSize: 12)
@@ -118,7 +117,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             field.configuration = VaultConfiguration(collector: collect, fieldName: name)
         }
 
-        tokeniseButton.isEnabled = true
         statesView.text = "Vault session ready"
         NSLog("[VAULT-TEST] collect initialised with backend sdk authorization")
     }

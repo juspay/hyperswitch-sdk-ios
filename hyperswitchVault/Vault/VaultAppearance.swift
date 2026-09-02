@@ -26,6 +26,9 @@ public struct VaultAppearance {
     public var inputHeight: CGFloat?
     public var fontScale: CGFloat?
     public var gap: CGFloat?
+    public var placeholderTextSizeAdjust: CGFloat?
+    public var errorTextSizeAdjust: CGFloat?
+    public var errorMessageSpacing: CGFloat?
     public var brandIconMode: BrandIconMode?
 
     public init(
@@ -41,6 +44,9 @@ public struct VaultAppearance {
         inputHeight: CGFloat? = nil,
         fontScale: CGFloat? = nil,
         gap: CGFloat? = nil,
+        placeholderTextSizeAdjust: CGFloat? = nil,
+        errorTextSizeAdjust: CGFloat? = nil,
+        errorMessageSpacing: CGFloat? = nil,
         brandIconMode: BrandIconMode? = nil
     ) {
         self.primaryColor = primaryColor
@@ -55,6 +61,9 @@ public struct VaultAppearance {
         self.inputHeight = inputHeight
         self.fontScale = fontScale
         self.gap = gap
+        self.placeholderTextSizeAdjust = placeholderTextSizeAdjust
+        self.errorTextSizeAdjust = errorTextSizeAdjust
+        self.errorMessageSpacing = errorMessageSpacing
         self.brandIconMode = brandIconMode
     }
 
@@ -72,6 +81,9 @@ public struct VaultAppearance {
         if let v = inputHeight { out["inputHeight"] = v }
         if let v = fontScale { out["fontScale"] = v }
         if let v = gap { out["gap"] = v }
+        if let v = placeholderTextSizeAdjust { out["placeholderTextSizeAdjust"] = v }
+        if let v = errorTextSizeAdjust { out["errorTextSizeAdjust"] = v }
+        if let v = errorMessageSpacing { out["errorMessageSpacing"] = v }
         if let v = brandIconMode { out["brandIconMode"] = v.rawValue }
         return out
     }
@@ -92,6 +104,9 @@ public struct VaultAppearance {
         if out.inputHeight == nil { out.inputHeight = base.inputHeight }
         if out.fontScale == nil { out.fontScale = base.fontScale }
         if out.gap == nil { out.gap = base.gap }
+        if out.placeholderTextSizeAdjust == nil { out.placeholderTextSizeAdjust = base.placeholderTextSizeAdjust }
+        if out.errorTextSizeAdjust == nil { out.errorTextSizeAdjust = base.errorTextSizeAdjust }
+        if out.errorMessageSpacing == nil { out.errorMessageSpacing = base.errorMessageSpacing }
         if out.brandIconMode == nil { out.brandIconMode = base.brandIconMode }
         return out
     }
