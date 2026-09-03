@@ -19,8 +19,10 @@ extension Hyperswitch {
     /// )
     /// ```
     ///
-    /// Every returned `PaymentMethodSession` owns a **separate React Native host** —
-    /// sessions are fully isolated from each other and from the main payment SDK's host.
+    /// Every call returns a **new** `PaymentMethodSession` that constructs its own
+    /// `RNViewManager` (own `RCTReactNativeFactory` → own `RCTHost` → own JS runtime),
+    /// i.e. every `initPaymentMethodSession` call results in a **new React host instance**
+    /// (`session1.hostInstanceId != session2.hostInstanceId`), never a shared/cached one.
     ///
     /// - Parameters:
     ///   - sdkAuthorization: session authorisation token issued by the merchant backend.

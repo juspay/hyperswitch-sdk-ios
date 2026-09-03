@@ -20,9 +20,18 @@ import UIKit
 /// and bind UI widgets through `createCardForm()`.
 public class PaymentMethodSession {
 
+    private static let hostCounterLock = NSLock()
+    private static var hostCounter = 0
+
     internal let sdkAuthorization: String
     internal let configuration: PaymentMethodSessionConfiguration
     internal let hyperswitchConfiguration: HyperswitchConfiguration?
+
+    /// Unique id of this session's dedicated React host — distinct for every session.
+    /// `initPaymentMethodSession` calls it on a new `PaymentMethodSession` each time,
+    /// and each session constructs its OWN `RNViewManager` (own `RCTReactNativeFactory`
+    /// → own `RCTHost` → own JS runtime + own JS thread); `sharedInstance` is never used.
+    public let hostInstanceId: Int
 
     /// Dedicated RN host for this session — never the shared manager.
     /// It loads the separate `hyperswitch-payment-methods` JS bundle, so every
@@ -37,6 +46,14 @@ public class PaymentMethodSession {
         self.sdkAuthorization = sdkAuthorization
         self.configuration = configuration
         self.hyperswitchConfiguration = hyperswitchConfiguration
+
+        PaymentMethodSession.hostCounterLock.lock()
+        PaymentMethodSession.hostCounter += 1
+        self.hostInstanceId = PaymentMethodSession.hostCounter
+        PaymentMethodSession.hostCounterLock.unlock()
+
+        // A fresh manager per session — a new RCTReactNativeFactory, hence a NEW
+        // React host instance for every initPaymentMethodSession call.
         self.reactManager = RNViewManager(bundleName: "hyperswitch-payment-methods")
     }
 
