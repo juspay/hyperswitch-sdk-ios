@@ -34,49 +34,24 @@ private final class PendingSavedMethodsRequest {
     }
 
     func releaseRootView() {
-        guard let rootView else { return }
-        RNHeadlessManager.sharedInstance.releaseRootView(rootView)
-        self.rootView = nil
-    }
-}
-
-/* Time-boxed confirmation registration, same as the prefetch and saved-methods requests:
-   a dead runtime must not lock the authorization's slot forever — the entry settles as
-   a failure when its timer fires. */
-private final class PendingConfirmation {
-    let completion: (PaymentResult) -> Void
-    private var timeoutTask: DispatchWorkItem?
-
-    init(completion: @escaping (PaymentResult) -> Void) {
-        self.completion = completion
-    }
-
-    func scheduleTimeout(
-        timeout: TimeInterval,
-        onTimeout: @escaping () -> Void
-    ) {
-        let task = DispatchWorkItem(block: onTimeout)
-        timeoutTask = task
-        DispatchQueue.main.asyncAfter(deadline: .now() + timeout, execute: task)
-    }
-
-    func cancelTimeout() {
-        timeoutTask?.cancel()
-        timeoutTask = nil
+        rootView = nil
     }
 }
 
 /// These registries are main-queue confined. Different authorizations can run concurrently;
 /// duplicate work for one authorization is rejected instead of overwriting the first owner.
 private var pendingSavedMethodsRequests: [String: PendingSavedMethodsRequest] = [:]
-private var headlessConfirmations: [String: PendingConfirmation] = [:]
+
+/* Confirmations currently running through the headless runtime. No timeout on purpose: a
+   confirm can wait on a 3DS challenge or a wallet sheet for minutes, and a late real result
+   must reach the merchant. A detached runtime is handled by rollbackSavedMethodConfirmation. */
+private var headlessConfirmations: [String: (PaymentResult) -> Void] = [:]
 
 extension PaymentSession {
 
     /* SDK-side last-resort budgets; JS has no budget of its own. Same 30s window as Android. */
     private static let prefetchTimeout: DispatchTimeInterval = .seconds(30)
     private static let savedMethodsTimeout: DispatchTimeInterval = .seconds(30)
-    private static let confirmationTimeout: TimeInterval = 30
 
     /// Runs the initial prefetch headless task and waits for its result.
     ///
@@ -105,13 +80,13 @@ extension PaymentSession {
         }
     }
 
-    /// Fetches the new intent's data without mutating the active session. The `try?`
-    /// collapses both failure kinds (duplicate, empty result) into nil — and the
-    /// updateIntent gate reports that nil as PREFETCH_FAILED by design.
+    /// Fetches the new intent's data without mutating the active session. Throws
+    /// SESSION_INIT_IN_PROGRESS when another in-progress session owns this authorization;
+    /// returns nil on a timeout.
     internal func fetchIntentUpdate(
         configuration: PaymentSessionConfiguration
-    ) async -> [String: Any]? {
-        try? await loadHeadlessData(
+    ) async throws -> [String: Any]? {
+        try await loadHeadlessData(
             headlessType: "updateIntent",
             configuration: configuration
         )
@@ -188,7 +163,6 @@ extension PaymentSession {
         guard let pending = pendingPrefetches.removeValue(forKey: sdkAuthorization) else {
             return false
         }
-        RNHeadlessManager.sharedInstance.releaseRootView(pending.rootView)
         pending.continuation.resume(returning: data.isEmpty ? nil : data)
         return true
     }
@@ -278,6 +252,7 @@ extension PaymentSession {
                 "hyperswitchConfig": hyperswitchConfiguration as Any,
                 "paymentSessionConfig": paymentSessionConfiguration as Any,
                 "sdkParams": sdkParams,
+                "headlessType": "savedPM",
             ]
 
             props["configuration"] = [
@@ -314,9 +289,10 @@ extension PaymentSession {
             guard let request = pendingSavedMethodsRequests.removeValue(
                 forKey: sdkAuthorization
             ) else { return }
-            /* Staleness (request filed for a superseded intent) is rejected by
-               the JS-side guards before a response reaches native; whatever
-               arrives here is delivered as-is. */
+            /* A request filed for a superseded intent is still delivered here. Staleness is
+               rejected natively at confirm time: beginSavedMethodConfirmation compares the
+               session's current authorization with the handler's, and native is the only
+               side that knows the current authorization. */
             let handler = PaymentSessionHandler(
                 getCustomerDefaultSavedPaymentMethodData: {
                     return decodePaymentMethodData(getPaymentMethodData)
@@ -425,11 +401,10 @@ extension PaymentSession {
         result: PaymentResult
     ) -> Bool {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard let pending = headlessConfirmations.removeValue(
+        guard let completion = headlessConfirmations.removeValue(
             forKey: sdkAuthorization
         ) else { return false }
-        pending.cancelTimeout()
-        pending.completion(result)
+        completion(result)
         return true
     }
 
@@ -471,22 +446,13 @@ extension PaymentSession {
             return false
         }
         request.confirmationStarted = true
-        let pending = PendingConfirmation { result in
+        headlessConfirmations[sdkAuthorization] = { result in
             request.session?.handlePaymentResult(
                 result,
                 sdkAuthorization: sdkAuthorization
             )
             request.releaseRootView()
             resultHandler(result)
-        }
-        headlessConfirmations[sdkAuthorization] = pending
-        pending.scheduleTimeout(timeout: PaymentSession.confirmationTimeout) {
-            headlessConfirmations.removeValue(forKey: sdkAuthorization)?.completion(
-                savedMethodsFailure(
-                    code: "CONFIRM_RESULT_TIMEOUT",
-                    message: "Confirmation did not complete in time"
-                )
-            )
         }
         return true
     }
@@ -505,9 +471,8 @@ extension PaymentSession {
     /* The emit could not reach JS: roll the registration back so the entry doesn't
        wedge every later confirm on this authorization with ALREADY_IN_PROGRESS. */
     private static func rollbackSavedMethodConfirmation(sdkAuthorization: String) {
-        if let pending = headlessConfirmations.removeValue(forKey: sdkAuthorization) {
-            pending.cancelTimeout()
-            pending.completion(.failed(error: NSError(
+        if let completion = headlessConfirmations.removeValue(forKey: sdkAuthorization) {
+            completion(.failed(error: NSError(
                 domain: "RUNTIME_UNAVAILABLE",
                 code: 0,
                 userInfo: [NSLocalizedDescriptionKey: "React runtime is not available"]

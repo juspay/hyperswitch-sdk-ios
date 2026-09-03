@@ -13,20 +13,13 @@ import WebKit
 internal protocol HyperHeadlessShim: NSObjectProtocol {
     @objc(attachImpl:)
     func attach(impl: HyperHeadlessImpl)
-    @objc(viewForRootTag:)
-    func view(forRootTag rootTag: NSNumber) -> UIView?
 }
 
 @objc(HyperHeadlessImpl)
 internal class HyperHeadlessImpl: NSObject {
 
-    private weak var shim: HyperHeadlessShim?
-
     internal func attach(to shim: HyperHeadlessShim) {
         shim.attach(impl: self)
-        DispatchQueue.main.async {
-            self.shim = shim
-        }
     }
 
     /// Completion signal for one payment's prefetch. The payload itself lives only in the
@@ -60,11 +53,10 @@ internal class HyperHeadlessImpl: NSObject {
     }
 
     /* The codegen adapter decomposes the typed PaymentExitResult object into these flat
-       params (same shape as spec's PaymentExitResult). Registered confirmations consume
-       by sdkAuthorization; rootTag rides the wire but is unused here (the auth-keyed
-       registry is the single completion channel). */
-    @objc(exitHeadless:rootTag:status:code:message:)
-    internal func exitHeadless(_ sdkAuthorization: String, _ rootTag: NSNumber, _ status: String, _ code: String?, _ message: String?) {
+       params. Keyed by sdkAuthorization; the auth-keyed confirmation registry is the single
+       completion channel. */
+    @objc(exitHeadless:status:code:message:)
+    internal func exitHeadless(_ sdkAuthorization: String, _ status: String, _ code: String?, _ message: String?) {
         DispatchQueue.main.async {
             let result = PaymentResult.from(status: status, code: code, message: message)
             _ = PaymentSession.exitHeadless(sdkAuthorization: sdkAuthorization, result: result)

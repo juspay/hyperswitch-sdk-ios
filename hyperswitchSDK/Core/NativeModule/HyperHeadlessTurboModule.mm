@@ -8,10 +8,6 @@
 #ifdef RCT_NEW_ARCH_ENABLED
 
 #import <React/RCTBridgeModule.h>
-#import <React/RCTFabricSurface.h>
-#import <React/RCTSurfacePresenter.h>
-#import <React/RCTSurfacePresenterStub.h>
-#import <React/RCTSurfaceView.h>
 
 #if __has_include(<ReactCodegen/HyperswitchClientCoreSpec/HyperswitchClientCoreSpec.h>)
 #import <ReactCodegen/HyperswitchClientCoreSpec/HyperswitchClientCoreSpec.h>
@@ -26,15 +22,9 @@
 
 @implementation HyperHeadless {
   HyperHeadlessImpl *_impl;
-  __weak RCTSurfacePresenter *_surfacePresenter;
 }
 
 RCT_EXPORT_MODULE()
-
-- (void)setSurfacePresenter:(id<RCTSurfacePresenterStub>)surfacePresenter
-{
-  _surfacePresenter = (RCTSurfacePresenter *)surfacePresenter;
-}
 
 + (BOOL)requiresMainQueueSetup
 {
@@ -53,11 +43,6 @@ RCT_EXPORT_MODULE()
   _impl = impl;
 }
 
-- (UIView *)viewForRootTag:(NSNumber *)rootTag
-{
-  return [[_surfacePresenter surfaceForRootTag:rootTag.intValue] view];
-}
-
 #pragma mark - NativeHyperHeadlessSpec
 
 - (void)getPaymentSession:(NSString *)sdkAuthorization
@@ -73,9 +58,9 @@ RCT_EXPORT_MODULE()
                   callback:callback];
 }
 
-- (void)exitHeadless:(NSString *)sdkAuthorization rootTag:(NSInteger)rootTag result:(JS::NativeHyperHeadless::PaymentExitResult &)result
+- (void)exitHeadless:(NSString *)sdkAuthorization result:(JS::NativeHyperHeadless::PaymentExitResult &)result
 {
-  [_impl exitHeadless:sdkAuthorization rootTag:@(rootTag) status:result.status() code:result.code() message:result.message()];
+  [_impl exitHeadless:sdkAuthorization status:result.status() code:result.code() message:result.message()];
 }
 
 - (void)completePrefetch:(NSDictionary *)data

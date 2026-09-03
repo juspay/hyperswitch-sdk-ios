@@ -10,7 +10,6 @@
 import Foundation
 import React
 
-/// Tracks the temporary off-screen root views used for headless work.
 /// Headless roots mount on the SAME ReactHost as visible UI (RNViewManager),
 /// so the JS module cache (PrefetchCache) is shared between headless tasks and
 /// sheets/widgets — no second JS runtime, no native data handoff.
@@ -19,24 +18,15 @@ import React
 /// recreating a ReactHost here would tear down the shared UI runtime.
 internal class RNHeadlessManager: NSObject {
 
-    internal var responseHandler: RNResponseHandler?
-    internal private(set) var rootView: UIView?
-
     internal static let sharedInstance = RNHeadlessManager()
 
+    /// Mounts a headless root on the shared ReactHost. The caller owns the returned view;
+    /// dropping the last reference stops its surface (RCTSurfaceHostingView deinit).
     internal func viewForModule(_ moduleName: String, initialProperties: [String: Any]?) -> UIView {
-        let rootView = RNViewManager.sharedInstance.widgetViewForModule(
+        return RNViewManager.sharedInstance.widgetViewForModule(
             moduleName,
             initialProperties: initialProperties
         )
-        self.rootView = rootView
-        return rootView
-    }
-
-    /// Unmounts one completed headless root without disturbing shared JS module state.
-    internal func releaseRootView(_ completedRootView: UIView) {
-        guard rootView === completedRootView else { return }
-        rootView = nil
     }
 
     internal func removePrefetchCache(sdkAuthorization: String) {

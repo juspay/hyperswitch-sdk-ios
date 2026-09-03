@@ -77,9 +77,25 @@ public class PaymentSession {
 
                 #if canImport(React)
                 Task {
-                    let newPrefetchedData = await self.fetchIntentUpdate(
-                        configuration: newSessionConfiguration
-                    )
+                    let newPrefetchedData: [String: Any]?
+                    do {
+                        newPrefetchedData = try await self.fetchIntentUpdate(
+                            configuration: newSessionConfiguration
+                        )
+                    } catch {
+                        /* SESSION_INIT_IN_PROGRESS: another in-progress session owns this
+                           authorization's entry and its cache write. Do not clear it. Widgets
+                           already show their overlay since init, so release them. */
+                        await MainActor.run {
+                            if targetCount > 0 {
+                                self.updateIntentDidComplete.send(
+                                    UpdateIntentPayload(sdkAuthorization: "")
+                                )
+                            }
+                            self.finishIntentUpdate(completion: completion, result: .failure(error))
+                        }
+                        return
+                    }
                     await MainActor.run {
                         self.deliverUpdatedIntent(
                             newSessionConfiguration: newSessionConfiguration,
@@ -101,13 +117,13 @@ public class PaymentSession {
             return
         }
 
-        /* A registered widget that never responds must not wedge the update-intent lock:
-           on timeout, proceed with an empty result set (graceful degrade). */
+        /* timeout must sit upstream of collect: on expiry it finishes the stream and collect
+           emits whatever arrived. Downstream of collect it finishes without a value, the sink
+           never runs, and the update-intent lock stays wedged. */
         updateIntentInitReturned
             .prefix(targetCount)
-            .collect()
             .timeout(.seconds(30), scheduler: DispatchQueue.main)
-            .replaceError(with: [])
+            .collect()
             .receive(on: DispatchQueue.main)
             .sink { _ in requestAuthorization() }
             .store(in: &updateIntentCancellables)
@@ -173,22 +189,22 @@ public class PaymentSession {
             return
         }
 
-        /* On timeout, deliver an empty result set: the sink treats it as a failed update,
-           clears the unapplied prefetch, and releases updateIntentInProgress. */
-        /* A failed prefetch must reach the caller WITHOUT broadcasting to widgets:
-           a broadcast would switch the JS widgets to the new intent while the native
-           session stays on the old authorization — split-brain state. */
+        /* A failed prefetch must reach the caller WITHOUT switching the widgets to the new
+           intent — the native session stays on the old authorization. The widgets have shown
+           their update overlay since init, so they still need a completion: an empty
+           authorization is the JS abort signal (UpdateIntentHook resets loading and replies
+           invalid_sdk_authorization without switching). Replies are not awaited. */
         guard newPrefetchedData != nil else {
             clearUnappliedPrefetch(sdkAuthorization: sdkAuthorization)
+            updateIntentDidComplete.send(UpdateIntentPayload(sdkAuthorization: ""))
             finishIntentUpdate(completion: completion, result: prefetchFailedUpdateResult())
             return
         }
 
         updateIntentCompleteReturned
             .prefix(targetCount)
-            .collect()
             .timeout(.seconds(30), scheduler: DispatchQueue.main)
-            .replaceError(with: [])
+            .collect()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] results in
                 guard let self = self else { return }
