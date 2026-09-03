@@ -289,7 +289,7 @@ extension PaymentSession {
             guard let request = pendingSavedMethodsRequests.removeValue(
                 forKey: sdkAuthorization
             ) else {
-                print("[Hyperswitch] getPaymentSession: no pending saved-methods request for authorization \(sdkAuthorization.prefix(12))…; dropping late response")
+                print("[Hyperswitch] getPaymentSession: no pending saved-methods request for this authorization; dropping late response")
                 return
             }
             /* A request filed for a superseded intent is still delivered here. Staleness is
