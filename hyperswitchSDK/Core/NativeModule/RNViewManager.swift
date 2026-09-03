@@ -120,4 +120,14 @@ internal class RNViewManager: NSObject, ReactHostManager {
             initialProperties: initialProperties
         )
     }
+
+    internal func removePrefetchCache(sdkAuthorization: String) {
+        guard !sdkAuthorization.isEmpty else { return }
+        /* Must go through the module's codegen event channel: the RCTBridge compat layer is
+           nil on the bridgeless runtime, so enqueueJSCall would silently drop the event. */
+        hyperModule.emit(
+            "clearPrefetchCache",
+            ["sdkAuthorization": sdkAuthorization]
+        )
+    }
 }

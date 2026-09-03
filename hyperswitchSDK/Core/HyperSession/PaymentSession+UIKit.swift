@@ -130,7 +130,7 @@ extension PaymentSession {
                     "headlessType": headlessType,
                 ]
 
-                let rootView = RNHeadlessManager.sharedInstance.viewForModule(
+                let rootView = RNViewManager.sharedInstance.widgetViewForModule(
                     "HyperHeadless", initialProperties: ["props": props]
                 )
                 pendingPrefetches[sdkAuthorization] = PendingPrefetch(
@@ -148,7 +148,7 @@ extension PaymentSession {
 
     internal func clearPrefetch(for sdkAuthorization: String) {
         guard !sdkAuthorization.isEmpty else { return }
-        RNHeadlessManager.sharedInstance.removePrefetchCache(
+        RNViewManager.sharedInstance.removePrefetchCache(
             sdkAuthorization: sdkAuthorization
         )
     }
@@ -261,7 +261,7 @@ extension PaymentSession {
                 ]
             ]
 
-            request.rootView = RNHeadlessManager.sharedInstance.viewForModule(
+            request.rootView = RNViewManager.sharedInstance.widgetViewForModule(
                 "HyperHeadless",
                 initialProperties: ["props": props]
             )
@@ -288,7 +288,10 @@ extension PaymentSession {
         DispatchQueue.main.async {
             guard let request = pendingSavedMethodsRequests.removeValue(
                 forKey: sdkAuthorization
-            ) else { return }
+            ) else {
+                print("[Hyperswitch] getPaymentSession: no pending saved-methods request for authorization \(sdkAuthorization.prefix(12))…; dropping late response")
+                return
+            }
             /* A request filed for a superseded intent is still delivered here. Staleness is
                rejected natively at confirm time: beginSavedMethodConfirmation compares the
                session's current authorization with the handler's, and native is the only
