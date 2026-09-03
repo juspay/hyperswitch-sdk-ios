@@ -13,9 +13,15 @@ private struct PendingPrefetch {
     let rootView: UIView
 }
 
+/* INTERIM(1 session): authorization-keyed routing commented out. A single slot per waiter
+   kind suffices while only one session is supported; the auth-keyed registries return with
+   the multisession work (stash "headless-roottag-ios-wip", docs/plans/headless-roottag-ios.md).
+
 /// Accessed only on the main queue. The authorization is the routing key for the one payment
 /// currently being prefetched; no separate request identifier or callback fan-out is needed.
 private var pendingPrefetches: [String: PendingPrefetch] = [:]
+*/
+private var pendingPrefetch: PendingPrefetch?
 
 private final class PendingSavedMethodsRequest {
     weak var session: PaymentSession?
@@ -38,14 +44,21 @@ private final class PendingSavedMethodsRequest {
     }
 }
 
+/* INTERIM(1 session): commented out with the registries; the live slot is below.
 /// These registries are main-queue confined. Different authorizations can run concurrently;
 /// duplicate work for one authorization is rejected instead of overwriting the first owner.
 private var pendingSavedMethodsRequests: [String: PendingSavedMethodsRequest] = [:]
+*/
+private var pendingSavedMethodsRequest: PendingSavedMethodsRequest?
 
 /* Confirmations currently running through the headless runtime. No timeout on purpose: a
    confirm can wait on a 3DS challenge or a wallet sheet for minutes, and a late real result
    must reach the merchant. A detached runtime is handled by rollbackSavedMethodConfirmation. */
+
+/* INTERIM(1 session): commented out with the registries; the live slot is below.
 private var headlessConfirmations: [String: (PaymentResult) -> Void] = [:]
+*/
+private var headlessConfirmation: ((PaymentResult) -> Void)?
 
 extension PaymentSession {
 
@@ -108,7 +121,8 @@ extension PaymentSession {
                    entry and its cache write. A concurrent duplicate (merchant init'd the
                    same intent twice) must not clear, wait, or silently fall back — it throws
                    SESSION_INIT_IN_PROGRESS loudly. */
-                guard pendingPrefetches[sdkAuthorization] == nil else {
+                // INTERIM(1 session): guard pendingPrefetches[sdkAuthorization] == nil else {
+                guard pendingPrefetch == nil else {
                     continuation.resume(throwing: NSError(
                         domain: "SESSION_INIT_IN_PROGRESS",
                         code: 0,
@@ -133,7 +147,8 @@ extension PaymentSession {
                 let rootView = RNViewManager.sharedInstance.widgetViewForModule(
                     "HyperHeadless", initialProperties: ["props": props]
                 )
-                pendingPrefetches[sdkAuthorization] = PendingPrefetch(
+                // INTERIM(1 session): pendingPrefetches[sdkAuthorization] = PendingPrefetch(
+                pendingPrefetch = PendingPrefetch(
                     continuation: continuation,
                     rootView: rootView
                 )
@@ -160,9 +175,11 @@ extension PaymentSession {
         data: [String: Any]
     ) -> Bool {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard let pending = pendingPrefetches.removeValue(forKey: sdkAuthorization) else {
+        // INTERIM(1 session): guard let pending = pendingPrefetches.removeValue(forKey: sdkAuthorization) else {
+        guard let pending = pendingPrefetch else {
             return false
         }
+        pendingPrefetch = nil
         pending.continuation.resume(returning: data.isEmpty ? nil : data)
         return true
     }
@@ -232,7 +249,8 @@ extension PaymentSession {
                 ))
                 return
             }
-            guard pendingSavedMethodsRequests[sdkAuthorization] == nil else {
+            // INTERIM(1 session): guard pendingSavedMethodsRequests[sdkAuthorization] == nil else {
+            guard pendingSavedMethodsRequest == nil else {
                 func_(PaymentSession.failedSavedMethodsHandler(
                     code: "ALREADY_IN_PROGRESS",
                     message: "Saved payment methods request already in progress"
@@ -241,7 +259,8 @@ extension PaymentSession {
             }
 
             let request = PendingSavedMethodsRequest(session: self, completion: func_)
-            pendingSavedMethodsRequests[sdkAuthorization] = request
+            // INTERIM(1 session): pendingSavedMethodsRequests[sdkAuthorization] = request
+            pendingSavedMethodsRequest = request
 
             let hyperswitchConfiguration = try? self.hyperswitchConfiguration?.toDictionary()
             let paymentSessionConfiguration = try? self.paymentSessionConfiguration.toDictionary()
@@ -267,8 +286,10 @@ extension PaymentSession {
             )
 
             DispatchQueue.main.asyncAfter(deadline: .now() + PaymentSession.savedMethodsTimeout) {
-                guard pendingSavedMethodsRequests[sdkAuthorization] === request else { return }
-                pendingSavedMethodsRequests.removeValue(forKey: sdkAuthorization)
+                // INTERIM(1 session): guard pendingSavedMethodsRequests[sdkAuthorization] === request else { return }
+                guard pendingSavedMethodsRequest === request else { return }
+                // INTERIM(1 session): pendingSavedMethodsRequests.removeValue(forKey: sdkAuthorization)
+                pendingSavedMethodsRequest = nil
                 request.releaseRootView()
                 request.completion(PaymentSession.failedSavedMethodsHandler(
                     code: "HEADLESS_TIMEOUT",
@@ -286,12 +307,13 @@ extension PaymentSession {
         callback: @escaping RCTResponseSenderBlock
     ) {
         DispatchQueue.main.async {
-            guard let request = pendingSavedMethodsRequests.removeValue(
-                forKey: sdkAuthorization
-            ) else {
+            /* INTERIM(1 session): guard let request = pendingSavedMethodsRequests.removeValue(
+               forKey: sdkAuthorization) else { */
+            guard let request = pendingSavedMethodsRequest else {
                 print("[Hyperswitch] getPaymentSession: no pending saved-methods request for this authorization; dropping late response")
                 return
             }
+            pendingSavedMethodsRequest = nil
             /* A request filed for a superseded intent is still delivered here. Staleness is
                rejected natively at confirm time: beginSavedMethodConfirmation compares the
                session's current authorization with the handler's, and native is the only
@@ -404,9 +426,10 @@ extension PaymentSession {
         result: PaymentResult
     ) -> Bool {
         dispatchPrecondition(condition: .onQueue(.main))
-        guard let completion = headlessConfirmations.removeValue(
-            forKey: sdkAuthorization
-        ) else { return false }
+        /* INTERIM(1 session): guard let completion = headlessConfirmations.removeValue(
+           forKey: sdkAuthorization) else { return false } */
+        guard let completion = headlessConfirmation else { return false }
+        headlessConfirmation = nil
         completion(result)
         return true
     }
@@ -431,16 +454,19 @@ extension PaymentSession {
            first confirm and the registry entry by its result. A post-terminal retry
            on the same handler is HANDLER_ALREADY_USED — only an in-flight duplicate is
            ALREADY_IN_PROGRESS. */
-        if request.confirmationStarted, headlessConfirmations[sdkAuthorization] == nil {
+        // INTERIM(1 session): if request.confirmationStarted, headlessConfirmations[sdkAuthorization] == nil {
+        if request.confirmationStarted, headlessConfirmation == nil {
             resultHandler(savedMethodsFailure(
                 code: "HANDLER_ALREADY_USED",
                 message: "This saved payment methods handler has already completed"
             ))
             return false
         }
+        /* INTERIM(1 session): guard !request.confirmationStarted,
+           headlessConfirmations[sdkAuthorization] == nil else { */
         guard
             !request.confirmationStarted,
-            headlessConfirmations[sdkAuthorization] == nil
+            headlessConfirmation == nil
         else {
             resultHandler(savedMethodsFailure(
                 code: "ALREADY_IN_PROGRESS",
@@ -449,7 +475,8 @@ extension PaymentSession {
             return false
         }
         request.confirmationStarted = true
-        headlessConfirmations[sdkAuthorization] = { result in
+        // INTERIM(1 session): headlessConfirmations[sdkAuthorization] = { result in
+        headlessConfirmation = { result in
             request.session?.handlePaymentResult(
                 result,
                 sdkAuthorization: sdkAuthorization
@@ -474,7 +501,9 @@ extension PaymentSession {
     /* The emit could not reach JS: roll the registration back so the entry doesn't
        wedge every later confirm on this authorization with ALREADY_IN_PROGRESS. */
     private static func rollbackSavedMethodConfirmation(sdkAuthorization: String) {
-        if let completion = headlessConfirmations.removeValue(forKey: sdkAuthorization) {
+        // INTERIM(1 session): if let completion = headlessConfirmations.removeValue(forKey: sdkAuthorization) {
+        if let completion = headlessConfirmation {
+            headlessConfirmation = nil
             completion(.failed(error: NSError(
                 domain: "RUNTIME_UNAVAILABLE",
                 code: 0,
