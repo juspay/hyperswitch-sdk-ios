@@ -8,14 +8,21 @@
 import Foundation
 import UIKit
 
+/* INTERIM(1 session): why the slot stores an authorization. Single slots block duplicate
+   launches, but they cannot tell a stale reply from a current one: the 30s timeout consumes
+   a waiter without stopping the JS task behind it, so a late reply can arrive once a newer
+   waiter owns the slot. The stored tag is what the consume guards use to drop it. */
 private struct PendingPrefetch {
+    let sdkAuthorization: String
     let continuation: CheckedContinuation<[String: Any]?, Error>
     let rootView: UIView
+    var timeoutItem: DispatchWorkItem?
 }
 
 /* INTERIM(1 session): authorization-keyed routing commented out. A single slot per waiter
-   kind suffices while only one session is supported; the auth-keyed registries return with
-   the multisession work (stash "headless-roottag-ios-wip", docs/plans/headless-roottag-ios.md).
+   kind suffices while only one session is supported; each slot stores the authorization it
+   was registered with and is consumed only by a matching call. The auth-keyed registries
+   return when multisession lands.
 
 /// Accessed only on the main queue. The authorization is the routing key for the one payment
 /// currently being prefetched; no separate request identifier or callback fan-out is needed.
@@ -25,6 +32,8 @@ private var pendingPrefetch: PendingPrefetch?
 
 private final class PendingSavedMethodsRequest {
     weak var session: PaymentSession?
+    /* INTERIM(1 session): captured at registration so the consume guards can reject a stale
+       reply from a task that outlived this request's timeout. */
     let sdkAuthorization: String
     let completion: (PaymentSessionHandler) -> Void
     var rootView: UIView?
@@ -58,7 +67,10 @@ private var pendingSavedMethodsRequest: PendingSavedMethodsRequest?
 /* INTERIM(1 session): commented out with the registries; the live slot is below.
 private var headlessConfirmations: [String: (PaymentResult) -> Void] = [:]
 */
-private var headlessConfirmation: ((PaymentResult) -> Void)?
+/* INTERIM(1 session): the tag is the reply guard. Confirms have no timeout, so this slot
+   can span an updateIntent or a session swap in the shared runtime — only a reply whose
+   authorization matches may complete it. */
+private var headlessConfirmation: (sdkAuthorization: String, completion: (PaymentResult) -> Void)?
 
 extension PaymentSession {
 
@@ -148,15 +160,26 @@ extension PaymentSession {
                     "HyperHeadless", initialProperties: ["props": props]
                 )
                 // INTERIM(1 session): pendingPrefetches[sdkAuthorization] = PendingPrefetch(
+                /* INTERIM(1 session): the tag is the registration-time authorization, not a
+                   live lookup — during updateIntent's fetch the session still holds the OLD
+                   authorization until commit, so a live value here would reject the
+                   legitimate reply. */
                 pendingPrefetch = PendingPrefetch(
+                    sdkAuthorization: sdkAuthorization,
                     continuation: continuation,
                     rootView: rootView
                 )
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + PaymentSession.prefetchTimeout) {
-                    guard PaymentSession.finishPrefetch(sdkAuthorization, data: [:]) else { return }
-                    print("[Hyperswitch] Prefetch timed out; falling back to on-demand API calls")
+                /* The timer lives on the waiter so a finished prefetch cancels its own —
+                   a stale timer can never resolve a later waiter's request. */
+                let timeoutItem = DispatchWorkItem {
+                    _ = PaymentSession.finishPrefetch(sdkAuthorization, data: [:])
                 }
+                pendingPrefetch?.timeoutItem = timeoutItem
+                DispatchQueue.main.asyncAfter(
+                    deadline: .now() + PaymentSession.prefetchTimeout,
+                    execute: timeoutItem
+                )
             }
         }
     }
@@ -176,10 +199,15 @@ extension PaymentSession {
     ) -> Bool {
         dispatchPrecondition(condition: .onQueue(.main))
         // INTERIM(1 session): guard let pending = pendingPrefetches.removeValue(forKey: sdkAuthorization) else {
-        guard let pending = pendingPrefetch else {
+        /* Stale-reply guard: a mismatching authorization was never registered to this waiter —
+           a straggler from an abandoned task or a swapped-out session; dropped, not delivered. */
+        guard let pending = pendingPrefetch,
+              pending.sdkAuthorization == sdkAuthorization
+        else {
             return false
         }
         pendingPrefetch = nil
+        pending.timeoutItem?.cancel()
         pending.continuation.resume(returning: data.isEmpty ? nil : data)
         return true
     }
@@ -309,8 +337,11 @@ extension PaymentSession {
         DispatchQueue.main.async {
             /* INTERIM(1 session): guard let request = pendingSavedMethodsRequests.removeValue(
                forKey: sdkAuthorization) else { */
-            guard let request = pendingSavedMethodsRequest else {
-                print("[Hyperswitch] getPaymentSession: no pending saved-methods request for this authorization; dropping late response")
+            /* Stale-reply guard: only a reply for the authorization this request was registered
+               under may consume it. */
+            guard let request = pendingSavedMethodsRequest,
+                  request.sdkAuthorization == sdkAuthorization
+            else {
                 return
             }
             pendingSavedMethodsRequest = nil
@@ -428,9 +459,12 @@ extension PaymentSession {
         dispatchPrecondition(condition: .onQueue(.main))
         /* INTERIM(1 session): guard let completion = headlessConfirmations.removeValue(
            forKey: sdkAuthorization) else { return false } */
-        guard let completion = headlessConfirmation else { return false }
+        /* Stale-reply guard: a foreign authorization's result must not complete this confirm. */
+        guard let confirmation = headlessConfirmation,
+              confirmation.sdkAuthorization == sdkAuthorization
+        else { return false }
         headlessConfirmation = nil
-        completion(result)
+        confirmation.completion(result)
         return true
     }
 
@@ -476,14 +510,14 @@ extension PaymentSession {
         }
         request.confirmationStarted = true
         // INTERIM(1 session): headlessConfirmations[sdkAuthorization] = { result in
-        headlessConfirmation = { result in
+        headlessConfirmation = (sdkAuthorization: sdkAuthorization, completion: { result in
             request.session?.handlePaymentResult(
                 result,
                 sdkAuthorization: sdkAuthorization
             )
             request.releaseRootView()
             resultHandler(result)
-        }
+        })
         return true
     }
 
@@ -502,14 +536,15 @@ extension PaymentSession {
        wedge every later confirm on this authorization with ALREADY_IN_PROGRESS. */
     private static func rollbackSavedMethodConfirmation(sdkAuthorization: String) {
         // INTERIM(1 session): if let completion = headlessConfirmations.removeValue(forKey: sdkAuthorization) {
-        if let completion = headlessConfirmation {
-            headlessConfirmation = nil
-            completion(.failed(error: NSError(
-                domain: "RUNTIME_UNAVAILABLE",
-                code: 0,
-                userInfo: [NSLocalizedDescriptionKey: "React runtime is not available"]
-            )))
-        }
+        guard let confirmation = headlessConfirmation,
+              confirmation.sdkAuthorization == sdkAuthorization
+        else { return }
+        headlessConfirmation = nil
+        confirmation.completion(.failed(error: NSError(
+            domain: "RUNTIME_UNAVAILABLE",
+            code: 0,
+            userInfo: [NSLocalizedDescriptionKey: "React runtime is not available"]
+        )))
     }
 
     private static func finishSavedMethodDirectly(

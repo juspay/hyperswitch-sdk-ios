@@ -161,7 +161,14 @@ public class PaymentSession {
         completion: @escaping (UpdateIntentResult) -> Void,
         result: UpdateIntentResult
     ) {
+        /* The provider can fire its callback more than once; only the task that owns the
+           in-progress update may complete it — a second call must never resume the waiting
+           continuation a second time. */
         updateIntentLock.lock()
+        guard updateIntentInProgress else {
+            updateIntentLock.unlock()
+            return
+        }
         updateIntentInProgress = false
         updateIntentLock.unlock()
         updateIntentCancellables.removeAll()
