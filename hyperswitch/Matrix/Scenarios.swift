@@ -136,7 +136,7 @@ enum Scenarios {
         Scenario(id: "H2", title: "Confirm by token, then cache cleared") { c in
             let a = try c.session("A")
             guard let handler = c.handlers["A"] else { throw c.fail("run H1 first") }
-            let result = await c.confirmDefault(handler)
+            let result = try await c.confirmLastUsed(handler)
             c.check(c.isTerminal(result), "terminal result (\(c.describe(result)))")
             try await c.settle(); c.expect(a, confirm: 1)
             _ = await c.headlessGet(a)
@@ -144,7 +144,7 @@ enum Scenarios {
         },
         Scenario(id: "H3", title: "Retry on a used handler") { c in
             guard let handler = c.handlers["A"] else { throw c.fail("run H1 first") }
-            let result = await c.confirmDefault(handler)
+            let result = try await c.confirmLastUsed(handler)
             c.check(c.code(result) == "HANDLER_ALREADY_USED", "HANDLER_ALREADY_USED (got \(c.describe(result)))")
         },
         Scenario(id: "H4", title: "Stale handler after update") { c in
@@ -154,7 +154,7 @@ enum Scenarios {
             let outcome = await c.updateIntent(g, amount: 4065, newLabel: "G'")
             c.check(c.isSuccess(outcome.result), "updateIntent Success")
             try await c.settle()
-            let result = await c.confirmDefault(handler)
+            let result = try await c.confirmLastUsed(handler)
             c.check(c.code(result) == "STALE_PAYMENT_SESSION_HANDLER", "STALE_PAYMENT_SESSION_HANDLER (got \(c.describe(result)))")
             try await c.settle(); c.expect(g)
         },
@@ -218,9 +218,9 @@ enum Scenarios {
             async let hu = c.headlessGet(u)
             async let hv = c.headlessGet(v)
             let (handlerU, handlerV) = await (hu, hv)
-            async let ru = c.confirmDefault(handlerU)
-            async let rv = c.confirmDefault(handlerV)
-            let (resultU, resultV) = await (ru, rv)
+            async let ru = c.confirmLastUsed(handlerU)
+            async let rv = c.confirmLastUsed(handlerV)
+            let (resultU, resultV) = try await (ru, rv)
             c.check(c.isTerminal(resultU) && c.isTerminal(resultV), "both confirms terminal (\(c.describe(resultU)), \(c.describe(resultV)))")
             try await c.settle(); c.expect(u, confirm: 1); c.expect(v, confirm: 1)
         },

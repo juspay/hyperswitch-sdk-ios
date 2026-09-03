@@ -262,6 +262,15 @@ final class Ctx {
         }
     }
 
+    /* Mirrors Android's confirmWithCustomerLastUsedPaymentMethod: resolve the last-used
+       token, then confirm by token (iOS has no last-used callback without a CVC widget). */
+    func confirmLastUsed(_ handler: PaymentSessionHandler) async throws -> PaymentResult {
+        guard case .success(let method) = handler.getCustomerLastUsedPaymentMethodData() else {
+            throw fail("no customer last-used payment method data")
+        }
+        return await confirmToken(handler, token: method.paymentToken)
+    }
+
     func confirmToken(_ handler: PaymentSessionHandler, token: String) async -> PaymentResult {
         await withCheckedContinuation { continuation in
             handler.confirmWithCustomerPaymentToken(paymentToken: token) { result in continuation.resume(returning: result) }
