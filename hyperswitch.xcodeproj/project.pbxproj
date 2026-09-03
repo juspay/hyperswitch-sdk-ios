@@ -124,6 +124,7 @@
 		798F8FF92FBB4B0500765B4C /* PaymentMethodType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8FF82FBB4B0500765B4C /* PaymentMethodType.swift */; };
 		798F8FFA2FBB4B0500765B4C /* PaymentMethodType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8FF82FBB4B0500765B4C /* PaymentMethodType.swift */; };
 		7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7996A8322BA1FDD000394FAF /* hyperswitch.bundle */; };
+		D9497C5638654FF99D7B0DD7 /* hyperswitch-payment-methods.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9AC9FC5FF79E48E0B898ED7D /* hyperswitch-payment-methods.bundle */; };
 		799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */; };
 		79D474B42CC6FDC30022C47E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B32CC6FDBF0022C47E /* Helper.swift */; };
 		79D474B52CC6FDC30022C47E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B32CC6FDBF0022C47E /* Helper.swift */; };
@@ -310,6 +311,7 @@
 		798F8FF52FBB2CDD00765B4C /* HyperswitchEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperswitchEnvironment.swift; sourceTree = "<group>"; };
 		798F8FF82FBB4B0500765B4C /* PaymentMethodType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodType.swift; sourceTree = "<group>"; };
 		7996A8322BA1FDD000394FAF /* hyperswitch.bundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hyperswitch.bundle; sourceTree = "<group>"; };
+		9AC9FC5FF79E48E0B898ED7D /* hyperswitch-payment-methods.bundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "hyperswitch-payment-methods.bundle"; sourceTree = "<group>"; };
 		799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		79D474B32CC6FDBF0022C47E /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		79D474B62CC6FDE50022C47E /* RNResponseHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNResponseHandler.swift; sourceTree = "<group>"; };
@@ -749,6 +751,7 @@
 			children = (
 				75E692FB2D5B2AB90077C0F3 /* HyperOTA.plist */,
 				7996A8322BA1FDD000394FAF /* hyperswitch.bundle */,
+				9AC9FC5FF79E48E0B898ED7D /* hyperswitch-payment-methods.bundle */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -852,6 +855,7 @@
 				43E668722C084FB70094BD13 /* montserrat_extralightitalic.ttf in Resources */,
 				799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */,
 				7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */,
+				D9497C5638654FF99D7B0DD7 /* hyperswitch-payment-methods.bundle in Resources */,
 				43E668782C084FB70094BD13 /* montserrat_thinitalic.ttf in Resources */,
 				43E6686E2C084FB70094BD13 /* montserrat_lightitalic.ttf in Resources */,
 				43E668792C084FB70094BD13 /* montserrat_semibolditalic.ttf in Resources */,

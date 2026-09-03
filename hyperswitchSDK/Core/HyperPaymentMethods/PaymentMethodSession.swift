@@ -25,6 +25,8 @@ public class PaymentMethodSession {
     internal let hyperswitchConfiguration: HyperswitchConfiguration?
 
     /// Dedicated RN host for this session — never the shared manager.
+    /// It loads the separate `hyperswitch-payment-methods` JS bundle, so every
+    /// payment-method session runs on its own isolated JS runtime.
     internal let reactManager: RNViewManager
 
     internal init(
@@ -35,7 +37,7 @@ public class PaymentMethodSession {
         self.sdkAuthorization = sdkAuthorization
         self.configuration = configuration
         self.hyperswitchConfiguration = hyperswitchConfiguration
-        self.reactManager = RNViewManager()
+        self.reactManager = RNViewManager(bundleName: "hyperswitch-payment-methods")
     }
 
     /// Creates a `CardForm` instance backed by an empty RN view on this session's host.
