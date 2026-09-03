@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D632138FD2A34407A7FC7DAD /* PaymentMethodSessionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3F1DC29B66F492AA1B33940 /* PaymentMethodSessionConfiguration.swift */; };
+		E42BFC1BB6774B778DE48092 /* PaymentMethodSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE3830FF99E49DD9F825B91 /* PaymentMethodSession.swift */; };
+		04C9844C275F43729C08BECF /* CardForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA87B489AF7344DF8317D690 /* CardForm.swift */; };
+		0F06BDF6BEF8473AA24F0A12 /* BaseRNInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05E66DC411074BD0AA1CAE02 /* BaseRNInputField.swift */; };
+		48310B1F51AE4AB48138DAE8 /* CardNumberInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2283112520A944168F1AADAF /* CardNumberInputField.swift */; };
+		59541BB241A04D8681C2A176 /* CardExpiryInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5848B0EB3C234544BDB9E9D4 /* CardExpiryInputField.swift */; };
+		6C730A036CB0494DA712BB2C /* CardCVCInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BCA5C4EF993434C9338DE48 /* CardCVCInputField.swift */; };
+		9F5959F68FB048E4831C83D4 /* CardHolderInputField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ABB6A5F00BD4B8EA0004F21 /* CardHolderInputField.swift */; };
+		B8623B81C77D44839799A04B /* Hyperswitch+PaymentMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAB83E7BF2724FE885D560EE /* Hyperswitch+PaymentMethods.swift */; };
 		139913B798F4478A85C0700F /* HyperTurboModule.mm in Sources */ = {isa = PBXBuildFile; fileRef = D8E057101BF84067AC180115 /* HyperTurboModule.mm */; };
 		1CC05B6C00564E2DB86ADEE6 /* HyperHeadlessTurboModule.mm in Sources */ = {isa = PBXBuildFile; fileRef = F8A50F38F5164A3DA5CF1FAB /* HyperHeadlessTurboModule.mm */; };
 		4365207C2C8768B90006C856 /* ApplePayHandlerLite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4365207B2C8768B90006C856 /* ApplePayHandlerLite.swift */; };
@@ -115,6 +124,7 @@
 		798F8FF92FBB4B0500765B4C /* PaymentMethodType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8FF82FBB4B0500765B4C /* PaymentMethodType.swift */; };
 		798F8FFA2FBB4B0500765B4C /* PaymentMethodType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798F8FF82FBB4B0500765B4C /* PaymentMethodType.swift */; };
 		7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 7996A8322BA1FDD000394FAF /* hyperswitch.bundle */; };
+		D9497C5638654FF99D7B0DD7 /* hyperswitch-payment-methods.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 9AC9FC5FF79E48E0B898ED7D /* hyperswitch-payment-methods.bundle */; };
 		799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */; };
 		79D474B42CC6FDC30022C47E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B32CC6FDBF0022C47E /* Helper.swift */; };
 		79D474B52CC6FDC30022C47E /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D474B32CC6FDBF0022C47E /* Helper.swift */; };
@@ -200,6 +210,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C3F1DC29B66F492AA1B33940 /* PaymentMethodSessionConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodSessionConfiguration.swift; sourceTree = "<group>"; };
+		DCE3830FF99E49DD9F825B91 /* PaymentMethodSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodSession.swift; sourceTree = "<group>"; };
+		EA87B489AF7344DF8317D690 /* CardForm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardForm.swift; sourceTree = "<group>"; };
+		05E66DC411074BD0AA1CAE02 /* BaseRNInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseRNInputField.swift; sourceTree = "<group>"; };
+		2283112520A944168F1AADAF /* CardNumberInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNumberInputField.swift; sourceTree = "<group>"; };
+		5848B0EB3C234544BDB9E9D4 /* CardExpiryInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardExpiryInputField.swift; sourceTree = "<group>"; };
+		5BCA5C4EF993434C9338DE48 /* CardCVCInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardCVCInputField.swift; sourceTree = "<group>"; };
+		9ABB6A5F00BD4B8EA0004F21 /* CardHolderInputField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardHolderInputField.swift; sourceTree = "<group>"; };
+		AAB83E7BF2724FE885D560EE /* Hyperswitch+PaymentMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Hyperswitch+PaymentMethods.swift"; sourceTree = "<group>"; };
 		06DD778FE73D7D7BC674262C /* Pods_hyperswitchAppClip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hyperswitchAppClip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CCA1FC8DE37B8F2B7E80D78 /* libPods-hyperswitch.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-hyperswitch.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		27776607FD71549253487622 /* Pods-hyperswitchAppClip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitchAppClip.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip.debug.xcconfig"; sourceTree = "<group>"; };
@@ -292,6 +311,7 @@
 		798F8FF52FBB2CDD00765B4C /* HyperswitchEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HyperswitchEnvironment.swift; sourceTree = "<group>"; };
 		798F8FF82FBB4B0500765B4C /* PaymentMethodType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodType.swift; sourceTree = "<group>"; };
 		7996A8322BA1FDD000394FAF /* hyperswitch.bundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = hyperswitch.bundle; sourceTree = "<group>"; };
+		9AC9FC5FF79E48E0B898ED7D /* hyperswitch-payment-methods.bundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "hyperswitch-payment-methods.bundle"; sourceTree = "<group>"; };
 		799B7EB02BF3855F0011C690 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		79D474B32CC6FDBF0022C47E /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		79D474B62CC6FDE50022C47E /* RNResponseHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNResponseHandler.swift; sourceTree = "<group>"; };
@@ -644,10 +664,27 @@
 				DC4AC9F3296D737300E0D2A6 /* HyperPaymentCardTextField */,
 				792D69F42B95E91D001598CD /* HyperExpressCheckout */,
 				4E0A93E52CA2F3E000E3A767 /* HyperPaymentMethodManagement */,
+				9A7E956ECD4148FE9F33A8C4 /* HyperPaymentMethods */,
 				790B67132FC4CBAA003FB459 /* DeviceDataCollection */,
 				DC5D012C29486B560017C67A /* Resources */,
 			);
 			path = Core;
+			sourceTree = "<group>";
+		};
+		9A7E956ECD4148FE9F33A8C4 /* HyperPaymentMethods */ = {
+			isa = PBXGroup;
+			children = (
+				C3F1DC29B66F492AA1B33940 /* PaymentMethodSessionConfiguration.swift */,
+				DCE3830FF99E49DD9F825B91 /* PaymentMethodSession.swift */,
+				AAB83E7BF2724FE885D560EE /* Hyperswitch+PaymentMethods.swift */,
+				EA87B489AF7344DF8317D690 /* CardForm.swift */,
+				05E66DC411074BD0AA1CAE02 /* BaseRNInputField.swift */,
+				2283112520A944168F1AADAF /* CardNumberInputField.swift */,
+				5848B0EB3C234544BDB9E9D4 /* CardExpiryInputField.swift */,
+				5BCA5C4EF993434C9338DE48 /* CardCVCInputField.swift */,
+				9ABB6A5F00BD4B8EA0004F21 /* CardHolderInputField.swift */,
+			);
+			path = HyperPaymentMethods;
 			sourceTree = "<group>";
 		};
 		9242DBFE465CA99EFC0559F1 /* Frameworks */ = {
@@ -714,6 +751,7 @@
 			children = (
 				75E692FB2D5B2AB90077C0F3 /* HyperOTA.plist */,
 				7996A8322BA1FDD000394FAF /* hyperswitch.bundle */,
+				9AC9FC5FF79E48E0B898ED7D /* hyperswitch-payment-methods.bundle */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -817,6 +855,7 @@
 				43E668722C084FB70094BD13 /* montserrat_extralightitalic.ttf in Resources */,
 				799B7EB12BF3855F0011C690 /* PrivacyInfo.xcprivacy in Resources */,
 				7996A8332BA1FDD000394FAF /* hyperswitch.bundle in Resources */,
+				D9497C5638654FF99D7B0DD7 /* hyperswitch-payment-methods.bundle in Resources */,
 				43E668782C084FB70094BD13 /* montserrat_thinitalic.ttf in Resources */,
 				43E6686E2C084FB70094BD13 /* montserrat_lightitalic.ttf in Resources */,
 				43E668792C084FB70094BD13 /* montserrat_semibolditalic.ttf in Resources */,
@@ -967,6 +1006,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D632138FD2A34407A7FC7DAD /* PaymentMethodSessionConfiguration.swift in Sources */,
+				E42BFC1BB6774B778DE48092 /* PaymentMethodSession.swift in Sources */,
+				04C9844C275F43729C08BECF /* CardForm.swift in Sources */,
+				0F06BDF6BEF8473AA24F0A12 /* BaseRNInputField.swift in Sources */,
+				48310B1F51AE4AB48138DAE8 /* CardNumberInputField.swift in Sources */,
+				59541BB241A04D8681C2A176 /* CardExpiryInputField.swift in Sources */,
+				6C730A036CB0494DA712BB2C /* CardCVCInputField.swift in Sources */,
+				9F5959F68FB048E4831C83D4 /* CardHolderInputField.swift in Sources */,
+				B8623B81C77D44839799A04B /* Hyperswitch+PaymentMethods.swift in Sources */,
 				791A9A852FBCD46000A8D1EC /* SavedPaymentMethodsConfiguration.swift in Sources */,
 				793451FB2F96EB9F00416A4B /* CVCWidget.swift in Sources */,
 				79728FB92C3412BB00CA8C10 /* HeadlessViewController.swift in Sources */,
