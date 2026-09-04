@@ -7,8 +7,8 @@
 
 import Foundation
 import React
-import React_RCTAppDelegate
 import ReactAppDependencyProvider
+import React_RCTAppDelegate
 
 internal protocol ReactHostManager: AnyObject {
     var hyperModule: HyperModuleImpl { get }
@@ -82,11 +82,6 @@ internal class RNViewManagerDelegate: RNFactoryDelegate {
     }
 }
 
-/* One host for sheet and headless. The JS PrefetchCache is module state in this host's one JS
-   runtime, so a prefetch written by the headless root is exactly what the sheet reads — a second
-   host would have a second, empty cache and the feature would be a no-op. RNHeadlessManager's
-   per-call reinvalidateBridge() can never come back: rebuilding this runtime would destroy the
-   sheet and the cache with it. One payment session at a time is a hard precondition. */
 internal class RNViewManager: NSObject, ReactHostManager {
 
     internal let hyperModule = HyperModuleImpl()
@@ -100,8 +95,6 @@ internal class RNViewManager: NSObject, ReactHostManager {
         RCTReactNativeFactory(delegate: self.delegate)
     }()
 
-    internal static let sharedInstance = RNViewManager()
-
     internal override init() {
         self.delegate = RNViewManagerDelegate()
         super.init()
@@ -110,7 +103,7 @@ internal class RNViewManager: NSObject, ReactHostManager {
         self.hyperModule.host = self
     }
 
-    internal func viewForModule(_ moduleName: String, initialProperties: [String: Any]?) -> UIView {
+    internal func presentedViewForModule(_ moduleName: String, initialProperties: [String: Any]?) -> UIView {
         let rootView = factory.rootViewFactory.view(
             withModuleName: moduleName,
             initialProperties: initialProperties
@@ -119,20 +112,22 @@ internal class RNViewManager: NSObject, ReactHostManager {
         return rootView
     }
 
-    internal func widgetViewForModule(_ moduleName: String, initialProperties: [String: Any]?) -> UIView {
+    internal func viewForModule(_ moduleName: String, initialProperties: [String: Any]?) -> UIView {
         return factory.rootViewFactory.view(
             withModuleName: moduleName,
             initialProperties: initialProperties
         )
     }
 
-    internal func removePrefetchCache(sdkAuthorization: String) {
-        guard !sdkAuthorization.isEmpty else { return }
-        /* Must go through the module's codegen event channel: the RCTBridge compat layer is
-           nil on the bridgeless runtime, so enqueueJSCall would silently drop the event. */
-        hyperModule.emit(
-            "clearPrefetchCache",
-            ["sdkAuthorization": sdkAuthorization]
-        )
+    internal func awaitReady() async {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.main.async {
+                if self.hyperModule.isAttached {
+                    continuation.resume()
+                } else {
+                    self.hyperModule.onAttached = { continuation.resume() }
+                }
+            }
+        }
     }
 }

@@ -5,7 +5,6 @@
 //  Created by Harshit Srivastava on 21/04/26.
 //
 
-import Combine
 import Foundation
 
 public class PaymentWidget: UIControl {
@@ -17,9 +16,8 @@ public class PaymentWidget: UIControl {
     private var rootView: UIView?
     private var initCallback: ((PaymentResult) -> Void)?
     private var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
-    private var cancellables = Set<AnyCancellable>()
     private var subscribedEventNames: [String]?
-    private let reactManager = RNViewManager.sharedInstance
+    private var reactManager: RNViewManager { paymentSession.reactManager }
     internal var paymentEventListener: PaymentEventListener?
 
     public init(
@@ -74,8 +72,6 @@ public class PaymentWidget: UIControl {
 
     private func commonInit() {
 
-        paymentSession.registerWidget(self)
-
         let hyperswitchConfiguration = try? paymentSession.hyperswitchConfiguration?.toDictionary()
         let paymentSessionConfiguration = try? paymentSession.paymentSessionConfiguration.toDictionary()
 
@@ -96,7 +92,7 @@ public class PaymentWidget: UIControl {
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
 
-        self.rootView = reactManager.widgetViewForModule(
+        self.rootView = reactManager.viewForModule(
             "hyperSwitch",
             initialProperties: ["props": props]
         )
@@ -115,33 +111,6 @@ public class PaymentWidget: UIControl {
                 rootView.trailingAnchor.constraint(equalTo: trailingAnchor),
             ])
         }
-
-        paymentSession.updateIntentDidStart
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] in
-                guard let self = self else { return }
-                let payload: [String: Any] = ["rootTag": self.widgetReactTag ?? -1]
-                self.reactManager.hyperModule.emit("updateIntentInit", payload)
-            }
-            .store(in: &cancellables)
-
-        paymentSession.updateIntentDidComplete
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] update in
-                guard let self = self else { return }
-                // Payload is intentionally sdkAuthorization-only: JS resolves the fresh
-                // intent data from its own PrefetchCache on the shared bridge.
-                let payload: [String: Any] = [
-                    "rootTag": self.widgetReactTag ?? -1,
-                    "sdkAuthorization": update.sdkAuthorization,
-                ]
-                self.reactManager.hyperModule.emit("updateIntentComplete", payload)
-            }
-            .store(in: &cancellables)
-    }
-
-    deinit {
-        paymentSession.unregisterWidget(self)
     }
 
     public func confirm() {
@@ -164,23 +133,9 @@ public class PaymentWidget: UIControl {
         }
     }
 
-    internal func handleUpdateIntentEvent(type: String, result: String) {
-        switch type {
-        case "UPDATE_INTENT_INIT_RETURNED":
-            paymentSession.updateIntentInitReturned.send(result)
-        case "UPDATE_INTENT_COMPLETE_RETURNED":
-            paymentSession.updateIntentCompleteReturned.send(result)
-        default:
-            break
-        }
-    }
-
     internal func handleConfirmPaymentResponse(_ result: PaymentResult) {
-        paymentSession.unregisterWidget(self)
-        paymentSession.handlePaymentResult(result)
         initCallback?(result)
         initCallback = nil
-        cancellables.removeAll()
         rootView?.removeFromSuperview()
         rootView = nil
         widgetReactTag = nil

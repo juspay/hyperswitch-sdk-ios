@@ -9,6 +9,8 @@ import Foundation
 
 public class ExpressCheckout: UIControl {
 
+    private let reactManager = RNViewManager()
+
     required public init?(
         coder aDecoder: NSCoder
     ) {
@@ -30,7 +32,7 @@ public class ExpressCheckout: UIControl {
 
     func commonInit() {
 
-        let cardView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": ["type": "expressCheckout"]])
+        let cardView = reactManager.presentedViewForModule("hyperSwitch", initialProperties: ["props": ["type": "expressCheckout"]])
         cardView.backgroundColor = UIColor.clear
         addSubview(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false

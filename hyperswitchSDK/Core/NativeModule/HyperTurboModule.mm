@@ -58,10 +58,10 @@ RCT_EXPORT_MODULE()
   return [[_surfacePresenter surfaceForRootTag:rootTag.intValue] view];
 }
 
-- (BOOL)emitEventWithName:(NSString *)name payload:(NSDictionary<NSString *, id> *)payload
+- (void)emitEventWithName:(NSString *)name payload:(NSDictionary<NSString *, id> *)payload
 {
   if (!_eventEmitterCallback) {
-    return NO;
+    return;
   }
   if ([name isEqualToString:@"confirm"]) {
     [self emitConfirm:payload];
@@ -75,14 +75,7 @@ RCT_EXPORT_MODULE()
     [self emitUpdateIntentInit:payload];
   } else if ([name isEqualToString:@"updateIntentComplete"]) {
     [self emitUpdateIntentComplete:payload];
-  } else if ([name isEqualToString:@"clearPrefetchCache"]) {
-    [self emitClearPrefetchCache:payload];
-  } else if ([name isEqualToString:@"headlessRequest"]) {
-    [self emitHeadlessRequest:payload];
-  } else {
-    return NO;
   }
-  return YES;
 }
 
 #pragma mark - NativeHyperModuleSpec

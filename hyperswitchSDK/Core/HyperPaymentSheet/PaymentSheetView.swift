@@ -33,8 +33,9 @@ internal extension PaymentSheet {
             "sdkParams": sdkParams,
             "configuration": configuration as Any,
         ]
-        /// Get the root view from the RNViewManager with the "hyperSwitch" module and the props dictionary.
-        let rootView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": props])
+        guard let rootView = reactManager?.viewForModule("hyperSwitch", initialProperties: ["props": props]) else {
+            return UIView()
+        }
 
         rootView.backgroundColor = UIColor.clear
         return rootView
@@ -60,7 +61,9 @@ internal extension PaymentSheet {
             "from": "rn",
         ]
 
-        let rootView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": props])
+        guard let rootView = reactManager?.viewForModule("hyperSwitch", initialProperties: ["props": props]) else {
+            return UIView()
+        }
 
         rootView.backgroundColor = UIColor.clear
         return rootView
