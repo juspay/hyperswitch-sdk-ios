@@ -131,44 +131,28 @@ public struct PMError: Codable, Error {
     public let message: String
 }
 
-/// Handler for payment session operations
-public struct PaymentSessionHandler {
-    public let getCustomerDefaultSavedPaymentMethodData: () -> Result<PaymentMethod, PMError>
-    public let getCustomerLastUsedPaymentMethodData: () -> Result<PaymentMethod, PMError>
-    public let getCustomerSavedPaymentMethodData: () -> Result<[PaymentMethod], PMError>
-    private let confirmWithCustomerDefaultPaymentMethod: (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
-    private let confirmWithCustomerLastUsedPaymentMethod:
-        (_ cvcWidget: CVCWidget, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
-    private let confirmWithCustomerPaymentToken:
-        (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+/// Handler for payment session operations.
+public protocol PaymentSessionHandler {
+    func getCustomerDefaultSavedPaymentMethodData() -> Result<PaymentMethod, PMError>
+    func getCustomerLastUsedPaymentMethodData() -> Result<PaymentMethod, PMError>
+    func getCustomerSavedPaymentMethodData() -> Result<[PaymentMethod], PMError>
+    func confirmWithCustomerDefaultPaymentMethod(cvc: String?, resultHandler: @escaping (PaymentResult) -> Void)
+    func confirmWithCustomerLastUsedPaymentMethod(cvc: String?, resultHandler: @escaping (PaymentResult) -> Void)
+    func confirmWithCustomerPaymentToken(paymentToken: String, cvc: String?, resultHandler: @escaping (PaymentResult) -> Void)
+    func confirmWithCustomerDefaultPaymentMethod(cvcWidget: CVCWidget, resultHandler: @escaping (PaymentResult) -> Void)
+    func confirmWithCustomerLastUsedPaymentMethod(cvcWidget: CVCWidget, resultHandler: @escaping (PaymentResult) -> Void)
+}
 
-    public init(
-        getCustomerDefaultSavedPaymentMethodData: @escaping () -> Result<PaymentMethod, PMError>,
-        getCustomerLastUsedPaymentMethodData: @escaping () -> Result<PaymentMethod, PMError>,
-        getCustomerSavedPaymentMethodData: @escaping () -> Result<[PaymentMethod], PMError>,
-        confirmWithCustomerDefaultPaymentMethod: @escaping (_ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void,
-        confirmWithCustomerLastUsedPaymentMethod:
-            @escaping (_ cvcWidget: CVCWidget, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void,
-        confirmWithCustomerPaymentToken:
-            @escaping (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
-    ) {
-        self.getCustomerDefaultSavedPaymentMethodData = getCustomerDefaultSavedPaymentMethodData
-        self.getCustomerLastUsedPaymentMethodData = getCustomerLastUsedPaymentMethodData
-        self.getCustomerSavedPaymentMethodData = getCustomerSavedPaymentMethodData
-        self.confirmWithCustomerDefaultPaymentMethod = confirmWithCustomerDefaultPaymentMethod
-        self.confirmWithCustomerLastUsedPaymentMethod = confirmWithCustomerLastUsedPaymentMethod
-        self.confirmWithCustomerPaymentToken = confirmWithCustomerPaymentToken
+public extension PaymentSessionHandler {
+    func confirmWithCustomerDefaultPaymentMethod(resultHandler: @escaping (PaymentResult) -> Void) {
+        confirmWithCustomerDefaultPaymentMethod(cvc: nil, resultHandler: resultHandler)
     }
 
-    public func confirmWithCustomerDefaultPaymentMethod(resultHandler: @escaping (PaymentResult) -> Void) {
-        confirmWithCustomerDefaultPaymentMethod(nil, resultHandler)
+    func confirmWithCustomerLastUsedPaymentMethod(resultHandler: @escaping (PaymentResult) -> Void) {
+        confirmWithCustomerLastUsedPaymentMethod(cvc: nil, resultHandler: resultHandler)
     }
 
-    public func confirmWithCustomerLastUsedPaymentMethod(_ cvcWidget: CVCWidget, resultHandler: @escaping (PaymentResult) -> Void) {
-        confirmWithCustomerLastUsedPaymentMethod(cvcWidget, resultHandler)
-    }
-
-    public func confirmWithCustomerPaymentToken(paymentToken: String, resultHandler: @escaping (PaymentResult) -> Void) {
-        confirmWithCustomerPaymentToken(paymentToken, nil, resultHandler)
+    func confirmWithCustomerPaymentToken(paymentToken: String, resultHandler: @escaping (PaymentResult) -> Void) {
+        confirmWithCustomerPaymentToken(paymentToken: paymentToken, cvc: nil, resultHandler: resultHandler)
     }
 }

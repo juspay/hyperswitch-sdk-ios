@@ -17,6 +17,8 @@ import WebKit
 
 public class ExpressCheckoutLauncher {
 
+    private let reactManager = RNViewManager()
+
     init() {}
 
     var configuration: PaymentSheet.Configuration?
@@ -53,7 +55,7 @@ public class ExpressCheckoutLauncher {
 
         DispatchQueue.main.async {
 
-            RNViewManager.sharedInstance.responseHandler = self
+            self.reactManager.responseHandler = self
 
             let hyperParams = SDKParams.getSDKParams()
 
@@ -68,7 +70,7 @@ public class ExpressCheckoutLauncher {
                 "customParams": APIClient.shared.customParams as Any,
             ]
 
-            let rootView = RNViewManager.sharedInstance.viewForModule("hyperSwitch", initialProperties: ["props": props])
+            let rootView = self.reactManager.presentedViewForModule("hyperSwitch", initialProperties: ["props": props])
 
             rootView.backgroundColor = UIColor.clear
 
@@ -100,7 +102,7 @@ extension ExpressCheckoutLauncher: RNResponseHandler {
 extension ExpressCheckoutLauncher {
     public func confirm() {
 
-        RNViewManager.sharedInstance.responseHandler = self
+        reactManager.responseHandler = self
 
         var props: [String: Any] = [
             "publishableKey": APIClient.shared.publishableKey as Any,

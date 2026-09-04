@@ -30,4 +30,9 @@ public class PaymentSheet {
     internal var subscribedEvents: [String]?
     internal var paymentEventListener: PaymentEventListener?
     internal var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
+
+    #if canImport(React)
+    // Host of the presenting session.
+    internal weak var reactManager: RNViewManager?
+    #endif
 }

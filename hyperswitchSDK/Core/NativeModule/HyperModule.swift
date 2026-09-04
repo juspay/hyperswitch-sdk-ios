@@ -32,10 +32,8 @@ extension PaymentResult {
 internal protocol HyperModuleShim: NSObjectProtocol {
     @objc(attachImpl:)
     func attach(impl: HyperModuleImpl)
-    /* Returns false when the JS event emitter is not armed (detached runtime):
-       callers holding a pending confirmation registration must roll it back. */
     @objc(emitEventWithName:payload:)
-    func emitEvent(name: String, payload: [String: Any]) -> Bool
+    func emitEvent(name: String, payload: [String: Any])
     @objc(viewForRootTag:)
     func view(forRootTag rootTag: NSNumber) -> UIView?
 }
@@ -44,6 +42,8 @@ internal protocol HyperModuleShim: NSObjectProtocol {
 internal class HyperModuleImpl: NSObject {
 
     internal weak var host: ReactHostManager?
+    internal static let prefetchSurfaceTag = -100
+    internal var onPrefetchUpdateIntentReply: ((_ type: String, _ result: String) -> Void)?
 
     private let applePayPaymentHandler = ApplePayHandler()
     private var presentCallback: (([Any]?) -> Void)? = nil
@@ -51,27 +51,26 @@ internal class HyperModuleImpl: NSObject {
     internal var onAddPaymentMethod: (() -> Void)?
 
     private weak var shim: HyperModuleShim?
+    internal private(set) var isAttached = false
+    internal var onAttached: (() -> Void)?
 
     internal func attach(to shim: HyperModuleShim) {
         shim.attach(impl: self)
         onMain {
             self.shim = shim
+            self.isAttached = true
+            let onAttached = self.onAttached
+            self.onAttached = nil
+            onAttached?()
         }
     }
 
     internal func emit(_ name: String, _ payload: [String: Any]) {
         onMain {
-            _ = self.shim?.emitEvent(name: name, payload: payload)
+            self.shim?.emitEvent(name: name, payload: payload)
         }
     }
 
-    /* Synchronous, main-thread delivery check for callers that registered a
-       pending confirmation: false means the event can never reach JS. */
-    @discardableResult
-    internal func emitChecked(_ name: String, _ payload: [String: Any]) -> Bool {
-        dispatchPrecondition(condition: .onQueue(.main))
-        return shim?.emitEvent(name: name, payload: payload) ?? false
-    }
     internal func confirm(data: [String: Any]) {
         emit("confirm", data)
     }
@@ -116,8 +115,11 @@ internal class HyperModuleImpl: NSObject {
     internal func exitPaymentsheet(_ reactTag: NSNumber, _ status: String, _ code: String?, _ message: String?, _ reset: Bool) {
         let result = PaymentResult.from(status: status, code: code, message: message)
         withPaymentSheet(reactTag) { vc, sheet in
-            sheet?.completion?(result)
-            vc?.dismiss(animated: false, completion: nil)
+            guard let vc = vc else {
+                sheet?.completion?(result)
+                return
+            }
+            vc.dismiss(animated: false) { sheet?.completion?(result) }
         }
     }
 
@@ -148,10 +150,9 @@ internal class HyperModuleImpl: NSObject {
 
     @objc(onUpdateIntentEvent:eventType:status:code:message:)
     internal func onUpdateIntentEvent(_ rootTag: NSNumber, _ type: String, _ status: String, _ code: String?, _ message: String?) {
+        guard rootTag.intValue == Self.prefetchSurfaceTag else { return }
         let result = Self.encodeExitResult(status: status, code: code, message: message)
-        withWidget(rootTag) { widget in
-            widget.handleUpdateIntentEvent(type: type, result: result)
-        }
+        onMain { self.onPrefetchUpdateIntentReply?(type, result) }
     }
 
     private static func encodeExitResult(status: String, code: String?, message: String?) -> String {
@@ -223,45 +224,32 @@ internal class HyperModuleImpl: NSObject {
     private func exitSheet(_ rnMessage: String) {
         var response: String?
         var error: NSError?
+        let unknownError = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
 
-        if let data = rnMessage.data(using: .utf8) {
-            do {
-                if let jsonDictionary = try JSONSerialization.jsonObject(with: data, options: []) as? [String: String] {
-                    let status = jsonDictionary["status"]
-
-                    if status == "failed" || status == "requires_payment_method" {
-                        error = NSError(
-                            domain: (jsonDictionary["code"] ?? "") != "" ? jsonDictionary["code"]! : "UNKNOWN_ERROR",
-                            code: 0,
-                            userInfo: ["message": jsonDictionary["message"] ?? "An error has occurred."]
-                        )
-                    } else {
-                        response = status
-                    }
-                    self.host?.responseHandler?.didReceiveResponse(response: response, error: error)
-                } else {
-                    self.host?.responseHandler?.didReceiveResponse(
-                        response: "failed",
-                        error: NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
-                    )
-                }
-            } catch {
-                self.host?.responseHandler?.didReceiveResponse(
-                    response: "failed",
-                    error: NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
+        if let data = rnMessage.data(using: .utf8),
+            let jsonDictionary = (try? JSONSerialization.jsonObject(with: data, options: [])) as? [String: String]
+        {
+            let status = jsonDictionary["status"]
+            if status == "failed" || status == "requires_payment_method" {
+                error = NSError(
+                    domain: (jsonDictionary["code"] ?? "") != "" ? jsonDictionary["code"]! : "UNKNOWN_ERROR",
+                    code: 0,
+                    userInfo: ["message": jsonDictionary["message"] ?? "An error has occurred."]
                 )
+            } else {
+                response = status
             }
         } else {
-            self.host?.responseHandler?.didReceiveResponse(
-                response: "failed",
-                error: NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
-            )
+            response = "failed"
+            error = unknownError
         }
+        let deliver = { self.host?.responseHandler?.didReceiveResponse(response: response, error: error) }
         DispatchQueue.main.async {
-            if let view = self.host?.rootView {
-                let reactNativeVC: UIViewController? = view.reactViewController()
-                reactNativeVC?.dismiss(animated: false, completion: nil)
+            guard let vc = self.host?.rootView?.reactViewController() else {
+                deliver()
+                return
             }
+            vc.dismiss(animated: false) { deliver() }
         }
     }
 
@@ -292,8 +280,9 @@ internal class HyperModuleImpl: NSObject {
 
     private func withWidget(_ rootTag: NSNumber, _ block: @escaping (PaymentWidget) -> Void) {
         DispatchQueue.main.async {
-            guard let widget = self.shim?.view(forRootTag: rootTag)?
-                .nearestAncestor(ofType: PaymentWidget.self)
+            guard
+                let widget = self.shim?.view(forRootTag: rootTag)?
+                    .nearestAncestor(ofType: PaymentWidget.self)
             else { return }
             block(widget)
         }

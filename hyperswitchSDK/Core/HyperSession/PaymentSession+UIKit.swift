@@ -10,94 +10,19 @@ import UIKit
 
 extension PaymentSession {
 
-    /* Same props map on every headless request — mount and event paths carry it verbatim;
-       during updateIntent the passed (new) configuration is used, not the session's. */
-    internal func headlessProps(
-        headlessType: String,
-        configuration: PaymentSessionConfiguration? = nil
-    ) -> [String: Any] {
-        let hyperswitchConfig = try? hyperswitchConfiguration?.toDictionary()
-        let paymentSessionConfig = try? (configuration ?? paymentSessionConfiguration).toDictionary()
-        return [
-            "hyperswitchConfig": hyperswitchConfig as Any,
-            "paymentSessionConfig": paymentSessionConfig as Any,
-            "sdkParams": SDKParams.getSDKParams(),
-            "headlessType": headlessType,
-        ]
-    }
-
-    /// Runs the initial prefetch headless task and waits for its result.
-    ///
-    /// A prefetch miss is not fatal: the sheet and headless flows fall back to making the API
-    /// calls themselves, so a timeout resolves with no data rather than propagating an error.
-    internal func triggerPrefetch() async throws {
-        let configuration = paymentSessionConfiguration
-        /* One headless root per session: a re-init releases the previous session's root before
-           this prefetch mounts or reuses one. */
-        RNViewManager.sharedInstance.headlessModule.finishHeadlessRoot()
-        /* The fetched payload lives only in the JS PrefetchCache; this waits purely so the
-           cache is warm before the merchant is allowed to present UI. */
-        let data = await loadHeadlessData(
-            headlessType: "prefetch",
-            configuration: configuration
-        )
-        if data == nil, !configuration.sdkAuthorization.isEmpty,
-           paymentSessionConfiguration.sdkAuthorization == configuration.sdkAuthorization {
-            /* A failed re-validation must not leave an earlier (e.g. cancelled) attempt's
-               entry behind: the sheet would mount with minutes-old session tokens instead
-               of fetching for itself. Same-auth guard keeps a late-finishing prefetch of
-               an old session from wiping a newer session's entry. Empty-auth stays silent
-               (prefetch miss is not an error). */
-            clearPrefetch(for: configuration.sdkAuthorization)
-        }
-    }
-
-    /// Fetches the new intent's data without mutating the active session. Returns nil when the
-    /// fetch produced nothing usable (timeout or wedged bridge).
-    internal func fetchIntentUpdate(
-        configuration: PaymentSessionConfiguration
-    ) async -> [String: Any]? {
-        await loadHeadlessData(
-            headlessType: "updateIntent",
-            configuration: configuration
-        )
-    }
-
-    /* The continuation and its timeout live on the headless module, not in file scope: the impl
-       owns the root they reply to. */
-    private func loadHeadlessData(
-        headlessType: String,
-        configuration: PaymentSessionConfiguration
-    ) async -> [String: Any]? {
-        guard !configuration.sdkAuthorization.isEmpty else {
-            return nil
-        }
-        return await RNViewManager.sharedInstance.headlessModule.requestAndAwait(
-            headlessType: headlessType,
-            props: headlessProps(headlessType: headlessType, configuration: configuration)
-        )
-    }
-
-    internal func clearPrefetch(for sdkAuthorization: String) {
-        guard !sdkAuthorization.isEmpty else { return }
-        RNViewManager.sharedInstance.removePrefetchCache(
-            sdkAuthorization: sdkAuthorization
-        )
-    }
-
     public func presentPaymentSheet(
         viewController: UIViewController,
         configuration: PaymentSheet.Configuration? = nil,
         subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil,
         completion: @escaping (PaymentResult) -> Void
     ) {
-        let sdkAuthorization = paymentSessionConfiguration.sdkAuthorization
         let paymentSheet = PaymentSheet(
             paymentSessionConfiguration: paymentSessionConfiguration,
             hyperswitchConfiguration: hyperswitchConfiguration ?? nil,
             configuration: configuration
         )
 
+        paymentSheet.reactManager = reactManager
         if let subscribe {
             let builder = PaymentEventSubscriptionBuilder()
             subscribe(builder)
@@ -105,10 +30,7 @@ extension PaymentSession {
             paymentSheet.subscribedEvents = subscription.subscribedEventStrings()
             paymentSheet.paymentEventListener = builtListener
         }
-        paymentSheet.present(from: viewController) { [weak self] result in
-            self?.handlePaymentResult(result, sdkAuthorization: sdkAuthorization)
-            completion(result)
-        }
+        paymentSheet.present(from: viewController, completion: completion)
     }
 
     // MARK: for external frameworks
@@ -118,12 +40,12 @@ extension PaymentSession {
         subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil,
         completion: @escaping (PaymentResult) -> Void
     ) {
-        let sdkAuthorization = paymentSessionConfiguration.sdkAuthorization
         let paymentSheet = PaymentSheet(
             paymentSessionConfiguration: paymentSessionConfiguration,
             hyperswitchConfiguration: hyperswitchConfiguration ?? nil
         )
 
+        paymentSheet.reactManager = reactManager
         if let subscribe {
             let builder = PaymentEventSubscriptionBuilder()
             subscribe(builder)
@@ -131,27 +53,154 @@ extension PaymentSession {
             paymentSheet.subscribedEvents = subscription.subscribedEventStrings()
             paymentSheet.paymentEventListener = builtListener
         }
-        paymentSheet.presentWithParams(from: viewController, props: params) { [weak self] result in
-            self?.handlePaymentResult(result, sdkAuthorization: sdkAuthorization)
-            completion(result)
+        paymentSheet.presentWithParams(from: viewController, props: params, completion: completion)
+    }
+
+    public func getCustomerSavedPaymentMethods(
+        _ func_: @escaping (any PaymentSessionHandler) -> Void,
+        configuration: SavedPaymentMethodsConfiguration? = nil
+    ) {
+        let manager = reactManager
+        manager.headlessModule.begin(session: self, completion: func_)
+        let hyperswitchConfiguration = try? hyperswitchConfiguration?.toDictionary()
+        let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
+        let sdkParams = SDKParams.getSDKParams()
+        let configurationDict = try? configuration.toDictionary()
+
+        var props: [String: Any] = [
+            "hyperswitchConfig": hyperswitchConfiguration as Any,
+            "paymentSessionConfig": paymentSessionConfiguration as Any,
+            "sdkParams": sdkParams,
+        ]
+
+        props["configuration"] = [
+            "paymentMethodLayout": [
+                "savedMethodCustomization": configurationDict
+            ]
+        ]
+
+        reactRuntime.headlessSurface = manager.viewForModule("HyperHeadless", initialProperties: ["props": props])
+    }
+}
+
+internal final class UpdateIntentAttempt {
+    let completion: (UpdateIntentResult) -> Void
+    var configuration: PaymentSessionConfiguration?
+    var timeout: DispatchWorkItem?
+
+    init(completion: @escaping (UpdateIntentResult) -> Void) {
+        self.completion = completion
+    }
+}
+
+internal final class PaymentSessionReactRuntime {
+    let manager: RNViewManager
+    var prefetchSurface: UIView?
+    var headlessSurface: UIView?
+    var updateIntentAttempt: UpdateIntentAttempt?
+
+    init(manager: RNViewManager) {
+        self.manager = manager
+    }
+}
+
+extension PaymentSession {
+
+    internal var reactManager: RNViewManager { reactRuntime.manager }
+
+    internal func activateRuntime() async {
+        reactManager.hyperModule.onPrefetchUpdateIntentReply = { [weak self] type, result in
+            self?.handleUpdateIntentReply(type: type, result: result)
+        }
+        onMain { [weak self] in self?.ensurePrefetchSurface() }
+        await reactManager.awaitReady()
+    }
+
+    private func ensurePrefetchSurface() {
+        guard reactRuntime.prefetchSurface == nil else { return }
+        let props: [String: Any] = [
+            "type": "prefetch",
+            "hyperswitchConfig": (try? hyperswitchConfiguration?.toDictionary()) as Any,
+            "paymentSessionConfig": (try? paymentSessionConfiguration.toDictionary()) as Any,
+            "sdkParams": SDKParams.getSDKParams(),
+            "prefetchTag": HyperModuleImpl.prefetchSurfaceTag,
+        ]
+        reactRuntime.prefetchSurface = reactManager.viewForModule("HyperHeadless", initialProperties: ["props": props])
+    }
+
+    private func onMain(_ work: @escaping () -> Void) {
+        if Thread.isMainThread {
+            work()
+        } else {
+            DispatchQueue.main.async(execute: work)
         }
     }
 
-    /* The session's headless root mounts once (at prefetch); this is either the mount on a cold
-       start or a headlessRequest event into the live root. The reply arrives on the impl by
-       rootTag (HyperHeadlessImpl.getPaymentSession), as on main. */
-    public func getCustomerSavedPaymentMethods(
-        _ func_: @escaping (PaymentSessionHandler) -> Void,
-        configuration: SavedPaymentMethodsConfiguration? = nil
+    public func updateIntent(
+        authorizationProvider: @escaping (@escaping (String) -> Void) -> Void,
+        completion: @escaping (UpdateIntentResult) -> Void
     ) {
-        let manager = RNViewManager.sharedInstance
-        manager.headlessModule.begin(session: self, completion: func_)
-        var props = headlessProps(headlessType: "savedPM")
-        props["configuration"] = [
-            "paymentMethodLayout": [
-                "savedMethodCustomization": try? configuration?.toDictionary()
-            ]
-        ]
-        manager.headlessModule.request(headlessType: "savedPM", props: props)
+        onMain { [weak self] in
+            guard let self = self else { return }
+            guard self.reactRuntime.updateIntentAttempt == nil else {
+                completion(.failure(Self.error("ALREADY_IN_PROGRESS", "updateIntent already in progress")))
+                return
+            }
+            let attempt = UpdateIntentAttempt(completion: completion)
+            self.reactRuntime.updateIntentAttempt = attempt
+            self.ensurePrefetchSurface()
+            self.emitToPrefetchSurface("updateIntentInit", sdkAuthorization: nil)
+
+            authorizationProvider { [weak self] sdkAuthorization in
+                self?.onMain { self?.refetch(with: sdkAuthorization, attempt: attempt) }
+            }
+        }
+    }
+
+    private func refetch(with sdkAuthorization: String, attempt: UpdateIntentAttempt) {
+        guard reactRuntime.updateIntentAttempt === attempt else { return }
+        guard !sdkAuthorization.isEmpty else {
+            finish(attempt, .failure(Self.error("INVALID_SDK_AUTHORIZATION", "No sdkAuthorization was provided")))
+            return
+        }
+        attempt.configuration = PaymentSessionConfiguration(sdkAuthorization: sdkAuthorization)
+
+        let timeout = DispatchWorkItem { [weak self] in
+            self?.finish(attempt, .failure(Self.error("UPDATE_INTENT_TIMEOUT", "The updated payment intent was not acknowledged in time.")))
+        }
+        attempt.timeout = timeout
+        DispatchQueue.main.asyncAfter(deadline: .now() + 30, execute: timeout)
+
+        emitToPrefetchSurface("updateIntentComplete", sdkAuthorization: sdkAuthorization)
+    }
+
+    private func handleUpdateIntentReply(type: String, result: String) {
+        guard type == "UPDATE_INTENT_COMPLETE_RETURNED",
+            let attempt = reactRuntime.updateIntentAttempt
+        else { return }
+        let parsed = parseUpdateIntentResult(result)
+        if case .success = parsed, let configuration = attempt.configuration {
+            paymentSessionConfiguration = configuration
+        }
+        finish(attempt, parsed)
+    }
+
+    private func finish(_ attempt: UpdateIntentAttempt, _ result: UpdateIntentResult) {
+        guard reactRuntime.updateIntentAttempt === attempt else { return }
+        attempt.timeout?.cancel()
+        reactRuntime.updateIntentAttempt = nil
+        attempt.completion(result)
+    }
+
+    private func emitToPrefetchSurface(_ name: String, sdkAuthorization: String?) {
+        var payload: [String: Any] = ["rootTag": HyperModuleImpl.prefetchSurfaceTag]
+        if let sdkAuthorization = sdkAuthorization {
+            payload["sdkAuthorization"] = sdkAuthorization
+        }
+        reactManager.hyperModule.emit(name, payload)
+    }
+
+    private static func error(_ domain: String, _ message: String) -> NSError {
+        NSError(domain: domain, code: 0, userInfo: [NSLocalizedDescriptionKey: message])
     }
 }
