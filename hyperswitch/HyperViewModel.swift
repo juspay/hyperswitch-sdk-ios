@@ -39,7 +39,7 @@ class HyperViewModel: ObservableObject {
                 let paymentSessionConfiguration = PaymentSessionConfiguration(sdkAuthorization: sdkAuthorization)
 
                 let hyperswitch = Hyperswitch(configuration: hyperswitchConfiguration)
-                let paymentSession = try await hyperswitch.initPaymentSession(configuration: paymentSessionConfiguration)
+                let paymentSession = await hyperswitch.initPaymentSession(configuration: paymentSessionConfiguration)
 
                 DispatchQueue.main.async {
                     self.hyperswitch = hyperswitch

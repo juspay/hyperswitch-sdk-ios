@@ -30,7 +30,7 @@ extension PaymentSession {
     ///
     /// A prefetch miss is not fatal: the sheet and headless flows fall back to making the API
     /// calls themselves, so a timeout resolves with no data rather than propagating an error.
-    internal func triggerPrefetch() async throws {
+    internal func triggerPrefetch() async {
         let configuration = paymentSessionConfiguration
         /* One headless root per session: a re-init releases the previous session's root before
            this prefetch mounts or reuses one. */
@@ -73,7 +73,6 @@ extension PaymentSession {
             return nil
         }
         return await RNViewManager.sharedInstance.headlessModule.requestAndAwait(
-            headlessType: headlessType,
             props: headlessProps(headlessType: headlessType, configuration: configuration)
         )
     }
@@ -152,6 +151,6 @@ extension PaymentSession {
                 "savedMethodCustomization": try? configuration?.toDictionary()
             ]
         ]
-        manager.headlessModule.request(headlessType: "savedPM", props: props)
+        manager.headlessModule.request(props: props)
     }
 }

@@ -26,9 +26,8 @@ internal class HyperHeadlessImpl: NSObject {
     private var hasResponded = false
 
     /* One headless root per session, mounted at the session's first headless request and kept
-       for its life. The tag is the liveness probe into the surface presenter; the retained view
-       keeps the surface alive. */
-    private var headlessRootTag: NSNumber?
+       for its life. The retained root is the liveness probe into the surface presenter (via its
+       surfaceRootTag) and keeps the surface alive. */
     private var headlessRootView: UIView?
     private var prefetchContinuation: CheckedContinuation<[String: Any]?, Never>?
     private var prefetchTimeoutItem: DispatchWorkItem?
@@ -57,36 +56,38 @@ internal class HyperHeadlessImpl: NSObject {
        the module re-attaches long before the new runtime mounts a headless root — the event
        would fall on the floor and the merchant's callback would hang. A surface from a dead
        runtime no longer resolves, so a dead root self-heals into a fresh mount. */
-    internal func request(headlessType: String, props: [String: Any]) {
+    internal func request(props: [String: Any]) {
         DispatchQueue.main.async {
             let manager = RNViewManager.sharedInstance
-            if let rootTag = self.headlessRootTag,
-               self.shim?.view(forRootTag: rootTag) != nil,
+            if let root = self.headlessRootView,
+               let tag = root.surfaceRootTag,
+               self.shim?.view(forRootTag: tag) != nil,
                manager.hyperModule.emitChecked("headlessRequest", props) {
                 return
             }
-            self.headlessRootView = nil
-            self.headlessRootTag = nil
-            let rootView = manager.widgetViewForModule(
+            self.headlessRootView = manager.widgetViewForModule(
                 "HyperHeadless", initialProperties: ["props": props]
             )
-            self.headlessRootView = rootView
-            self.headlessRootTag = rootView.surfaceRootTag
         }
     }
 
-    /* Registers the waiter before the mount/emit so the reply can never beat the registration. */
-    internal func requestAndAwait(headlessType: String, props: [String: Any]) async -> [String: Any]? {
+    /* Registers the waiter before the mount/emit so the reply can never beat the registration.
+       The slot is single: any prior waiter is released as a prefetch miss before retaking it —
+       clobbering it would strand that await forever (a prefetch miss is not fatal; the caller
+       fetches for itself). */
+    internal func requestAndAwait(props: [String: Any]) async -> [String: Any]? {
         await withCheckedContinuation { continuation in
             DispatchQueue.main.async {
                 self.prefetchTimeoutItem?.cancel()
+                self.prefetchTimeoutItem = nil
+                self.resolvePrefetch(nil)
                 self.prefetchContinuation = continuation
                 let item = DispatchWorkItem { [weak self] in
                     self?.resolvePrefetch(nil)
                 }
                 self.prefetchTimeoutItem = item
                 DispatchQueue.main.asyncAfter(deadline: .now() + Self.prefetchTimeout, execute: item)
-                self.request(headlessType: headlessType, props: props)
+                self.request(props: props)
             }
         }
     }
@@ -99,7 +100,6 @@ internal class HyperHeadlessImpl: NSObject {
     internal func finishHeadlessRoot() {
         DispatchQueue.main.async {
             self.headlessRootView = nil
-            self.headlessRootTag = nil
             self.prefetchTimeoutItem?.cancel()
             self.prefetchTimeoutItem = nil
             self.resolvePrefetch(nil)
