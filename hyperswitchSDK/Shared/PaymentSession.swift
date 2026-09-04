@@ -101,12 +101,8 @@ public class PaymentSession {
             return
         }
 
-        /* timeout must sit upstream of collect: on expiry it finishes the stream and collect
-           emits whatever arrived. Downstream of collect it finishes without a value, the sink
-           never runs, and the update-intent lock stays wedged. */
         updateIntentInitReturned
             .prefix(targetCount)
-            .timeout(.seconds(30), scheduler: DispatchQueue.main)
             .collect()
             .receive(on: DispatchQueue.main)
             .sink { _ in requestAuthorization() }
@@ -194,23 +190,11 @@ public class PaymentSession {
 
         updateIntentCompleteReturned
             .prefix(targetCount)
-            .timeout(.seconds(30), scheduler: DispatchQueue.main)
             .collect()
             .receive(on: DispatchQueue.main)
             .sink { [weak self] results in
                 guard let self = self else { return }
                 let parsedResults = results.map(self.parseUpdateIntentResult)
-                /* An empty collection only arises from the timeout fallback: no widget
-                   acknowledged the new intent, so nothing was committed — the merchant
-                   must hear a failure, not a silent success. */
-                guard !parsedResults.isEmpty else {
-                    self.clearUnappliedPrefetch(sdkAuthorization: sdkAuthorization)
-                    self.finishIntentUpdate(
-                        completion: completion,
-                        result: updateTimeoutResult()
-                    )
-                    return
-                }
                 if parsedResults.contains(where: { result in
                     if case .success = result { return true }
                     return false
@@ -251,14 +235,6 @@ public class PaymentSession {
             domain: "PREFETCH_FAILED",
             code: 0,
             userInfo: [NSLocalizedDescriptionKey: "No API data was returned for the updated payment intent."]
-        ))
-    }
-
-    private func updateTimeoutResult() -> UpdateIntentResult {
-        .failure(NSError(
-            domain: "UPDATE_INTENT_TIMEOUT",
-            code: 0,
-            userInfo: [NSLocalizedDescriptionKey: "Widgets did not acknowledge the updated payment intent in time."]
         ))
     }
 
