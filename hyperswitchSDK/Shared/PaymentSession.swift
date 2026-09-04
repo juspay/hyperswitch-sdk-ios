@@ -77,25 +77,9 @@ public class PaymentSession {
 
                 #if canImport(React)
                 Task {
-                    let newPrefetchedData: [String: Any]?
-                    do {
-                        newPrefetchedData = try await self.fetchIntentUpdate(
-                            configuration: newSessionConfiguration
-                        )
-                    } catch {
-                        /* SESSION_INIT_IN_PROGRESS: another in-progress session owns this
-                           authorization's entry and its cache write. Do not clear it. Widgets
-                           already show their overlay since init, so release them. */
-                        await MainActor.run {
-                            if targetCount > 0 {
-                                self.updateIntentDidComplete.send(
-                                    UpdateIntentPayload(sdkAuthorization: "")
-                                )
-                            }
-                            self.finishIntentUpdate(completion: completion, result: .failure(error))
-                        }
-                        return
-                    }
+                    let newPrefetchedData = await self.fetchIntentUpdate(
+                        configuration: newSessionConfiguration
+                    )
                     await MainActor.run {
                         self.deliverUpdatedIntent(
                             newSessionConfiguration: newSessionConfiguration,
