@@ -92,10 +92,7 @@
 		7932B80F2CB4182100A40E1A /* HyperUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A93DC2CA2F29500E3A767 /* HyperUIViewController.swift */; };
 		793451F62F96E4C700416A4B /* PaymentWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 793451F42F96E4C700416A4B /* PaymentWidget.swift */; };
 		793451F82F96E7C700416A4B /* WidgetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 793451F72F96E7C700416A4B /* WidgetViewController.swift */; };
-		97C4C3511B334289B7905FB7 /* MatrixBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E02FA26FFBA4EB199BFE043 /* MatrixBackend.swift */; };
-		82863DDA65F44188B5FCA638 /* ScenarioRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1582C7480D0E4127ACA93AB0 /* ScenarioRunner.swift */; };
-		B1A4C1EA12924AA9A7EE36FC /* Scenarios.swift in Sources */ = {isa = PBXBuildFile; fileRef = C93FCC85182144A59577D0A1 /* Scenarios.swift */; };
-		3E12E18CAE064C4C9F0FC42D /* MatrixViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9655DAB8B6394EEAB1B87CF5 /* MatrixViewController.swift */; };
+
 		793451FB2F96EB9F00416A4B /* CVCWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 793451FA2F96EB9F00416A4B /* CVCWidget.swift */; };
 		7938D81B2A4EF45000286CEE /* PaymentMethodParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7938D81A2A4EF45000286CEE /* PaymentMethodParams.swift */; };
 		79727F8F2EE73E7E00D60AB4 /* LogBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790F847D2D8C311900178A09 /* LogBuilder.swift */; };
@@ -283,10 +280,7 @@
 		793083EC2A0DA9F100E78310 /* PaymentIntentParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentIntentParams.swift; sourceTree = "<group>"; };
 		793451F42F96E4C700416A4B /* PaymentWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentWidget.swift; sourceTree = "<group>"; };
 		793451F72F96E7C700416A4B /* WidgetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetViewController.swift; sourceTree = "<group>"; };
-		8E02FA26FFBA4EB199BFE043 /* MatrixBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MatrixBackend.swift; path = Matrix/MatrixBackend.swift; sourceTree = "<group>"; };
-		1582C7480D0E4127ACA93AB0 /* ScenarioRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ScenarioRunner.swift; path = Matrix/ScenarioRunner.swift; sourceTree = "<group>"; };
-		C93FCC85182144A59577D0A1 /* Scenarios.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Scenarios.swift; path = Matrix/Scenarios.swift; sourceTree = "<group>"; };
-		9655DAB8B6394EEAB1B87CF5 /* MatrixViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MatrixViewController.swift; path = Matrix/MatrixViewController.swift; sourceTree = "<group>"; };
+
 		793451FA2F96EB9F00416A4B /* CVCWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVCWidget.swift; sourceTree = "<group>"; };
 		7938D81A2A4EF45000286CEE /* PaymentMethodParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodParams.swift; sourceTree = "<group>"; };
 		79727F942EE74F7400D60AB4 /* ClickToPayProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayProtocol.swift; sourceTree = "<group>"; };
@@ -463,7 +457,7 @@
 				790525792BDA73A600D49FE8 /* SwiftUIView.swift */,
 				79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */,
 				4E69679A2CB7CF71000DBE0A /* PMMViewController.swift */,
-				36F4306AFD9D42FEB189F7AB /* Matrix */,
+
 				DC5D011F2E968D7000185E87 /* AuthenticationViewController.swift */,
 				4EEA2BD52E9926040094AA83 /* NetworkUtils.swift */,
 				790525702BDA66EF00D49FE8 /* HyperViewModel.swift */,
@@ -476,17 +470,7 @@
 			path = hyperswitch;
 			sourceTree = "<group>";
 		};
-		36F4306AFD9D42FEB189F7AB /* Matrix */ = {
-			isa = PBXGroup;
-			children = (
-				8E02FA26FFBA4EB199BFE043 /* MatrixBackend.swift */,
-				1582C7480D0E4127ACA93AB0 /* ScenarioRunner.swift */,
-				C93FCC85182144A59577D0A1 /* Scenarios.swift */,
-				9655DAB8B6394EEAB1B87CF5 /* MatrixViewController.swift */,
-			);
-			name = Matrix;
-			sourceTree = "<group>";
-		};
+
 		66486F97294355BE00150E4F /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
@@ -1019,10 +1003,7 @@
 				52AABE56914A47D3822FEBDA /* ApplePayView.swift in Sources */,
 				61EB688481314069B806010C /* ApplePayButtonComponentView.mm in Sources */,
 				793451F82F96E7C700416A4B /* WidgetViewController.swift in Sources */,
-				97C4C3511B334289B7905FB7 /* MatrixBackend.swift in Sources */,
-				82863DDA65F44188B5FCA638 /* ScenarioRunner.swift in Sources */,
-				B1A4C1EA12924AA9A7EE36FC /* Scenarios.swift in Sources */,
-				3E12E18CAE064C4C9F0FC42D /* MatrixViewController.swift in Sources */,
+
 				4E8C838E2E98CAC600A61749 /* Transaction.swift in Sources */,
 				4E8C838F2E98CAC600A61749 /* ThreeDSProviderType.swift in Sources */,
 				75AA28E02D477FB100CD88A6 /* LogManager.swift in Sources */,

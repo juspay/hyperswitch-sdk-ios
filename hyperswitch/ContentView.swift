@@ -19,7 +19,6 @@ struct ContentView: View {
                 Text("3DS").tag(3)
                 Text("C2P").tag(4)
                 Text("Widget").tag(5)
-                Text("Matrix").tag(6)
             }.pickerStyle(SegmentedPickerStyle())
 
             switch selectedSegment {
@@ -35,22 +34,10 @@ struct ContentView: View {
                 ClickToPayView()
             case 5:
                 WidgetView()
-            case 6:
-                MatrixView()
             default:
                 UIKitView()
             }
         }
-    }
-}
-struct MatrixView: UIViewControllerRepresentable {
-    typealias UIViewControllerType = MatrixViewController
-
-    func makeUIViewController(context: Context) -> MatrixViewController {
-        return MatrixViewController()
-    }
-
-    func updateUIViewController(_ uiViewController: MatrixViewController, context: Context) {
     }
 }
 struct HeadlessView: UIViewControllerRepresentable {
