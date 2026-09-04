@@ -13,6 +13,7 @@ public class CVCWidget: UIControl {
     private var configurationDict: [String: Any]?
     private var widgetReactTag: NSNumber?
     private var rootView: UIView?
+    private var cvcCallback: ((PaymentResult) -> Void)?
     private var subscribedEventNames: [String]?
     private let hyperswitch: Hyperswitch
     private let reactManager = RNViewManager.sharedInstance
@@ -96,6 +97,16 @@ public class CVCWidget: UIControl {
                 rootView.trailingAnchor.constraint(equalTo: trailingAnchor),
             ])
         }
+    }
+
+    internal func awaitConfirmResult(_ handler: @escaping (PaymentResult) -> Void) {
+        cvcCallback = handler
+    }
+
+    internal func resolveConfirmResult(_ result: PaymentResult) {
+        let handler = cvcCallback
+        cvcCallback = nil
+        handler?(result)
     }
 
     /* Returns false when the JS emitter is detached: the confirm can never start,
