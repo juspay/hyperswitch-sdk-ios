@@ -25,6 +25,17 @@ internal class HyperHeadlessImpl: NSObject {
     private var completion: ((PaymentResult) -> Void)?
     private var hasResponded = false
 
+    /* One headless root per session, mounted at the session's first headless request and kept
+       for its life. The tag is the liveness probe into the surface presenter; the retained view
+       keeps the surface alive. */
+    private var headlessRootTag: NSNumber?
+    private var headlessRootView: UIView?
+    private var prefetchContinuation: CheckedContinuation<[String: Any]?, Never>?
+    private var prefetchTimeoutItem: DispatchWorkItem?
+
+    /* SDK-side last-resort budget; JS has none of its own. Same 30s window as Android. */
+    private static let prefetchTimeout: DispatchTimeInterval = .seconds(30)
+
     private weak var shim: HyperHeadlessShim?
 
     internal func attach(to shim: HyperHeadlessShim) {
@@ -38,6 +49,78 @@ internal class HyperHeadlessImpl: NSObject {
         hasResponded = false
         headlessCompletion = completion
         activeSession = session
+    }
+
+    /* The session's single dispatch point: after the first mount everything is a headlessRequest
+       event into the live JS closure. Liveness comes from the surface presenter, not emit
+       success: emitChecked proves only that a module is attached, and after a runtime restart
+       the module re-attaches long before the new runtime mounts a headless root — the event
+       would fall on the floor and the merchant's callback would hang. A surface from a dead
+       runtime no longer resolves, so a dead root self-heals into a fresh mount. */
+    internal func request(headlessType: String, props: [String: Any]) {
+        DispatchQueue.main.async {
+            let manager = RNViewManager.sharedInstance
+            if let rootTag = self.headlessRootTag,
+               self.shim?.view(forRootTag: rootTag) != nil,
+               manager.hyperModule.emitChecked("headlessRequest", props) {
+                return
+            }
+            self.headlessRootView = nil
+            self.headlessRootTag = nil
+            let rootView = manager.widgetViewForModule(
+                "HyperHeadless", initialProperties: ["props": props]
+            )
+            self.headlessRootView = rootView
+            self.headlessRootTag = rootView.surfaceRootTag
+        }
+    }
+
+    /* Registers the waiter before the mount/emit so the reply can never beat the registration. */
+    internal func requestAndAwait(headlessType: String, props: [String: Any]) async -> [String: Any]? {
+        await withCheckedContinuation { continuation in
+            DispatchQueue.main.async {
+                self.prefetchTimeoutItem?.cancel()
+                self.prefetchContinuation = continuation
+                let item = DispatchWorkItem { [weak self] in
+                    self?.resolvePrefetch(nil)
+                }
+                self.prefetchTimeoutItem = item
+                DispatchQueue.main.asyncAfter(deadline: .now() + Self.prefetchTimeout, execute: item)
+                self.request(headlessType: headlessType, props: props)
+            }
+        }
+    }
+
+    /* Ends the session's root when a new initPaymentSession supersedes it — not on a terminal
+       payment result: a saved-methods request may still follow. Releasing the surface ends the
+       root on its own: the task's JS promise never resolves, which is inert — nothing awaits it,
+       and the subscription HeadlessTask installs is runtime-lifetime module state. No shutdown
+       event: it would race the next session's mount through the JS queue. */
+    internal func finishHeadlessRoot() {
+        DispatchQueue.main.async {
+            self.headlessRootView = nil
+            self.headlessRootTag = nil
+            self.prefetchTimeoutItem?.cancel()
+            self.prefetchTimeoutItem = nil
+            self.resolvePrefetch(nil)
+        }
+    }
+
+    /* Completion signal for one payment's prefetch. The payload itself lives only in the
+       JS PrefetchCache (shared VM); native just resumes the awaiting session. */
+    @objc(completePrefetch:data:)
+    internal func completePrefetch(_ rootTag: NSNumber, _ data: NSDictionary) {
+        DispatchQueue.main.async {
+            self.prefetchTimeoutItem?.cancel()
+            self.prefetchTimeoutItem = nil
+            self.resolvePrefetch(data as? [String: Any])
+        }
+    }
+
+    private func resolvePrefetch(_ data: [String: Any]?) {
+        let continuation = prefetchContinuation
+        prefetchContinuation = nil
+        continuation?.resume(returning: data)
     }
 
     private func safeResolve(
@@ -101,15 +184,35 @@ internal class HyperHeadlessImpl: NSObject {
                         map["paymentToken"] = paymentToken
                         map["cvc"] = cvc
                         self.safeResolve(rnCallback, [map], resultHandler)
+                    } else {
+                        /* No default method exists (JS sends an error payload without a token):
+                           main's missing else left resultHandler uncalled forever. */
+                        resultHandler(.failed(error: NSError(
+                            domain: "MISSING_PAYMENT_TOKEN",
+                            code: 0,
+                            userInfo: [NSLocalizedDescriptionKey: "Saved payment method has no payment token"]
+                        )))
                     }
                 },
                 confirmWithCustomerLastUsedPaymentMethod: { cvc, resultHandler in
                     if let paymentToken = rnMessage2["payment_token"] as? String {
                         cvc.awaitConfirmResult(resultHandler)
-                        cvc.confirm(
+                        if !cvc.confirm(
                             sdkAuthorization: self.activeSession?.paymentSessionConfiguration.sdkAuthorization ?? "",
                             paymentToken: paymentToken
-                        )
+                        ) {
+                            cvc.resolveConfirmResult(.failed(error: NSError(
+                                domain: "RUNTIME_UNAVAILABLE",
+                                code: 0,
+                                userInfo: [NSLocalizedDescriptionKey: "React runtime is not available"]
+                            )))
+                        }
+                    } else {
+                        resultHandler(.failed(error: NSError(
+                            domain: "MISSING_PAYMENT_TOKEN",
+                            code: 0,
+                            userInfo: [NSLocalizedDescriptionKey: "Saved payment method has no payment token"]
+                        )))
                     }
                 },
                 confirmWithCustomerPaymentToken: { paymentToken, cvc, resultHandler in
@@ -124,6 +227,8 @@ internal class HyperHeadlessImpl: NSObject {
         }
     }
 
+    /* Replies route by root tag, exactly as on main: a reply from a CVC widget's own surface
+       goes to that widget; anything else is the headless root's own reply. */
     @objc(exitHeadless:status:code:message:)
     internal func exitHeadless(_ rootTag: NSNumber, _ status: String, _ code: String?, _ message: String?) {
         DispatchQueue.main.async {

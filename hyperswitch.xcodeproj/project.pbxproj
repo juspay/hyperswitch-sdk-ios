@@ -58,7 +58,6 @@
 		66486FAA2943580F00150E4F /* RNViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66486FA32943580F00150E4F /* RNViewManager.swift */; };
 		66486FAB2943580F00150E4F /* HyperModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66486FA42943580F00150E4F /* HyperModule.swift */; };
 		66C2F89B29444E6700ACD32D /* ApplePayHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66C2F89A29444E6700ACD32D /* ApplePayHandler.swift */; };
-		752CF93C2DF6D47A0056F58A /* RNHeadlessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 752CF93B2DF6D47A0056F58A /* RNHeadlessManager.swift */; };
 		75AA28DE2D477F9D00CD88A6 /* Debouncer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28DD2D477F9D00CD88A6 /* Debouncer.swift */; };
 		75AA28E02D477FB100CD88A6 /* LogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28DF2D477FB100CD88A6 /* LogManager.swift */; };
 		75AA28E42D477FDA00CD88A6 /* LogFileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75AA28E32D477FDA00CD88A6 /* LogFileManager.swift */; };
@@ -93,6 +92,7 @@
 		7932B80F2CB4182100A40E1A /* HyperUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A93DC2CA2F29500E3A767 /* HyperUIViewController.swift */; };
 		793451F62F96E4C700416A4B /* PaymentWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 793451F42F96E4C700416A4B /* PaymentWidget.swift */; };
 		793451F82F96E7C700416A4B /* WidgetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 793451F72F96E7C700416A4B /* WidgetViewController.swift */; };
+
 		793451FB2F96EB9F00416A4B /* CVCWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 793451FA2F96EB9F00416A4B /* CVCWidget.swift */; };
 		7938D81B2A4EF45000286CEE /* PaymentMethodParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7938D81A2A4EF45000286CEE /* PaymentMethodParams.swift */; };
 		79727F8F2EE73E7E00D60AB4 /* LogBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790F847D2D8C311900178A09 /* LogBuilder.swift */; };
@@ -252,7 +252,6 @@
 		66486FA32943580F00150E4F /* RNViewManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RNViewManager.swift; sourceTree = "<group>"; };
 		66486FA42943580F00150E4F /* HyperModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HyperModule.swift; sourceTree = "<group>"; };
 		66C2F89A29444E6700ACD32D /* ApplePayHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplePayHandler.swift; sourceTree = "<group>"; };
-		752CF93B2DF6D47A0056F58A /* RNHeadlessManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNHeadlessManager.swift; sourceTree = "<group>"; };
 		75AA28DD2D477F9D00CD88A6 /* Debouncer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debouncer.swift; sourceTree = "<group>"; };
 		75AA28DF2D477FB100CD88A6 /* LogManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogManager.swift; sourceTree = "<group>"; };
 		75AA28E32D477FDA00CD88A6 /* LogFileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogFileManager.swift; sourceTree = "<group>"; };
@@ -281,6 +280,7 @@
 		793083EC2A0DA9F100E78310 /* PaymentIntentParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentIntentParams.swift; sourceTree = "<group>"; };
 		793451F42F96E4C700416A4B /* PaymentWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentWidget.swift; sourceTree = "<group>"; };
 		793451F72F96E7C700416A4B /* WidgetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetViewController.swift; sourceTree = "<group>"; };
+
 		793451FA2F96EB9F00416A4B /* CVCWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVCWidget.swift; sourceTree = "<group>"; };
 		7938D81A2A4EF45000286CEE /* PaymentMethodParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentMethodParams.swift; sourceTree = "<group>"; };
 		79727F942EE74F7400D60AB4 /* ClickToPayProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayProtocol.swift; sourceTree = "<group>"; };
@@ -457,6 +457,7 @@
 				790525792BDA73A600D49FE8 /* SwiftUIView.swift */,
 				79728FB82C3412BB00CA8C10 /* HeadlessViewController.swift */,
 				4E69679A2CB7CF71000DBE0A /* PMMViewController.swift */,
+
 				DC5D011F2E968D7000185E87 /* AuthenticationViewController.swift */,
 				4EEA2BD52E9926040094AA83 /* NetworkUtils.swift */,
 				790525702BDA66EF00D49FE8 /* HyperViewModel.swift */,
@@ -469,6 +470,7 @@
 			path = hyperswitch;
 			sourceTree = "<group>";
 		};
+
 		66486F97294355BE00150E4F /* Preview Content */ = {
 			isa = PBXGroup;
 			children = (
@@ -703,7 +705,6 @@
 				792D6A072B99C215001598CD /* HyperHeadless.swift */,
 				79D474B62CC6FDE50022C47E /* RNResponseHandler.swift */,
 				66486FA32943580F00150E4F /* RNViewManager.swift */,
-				752CF93B2DF6D47A0056F58A /* RNHeadlessManager.swift */,
 				75E692F92D5B28D70077C0F3 /* OTAServices.swift */,
 			);
 			path = NativeModule;
@@ -1002,6 +1003,7 @@
 				52AABE56914A47D3822FEBDA /* ApplePayView.swift in Sources */,
 				61EB688481314069B806010C /* ApplePayButtonComponentView.mm in Sources */,
 				793451F82F96E7C700416A4B /* WidgetViewController.swift in Sources */,
+
 				4E8C838E2E98CAC600A61749 /* Transaction.swift in Sources */,
 				4E8C838F2E98CAC600A61749 /* ThreeDSProviderType.swift in Sources */,
 				75AA28E02D477FB100CD88A6 /* LogManager.swift in Sources */,
@@ -1041,7 +1043,6 @@
 				4E8C83A42E9904CD00A61749 /* AuthenticationViewModel.swift in Sources */,
 				66486FAA2943580F00150E4F /* RNViewManager.swift in Sources */,
 				75AA28DE2D477F9D00CD88A6 /* Debouncer.swift in Sources */,
-				752CF93C2DF6D47A0056F58A /* RNHeadlessManager.swift in Sources */,
 				79E8E4B62EB2333D00FA3886 /* ThreeDSSession.swift in Sources */,
 				DC4AC9F5296EC12D00E0D2A6 /* PaymentCardTextField+SwiftUI.swift in Sources */,
 				798F8DE42FBAC13000765B4C /* Hyperswitch.swift in Sources */,

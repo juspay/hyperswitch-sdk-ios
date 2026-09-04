@@ -74,6 +74,8 @@ public class PaymentWidget: UIControl {
 
     private func commonInit() {
 
+        paymentSession.registerWidget(self)
+
         let hyperswitchConfiguration = try? paymentSession.hyperswitchConfiguration?.toDictionary()
         let paymentSessionConfiguration = try? paymentSession.paymentSessionConfiguration.toDictionary()
 
@@ -125,15 +127,21 @@ public class PaymentWidget: UIControl {
 
         paymentSession.updateIntentDidComplete
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] sdkAuthorization in
+            .sink { [weak self] update in
                 guard let self = self else { return }
+                // Payload is intentionally sdkAuthorization-only: JS resolves the fresh
+                // intent data from its own PrefetchCache on the shared bridge.
                 let payload: [String: Any] = [
                     "rootTag": self.widgetReactTag ?? -1,
-                    "sdkAuthorization": sdkAuthorization,
+                    "sdkAuthorization": update.sdkAuthorization,
                 ]
                 self.reactManager.hyperModule.emit("updateIntentComplete", payload)
             }
             .store(in: &cancellables)
+    }
+
+    deinit {
+        paymentSession.unregisterWidget(self)
     }
 
     public func confirm() {
@@ -168,6 +176,8 @@ public class PaymentWidget: UIControl {
     }
 
     internal func handleConfirmPaymentResponse(_ result: PaymentResult) {
+        paymentSession.unregisterWidget(self)
+        paymentSession.handlePaymentResult(result)
         initCallback?(result)
         initCallback = nil
         cancellables.removeAll()

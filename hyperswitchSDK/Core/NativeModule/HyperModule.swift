@@ -32,8 +32,10 @@ extension PaymentResult {
 internal protocol HyperModuleShim: NSObjectProtocol {
     @objc(attachImpl:)
     func attach(impl: HyperModuleImpl)
+    /* Returns false when the JS event emitter is not armed (detached runtime):
+       callers holding a pending confirmation registration must roll it back. */
     @objc(emitEventWithName:payload:)
-    func emitEvent(name: String, payload: [String: Any])
+    func emitEvent(name: String, payload: [String: Any]) -> Bool
     @objc(viewForRootTag:)
     func view(forRootTag rootTag: NSNumber) -> UIView?
 }
@@ -59,10 +61,17 @@ internal class HyperModuleImpl: NSObject {
 
     internal func emit(_ name: String, _ payload: [String: Any]) {
         onMain {
-            self.shim?.emitEvent(name: name, payload: payload)
+            _ = self.shim?.emitEvent(name: name, payload: payload)
         }
     }
 
+    /* Synchronous, main-thread delivery check for callers that registered a
+       pending confirmation: false means the event can never reach JS. */
+    @discardableResult
+    internal func emitChecked(_ name: String, _ payload: [String: Any]) -> Bool {
+        dispatchPrecondition(condition: .onQueue(.main))
+        return shim?.emitEvent(name: name, payload: payload) ?? false
+    }
     internal func confirm(data: [String: Any]) {
         emit("confirm", data)
     }

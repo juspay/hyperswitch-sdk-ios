@@ -20,16 +20,26 @@ public enum UpdateIntentResult {
     case failure(Error)
 }
 
+internal struct UpdateIntentPayload {
+    let sdkAuthorization: String
+}
+
 public class PaymentSession {
 
     internal var paymentSessionConfiguration: PaymentSessionConfiguration
     internal var hyperswitchConfiguration: HyperswitchConfiguration?
 
     internal let updateIntentDidStart = PassthroughSubject<Void, Never>()
-    internal let updateIntentDidComplete = PassthroughSubject<String, Never>()
+    internal let updateIntentDidComplete = PassthroughSubject<UpdateIntentPayload, Never>()
     internal let updateIntentInitReturned = PassthroughSubject<String, Never>()
     internal let updateIntentCompleteReturned = PassthroughSubject<String, Never>()
-    private var cancellables = Set<AnyCancellable>()
+    /* per-updateIntent subscriptions; drained at finish so they don't accumulate
+       (+2 per call). */
+    private var updateIntentCancellables = Set<AnyCancellable>()
+    private var activeWidgetIds = Set<ObjectIdentifier>()
+    private let activeWidgetLock = NSLock()
+    private var updateIntentInProgress = false
+    private let updateIntentLock = NSLock()
 
     internal init(paymentSessionConfiguration: PaymentSessionConfiguration, hyperswitchConfiguration: HyperswitchConfiguration? = nil) {
         self.paymentSessionConfiguration = paymentSessionConfiguration
@@ -47,31 +57,216 @@ public class PaymentSession {
         authorizationProvider: @escaping (@escaping (String) -> Void) -> Void,
         completion: @escaping (UpdateIntentResult) -> Void
     ) {
-        //        updateIntentInitReturned
-        //            .first()
-        //            .receive(on: DispatchQueue.main)
-        //            .sink { [weak self] _ in
-        //                guard let self = self else { return }
-        //                authorizationProvider { [weak self] sdkAuthorization in
-        //                    guard let self = self else { return }
-        //                    self.updateIntentCompleteReturned
-        //                        .first()
-        //                        .receive(on: DispatchQueue.main)
-        //                        .sink { result in
-        //                            completion(self.parseUpdateIntentResult(result))
-        //                        }
-        //                        .store(in: &self.cancellables)
-        //                    self.sdkAuthorization = sdkAuthorization
-        //                    self.updateIntentDidComplete.send(sdkAuthorization)
-        //                }
-        //            }
-        //            .store(in: &cancellables)
-        //        updateIntentDidStart.send(())
+        guard beginIntentUpdate() else {
+            completion(.failure(NSError(
+                domain: "ALREADY_IN_PROGRESS",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey: "updateIntent already in progress"]
+            )))
+            return
+        }
+        let targetCount = activeWidgetCount
 
-        // MARK: workaround
-        authorizationProvider { [weak self] sdkAuthorization in
-            self?.paymentSessionConfiguration = PaymentSessionConfiguration(sdkAuthorization: sdkAuthorization)
-            completion(UpdateIntentResult.success)
+        let requestAuthorization = { [weak self] in
+            guard let self = self else { return }
+            authorizationProvider { [weak self] sdkAuthorization in
+                guard let self = self else { return }
+                let newSessionConfiguration = PaymentSessionConfiguration(
+                    sdkAuthorization: sdkAuthorization
+                )
+
+                #if canImport(React)
+                Task {
+                    let newPrefetchedData = await self.fetchIntentUpdate(
+                        configuration: newSessionConfiguration
+                    )
+                    await MainActor.run {
+                        self.deliverUpdatedIntent(
+                            newSessionConfiguration: newSessionConfiguration,
+                            newPrefetchedData: newPrefetchedData,
+                            targetCount: targetCount,
+                            completion: completion
+                        )
+                    }
+                }
+                #else
+                self.paymentSessionConfiguration = newSessionConfiguration
+                self.finishIntentUpdate(completion: completion, result: .success)
+                #endif
+            }
+        }
+
+        guard targetCount > 0 else {
+            requestAuthorization()
+            return
+        }
+
+        updateIntentInitReturned
+            .prefix(targetCount)
+            .collect()
+            .receive(on: DispatchQueue.main)
+            .sink { _ in requestAuthorization() }
+            .store(in: &updateIntentCancellables)
+
+        updateIntentDidStart.send(())
+    }
+
+    internal func registerWidget(_ widget: AnyObject) {
+        activeWidgetLock.lock()
+        activeWidgetIds.insert(ObjectIdentifier(widget))
+        activeWidgetLock.unlock()
+    }
+
+    internal func unregisterWidget(_ widget: AnyObject) {
+        activeWidgetLock.lock()
+        activeWidgetIds.remove(ObjectIdentifier(widget))
+        activeWidgetLock.unlock()
+    }
+
+    private var activeWidgetCount: Int {
+        activeWidgetLock.lock()
+        defer { activeWidgetLock.unlock() }
+        return activeWidgetIds.count
+    }
+
+    private func beginIntentUpdate() -> Bool {
+        updateIntentLock.lock()
+        defer { updateIntentLock.unlock() }
+        guard !updateIntentInProgress else { return false }
+        updateIntentInProgress = true
+        return true
+    }
+
+    private func finishIntentUpdate(
+        completion: @escaping (UpdateIntentResult) -> Void,
+        result: UpdateIntentResult
+    ) {
+        /* The provider can fire its callback more than once; only the task that owns the
+           in-progress update may complete it — a second call must never resume the waiting
+           continuation a second time. */
+        updateIntentLock.lock()
+        guard updateIntentInProgress else {
+            updateIntentLock.unlock()
+            return
+        }
+        updateIntentInProgress = false
+        updateIntentLock.unlock()
+        updateIntentCancellables.removeAll()
+        completion(result)
+    }
+
+    private func deliverUpdatedIntent(
+        newSessionConfiguration: PaymentSessionConfiguration,
+        newPrefetchedData: [String: Any]?,
+        targetCount: Int,
+        completion: @escaping (UpdateIntentResult) -> Void
+    ) {
+        let sdkAuthorization = newSessionConfiguration.sdkAuthorization
+        guard targetCount > 0 else {
+            if newPrefetchedData != nil {
+                commitIntentUpdate(configuration: newSessionConfiguration)
+                finishIntentUpdate(completion: completion, result: .success)
+            } else {
+                clearUnappliedPrefetch(sdkAuthorization: sdkAuthorization)
+                finishIntentUpdate(
+                    completion: completion,
+                    result: prefetchFailedUpdateResult()
+                )
+            }
+            return
+        }
+
+        /* A failed prefetch must reach the caller WITHOUT switching the widgets to the new
+           intent — the native session stays on the old authorization. The widgets have shown
+           their update overlay since init, so they still need a completion: an empty
+           authorization is the JS abort signal (UpdateIntentHook resets loading and replies
+           invalid_sdk_authorization without switching). Replies are not awaited. */
+        guard newPrefetchedData != nil else {
+            clearUnappliedPrefetch(sdkAuthorization: sdkAuthorization)
+            updateIntentDidComplete.send(UpdateIntentPayload(sdkAuthorization: ""))
+            finishIntentUpdate(completion: completion, result: prefetchFailedUpdateResult())
+            return
+        }
+
+        updateIntentCompleteReturned
+            .prefix(targetCount)
+            .collect()
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] results in
+                guard let self = self else { return }
+                let parsedResults = results.map(self.parseUpdateIntentResult)
+                if parsedResults.contains(where: { result in
+                    if case .success = result { return true }
+                    return false
+                }) {
+                    self.commitIntentUpdate(configuration: newSessionConfiguration)
+                } else {
+                    self.clearUnappliedPrefetch(sdkAuthorization: sdkAuthorization)
+                }
+                self.finishIntentUpdate(
+                    completion: completion,
+                    result: self.aggregateUpdateIntentResults(parsedResults)
+                )
+            }
+            .store(in: &updateIntentCancellables)
+
+        updateIntentDidComplete.send(UpdateIntentPayload(
+            sdkAuthorization: sdkAuthorization
+        ))
+    }
+
+    private func aggregateUpdateIntentResults(_ results: [UpdateIntentResult]) -> UpdateIntentResult {
+        var sawCancellation = false
+        for result in results {
+            switch result {
+            case .failure(let error):
+                return .failure(error)
+            case .cancelled:
+                sawCancellation = true
+            case .success:
+                continue
+            }
+        }
+        return sawCancellation ? .cancelled : .success
+    }
+
+    private func prefetchFailedUpdateResult() -> UpdateIntentResult {
+        .failure(NSError(
+            domain: "PREFETCH_FAILED",
+            code: 0,
+            userInfo: [NSLocalizedDescriptionKey: "No API data was returned for the updated payment intent."]
+        ))
+    }
+
+    private func commitIntentUpdate(configuration: PaymentSessionConfiguration) {
+        let previousAuthorization = paymentSessionConfiguration.sdkAuthorization
+        paymentSessionConfiguration = configuration
+        #if canImport(React)
+        if previousAuthorization != configuration.sdkAuthorization {
+            clearPrefetch(for: previousAuthorization)
+        }
+        #endif
+    }
+
+    private func clearUnappliedPrefetch(sdkAuthorization: String) {
+        #if canImport(React)
+        if sdkAuthorization != paymentSessionConfiguration.sdkAuthorization {
+            clearPrefetch(for: sdkAuthorization)
+        }
+        #endif
+    }
+
+    internal func handlePaymentResult(
+        _ result: PaymentResult,
+        sdkAuthorization: String? = nil
+    ) {
+        guard case .canceled = result else {
+            #if canImport(React)
+            clearPrefetch(
+                for: sdkAuthorization ?? paymentSessionConfiguration.sdkAuthorization
+            )
+            #endif
+            return
         }
     }
 
