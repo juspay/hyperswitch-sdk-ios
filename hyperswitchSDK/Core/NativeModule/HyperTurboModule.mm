@@ -77,6 +77,8 @@ RCT_EXPORT_MODULE()
     [self emitUpdateIntentComplete:payload];
   } else if ([name isEqualToString:@"clearPrefetchCache"]) {
     [self emitClearPrefetchCache:payload];
+  } else if ([name isEqualToString:@"headlessRequest"]) {
+    [self emitHeadlessRequest:payload];
   } else {
     return NO;
   }
