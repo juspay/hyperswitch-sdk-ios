@@ -15,17 +15,14 @@ public class CVCWidget: UIControl {
     private var rootView: UIView?
     private var cvcCallback: ((PaymentResult) -> Void)?
     private var subscribedEventNames: [String]?
-    private let hyperswitch: Hyperswitch
-    private let reactManager = RNViewManager.sharedInstance
+    private let reactManager = RNViewManager()
 
     internal var paymentEventListener: PaymentEventListener?
 
     public init(
-        hyperswitch: Hyperswitch,
         configuration: PaymentSheet.Configuration? = nil,
         subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil
     ) {
-        self.hyperswitch = hyperswitch
         self.configuration = configuration
         self.configurationDict = nil
         if let subscribe {
@@ -40,9 +37,10 @@ public class CVCWidget: UIControl {
     }
 
     //MARK: pass through
-    public init(hyperswitch: Hyperswitch, configurationDict: [String: Any]?, subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil)
-    {
-        self.hyperswitch = hyperswitch
+    public init(
+        configurationDict: [String: Any]?,
+        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil
+    ) {
         self.configuration = nil
         self.configurationDict = configurationDict
         if let subscribe {
@@ -62,8 +60,6 @@ public class CVCWidget: UIControl {
 
     private func commonInit() {
 
-        let hyperswitchConfiguration = try? hyperswitch.hyperswitchConfiguration.toDictionary()
-
         let sdkParams = SDKParams.getSDKParams()
 
         var nativeConfig = try? configuration?.toDictionary()
@@ -71,14 +67,13 @@ public class CVCWidget: UIControl {
         configurationDict?["subscribedEvents"] = self.subscribedEventNames
 
         let props: [String: Any] = [
-            "hyperswitchConfig": hyperswitchConfiguration as Any,
             "type": "cvcWidget",
             "sdkParams": sdkParams,
             "configuration": configurationDict ?? nativeConfig as Any,
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
 
-        self.rootView = reactManager.widgetViewForModule(
+        self.rootView = reactManager.viewForModule(
             "hyperSwitch",
             initialProperties: ["props": props]
         )
@@ -109,17 +104,14 @@ public class CVCWidget: UIControl {
         handler?(result)
     }
 
-    /* Returns false when the JS emitter is detached: the confirm can never start,
-       so the caller must roll its confirmation registration back. */
-    @discardableResult
-    func confirm(sdkAuthorization: String, paymentToken: String) -> Bool {
+    func confirm(sdkAuthorization: String, paymentToken: String) {
         let payload: [String: Any] = [
             "actionType": "CONFIRM_CVC_PAYMENT",
             "rootTag": self.widgetReactTag ?? -1,
             "sdkAuthorization": sdkAuthorization,
             "paymentToken": paymentToken,
         ]
-        return reactManager.hyperModule.emitChecked("triggerWidgetAction", payload)
+        reactManager.hyperModule.emit("triggerWidgetAction", payload)
     }
 
     internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {

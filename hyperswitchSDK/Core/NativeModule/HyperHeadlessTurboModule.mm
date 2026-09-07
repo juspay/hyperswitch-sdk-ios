@@ -78,11 +78,6 @@ RCT_EXPORT_MODULE()
   [_impl exitHeadless:@(rootTag) status:result.status() code:result.code() message:result.message()];
 }
 
-- (void)completePrefetch:(NSInteger)rootTag data:(NSDictionary *)data
-{
-  [_impl completePrefetch:@(rootTag) data:data];
-}
-
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params
 {

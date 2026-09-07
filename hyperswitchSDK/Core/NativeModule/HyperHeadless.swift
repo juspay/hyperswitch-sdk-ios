@@ -21,20 +21,9 @@ internal protocol HyperHeadlessShim: NSObjectProtocol {
 internal class HyperHeadlessImpl: NSObject {
 
     private weak var activeSession: PaymentSession?
-    private var headlessCompletion: ((PaymentSessionHandler) -> Void)?
+    private var headlessCompletion: ((any PaymentSessionHandler) -> Void)?
     private var completion: ((PaymentResult) -> Void)?
     private var hasResponded = false
-
-    /* One headless root per session, mounted at the session's first headless request and kept
-       for its life. The tag is the liveness probe into the surface presenter; the retained view
-       keeps the surface alive. */
-    private var headlessRootTag: NSNumber?
-    private var headlessRootView: UIView?
-    private var prefetchContinuation: CheckedContinuation<[String: Any]?, Never>?
-    private var prefetchTimeoutItem: DispatchWorkItem?
-
-    /* SDK-side last-resort budget; JS has none of its own. Same 30s window as Android. */
-    private static let prefetchTimeout: DispatchTimeInterval = .seconds(30)
 
     private weak var shim: HyperHeadlessShim?
 
@@ -45,82 +34,10 @@ internal class HyperHeadlessImpl: NSObject {
         }
     }
 
-    internal func begin(session: PaymentSession, completion: @escaping (PaymentSessionHandler) -> Void) {
+    internal func begin(session: PaymentSession, completion: @escaping (any PaymentSessionHandler) -> Void) {
         hasResponded = false
         headlessCompletion = completion
         activeSession = session
-    }
-
-    /* The session's single dispatch point: after the first mount everything is a headlessRequest
-       event into the live JS closure. Liveness comes from the surface presenter, not emit
-       success: emitChecked proves only that a module is attached, and after a runtime restart
-       the module re-attaches long before the new runtime mounts a headless root — the event
-       would fall on the floor and the merchant's callback would hang. A surface from a dead
-       runtime no longer resolves, so a dead root self-heals into a fresh mount. */
-    internal func request(headlessType: String, props: [String: Any]) {
-        DispatchQueue.main.async {
-            let manager = RNViewManager.sharedInstance
-            if let rootTag = self.headlessRootTag,
-               self.shim?.view(forRootTag: rootTag) != nil,
-               manager.hyperModule.emitChecked("headlessRequest", props) {
-                return
-            }
-            self.headlessRootView = nil
-            self.headlessRootTag = nil
-            let rootView = manager.widgetViewForModule(
-                "HyperHeadless", initialProperties: ["props": props]
-            )
-            self.headlessRootView = rootView
-            self.headlessRootTag = rootView.surfaceRootTag
-        }
-    }
-
-    /* Registers the waiter before the mount/emit so the reply can never beat the registration. */
-    internal func requestAndAwait(headlessType: String, props: [String: Any]) async -> [String: Any]? {
-        await withCheckedContinuation { continuation in
-            DispatchQueue.main.async {
-                self.prefetchTimeoutItem?.cancel()
-                self.prefetchContinuation = continuation
-                let item = DispatchWorkItem { [weak self] in
-                    self?.resolvePrefetch(nil)
-                }
-                self.prefetchTimeoutItem = item
-                DispatchQueue.main.asyncAfter(deadline: .now() + Self.prefetchTimeout, execute: item)
-                self.request(headlessType: headlessType, props: props)
-            }
-        }
-    }
-
-    /* Ends the session's root when a new initPaymentSession supersedes it — not on a terminal
-       payment result: a saved-methods request may still follow. Releasing the surface ends the
-       root on its own: the task's JS promise never resolves, which is inert — nothing awaits it,
-       and the subscription HeadlessTask installs is runtime-lifetime module state. No shutdown
-       event: it would race the next session's mount through the JS queue. */
-    internal func finishHeadlessRoot() {
-        DispatchQueue.main.async {
-            self.headlessRootView = nil
-            self.headlessRootTag = nil
-            self.prefetchTimeoutItem?.cancel()
-            self.prefetchTimeoutItem = nil
-            self.resolvePrefetch(nil)
-        }
-    }
-
-    /* Completion signal for one payment's prefetch. The payload itself lives only in the
-       JS PrefetchCache (shared VM); native just resumes the awaiting session. */
-    @objc(completePrefetch:data:)
-    internal func completePrefetch(_ rootTag: NSNumber, _ data: NSDictionary) {
-        DispatchQueue.main.async {
-            self.prefetchTimeoutItem?.cancel()
-            self.prefetchTimeoutItem = nil
-            self.resolvePrefetch(data as? [String: Any])
-        }
-    }
-
-    private func resolvePrefetch(_ data: [String: Any]?) {
-        let continuation = prefetchContinuation
-        prefetchContinuation = nil
-        continuation?.resume(returning: data)
     }
 
     private func safeResolve(
@@ -147,75 +64,15 @@ internal class HyperHeadlessImpl: NSObject {
     ) {
         DispatchQueue.main.async {
             self.hasResponded = false
-            let handler = PaymentSessionHandler(
-                getCustomerDefaultSavedPaymentMethodData: {
-                    return HyperHeadlessImpl.decodePaymentMethodData(rnMessage)
+            let handler = PaymentSessionHandlerImpl(
+                defaultMethod: rnMessage,
+                lastUsedMethod: rnMessage2,
+                allMethods: rnMessage3,
+                sdkAuthorization: { [weak self] in
+                    self?.activeSession?.paymentSessionConfiguration.sdkAuthorization ?? ""
                 },
-                getCustomerLastUsedPaymentMethodData: {
-                    return HyperHeadlessImpl.decodePaymentMethodData(rnMessage2)
-                },
-                getCustomerSavedPaymentMethodData: {
-                    var array = [PaymentMethod]()
-                    for i in 0..<rnMessage3.count {
-                        if let map = rnMessage3[i] as? NSDictionary {
-                            switch HyperHeadlessImpl.decodePaymentMethodData(map) {
-                            case .success(let paymentMethod):
-                                array.append(paymentMethod)
-                            case .failure(_):
-                                continue
-                            }
-                        }
-                    }
-                    if array.isEmpty {
-                        return .failure(
-                            PMError(
-                                code: "01",
-                                message: "No default type found"
-                            )
-                        )
-                    }
-                    return .success(array)
-
-                },
-                confirmWithCustomerDefaultPaymentMethod: { cvc, resultHandler in
-                    if let paymentToken = rnMessage["payment_token"] as? String {
-                        self.completion = resultHandler
-                        var map = [String: Any]()
-                        map["paymentToken"] = paymentToken
-                        map["cvc"] = cvc
-                        self.safeResolve(rnCallback, [map], resultHandler)
-                    } else {
-                        /* No default method exists (JS sends an error payload without a token):
-                           main's missing else left resultHandler uncalled forever. */
-                        resultHandler(.failed(error: NSError(
-                            domain: "MISSING_PAYMENT_TOKEN",
-                            code: 0,
-                            userInfo: [NSLocalizedDescriptionKey: "Saved payment method has no payment token"]
-                        )))
-                    }
-                },
-                confirmWithCustomerLastUsedPaymentMethod: { cvc, resultHandler in
-                    if let paymentToken = rnMessage2["payment_token"] as? String {
-                        cvc.awaitConfirmResult(resultHandler)
-                        if !cvc.confirm(
-                            sdkAuthorization: self.activeSession?.paymentSessionConfiguration.sdkAuthorization ?? "",
-                            paymentToken: paymentToken
-                        ) {
-                            cvc.resolveConfirmResult(.failed(error: NSError(
-                                domain: "RUNTIME_UNAVAILABLE",
-                                code: 0,
-                                userInfo: [NSLocalizedDescriptionKey: "React runtime is not available"]
-                            )))
-                        }
-                    } else {
-                        resultHandler(.failed(error: NSError(
-                            domain: "MISSING_PAYMENT_TOKEN",
-                            code: 0,
-                            userInfo: [NSLocalizedDescriptionKey: "Saved payment method has no payment token"]
-                        )))
-                    }
-                },
-                confirmWithCustomerPaymentToken: { paymentToken, cvc, resultHandler in
+                resolveToken: { [weak self] paymentToken, cvc, resultHandler in
+                    guard let self = self else { return }
                     self.completion = resultHandler
                     var map = [String: Any]()
                     map["paymentToken"] = paymentToken
@@ -227,8 +84,6 @@ internal class HyperHeadlessImpl: NSObject {
         }
     }
 
-    /* Replies route by root tag, exactly as on main: a reply from a CVC widget's own surface
-       goes to that widget; anything else is the headless root's own reply. */
     @objc(exitHeadless:status:code:message:)
     internal func exitHeadless(_ rootTag: NSNumber, _ status: String, _ code: String?, _ message: String?) {
         DispatchQueue.main.async {
@@ -246,7 +101,7 @@ internal class HyperHeadlessImpl: NSObject {
         return shim?.view(forRootTag: rootTag)?.nearestAncestor(ofType: CVCWidget.self)
     }
 
-    private static func decodePaymentMethodData(_ readableMap: NSDictionary) -> Result<PaymentMethod, PMError> {
+    internal static func decodePaymentMethodData(_ readableMap: NSDictionary) -> Result<PaymentMethod, PMError> {
         if let jsonData = try? JSONSerialization.data(withJSONObject: readableMap),
             let paymentMethod = try? JSONDecoder().decode(PaymentMethod.self, from: jsonData)
         {
@@ -260,4 +115,95 @@ internal class HyperHeadlessImpl: NSObject {
             )
         }
     }
+}
+
+// MARK: - PaymentSessionHandlerImpl
+
+internal final class PaymentSessionHandlerImpl: PaymentSessionHandler {
+
+    private let defaultMethod: NSDictionary
+    private let lastUsedMethod: NSDictionary
+    private let allMethods: NSArray
+    private let sdkAuthorization: () -> String
+    private let resolveToken: (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+
+    init(
+        defaultMethod: NSDictionary,
+        lastUsedMethod: NSDictionary,
+        allMethods: NSArray,
+        sdkAuthorization: @escaping () -> String,
+        resolveToken: @escaping (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
+    ) {
+        self.defaultMethod = defaultMethod
+        self.lastUsedMethod = lastUsedMethod
+        self.allMethods = allMethods
+        self.sdkAuthorization = sdkAuthorization
+        self.resolveToken = resolveToken
+    }
+
+    func getCustomerDefaultSavedPaymentMethodData() -> Result<PaymentMethod, PMError> {
+        HyperHeadlessImpl.decodePaymentMethodData(defaultMethod)
+    }
+
+    func getCustomerLastUsedPaymentMethodData() -> Result<PaymentMethod, PMError> {
+        HyperHeadlessImpl.decodePaymentMethodData(lastUsedMethod)
+    }
+
+    func getCustomerSavedPaymentMethodData() -> Result<[PaymentMethod], PMError> {
+        var methods = [PaymentMethod]()
+        for i in 0..<allMethods.count {
+            if let map = allMethods[i] as? NSDictionary,
+                case .success(let method) = HyperHeadlessImpl.decodePaymentMethodData(map)
+            {
+                methods.append(method)
+            }
+        }
+        if methods.isEmpty {
+            return .failure(PMError(code: "01", message: "No default type found"))
+        }
+        return .success(methods)
+    }
+
+    func confirmWithCustomerDefaultPaymentMethod(cvc: String?, resultHandler: @escaping (PaymentResult) -> Void) {
+        confirm(token: defaultMethod["payment_token"] as? String, cvc: cvc, resultHandler: resultHandler)
+    }
+
+    func confirmWithCustomerLastUsedPaymentMethod(cvc: String?, resultHandler: @escaping (PaymentResult) -> Void) {
+        confirm(token: lastUsedMethod["payment_token"] as? String, cvc: cvc, resultHandler: resultHandler)
+    }
+
+    func confirmWithCustomerPaymentToken(paymentToken: String, cvc: String?, resultHandler: @escaping (PaymentResult) -> Void) {
+        resolveToken(paymentToken, cvc, resultHandler)
+    }
+
+    func confirmWithCustomerDefaultPaymentMethod(cvcWidget: CVCWidget, resultHandler: @escaping (PaymentResult) -> Void) {
+        confirm(widget: cvcWidget, token: defaultMethod["payment_token"] as? String, resultHandler: resultHandler)
+    }
+
+    func confirmWithCustomerLastUsedPaymentMethod(cvcWidget: CVCWidget, resultHandler: @escaping (PaymentResult) -> Void) {
+        confirm(widget: cvcWidget, token: lastUsedMethod["payment_token"] as? String, resultHandler: resultHandler)
+    }
+
+    private func confirm(token: String?, cvc: String?, resultHandler: @escaping (PaymentResult) -> Void) {
+        guard let token = token else {
+            resultHandler(.failed(error: Self.noTokenError))
+            return
+        }
+        resolveToken(token, cvc, resultHandler)
+    }
+
+    private func confirm(widget: CVCWidget, token: String?, resultHandler: @escaping (PaymentResult) -> Void) {
+        guard let token = token else {
+            resultHandler(.failed(error: Self.noTokenError))
+            return
+        }
+        widget.awaitConfirmResult(resultHandler)
+        widget.confirm(sdkAuthorization: sdkAuthorization(), paymentToken: token)
+    }
+
+    private static let noTokenError = NSError(
+        domain: "NO_PAYMENT_TOKEN",
+        code: 0,
+        userInfo: [NSLocalizedDescriptionKey: "The selected payment method has no payment token."]
+    )
 }

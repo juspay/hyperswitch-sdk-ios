@@ -163,19 +163,16 @@ class WidgetViewController: UIViewController {
                     callback(true)
                 }
             }
-            if let hyperswitch = hyperViewModel.hyperswitch {
-                self.cvcWidget = CVCWidget(
-                    hyperswitch: hyperswitch,
-                    configuration: configuration,
-                    subscribe: { builder in
-                        builder.on(.cvcStatus) { event in
-                            if case .cvcStatus(let info) = event.data {
-                                print(info)
-                            }
+            self.cvcWidget = CVCWidget(
+                configuration: configuration,
+                subscribe: { builder in
+                    builder.on(.cvcStatus) { event in
+                        if case .cvcStatus(let info) = event.data {
+                            print(info)
                         }
                     }
-                )
-            }
+                }
+            )
             if let cvcWidget = cvcWidget {
                 contentView.addSubview(cvcWidget)
                 cvcWidget.translatesAutoresizingMaskIntoConstraints = false
@@ -267,7 +264,7 @@ class WidgetViewController: UIViewController {
     @objc
     func confirm(_ sender: Any) {
         if let cvcWidget = cvcWidget {
-            self.handler?.confirmWithCustomerLastUsedPaymentMethod(cvcWidget, resultHandler: resultHandler)
+            self.handler?.confirmWithCustomerLastUsedPaymentMethod(cvcWidget: cvcWidget, resultHandler: resultHandler)
         }
     }
 

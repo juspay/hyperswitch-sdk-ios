@@ -17,7 +17,7 @@ import WebKit
 
 internal class PaymentMethodManagementWidget: UIControl {
     private var completion: ((PaymentMethodManagementResult) -> Void)?
-    private let reactManager = RNViewManager.sharedInstance
+    private let reactManager = RNViewManager()
 
     // Initialize the widget with the ephemeral key and configuration.
     public init(onAddPaymentMethod: (() -> Void)?, completion: @escaping (PaymentMethodManagementResult) -> Void) {
@@ -59,7 +59,7 @@ internal class PaymentMethodManagementWidget: UIControl {
         reactManager.responseHandler = self
 
         // Get the React Native view from RNViewManager.
-        let rootView = reactManager.viewForModule("hyperSwitch", initialProperties: ["props": props])
+        let rootView = reactManager.presentedViewForModule("hyperSwitch", initialProperties: ["props": props])
 
         rootView.frame = self.bounds
 
