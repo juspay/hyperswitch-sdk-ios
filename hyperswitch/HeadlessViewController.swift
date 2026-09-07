@@ -35,6 +35,12 @@ class HeadlessViewController: UIViewController {
     private var confirmConfig = UIButton.Configuration.filled()
     private var reloadButtonConfiguration = UIButton.Configuration.plain()
 
+    private let cvcToggle = UISwitch()
+    private let cvcRow = UIStackView()
+    private let confirmDefaultCVC = UIButton()
+    private let confirmLastCVC = UIButton()
+    private lazy var cvcWidget = CVCWidget()
+
     private var handler: PaymentSessionHandler?
     private var cancellables = Set<AnyCancellable>()
 
@@ -102,6 +108,7 @@ class HeadlessViewController: UIViewController {
             print(["type": paymentMethod.paymentMethod, "message": paymentMethod])
             self.statusLabel.text = "\(paymentMethod.paymentMethod) → \(paymentMethod)"
             confirmDefault.isEnabled = true
+            confirmDefaultCVC.isEnabled = true
         case .failure(let error):
             print(["type": "error", "message": error])
             self.statusLabel.text = "error → \(error)"
@@ -121,6 +128,7 @@ class HeadlessViewController: UIViewController {
             print(["type": paymentMethod.paymentMethod, "message": paymentMethod])
             self.statusLabel.text = "\(paymentMethod.paymentMethod) → \(paymentMethod)"
             confirmLast.isEnabled = true
+            confirmLastCVC.isEnabled = true
         case .failure(let error):
             print(["type": "error", "message": error])
             self.statusLabel.text = "error → \(error)"
@@ -156,6 +164,18 @@ class HeadlessViewController: UIViewController {
         handler?.confirmWithCustomerLastUsedPaymentMethod(resultHandler: resultHandler)
     }
 
+    @objc func confirmWithCustomerDefaultPaymentMethodCVC(_ sender: Any) {
+        handler?.confirmWithCustomerDefaultPaymentMethod(cvcWidget: cvcWidget, resultHandler: resultHandler)
+    }
+
+    @objc func confirmWithCustomerLastUsedPaymentMethodCVC(_ sender: Any) {
+        handler?.confirmWithCustomerLastUsedPaymentMethod(cvcWidget: cvcWidget, resultHandler: resultHandler)
+    }
+
+    @objc func toggleCVCWidget(_ sender: UISwitch) {
+        [cvcWidget, confirmDefaultCVC, confirmLastCVC].forEach { $0.isHidden = !sender.isOn }
+    }
+
     @objc func confirmWithCustomerPaymentToken(_ sender: Any) {
         //        handler?.confirmWithCustomerPaymentToken(<#T##String#>, <#T##String?#>, <#T##(PaymentResult) -> Void#>)
     }
@@ -179,8 +199,8 @@ extension HeadlessViewController {
     func viewFrame() {
         stackView.axis = .vertical
         stackView.alignment = .fill
-        stackView.distribution = .equalCentering
-        stackView.spacing = 20.0
+        stackView.distribution = .fill
+        stackView.spacing = 16.0
         stackView.addArrangedSubview(reloadButton)
         stackView.addArrangedSubview(headlessbutton)
         stackView.addArrangedSubview(getDefault)
@@ -188,14 +208,27 @@ extension HeadlessViewController {
         stackView.addArrangedSubview(getData)
         stackView.addArrangedSubview(confirmDefault)
         stackView.addArrangedSubview(confirmLast)
+        stackView.addArrangedSubview(cvcRow)
+        stackView.addArrangedSubview(cvcWidget)
+        stackView.addArrangedSubview(confirmDefaultCVC)
+        stackView.addArrangedSubview(confirmLastCVC)
         stackView.addArrangedSubview(confirm)
         stackView.addArrangedSubview(statusLabel)
-        view.addSubview(stackView)
+        view.addSubview(scrollView)
+        scrollView.addSubview(stackView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
         stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60).isActive = true
-        stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
-        stackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 80).isActive = true
-        stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            stackView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: 30),
+            stackView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor, constant: 60),
+            stackView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor, constant: -60),
+            stackView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -30),
+            stackView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor, constant: -120),
+        ])
 
         reloadButton.setTitle("Reload Client Secret", for: .normal)
         reloadButton.setTitleColor(.white, for: .normal)
@@ -236,6 +269,29 @@ extension HeadlessViewController {
         getData.configuration = getDataConfig
         getData.layer.cornerRadius = 10
 
+        let cvcLabel = UILabel()
+        cvcLabel.text = "Use CVC widget"
+        cvcLabel.font = .systemFont(ofSize: 15)
+        cvcRow.axis = .horizontal
+        cvcRow.addArrangedSubview(cvcLabel)
+        cvcRow.addArrangedSubview(cvcToggle)
+        cvcToggle.addTarget(self, action: #selector(toggleCVCWidget(_:)), for: .valueChanged)
+
+        cvcWidget.isHidden = true
+        cvcWidget.heightAnchor.constraint(equalToConstant: 44).isActive = true
+
+        confirmDefaultCVC.isHidden = true
+        confirmDefaultCVC.isEnabled = false
+        confirmDefaultCVC.setTitle("Confirm Default + CVC Widget", for: .normal)
+        confirmDefaultCVC.addTarget(self, action: #selector(confirmWithCustomerDefaultPaymentMethodCVC), for: .touchUpInside)
+        confirmDefaultCVC.configuration = confirmDefaultConfig
+
+        confirmLastCVC.isHidden = true
+        confirmLastCVC.isEnabled = false
+        confirmLastCVC.setTitle("Confirm Last Used + CVC Widget", for: .normal)
+        confirmLastCVC.addTarget(self, action: #selector(confirmWithCustomerLastUsedPaymentMethodCVC), for: .touchUpInside)
+        confirmLastCVC.configuration = confirmLastConfig
+
         confirmDefault.isEnabled = false
         confirmDefault.setTitle("Confirm With Default", for: .normal)
         confirmDefault.setTitleColor(.white, for: .normal)
@@ -261,7 +317,7 @@ extension HeadlessViewController {
         confirm.layer.cornerRadius = 10
 
         statusLabel.textAlignment = .center
-        statusLabel.numberOfLines = 15
+        statusLabel.numberOfLines = 0
         statusLabel.font = .systemFont(ofSize: 15)
     }
 }
