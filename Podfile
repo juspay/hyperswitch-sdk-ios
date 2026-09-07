@@ -1,3 +1,5 @@
+ENV['RCT_NEW_ARCH_ENABLED'] = '1'
+
 require Pod::Executable.execute_command('node', ['-p',
   'require.resolve(
     "react-native/scripts/react_native_pods.rb",
