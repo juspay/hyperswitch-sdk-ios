@@ -1,137 +1,225 @@
 import Combine
-import Foundation
 import SwiftUI
-import WebKit
+import UIKit
 
 class PaymentMethodManagementViewController: UIViewController {
+
     @ObservedObject var hyperViewModel = HyperViewModel()
-    private var paymentSession: PaymentSession?
+
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
+
+    private var reloadButton = UIButton()
+    private var reloadButtonConfiguration = UIButton.Configuration.plain()
+
+    private var presentSheetButton = UIButton()
+    private var presentSheetButtonConfiguration = UIButton.Configuration.plain()
+
+    private var confirmWidgetButton = UIButton()
+    private var confirmWidgetButtonConfiguration = UIButton.Configuration.plain()
+
+    private var statusLabel = UILabel()
     private var cancellables = Set<AnyCancellable>()
-    private let topBarView = UIView()
-    private let textLabel = UILabel()
-    private let backButton = UIButton(type: .custom)
+    private var pmmWidget: PaymentMethodManagementWidget?
+    private var widgetConstraints: [NSLayoutConstraint] = []
+    private let backChevron = UIButton(type: .system)
 
-    private func setupPaymentWidget(onAddPaymentMethod: @escaping () -> Void) {
-        guard hyperViewModel.paymentSession != nil else { return }
+    override func viewDidLoad() {
+        self.view.backgroundColor = UIColor(red: 0.50, green: 0.50, blue: 0.50, alpha: 0.2)
+        super.viewDidLoad()
+        setupScrollView()
+        asyncBind()
+        viewFrame()
+        hyperViewModel.preparePaymentMethodManagement()
 
-        lazy var paymentWidget = PaymentMethodManagementWidget(
-            onAddPaymentMethod: onAddPaymentMethod,
-            completion: { result in
-                switch result {
-                case .failed(let error):
-                    print("Payment Method Management failed: \(error)")
-                case .closed:
-                    print("Payment Method Management closed.")
-                }
-            }
-        )
-
-        view.addSubview(paymentWidget)
-        paymentWidget.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            paymentWidget.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            paymentWidget.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            paymentWidget.topAnchor.constraint(equalTo: topBarView.bottomAnchor),
-            paymentWidget.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-        ])
+        backChevron.setImage(UIImage(systemName: "chevron.left"), for: .normal)
+        backChevron.addTarget(self, action: #selector(backTapped), for: .touchUpInside)
+        view.addSubview(backChevron)
+        backChevron.translatesAutoresizingMaskIntoConstraints = false
+        backChevron.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8).isActive = true
+        backChevron.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12).isActive = true
+        backChevron.widthAnchor.constraint(equalToConstant: 28).isActive = true
+        backChevron.heightAnchor.constraint(equalToConstant: 28).isActive = true
     }
 
-    private func asyncBindPaymentManagementWidget(onAddPaymentMethod: @escaping () -> Void) {
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        backChevron.isHidden = (presentingViewController == nil)
+    }
+
+    @objc
+    private func backTapped() {
+        dismiss(animated: true, completion: nil)
+    }
+
+    private func asyncBind() {
         hyperViewModel.$status
             .receive(on: DispatchQueue.main)
             .sink { [weak self] status in
                 switch status {
                 case .loading:
-                    print("Loading payment method management session...")
+                    self?.statusLabel.text = "Loading..."
                 case .success:
-                    self?.setupPaymentWidget(onAddPaymentMethod: onAddPaymentMethod)
-                case .failure(let error):
-                    print("Failed to prepare payment method management session: \(error)")
+                    self?.statusLabel.text = "Connected to Server"
+                    self?.attachPaymentMethodManagementWidget()
+                case .failure(let message):
+                    self?.statusLabel.text = message
                 }
             }
             .store(in: &cancellables)
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .green
-        viewFrame()
-        //        hyperViewModel.preparePaymentMethodManagement()
-        asyncBindPaymentManagementWidget(onAddPaymentMethod: onAddPaymentMethod)
+    private func setupScrollView() {
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+
+            contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+
+            contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+        ])
     }
 
-    @objc func onAddPaymentMethod() {
-        var configuration = PaymentSheet.Configuration()
-        configuration.primaryButtonLabel = "Purchase ($0.00)"
-        configuration.paymentSheetHeaderLabel = "Add payment method"
-        configuration.displaySavedPaymentMethods = false
+    private func updateStatus(_ paymentResult: PaymentResult) {
+        switch paymentResult {
+        case .completed(let data):
+            statusLabel.text = "completed → \(data)"
+        case .canceled(let data):
+            statusLabel.text = "canceled → \(data)"
+        case .failed(let error):
+            statusLabel.text = "failed → \(error)"
+        }
+    }
 
+    @objc
+    private func presentSheet(_ sender: Any) {
+        var configuration = PaymentSheet.Configuration()
+        configuration.paymentSheetHeaderLabel = "Payment methods"
+        configureAppearance(&configuration)
+
+        hyperViewModel.paymentSession?.presentPaymentMethodManagement(
+            viewController: self,
+            configuration: configuration
+        ) { [weak self] result in
+            DispatchQueue.main.async {
+                self?.updateStatus(result)
+            }
+        }
+    }
+
+    @objc
+    private func confirmWidget(_ sender: Any) {
+        guard let pmmWidget = pmmWidget else { return }
+        statusLabel.text = "confirming..."
+        pmmWidget.confirm { [weak self] result in
+            DispatchQueue.main.async {
+                self?.updateStatus(result)
+            }
+        }
+    }
+
+    @objc
+    private func reloadSession(_ sender: Any) {
+        statusLabel.text = "Fetching fresh PM session..."
+        hyperViewModel.preparePaymentMethodManagement()
+    }
+
+    private func configureAppearance(_ configuration: inout PaymentSheet.Configuration) {
         var appearance = PaymentSheet.Appearance()
         appearance.colors.background = UIColor(red: 0.96, green: 0.97, blue: 0.98, alpha: 1.00)
         appearance.primaryButton.shapes.borderRadius = 32
         configuration.appearance = appearance
-
-        self.hyperViewModel.paymentSession?.presentPaymentSheet(
-            viewController: self,
-            configuration: configuration,
-            completion: { result in
-                DispatchQueue.main.async {
-                    switch result {
-                    case .completed:
-                        self.showAlert(title: "Success", message: "Successfully saved the payment method")
-                    //                        self.hyperViewModel.preparePaymentMethodManagement()
-                    case .failed(let error):
-                        self.showAlert(title: "Error", message: "Failure: \(error.localizedDescription)")
-                    //                        self.hyperViewModel.preparePaymentMethodManagement()
-                    case .canceled:
-                        break
-                    }
-                }
-            }
-        )
     }
 
-    @objc func backButtonTapped() {
-        self.dismiss(animated: true, completion: nil)
+    func attachPaymentMethodManagementWidget() {
+        NSLayoutConstraint.deactivate(widgetConstraints)
+        widgetConstraints.removeAll()
+        pmmWidget?.removeFromSuperview()
+
+        guard let paymentSession = hyperViewModel.paymentSession else { return }
+
+        var configuration = PaymentSheet.Configuration()
+        configuration.savedPaymentSheetHeaderLabel = "Saved payment methods"
+        configuration.displaySavedPaymentMethods = true
+        configureAppearance(&configuration)
+
+        let widget = PaymentMethodManagementWidget(paymentSession: paymentSession, configuration: configuration)
+        self.pmmWidget = widget
+
+        contentView.addSubview(widget)
+        widget.translatesAutoresizingMaskIntoConstraints = false
+        widgetConstraints = [
+            widget.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
+            widget.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+            widget.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 20),
+            widget.heightAnchor.constraint(equalToConstant: 420),
+
+            confirmWidgetButton.topAnchor.constraint(equalTo: widget.bottomAnchor, constant: 20),
+        ]
+        NSLayoutConstraint.activate(widgetConstraints)
+        widget.setNeedsLayout()
     }
 }
 
 extension PaymentMethodManagementViewController {
+
     func viewFrame() {
-        view.addSubview(topBarView)
-        topBarView.translatesAutoresizingMaskIntoConstraints = false
-        topBarView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-        topBarView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
-        topBarView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        topBarView.heightAnchor.constraint(equalToConstant: 65).isActive = true
+        reloadButton.setTitle("Reload PM Session", for: .normal)
+        reloadButton.setTitleColor(.white, for: .normal)
+        reloadButtonConfiguration.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        reloadButton.configuration = reloadButtonConfiguration
+        reloadButton.layer.cornerRadius = 10
+        reloadButton.backgroundColor = .systemBlue
+        reloadButton.addTarget(self, action: #selector(reloadSession(_:)), for: .touchUpInside)
+        contentView.addSubview(reloadButton)
+        reloadButton.translatesAutoresizingMaskIntoConstraints = false
+        reloadButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 60).isActive = true
+        reloadButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -60).isActive = true
+        reloadButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20).isActive = true
 
-        backButton.setImage(UIImage(systemName: "chevron.left"), for: .normal)
-        backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
-        topBarView.addSubview(backButton)
-        backButton.translatesAutoresizingMaskIntoConstraints = false
-        backButton.topAnchor.constraint(equalTo: topBarView.topAnchor, constant: 20).isActive = true
-        backButton.leadingAnchor.constraint(equalTo: topBarView.leadingAnchor, constant: 10).isActive = true
-        backButton.widthAnchor.constraint(equalToConstant: 25).isActive = true
-        backButton.heightAnchor.constraint(equalToConstant: 25).isActive = true
+        presentSheetButton.setTitle("Launch PMM Sheet", for: .normal)
+        presentSheetButton.setTitleColor(.white, for: .normal)
+        presentSheetButtonConfiguration.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        presentSheetButton.configuration = presentSheetButtonConfiguration
+        presentSheetButton.layer.cornerRadius = 10
+        presentSheetButton.backgroundColor = .systemBlue
+        presentSheetButton.addTarget(self, action: #selector(presentSheet(_:)), for: .touchUpInside)
+        contentView.addSubview(presentSheetButton)
+        presentSheetButton.translatesAutoresizingMaskIntoConstraints = false
+        presentSheetButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 60).isActive = true
+        presentSheetButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -60).isActive = true
+        presentSheetButton.topAnchor.constraint(equalTo: reloadButton.bottomAnchor, constant: 20).isActive = true
 
-        textLabel.text = "Hyperswitch"
-        textLabel.font = .boldSystemFont(ofSize: 16.5)
-        topBarView.addSubview(textLabel)
-        textLabel.translatesAutoresizingMaskIntoConstraints = false
-        textLabel.topAnchor.constraint(equalTo: topBarView.topAnchor, constant: 23.5).isActive = true
-        textLabel.leadingAnchor.constraint(equalTo: backButton.trailingAnchor, constant: 4).isActive = true
-        textLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        statusLabel.textAlignment = .center
+        statusLabel.numberOfLines = 7
+        statusLabel.font = .systemFont(ofSize: 18)
+        contentView.addSubview(statusLabel)
+        statusLabel.translatesAutoresizingMaskIntoConstraints = false
+        statusLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20).isActive = true
+        statusLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20).isActive = true
+        statusLabel.topAnchor.constraint(equalTo: presentSheetButton.bottomAnchor, constant: 20).isActive = true
 
-    }
-}
-
-extension PaymentMethodManagementViewController {
-    func showAlert(title: String, message: String) {
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
-        alertController.addAction(okAction)
-        DispatchQueue.main.async {
-            self.present(alertController, animated: true, completion: nil)
-        }
+        confirmWidgetButton.setTitle("Save Card (confirm)", for: .normal)
+        confirmWidgetButton.setTitleColor(.white, for: .normal)
+        confirmWidgetButtonConfiguration.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 10, bottom: 10, trailing: 10)
+        confirmWidgetButton.configuration = confirmWidgetButtonConfiguration
+        confirmWidgetButton.layer.cornerRadius = 10
+        confirmWidgetButton.backgroundColor = .systemBlue
+        confirmWidgetButton.addTarget(self, action: #selector(confirmWidget(_:)), for: .touchUpInside)
+        contentView.addSubview(confirmWidgetButton)
+        confirmWidgetButton.translatesAutoresizingMaskIntoConstraints = false
+        confirmWidgetButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 60).isActive = true
+        confirmWidgetButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -60).isActive = true
+        confirmWidgetButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20).isActive = true
     }
 }

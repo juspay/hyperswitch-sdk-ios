@@ -19,6 +19,7 @@ struct ContentView: View {
                 Text("3DS").tag(3)
                 Text("C2P").tag(4)
                 Text("Widget").tag(5)
+                Text("PMM").tag(6)
             }.pickerStyle(SegmentedPickerStyle())
 
             switch selectedSegment {
@@ -34,6 +35,8 @@ struct ContentView: View {
                 ClickToPayView()
             case 5:
                 WidgetView()
+            case 6:
+                PMMView()
             default:
                 UIKitView()
             }
@@ -93,5 +96,16 @@ struct WidgetView: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: WidgetViewController, context: Context) {
+    }
+}
+
+struct PMMView: UIViewControllerRepresentable {
+    typealias UIViewControllerType = PaymentMethodManagementViewController
+
+    func makeUIViewController(context: Context) -> PaymentMethodManagementViewController {
+        return PaymentMethodManagementViewController()
+    }
+
+    func updateUIViewController(_ uiViewController: PaymentMethodManagementViewController, context: Context) {
     }
 }

@@ -54,6 +54,41 @@ class HyperViewModel: ObservableObject {
         }
     }
 
+    func preparePaymentMethodManagement() {
+        Task {
+            do {
+                let json = try await NetworkUtility.postData(
+                    to: "/create-payment-method-session",
+                    body: ["storage_type": "persistent", "keep_alive": true],
+                    baseUrl: backendUrl
+                )
+                guard let sdkAuthorization = json["sdkAuthorization"] as? String,
+                    let publishableKey = json["publishableKey"] as? String,
+                    let profileId = json["profileId"] as? String
+                else {
+                    let serverMessage = (json["error"] as? [String: Any])?["message"] as? String
+                    throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: serverMessage ?? "Missing required fields"])
+                }
+
+                let hyperswitchConfiguration = HyperswitchConfiguration(publishableKey: publishableKey, profileId: profileId)
+                let paymentSessionConfiguration = PaymentSessionConfiguration(sdkAuthorization: sdkAuthorization)
+
+                let hyperswitch = Hyperswitch(configuration: hyperswitchConfiguration)
+                let paymentSession = try await hyperswitch.initPaymentSession(configuration: paymentSessionConfiguration)
+
+                DispatchQueue.main.async {
+                    self.status = .success
+                    self.hyperswitch = hyperswitch
+                    self.paymentSession = paymentSession
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.status = .failure(error.localizedDescription)
+                }
+            }
+        }
+    }
+
     func updatePaymentIntent() {
         self.paymentSession?.updateIntent(
             authorizationProvider: { completion in
