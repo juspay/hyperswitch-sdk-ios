@@ -14,6 +14,18 @@ internal extension PaymentSheet {
 
     /// Method to get the root view for the payment sheet based on the configured properties.
     func getRootView() -> UIView {
+        return getRootView(type: "payment")
+    }
+
+    /// Method to get the root view for the payment methods management (PMM) sheet.
+    /// - Note: Requires the session to be initialised with a
+    ///   `/v1/payment-method-sessions` `sdkAuthorization`.
+    func getPaymentMethodManagementRootView() -> UIView {
+        return getRootView(type: "paymentMethodsManagement")
+    }
+
+    /// Method to get the React Native root view for a given SDK flow type.
+    private func getRootView(type: String) -> UIView {
 
         let hyperswitchConfiguration = try? hyperswitchConfiguration?.toDictionary()
         let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
@@ -27,7 +39,7 @@ internal extension PaymentSheet {
 
         /// Create a dictionary of props to be sent to React Native with configuration, type, sdkAuthorization, publishable key, hyperParams, custom backend URL, themes, and custom parameters.
         let props: [String: Any] = [
-            "type": "payment",
+            "type": type,
             "hyperswitchConfig": hyperswitchConfiguration as Any,
             "paymentSessionConfig": paymentSessionConfiguration as Any,
             "sdkParams": sdkParams,

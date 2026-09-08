@@ -7,86 +7,102 @@
 
 import Foundation
 import UIKit
-import WebKit
 
-/// PaymentResult is an enum that represents the possible outcomes of a payment sheet operation.
-@frozen public enum PaymentMethodManagementResult {
-    case closed(data: String)
-    case failed(error: Error)
-}
+public class PaymentMethodManagementWidget: UIControl {
 
-internal class PaymentMethodManagementWidget: UIControl {
-    private var completion: ((PaymentMethodManagementResult) -> Void)?
-    private let reactManager = RNViewManager()
+    private let paymentSession: PaymentSession
+    private let configuration: PaymentSheet.Configuration?
+    private var widgetReactTag: NSNumber?
+    private var rootView: UIView?
+    private var confirmCallback: ((PaymentResult) -> Void)?
+    private var subscribedEventNames: [String]?
+    private var reactManager: RNViewManager { paymentSession.reactManager }
+    internal var paymentEventListener: PaymentEventListener?
 
-    // Initialize the widget with the ephemeral key and configuration.
-    public init(onAddPaymentMethod: (() -> Void)?, completion: @escaping (PaymentMethodManagementResult) -> Void) {
-        self.completion = completion
+    public init(
+        paymentSession: PaymentSession,
+        configuration: PaymentSheet.Configuration? = nil,
+        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil
+    ) {
+        self.paymentSession = paymentSession
+        self.configuration = configuration
+        if let subscribe {
+            let builder = PaymentEventSubscriptionBuilder()
+            subscribe(builder)
+            let (subscription, listener) = builder.build()
+            self.paymentEventListener = listener
+            self.subscribedEventNames = subscription.subscribedEventStrings()
+        }
         super.init(frame: .zero)
-        reactManager.hyperModule.onAddPaymentMethod = onAddPaymentMethod
         commonInit()
     }
 
-    required public init?(
-        coder: NSCoder
-    ) {
-        super.init(coder: coder)
-        commonInit()
-    }
-
-    public override init(
-        frame: CGRect
-    ) {
-        super.init(frame: frame)
-        commonInit()
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 
     private func commonInit() {
-        let hyperParams = SDKParams.getSDKParams()
 
-        // Prepare the props to send to the React Native module.
+        let hyperswitchConfiguration = try? paymentSession.hyperswitchConfiguration?.toDictionary()
+        let paymentSessionConfiguration = try? paymentSession.paymentSessionConfiguration.toDictionary()
+
+        let sdkParams = SDKParams.getSDKParams()
+
+        var configuration = try? self.configuration?.toDictionary()
+        configuration?["subscribedEvents"] = subscribedEventNames
+
         let props: [String: Any] = [
-            "type": "paymentMethodsManagement",
-            "hyperParams": hyperParams,
-            //            "ephemeralKey": PaymentSession.ephemeralKey ?? "",  // TODO: use paymentSession.ephemeralKey
-            "publishableKey": APIClient.shared.publishableKey as Any,
-            "profileId": APIClient.shared.profileId as Any,
-            "customBackendUrl": APIClient.shared.customBackendUrl as Any,
-            "customLogUrl": APIClient.shared.customLogUrl as Any,
-            "customParams": APIClient.shared.customParams as Any,
+            "type": "widgetPaymentMethodsManagement",
+            "hyperswitchConfig": hyperswitchConfiguration as Any,
+            "paymentSessionConfig": paymentSessionConfiguration as Any,
+            "sdkParams": sdkParams,
+            "configuration": configuration as Any,
+            "from": "nativeWidget",
         ]
 
-        reactManager.responseHandler = self
+        self.rootView = reactManager.viewForModule(
+            "hyperSwitch",
+            initialProperties: ["props": props]
+        )
+        if let rootView = self.rootView {
+            self.widgetReactTag = rootView.surfaceRootTag
 
-        // Get the React Native view from RNViewManager.
-        let rootView = reactManager.presentedViewForModule("hyperSwitch", initialProperties: ["props": props])
+            rootView.backgroundColor = .clear
 
-        rootView.frame = self.bounds
+            addSubview(rootView)
 
-        // Add the React Native view to the current view.
-        addSubview(rootView)
-
-        rootView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            rootView.topAnchor.constraint(equalTo: self.topAnchor),
-            rootView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-            rootView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            rootView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-        ])
+            rootView.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                rootView.topAnchor.constraint(equalTo: topAnchor),
+                rootView.bottomAnchor.constraint(equalTo: bottomAnchor),
+                rootView.leadingAnchor.constraint(equalTo: leadingAnchor),
+                rootView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            ])
+        }
     }
-}
 
-/// An extension that conforms to the RNResponseHandler protocol, which handles the response from the payment sheet operation.
-extension PaymentMethodManagementWidget: RNResponseHandler {
-    func didReceiveResponse(response: String?, error: Error?) {
-        if let completion = completion {
-            if let error = error {
-                completion(.failed(error: error))
-            } else if response == "cancelled" {
-                completion(.closed(data: "cancelled"))
-            } else {
-                completion(.closed(data: response ?? "failed"))
-            }
+    public func confirm(completion: @escaping (PaymentResult) -> Void) {
+        self.confirmCallback = completion
+        let payload: [String: Any] = [
+            "rootTag": self.widgetReactTag ?? -1,
+            "actionType": "CONFIRM_PAYMENT_ACTION",
+        ]
+        reactManager.hyperModule.emit("triggerWidgetAction", payload)
+    }
+
+
+    internal func handlePaymentResult(_ result: PaymentResult) {
+        confirmCallback?(result)
+        confirmCallback = nil
+    }
+
+    internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {
+        guard let listener = paymentEventListener else { return }
+        let event = PaymentEvent(type: type, payload: payload)
+        if Thread.isMainThread {
+            listener.onPaymentEvent(event)
+        } else {
+            DispatchQueue.main.async { listener.onPaymentEvent(event) }
         }
     }
 }

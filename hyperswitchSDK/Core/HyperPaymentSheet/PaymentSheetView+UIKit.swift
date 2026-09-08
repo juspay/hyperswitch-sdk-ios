@@ -36,6 +36,17 @@ internal extension PaymentSheet {
         self.presentWithRootView(from: presentingViewController, rootView: self.getRootView(), completion: completion)
     }
 
+    /// Method to present the payment methods management (PMM) sheet.
+    func presentPaymentMethodManagement(from presentingViewController: UIViewController, completion: @escaping (PaymentResult) -> Void) {
+
+        // Present the sheet with the root view obtained from the getPaymentMethodManagementRootView() method.
+        self.presentWithRootView(
+            from: presentingViewController,
+            rootView: self.getPaymentMethodManagementRootView(),
+            completion: completion
+        )
+    }
+
     /// Method to present the payment sheet view with custom parameters.
     func presentWithParams(
         from presentingViewController: UIViewController,

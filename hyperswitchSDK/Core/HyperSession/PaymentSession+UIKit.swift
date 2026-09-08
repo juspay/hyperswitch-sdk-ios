@@ -33,6 +33,30 @@ extension PaymentSession {
         paymentSheet.present(from: viewController, completion: completion)
     }
 
+
+    public func presentPaymentMethodManagement(
+        viewController: UIViewController,
+        configuration: PaymentSheet.Configuration? = nil,
+        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil,
+        completion: @escaping (PaymentResult) -> Void
+    ) {
+        let paymentSheet = PaymentSheet(
+            paymentSessionConfiguration: paymentSessionConfiguration,
+            hyperswitchConfiguration: hyperswitchConfiguration ?? nil,
+            configuration: configuration
+        )
+
+        paymentSheet.reactManager = reactManager
+        if let subscribe {
+            let builder = PaymentEventSubscriptionBuilder()
+            subscribe(builder)
+            let (subscription, builtListener) = builder.build()
+            paymentSheet.subscribedEvents = subscription.subscribedEventStrings()
+            paymentSheet.paymentEventListener = builtListener
+        }
+        paymentSheet.presentPaymentMethodManagement(from: viewController, completion: completion)
+    }
+
     // MARK: for external frameworks
     public func presentPaymentSheetWithParams(
         viewController: UIViewController,

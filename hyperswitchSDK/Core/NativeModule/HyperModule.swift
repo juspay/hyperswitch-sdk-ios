@@ -133,7 +133,26 @@ internal class HyperModuleImpl: NSObject {
 
     @objc(exitPaymentMethodManagement:result:reset:)
     internal func exitPaymentMethodManagement(_ reactTag: NSNumber, _ rnMessage: String, _ reset: Bool) {
-        exitSheet(rnMessage)
+        let result = Self.parseExitResult(rnMessage)
+        DispatchQueue.main.async {
+            /// An embedded PMM widget stays mounted: resolve the merchant's
+            /// pending `confirm` and let it handle the reset internally.
+            if let pmmWidget = self.shim?.view(forRootTag: reactTag)?
+                .nearestAncestor(ofType: PaymentMethodManagementWidget.self) {
+                pmmWidget.handlePaymentResult(result)
+                return
+            }
+            /// SDK-owned sheet: same routing as exitPaymentsheet.
+            if let vc = self.shim?.view(forRootTag: reactTag)?.reactViewController() as? HyperUIViewController,
+                vc.paymentSheet != nil
+            {
+                vc.paymentSheet?.completion?(result)
+                vc.dismiss(animated: false, completion: nil)
+                return
+            }
+            /// Legacy full-screen fallback (RNResponseHandler-based hosts).
+            self.exitSheet(rnMessage)
+        }
     }
 
     @objc(exitWidget:code:message:widgetType:)
@@ -146,6 +165,12 @@ internal class HyperModuleImpl: NSObject {
 
     @objc(notifyWidgetPaymentResult:status:code:message:)
     internal func notifyWidgetPaymentResult(_ rootTag: NSNumber, _ status: String, _ code: String?, _ message: String?) {
+        /// One-shot resolution of the PMM widget's merchant-driven confirm
+        /// (e.g. form-validation failure — the widget stays mounted for retry).
+        let result = PaymentResult.from(status: status, code: code, message: message)
+        withPMMWidget(rootTag) { widget in
+            widget.handlePaymentResult(result)
+        }
     }
 
     @objc(onUpdateIntentEvent:eventType:status:code:message:)
@@ -167,6 +192,21 @@ internal class HyperModuleImpl: NSObject {
         return json
     }
 
+    /// Parses the `{status, code, message}` JSON string passed to
+    /// `exitPaymentMethodManagement`, tolerating null/absent fields.
+    private static func parseExitResult(_ rnMessage: String) -> PaymentResult {
+        if let data = rnMessage.data(using: .utf8),
+            let jsonDictionary = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any]
+        {
+            return PaymentResult.from(
+                status: jsonDictionary["status"] as? String ?? "failed",
+                code: jsonDictionary["code"] as? String,
+                message: jsonDictionary["message"] as? String
+            )
+        }
+        return .failed(error: NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."]))
+    }
+
     @objc(emitPaymentEvent:eventType:payload:)
     internal func emitPaymentEvent(_ rootTag: NSNumber, _ eventType: String, _ payload: NSDictionary) {
         let map = (payload as? [String: Any]) ?? [:]
@@ -175,6 +215,8 @@ internal class HyperModuleImpl: NSObject {
                 widget.dispatchPaymentEvent(type: eventType, payload: map)
             } else if let cvc = target as? CVCWidget, cvc.paymentEventListener != nil {
                 cvc.dispatchPaymentEvent(type: eventType, payload: map)
+            } else if let pmmWidget = target as? PaymentMethodManagementWidget, pmmWidget.paymentEventListener != nil {
+                pmmWidget.dispatchPaymentEvent(type: eventType, payload: map)
             } else if let sheet = target as? PaymentSheet, sheet.paymentEventListener != nil {
                 sheet.dispatchPaymentEvent(type: eventType, payload: map)
             }
@@ -288,13 +330,22 @@ internal class HyperModuleImpl: NSObject {
         }
     }
 
+    private func withPMMWidget(_ rootTag: NSNumber, _ block: @escaping (PaymentMethodManagementWidget) -> Void) {
+        DispatchQueue.main.async {
+            guard let widget = self.shim?.view(forRootTag: rootTag)?
+                .nearestAncestor(ofType: PaymentMethodManagementWidget.self)
+            else { return }
+            block(widget)
+        }
+    }
+
     private func resolveSubscribingTarget(_ rootTag: NSNumber, _ block: @escaping (AnyObject?) -> Void) {
         DispatchQueue.main.async {
             guard let view = self.shim?.view(forRootTag: rootTag) else {
                 block(nil)
                 return
             }
-            if let widget = view.nearestAncestor(where: { $0 is PaymentWidget || $0 is CVCWidget }) {
+            if let widget = view.nearestAncestor(where: { $0 is PaymentWidget || $0 is CVCWidget || $0 is PaymentMethodManagementWidget }) {
                 block(widget)
                 return
             }
