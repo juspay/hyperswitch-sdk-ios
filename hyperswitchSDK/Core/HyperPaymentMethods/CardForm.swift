@@ -33,7 +33,7 @@ public class CardForm {
             guard let variables, !variables.isEmpty else { return nil }
             return ["appearance": ["variables": variables.toDictionary()]]
         }()
-        self.emptyRootView = session.reactManager.widgetViewForModule(
+        self.emptyRootView = session.reactManager.viewForModule(
             "HyperswitchPaymentMethods",
             initialProperties: ["props": session.launchProps(type: "cardForm", configuration: configuration)]
         )

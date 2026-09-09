@@ -89,7 +89,7 @@ open class BaseRNInputField: UIView {
     /// React host. No-op until the widget is bound to a card form.
     public func startInternalView() {
         guard let session = session, rootView == nil else { return }
-        let view = session.reactManager.widgetViewForModule(
+        let view = session.reactManager.viewForModule(
             "HyperswitchPaymentMethods",
             initialProperties: ["props": launchOptions]
         )
