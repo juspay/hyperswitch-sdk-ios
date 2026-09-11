@@ -17,7 +17,7 @@ import WebKit
 
 public class ExpressCheckoutLauncher {
 
-    private let reactManager = RNViewManager()
+    private var reactManager: RNViewManager { RNViewManager.shared }
 
     init() {}
 
@@ -70,7 +70,7 @@ public class ExpressCheckoutLauncher {
                 "customParams": APIClient.shared.customParams as Any,
             ]
 
-            let rootView = self.reactManager.presentedViewForModule("hyperSwitch", initialProperties: ["props": props])
+            let rootView = self.reactManager.presentedViewForModule("hyperSwitch", initialProperties: ["props": props], owner: self)
 
             rootView.backgroundColor = UIColor.clear
 

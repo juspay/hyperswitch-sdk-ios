@@ -36,14 +36,14 @@ internal protocol HyperModuleShim: NSObjectProtocol {
     func emitEvent(name: String, payload: [String: Any])
     @objc(viewForRootTag:)
     func view(forRootTag rootTag: NSNumber) -> UIView?
+    @objc(surfaceForRootTag:)
+    func surface(forRootTag rootTag: NSNumber) -> AnyObject?
 }
 
 @objc(HyperModuleImpl)
 internal class HyperModuleImpl: NSObject {
 
     internal weak var host: ReactHostManager?
-    internal static let prefetchSurfaceTag = -100
-    internal var onPrefetchUpdateIntentReply: ((_ type: String, _ result: String) -> Void)?
 
     private let applePayPaymentHandler = ApplePayHandler()
     private var presentCallback: (([Any]?) -> Void)? = nil
@@ -51,20 +51,17 @@ internal class HyperModuleImpl: NSObject {
     internal var onAddPaymentMethod: (() -> Void)?
 
     private weak var shim: HyperModuleShim?
-    internal private(set) var isAttached = false
-    internal var onAttached: (() -> Void)?
 
     internal func attach(to shim: HyperModuleShim) {
         shim.attach(impl: self)
         onMain {
             self.shim = shim
-            self.isAttached = true
-            let onAttached = self.onAttached
-            self.onAttached = nil
-            onAttached?()
         }
     }
 
+    /// Native → JS event on the shared host, dropped if JS has not instantiated this module
+    /// yet. Commands that must not be lost (widget confirms, updateIntent) go through the
+    /// target surface's props instead.
     internal func emit(_ name: String, _ payload: [String: Any]) {
         onMain {
             self.shim?.emitEvent(name: name, payload: payload)
@@ -133,7 +130,9 @@ internal class HyperModuleImpl: NSObject {
 
     @objc(exitPaymentMethodManagement:result:reset:)
     internal func exitPaymentMethodManagement(_ reactTag: NSNumber, _ rnMessage: String, _ reset: Bool) {
-        exitSheet(rnMessage)
+        resolveOwner(reactTag) { owner in
+            self.exitSheet(rnMessage, handler: owner as? RNResponseHandler)
+        }
     }
 
     @objc(exitWidget:code:message:widgetType:)
@@ -150,9 +149,14 @@ internal class HyperModuleImpl: NSObject {
 
     @objc(onUpdateIntentEvent:eventType:status:code:message:)
     internal func onUpdateIntentEvent(_ rootTag: NSNumber, _ type: String, _ status: String, _ code: String?, _ message: String?) {
-        guard rootTag.intValue == Self.prefetchSurfaceTag else { return }
         let result = Self.encodeExitResult(status: status, code: code, message: message)
-        onMain { self.onPrefetchUpdateIntentReply?(type, result) }
+        resolveOwner(rootTag) { owner in
+            guard let target = owner as? UpdateIntentReplyTarget else {
+                print("HyperModule: onUpdateIntentEvent has no prefetch owner for rootTag \(rootTag) (\(type))")
+                return
+            }
+            target.onUpdateIntentReply(type: type, result: result)
+        }
     }
 
     private static func encodeExitResult(status: String, code: String?, message: String?) -> String {
@@ -221,7 +225,9 @@ internal class HyperModuleImpl: NSObject {
         }
     }
 
-    private func exitSheet(_ rnMessage: String) {
+    /// Main thread. [handler] is the owner of the surface that exited when it has one;
+    /// single-root flows without an owner fall back to the host's response handler.
+    private func exitSheet(_ rnMessage: String, handler: RNResponseHandler?) {
         var response: String?
         var error: NSError?
         let unknownError = NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: ["message": "An error has occurred."])
@@ -243,14 +249,13 @@ internal class HyperModuleImpl: NSObject {
             response = "failed"
             error = unknownError
         }
-        let deliver = { self.host?.responseHandler?.didReceiveResponse(response: response, error: error) }
-        DispatchQueue.main.async {
-            guard let vc = self.host?.rootView?.reactViewController() else {
-                deliver()
-                return
-            }
-            vc.dismiss(animated: false) { deliver() }
+        let target = handler ?? self.host?.responseHandler
+        let deliver = { target?.didReceiveResponse(response: response, error: error) }
+        guard let vc = self.host?.rootView?.reactViewController() else {
+            deliver()
+            return
         }
+        vc.dismiss(animated: false) { deliver() }
     }
 
     @objc(onPaymentConfirmButtonClick:payload:callback:)
@@ -279,35 +284,32 @@ internal class HyperModuleImpl: NSObject {
     }
 
     private func withWidget(_ rootTag: NSNumber, _ block: @escaping (PaymentWidget) -> Void) {
-        DispatchQueue.main.async {
-            guard
-                let widget = self.shim?.view(forRootTag: rootTag)?
-                    .nearestAncestor(ofType: PaymentWidget.self)
-            else { return }
+        resolveOwner(rootTag) { owner in
+            guard let widget = owner as? PaymentWidget else { return }
             block(widget)
         }
     }
 
     private func resolveSubscribingTarget(_ rootTag: NSNumber, _ block: @escaping (AnyObject?) -> Void) {
+        resolveOwner(rootTag, block)
+    }
+
+    /// Root tag → surface object → the native object that owns it (a sheet, a widget, a
+    /// session or a headless attempt). Main thread.
+    private func resolveOwner(_ rootTag: NSNumber, _ block: @escaping (AnyObject?) -> Void) {
         DispatchQueue.main.async {
-            guard let view = self.shim?.view(forRootTag: rootTag) else {
+            guard let surface = self.shim?.surface(forRootTag: rootTag) else {
                 block(nil)
                 return
             }
-            if let widget = view.nearestAncestor(where: { $0 is PaymentWidget || $0 is CVCWidget }) {
-                block(widget)
-                return
-            }
-            block((view.reactViewController() as? HyperUIViewController)?.paymentSheet)
+            block(SurfaceOwners.owner(of: surface))
         }
     }
 
     private func withPaymentSheet(_ rootTag: NSNumber, _ block: @escaping (UIViewController?, PaymentSheet?) -> Void) {
-        DispatchQueue.main.async {
-            let view = self.shim?.view(forRootTag: rootTag)
-            let vc = view?.reactViewController() as? HyperUIViewController
-            let sheet = vc?.paymentSheet
-            block(vc, sheet)
+        resolveOwner(rootTag) { owner in
+            let sheet = owner as? PaymentSheet
+            block(sheet?.presentedViewController, sheet)
         }
     }
 }

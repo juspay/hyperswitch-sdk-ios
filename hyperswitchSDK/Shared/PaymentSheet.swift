@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 /// PaymentSheet is a class that handles the presentation and management of a payment sheet interface.
 public class PaymentSheet {
@@ -31,8 +32,9 @@ public class PaymentSheet {
     internal var paymentEventListener: PaymentEventListener?
     internal var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
 
-    #if canImport(React)
-    // Host of the presenting session.
-    internal weak var reactManager: RNViewManager?
-    #endif
+    /// Identity of the presenting session in JS (its prefetch root tag), if any.
+    internal var sessionTag: Int?
+
+    /// The controller presenting this sheet, for dismissal when JS exits it.
+    internal weak var presentedViewController: UIViewController?
 }

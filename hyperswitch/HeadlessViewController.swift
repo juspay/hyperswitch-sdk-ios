@@ -63,6 +63,8 @@ class HeadlessViewController: UIViewController {
                     self?.statusLabel.text = "Connected to Server"
                 case .failure(let message):
                     self?.statusLabel.text = message
+                case .info(let message):
+                    self?.statusLabel.text = message
                 }
             }
             .store(in: &cancellables)

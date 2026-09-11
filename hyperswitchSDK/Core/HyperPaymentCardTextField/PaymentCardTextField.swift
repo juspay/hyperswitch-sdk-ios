@@ -9,7 +9,7 @@ import Foundation
 
 public class PaymentCardTextField: UIControl {
 
-    private let reactManager = RNViewManager()
+    private var reactManager: RNViewManager { RNViewManager.shared }
 
     required public init?(
         coder aDecoder: NSCoder
@@ -34,7 +34,7 @@ public class PaymentCardTextField: UIControl {
 
     func commonInit() {
 
-        let cardView = reactManager.presentedViewForModule("hyperSwitch", initialProperties: ["props": ["type": "card"]])
+        let cardView = reactManager.presentedViewForModule("hyperSwitch", initialProperties: ["props": ["type": "card"]], owner: self)
         cardView.backgroundColor = UIColor.clear
         addSubview(cardView)
         cardView.translatesAutoresizingMaskIntoConstraints = false

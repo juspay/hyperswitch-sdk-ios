@@ -47,6 +47,8 @@ class PaymentMethodManagementViewController: UIViewController {
                     self?.setupPaymentWidget(onAddPaymentMethod: onAddPaymentMethod)
                 case .failure(let error):
                     print("Failed to prepare payment method management session: \(error)")
+                case .info(let message):
+                    print(message)
                 }
             }
             .store(in: &cancellables)
