@@ -72,13 +72,17 @@ extension PaymentSession {
             guard !self.reactRuntime.closed else {
                 let reason = "The payment session was closed"
                 let failure: NSDictionary = ["code": "SESSION_CLOSED", "message": reason]
-                func_(PaymentSessionHandlerImpl(
-                    defaultMethod: failure, lastUsedMethod: failure, allMethods: [],
-                    sdkAuthorization: { "" },
-                    resolveToken: { _, _, resultHandler in
-                        resultHandler(.failed(error: Self.error("SESSION_CLOSED", reason)))
-                    }
-                ))
+                func_(
+                    PaymentSessionHandlerImpl(
+                        defaultMethod: failure,
+                        lastUsedMethod: failure,
+                        allMethods: [],
+                        sdkAuthorization: { "" },
+                        resolveToken: { _, _, resultHandler in
+                            resultHandler(.failed(error: Self.error("SESSION_CLOSED", reason)))
+                        }
+                    )
+                )
                 return
             }
             var props: [String: Any] = [

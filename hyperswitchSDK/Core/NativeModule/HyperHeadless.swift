@@ -271,9 +271,14 @@ internal final class PaymentSessionHandlerImpl: PaymentSessionHandler {
             return
         }
         guard !updating() else {
-            resultHandler(.failed(error: NSError.hyperswitch(
-                "UPDATE_IN_PROGRESS", "An intent update is in progress; confirm after it completes"
-            )))
+            resultHandler(
+                .failed(
+                    error: NSError.hyperswitch(
+                        "UPDATE_IN_PROGRESS",
+                        "An intent update is in progress; confirm after it completes"
+                    )
+                )
+            )
             return
         }
         let sdkAuthorization = sdkAuthorization()
@@ -283,6 +288,7 @@ internal final class PaymentSessionHandlerImpl: PaymentSessionHandler {
     }
 
     private static let noTokenError = NSError.hyperswitch(
-        "NO_PAYMENT_TOKEN", "The selected payment method has no payment token."
+        "NO_PAYMENT_TOKEN",
+        "The selected payment method has no payment token."
     )
 }

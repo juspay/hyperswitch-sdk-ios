@@ -123,24 +123,39 @@ public class PaymentWidget: UIControl {
         DispatchQueue.main.async {
             guard !self.confirmInFlight else {
                 // The confirm in flight keeps its completion; this one is answered at once.
-                completion?(.failed(error: Self.error(
-                    "ALREADY_IN_PROGRESS", "A confirm is already in progress for this widget"
-                )))
+                completion?(
+                    .failed(
+                        error: Self.error(
+                            "ALREADY_IN_PROGRESS",
+                            "A confirm is already in progress for this widget"
+                        )
+                    )
+                )
                 return
             }
             self.confirmCompletion = completion
             guard let surface = self.rootView?.hostedSurface else {
-                self.handleConfirmPaymentResponse(.failed(error: Self.error(
-                    "WIDGET_UNAVAILABLE", "The payment widget has no React root."
-                )))
+                self.handleConfirmPaymentResponse(
+                    .failed(
+                        error: Self.error(
+                            "WIDGET_UNAVAILABLE",
+                            "The payment widget has no React root."
+                        )
+                    )
+                )
                 return
             }
             guard self.paymentSession.reactRuntime.updateIntentAttempt == nil else {
                 // The session is between intents: the credentials this would confirm with are
                 // about to be replaced, so the confirm would pay the old intent.
-                self.handleNonTerminalResult(.failed(error: Self.error(
-                    "UPDATE_IN_PROGRESS", "An intent update is in progress; confirm after it completes"
-                )))
+                self.handleNonTerminalResult(
+                    .failed(
+                        error: Self.error(
+                            "UPDATE_IN_PROGRESS",
+                            "An intent update is in progress; confirm after it completes"
+                        )
+                    )
+                )
                 return
             }
             self.confirmInFlight = true
@@ -171,7 +186,7 @@ public class PaymentWidget: UIControl {
         confirmCompletion = nil
         completion?(result)
     }
-    
+
     internal func handleConfirmPaymentResponse(_ result: PaymentResult) {
         confirmInFlight = false
         let completion = confirmCompletion ?? initCallback

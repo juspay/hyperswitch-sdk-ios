@@ -111,15 +111,25 @@ public class CVCWidget: UIControl {
         resultHandler: @escaping (PaymentResult) -> Void
     ) {
         guard cvcCallback == nil else {
-            resultHandler(.failed(error: NSError.hyperswitch(
-                "ALREADY_IN_PROGRESS", "CVC payment already in progress for this widget"
-            )))
+            resultHandler(
+                .failed(
+                    error: NSError.hyperswitch(
+                        "ALREADY_IN_PROGRESS",
+                        "CVC payment already in progress for this widget"
+                    )
+                )
+            )
             return
         }
         guard let surface = rootView?.hostedSurface else {
-            resultHandler(.failed(error: NSError.hyperswitch(
-                "WIDGET_UNAVAILABLE", "The CVC widget has no React root."
-            )))
+            resultHandler(
+                .failed(
+                    error: NSError.hyperswitch(
+                        "WIDGET_UNAVAILABLE",
+                        "The CVC widget has no React root."
+                    )
+                )
+            )
             return
         }
         cvcCallback = resultHandler
