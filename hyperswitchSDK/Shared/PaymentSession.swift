@@ -47,7 +47,7 @@ public class PaymentSession {
             let json = (try? JSONSerialization.jsonObject(with: bytes)) as? [String: String]
         else {
             return .failure(
-                NSError(domain: "UNKNOWN_ERROR", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid update intent result"])
+                NSError.hyperswitch("UNKNOWN_ERROR", "Invalid update intent result")
             )
         }
         switch json["status"] {
@@ -56,7 +56,7 @@ public class PaymentSession {
         case "failed", "error":
             let code = json["code"].flatMap { $0.isEmpty ? nil : $0 } ?? "UNKNOWN_ERROR"
             let message = json["message"].flatMap { $0.isEmpty ? nil : $0 } ?? (json["status"] ?? "failed")
-            return .failure(NSError(domain: code, code: 0, userInfo: [NSLocalizedDescriptionKey: message]))
+            return .failure(NSError.hyperswitch(code, message))
         default:
             return .success
         }

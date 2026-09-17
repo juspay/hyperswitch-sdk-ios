@@ -101,17 +101,21 @@ internal class HyperHeadlessImpl: NSObject {
 internal final class HeadlessAttempt {
 
     private let sdkAuthorization: () -> String
-    private let onHandler: (any PaymentSessionHandler) -> Void
+    private let updating: () -> Bool
+    private var onHandler: ((any PaymentSessionHandler) -> Void)?
     private var jsCallback: (([Any]?) -> Void)?
     private var handlerDelivered = false
     private var pendingResult: ((PaymentResult) -> Void)?
+    private var refusal: PaymentResult?
 
     internal init(
         sdkAuthorization: @escaping () -> String,
-        onHandler: @escaping (any PaymentSessionHandler) -> Void
+        onHandler: @escaping (any PaymentSessionHandler) -> Void,
+        updating: @escaping () -> Bool = { false }
     ) {
         self.sdkAuthorization = sdkAuthorization
         self.onHandler = onHandler
+        self.updating = updating
     }
 
     internal func onPaymentSession(
@@ -128,32 +132,39 @@ internal final class HeadlessAttempt {
             lastUsedMethod: lastUsedMethod,
             allMethods: allMethods,
             sdkAuthorization: sdkAuthorization,
-            resolveToken: { [weak self] paymentToken, cvc, resultHandler in
+            updating: updating,
+            resolveToken: { [self] paymentToken, cvc, resultHandler in
                 DispatchQueue.main.async {
-                    guard let self = self else {
-                        resultHandler(.failed(error: Self.error("SESSION_CLOSED", "The payment session was closed")))
-                        return
-                    }
                     self.confirm(paymentToken: paymentToken, cvc: cvc, resultHandler: resultHandler)
                 }
             }
         )
-        onHandler(handler)
+        let deliver = onHandler
+        onHandler = nil
+        deliver?(handler)
     }
 
     private func confirm(paymentToken: String, cvc: String?, resultHandler: @escaping (PaymentResult) -> Void) {
+        if let refusal = refusal {
+            resultHandler(refusal)
+            return
+        }
+        guard !updating() else {
+            resultHandler(.failed(error: Self.error("UPDATE_IN_PROGRESS", "An intent update is in progress; confirm after it completes")))
+            return
+        }
         guard pendingResult == nil else {
             resultHandler(.failed(error: Self.error("ALREADY_IN_PROGRESS", "Payment confirmation already in progress for this handler")))
             return
         }
         // A React callback can be invoked once; JS registers a new one after each confirm.
         guard let callback = jsCallback else {
-            resultHandler(.failed(error: Self.error("Not Initialised", "An error has occurred.")))
+            resultHandler(.failed(error: Self.error("NOT_INITIALISED", "The saved payment methods are not ready to confirm")))
             return
         }
         jsCallback = nil
         pendingResult = resultHandler
-        var map: [String: Any] = ["paymentToken": paymentToken]
+        var map: [String: Any] = ["paymentToken": paymentToken, "sdkAuthorization": sdkAuthorization()]
         map["cvc"] = cvc
         callback([map])
     }
@@ -164,14 +175,15 @@ internal final class HeadlessAttempt {
         handler?(result)
     }
 
-    /// The surface is going away: fail whatever is still waiting on it.
     internal func cancel() {
+        let cancelled = PaymentResult.failed(error: Self.error("CANCELLED", "The saved payment methods session was replaced or closed"))
         jsCallback = nil
-        onExit(.failed(error: Self.error("CANCELLED", "The saved payment methods session was replaced or closed")))
+        refusal = cancelled
+        onExit(cancelled)
     }
 
     private static func error(_ domain: String, _ message: String) -> NSError {
-        NSError(domain: domain, code: 0, userInfo: ["message": message])
+        .hyperswitch(domain, message)
     }
 }
 
@@ -183,6 +195,7 @@ internal final class PaymentSessionHandlerImpl: PaymentSessionHandler {
     private let lastUsedMethod: NSDictionary
     private let allMethods: NSArray
     private let sdkAuthorization: () -> String
+    private let updating: () -> Bool
     private let resolveToken: (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
 
     init(
@@ -190,12 +203,14 @@ internal final class PaymentSessionHandlerImpl: PaymentSessionHandler {
         lastUsedMethod: NSDictionary,
         allMethods: NSArray,
         sdkAuthorization: @escaping () -> String,
+        updating: @escaping () -> Bool = { false },
         resolveToken: @escaping (_ paymentToken: String, _ cvc: String?, _ resultHandler: @escaping (PaymentResult) -> Void) -> Void
     ) {
         self.defaultMethod = defaultMethod
         self.lastUsedMethod = lastUsedMethod
         self.allMethods = allMethods
         self.sdkAuthorization = sdkAuthorization
+        self.updating = updating
         self.resolveToken = resolveToken
     }
 
@@ -255,16 +270,19 @@ internal final class PaymentSessionHandlerImpl: PaymentSessionHandler {
             resultHandler(.failed(error: Self.noTokenError))
             return
         }
+        guard !updating() else {
+            resultHandler(.failed(error: NSError.hyperswitch(
+                "UPDATE_IN_PROGRESS", "An intent update is in progress; confirm after it completes"
+            )))
+            return
+        }
         let sdkAuthorization = sdkAuthorization()
         DispatchQueue.main.async {
-            widget.awaitConfirmResult(resultHandler)
-            widget.confirm(sdkAuthorization: sdkAuthorization, paymentToken: token)
+            widget.confirm(sdkAuthorization: sdkAuthorization, paymentToken: token, resultHandler: resultHandler)
         }
     }
 
-    private static let noTokenError = NSError(
-        domain: "NO_PAYMENT_TOKEN",
-        code: 0,
-        userInfo: [NSLocalizedDescriptionKey: "The selected payment method has no payment token."]
+    private static let noTokenError = NSError.hyperswitch(
+        "NO_PAYMENT_TOKEN", "The selected payment method has no payment token."
     )
 }
