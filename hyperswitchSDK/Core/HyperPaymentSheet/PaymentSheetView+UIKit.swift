@@ -22,6 +22,7 @@ internal extension PaymentSheet {
 
         let paymentSheetViewController = HyperUIViewController()
         paymentSheetViewController.paymentSheet = self
+        self.presentedViewController = paymentSheetViewController
         paymentSheetViewController.modalPresentationStyle = .overFullScreen
         paymentSheetViewController.view = rootView
 

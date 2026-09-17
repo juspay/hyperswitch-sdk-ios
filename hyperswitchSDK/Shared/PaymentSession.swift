@@ -25,7 +25,8 @@ public class PaymentSession {
     internal var hyperswitchConfiguration: HyperswitchConfiguration?
 
     #if canImport(React)
-    internal let reactRuntime = PaymentSessionReactRuntime(manager: RNViewManager())
+    /// This session's surfaces on the shared React host.
+    internal let reactRuntime = PaymentSessionReactRuntime()
     #endif
 
     internal init(paymentSessionConfiguration: PaymentSessionConfiguration, hyperswitchConfiguration: HyperswitchConfiguration? = nil) {

@@ -14,10 +14,12 @@ public class PaymentWidget: UIControl {
     private var configurationDict: [String: Any]?
     private var widgetReactTag: NSNumber?
     private var rootView: UIView?
+    private var initialProperties: [String: Any] = [:]
+    private var confirmSequence = 0
     private var initCallback: ((PaymentResult) -> Void)?
     private var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
     private var subscribedEventNames: [String]?
-    private var reactManager: RNViewManager { paymentSession.reactManager }
+    private var reactManager: RNViewManager { RNViewManager.shared }
     internal var paymentEventListener: PaymentEventListener?
 
     public init(
@@ -75,7 +77,7 @@ public class PaymentWidget: UIControl {
         let hyperswitchConfiguration = try? paymentSession.hyperswitchConfiguration?.toDictionary()
         let paymentSessionConfiguration = try? paymentSession.paymentSessionConfiguration.toDictionary()
 
-        let sdkParams = SDKParams.getSDKParams()
+        let sdkParams = paymentSession.sdkParams()
 
         var nativeConfig = try? configuration?.toDictionary()
         nativeConfig?["hideConfirmButton"] = true  // MARK: replace with `displayPayButton`
@@ -92,9 +94,11 @@ public class PaymentWidget: UIControl {
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
 
+        self.initialProperties = ["props": props]
         self.rootView = reactManager.viewForModule(
             "hyperSwitch",
-            initialProperties: ["props": props]
+            initialProperties: initialProperties,
+            owner: self
         )
         if let rootView = self.rootView {
             self.widgetReactTag = rootView.surfaceRootTag
@@ -114,11 +118,14 @@ public class PaymentWidget: UIControl {
     }
 
     public func confirm() {
-        let payload: [String: Any] = [
-            "rootTag": self.widgetReactTag ?? -1,
-            "actionType": "CONFIRM_PAYMENT_ACTION",
-        ]
-        reactManager.hyperModule.emit("triggerWidgetAction", payload)
+        DispatchQueue.main.async {
+            guard let surface = self.rootView?.hostedSurface else { return }
+            self.confirmSequence += 1
+            var inner = self.initialProperties["props"] as? [String: Any] ?? [:]
+            inner["widgetConfirm"] = ["attempt": self.confirmSequence]
+            self.initialProperties["props"] = inner
+            surface.properties = self.initialProperties
+        }
     }
 
     internal func handleShouldProceedWithPayment(payload: String, callback: @escaping (Bool) -> Void) {
