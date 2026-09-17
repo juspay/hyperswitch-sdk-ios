@@ -26,7 +26,7 @@ extension PaymentSession {
 
 extension PaymentSession {
 
-    internal func activateRuntime() async {} //no-op
+    internal func activateRuntime() async {}  //no-op
 
     public func updateIntent(
         authorizationProvider: @escaping (@escaping (String) -> Void) -> Void,

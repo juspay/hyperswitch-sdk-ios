@@ -34,7 +34,8 @@ internal extension PaymentSheet {
             "sdkParams": sdkParams,
             "configuration": configuration as Any,
         ]
-        guard let rootView = RNViewManager.shared.viewForModule("hyperSwitch", initialProperties: ["props": props], owner: self) as UIView? else {
+        guard let rootView = RNViewManager.shared.viewForModule("hyperSwitch", initialProperties: ["props": props], owner: self) as UIView?
+        else {
             return UIView()
         }
 
@@ -63,7 +64,8 @@ internal extension PaymentSheet {
             "from": "rn",
         ]
 
-        guard let rootView = RNViewManager.shared.viewForModule("hyperSwitch", initialProperties: ["props": props], owner: self) as UIView? else {
+        guard let rootView = RNViewManager.shared.viewForModule("hyperSwitch", initialProperties: ["props": props], owner: self) as UIView?
+        else {
             return UIView()
         }
 
