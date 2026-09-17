@@ -43,6 +43,12 @@ internal extension String {
     }
 }
 
+internal extension NSError {
+    static func hyperswitch(_ code: String, _ message: String) -> NSError {
+        NSError(domain: code, code: 0, userInfo: [NSLocalizedDescriptionKey: message, "message": message])
+    }
+}
+
 internal extension Encodable {
     func toDictionary() throws -> [String: Any] {
         let data = try JSONEncoder().encode(self)

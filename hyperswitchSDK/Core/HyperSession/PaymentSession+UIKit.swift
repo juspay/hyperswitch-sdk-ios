@@ -70,7 +70,15 @@ extension PaymentSession {
         onMain { [weak self] in
             guard let self = self else { return }
             guard !self.reactRuntime.closed else {
-                print("PaymentSession: getCustomerSavedPaymentMethods called on a closed session")
+                let reason = "The payment session was closed"
+                let failure: NSDictionary = ["code": "SESSION_CLOSED", "message": reason]
+                func_(PaymentSessionHandlerImpl(
+                    defaultMethod: failure, lastUsedMethod: failure, allMethods: [],
+                    sdkAuthorization: { "" },
+                    resolveToken: { _, _, resultHandler in
+                        resultHandler(.failed(error: Self.error("SESSION_CLOSED", reason)))
+                    }
+                ))
                 return
             }
             var props: [String: Any] = [
@@ -87,7 +95,8 @@ extension PaymentSession {
 
             let attempt = HeadlessAttempt(
                 sdkAuthorization: { [weak self] in self?.paymentSessionConfiguration.sdkAuthorization ?? "" },
-                onHandler: func_
+                onHandler: func_,
+                updating: { [weak self] in self?.reactRuntime.updateIntentAttempt != nil }
             )
             if let previous = self.reactRuntime.headless {
                 previous.attempt.cancel()
@@ -143,10 +152,7 @@ internal final class PaymentSessionReactRuntime {
         let headless = self.headless
         let pending = self.updateIntentAttempt
         DispatchQueue.main.async {
-            pending?.completion(.failure(NSError(
-                domain: "SESSION_CLOSED", code: 0,
-                userInfo: [NSLocalizedDescriptionKey: "The payment session was released"]
-            )))
+            pending?.completion(.failure(NSError.hyperswitch("SESSION_CLOSED", "The payment session was released")))
             prefetch?.stop()
             headless?.attempt.cancel()
             headless?.surface.stop()
@@ -312,6 +318,6 @@ extension PaymentSession: UpdateIntentReplyTarget {
     }
 
     private static func error(_ domain: String, _ message: String) -> NSError {
-        NSError(domain: domain, code: 0, userInfo: [NSLocalizedDescriptionKey: message])
+        .hyperswitch(domain, message)
     }
 }

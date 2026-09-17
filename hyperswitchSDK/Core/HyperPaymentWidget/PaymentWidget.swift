@@ -17,6 +17,8 @@ public class PaymentWidget: UIControl {
     private var initialProperties: [String: Any] = [:]
     private var confirmSequence = 0
     private var initCallback: ((PaymentResult) -> Void)?
+    private var confirmCompletion: ((PaymentResult) -> Void)?
+    private var confirmInFlight = false
     private var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
     private var subscribedEventNames: [String]?
     private var reactManager: RNViewManager { RNViewManager.shared }
@@ -117,11 +119,34 @@ public class PaymentWidget: UIControl {
         }
     }
 
-    public func confirm() {
+    public func confirm(completion: ((PaymentResult) -> Void)? = nil) {
         DispatchQueue.main.async {
-            guard let surface = self.rootView?.hostedSurface else { return }
+            guard !self.confirmInFlight else {
+                // The confirm in flight keeps its completion; this one is answered at once.
+                completion?(.failed(error: Self.error(
+                    "ALREADY_IN_PROGRESS", "A confirm is already in progress for this widget"
+                )))
+                return
+            }
+            self.confirmCompletion = completion
+            guard let surface = self.rootView?.hostedSurface else {
+                self.handleConfirmPaymentResponse(.failed(error: Self.error(
+                    "WIDGET_UNAVAILABLE", "The payment widget has no React root."
+                )))
+                return
+            }
+            guard self.paymentSession.reactRuntime.updateIntentAttempt == nil else {
+                // The session is between intents: the credentials this would confirm with are
+                // about to be replaced, so the confirm would pay the old intent.
+                self.handleNonTerminalResult(.failed(error: Self.error(
+                    "UPDATE_IN_PROGRESS", "An intent update is in progress; confirm after it completes"
+                )))
+                return
+            }
+            self.confirmInFlight = true
             self.confirmSequence += 1
             var inner = self.initialProperties["props"] as? [String: Any] ?? [:]
+            inner["paymentSessionConfig"] = (try? self.paymentSession.paymentSessionConfiguration.toDictionary()) as Any
             inner["widgetConfirm"] = ["attempt": self.confirmSequence]
             self.initialProperties["props"] = inner
             surface.properties = self.initialProperties
@@ -140,12 +165,26 @@ public class PaymentWidget: UIControl {
         }
     }
 
+    internal func handleNonTerminalResult(_ result: PaymentResult) {
+        confirmInFlight = false
+        let completion = confirmCompletion
+        confirmCompletion = nil
+        completion?(result)
+    }
+    
     internal func handleConfirmPaymentResponse(_ result: PaymentResult) {
-        initCallback?(result)
+        confirmInFlight = false
+        let completion = confirmCompletion ?? initCallback
+        confirmCompletion = nil
         initCallback = nil
+        completion?(result)
         rootView?.removeFromSuperview()
         rootView = nil
         widgetReactTag = nil
+    }
+
+    private static func error(_ domain: String, _ message: String) -> NSError {
+        .hyperswitch(domain, message)
     }
 
     internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {

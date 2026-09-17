@@ -13,15 +13,9 @@ extension PaymentResult {
         switch status {
         case "cancelled":
             return .canceled(data: "cancelled")
-        case "failed", "requires_payment_method":
+        case "failed", "requires_payment_method", "form_invalid":
             let domain = (code?.isEmpty == false) ? code! : "UNKNOWN_ERROR"
-            return .failed(
-                error: NSError(
-                    domain: domain,
-                    code: 0,
-                    userInfo: ["message": message ?? "An error has occurred."]
-                )
-            )
+            return .failed(error: NSError.hyperswitch(domain, message ?? "An error has occurred."))
         default:
             return .completed(data: status)
         }
@@ -145,6 +139,10 @@ internal class HyperModuleImpl: NSObject {
 
     @objc(notifyWidgetPaymentResult:status:code:message:)
     internal func notifyWidgetPaymentResult(_ rootTag: NSNumber, _ status: String, _ code: String?, _ message: String?) {
+        let result = PaymentResult.from(status: status, code: code, message: message)
+        withWidget(rootTag) { w in
+            w.handleNonTerminalResult(result)
+        }
     }
 
     @objc(onUpdateIntentEvent:eventType:status:code:message:)

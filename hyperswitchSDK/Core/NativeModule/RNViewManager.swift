@@ -223,11 +223,9 @@ internal final class RNViewManager: NSObject, ReactHostManager {
     }
 
     /// Boots the host, and with it the bundle, ahead of the first surface so
-    /// `initPaymentSession` does not wait for JS evaluation. Returns once the host exists;
-    /// the bundle keeps loading in the background, and the surfaces started meanwhile wait
-    /// for it on their own. Idempotent.
-    internal func warmUp() async {
-        await MainActor.run {
+    /// `initPaymentSession` does not wait for JS evaluation. Idempotent.
+    internal func warmUp() {
+        DispatchQueue.main.async {
             self.factory.rootViewFactory.initializeReactHost(
                 launchOptions: nil,
                 bundleConfiguration: RCTBundleConfiguration.default(),

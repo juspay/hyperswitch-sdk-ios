@@ -99,24 +99,30 @@ public class CVCWidget: UIControl {
         }
     }
 
-    internal func awaitConfirmResult(_ handler: @escaping (PaymentResult) -> Void) {
-        cvcCallback = handler
-    }
-
     internal func resolveConfirmResult(_ result: PaymentResult) {
         let handler = cvcCallback
         cvcCallback = nil
         handler?(result)
     }
 
-    func confirm(sdkAuthorization: String, paymentToken: String) {
-        guard let surface = rootView?.hostedSurface else {
-            resolveConfirmResult(.failed(error: NSError(
-                domain: "WIDGET_UNAVAILABLE", code: 0,
-                userInfo: ["message": "The CVC widget has no React root."]
+    internal func confirm(
+        sdkAuthorization: String,
+        paymentToken: String,
+        resultHandler: @escaping (PaymentResult) -> Void
+    ) {
+        guard cvcCallback == nil else {
+            resultHandler(.failed(error: NSError.hyperswitch(
+                "ALREADY_IN_PROGRESS", "CVC payment already in progress for this widget"
             )))
             return
         }
+        guard let surface = rootView?.hostedSurface else {
+            resultHandler(.failed(error: NSError.hyperswitch(
+                "WIDGET_UNAVAILABLE", "The CVC widget has no React root."
+            )))
+            return
+        }
+        cvcCallback = resultHandler
         confirmSequence += 1
         var inner = initialProperties["props"] as? [String: Any] ?? [:]
         inner["cvcConfirm"] = [
