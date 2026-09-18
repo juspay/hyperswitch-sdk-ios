@@ -13,6 +13,10 @@ public final class Hyperswitch {
         self.hyperswitchConfiguration = configuration
         // Task {} Superposition
         #if canImport(React)
+        #if canImport(Airborne)
+        // Before warmUp: the host resolves its bundle URL through Airborne.
+        OTAServices.shared.initialize(publishableKey: configuration.publishableKey)
+        #endif
         RNViewManager.shared.warmUp()
         #endif
     }
