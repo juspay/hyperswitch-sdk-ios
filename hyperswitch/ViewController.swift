@@ -16,6 +16,8 @@ class ViewController: UIViewController {
     private var reloadButtonConfiguration = UIButton.Configuration.plain()
     private var paymentSheetButton = UIButton()
     private var paymentSheetButtonConfiguration = UIButton.Configuration.plain()
+    private var cardFormDemoButton = UIButton()
+    private var cardFormDemoButtonConfig = UIButton.Configuration.plain()
     private var statusLabel = UILabel()
     private var cancellables = Set<AnyCancellable>()
 
@@ -94,6 +96,13 @@ class ViewController: UIViewController {
     }
 
     @objc
+    func openCardFormDemo(_ sender: Any) {
+        let cardFormVC = CardFormDemoViewController()
+        cardFormVC.modalPresentationStyle = .fullScreen
+        present(cardFormVC, animated: true)
+    }
+
+    @objc
     func reload(_ sender: Any) {
         hyperViewModel.fetchNetceteraSDKApiKey()
         hyperViewModel.preparePaymentSheet()
@@ -139,6 +148,18 @@ extension ViewController {
         paymentSheetButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
         paymentSheetButton.topAnchor.constraint(equalTo: reloadButton.bottomAnchor, constant: 80).isActive = true
 
+        cardFormDemoButton.setTitle("Card Form Demo", for: .normal)
+        cardFormDemoButton.setTitleColor(.white, for: .normal)
+        cardFormDemoButtonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 10)
+        cardFormDemoButton.configuration = cardFormDemoButtonConfig
+        cardFormDemoButton.backgroundColor = .systemBlue
+        cardFormDemoButton.layer.cornerRadius = 10
+        cardFormDemoButton.addTarget(self, action: #selector(openCardFormDemo(_:)), for: .touchUpInside)
+        view.addSubview(cardFormDemoButton)
+        cardFormDemoButton.translatesAutoresizingMaskIntoConstraints = false
+        cardFormDemoButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60).isActive = true
+        cardFormDemoButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
+        cardFormDemoButton.topAnchor.constraint(equalTo: paymentSheetButton.bottomAnchor, constant: 80).isActive = true
         statusLabel.textAlignment = .center
         statusLabel.numberOfLines = 7
         statusLabel.font = .systemFont(ofSize: 18)
@@ -146,6 +167,6 @@ extension ViewController {
         statusLabel.translatesAutoresizingMaskIntoConstraints = false
         statusLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20).isActive = true
         statusLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20).isActive = true
-        statusLabel.topAnchor.constraint(equalTo: paymentSheetButton.bottomAnchor, constant: 50).isActive = true
+        statusLabel.topAnchor.constraint(equalTo: cardFormDemoButton.bottomAnchor, constant: 50).isActive = true
     }
 }

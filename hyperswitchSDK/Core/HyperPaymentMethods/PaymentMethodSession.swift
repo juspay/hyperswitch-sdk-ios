@@ -1,0 +1,121 @@
+//
+//  PaymentMethodSession.swift
+//  hyperswitch
+//
+//  A payment-method session (pmsInstance) with its own dedicated RN host.
+//
+
+import Foundation
+import UIKit
+#if canImport(Hyperswitch)
+import Hyperswitch  // main SDK's public `HyperswitchConfiguration`, when built as a separate pod
+#endif
+
+/// A payment-method session created via
+/// `Hyperswitch.initPaymentMethodSession(sdkAuthorization:configuration:)`.
+///
+/// Every instance owns a **separate React Native host** — it instantiates its own
+/// `PaymentMethodHostManager` (a dedicated `RCTReactNativeFactory`), never the
+/// main SDK's `RNViewManager.shared`, so every payment-method session runs on its
+/// own JS runtime, isolated from the main payment SDK and from other sessions.
+///
+/// Follow the `PaymentSession` pattern: create one session per `sdkAuthorization`
+/// and bind UI widgets through `createCardForm()`.
+public class PaymentMethodSession {
+
+    private static let hostCounterLock = NSLock()
+    private static var hostCounter = 0
+
+    internal let sdkAuthorization: String
+    internal let configuration: PaymentMethodSessionConfiguration
+    internal let hyperswitchConfiguration: HyperswitchConfiguration?
+
+    /// Unique id of this session's dedicated React host — distinct for every session.
+    /// `initPaymentMethodSession` calls it on a new `PaymentMethodSession` each time,
+    /// and each session constructs its OWN `PaymentMethodHostManager` (own
+    /// `RCTReactNativeFactory` → own `RCTHost` → own JS runtime + own JS thread);
+    /// the main SDK's shared host is never used.
+    public let hostInstanceId: Int
+
+    /// Dedicated RN host for this session — never the main SDK's `RNViewManager`.
+    /// It loads the separate `hyperswitch-payment-methods` JS bundle, so every
+    /// payment-method session runs on its own isolated JS runtime.
+    internal let reactManager: PaymentMethodHostManager
+
+    /// Public: this SDK is a standalone library — sessions are created either via
+    /// `Hyperswitch.initPaymentMethodSession` (main SDK) or directly.
+    public init(
+        sdkAuthorization: String,
+        configuration: PaymentMethodSessionConfiguration,
+        hyperswitchConfiguration: HyperswitchConfiguration?
+    ) {
+        self.sdkAuthorization = sdkAuthorization
+        self.configuration = configuration
+        self.hyperswitchConfiguration = hyperswitchConfiguration
+
+        PaymentMethodSession.hostCounterLock.lock()
+        PaymentMethodSession.hostCounter += 1
+        self.hostInstanceId = PaymentMethodSession.hostCounter
+        PaymentMethodSession.hostCounterLock.unlock()
+
+        // A fresh manager per session — a new RCTReactNativeFactory, hence a NEW
+        // React host instance for every initPaymentMethodSession call.
+        self.reactManager = PaymentMethodHostManager()
+    }
+
+    /// Creates a `CardForm` instance backed by an empty RN view on this session's host.
+    ///
+    /// - Parameter variables: mirrors the JS `Appearance.variables` — flat theming primitives
+    ///   forwarded to the vault's own rendering. Only the `hyperswitch` vault adapter honors
+    ///   these today; other vault types ignore them.
+    public func createCardForm(variables: AppearanceVariables? = nil) -> CardForm {
+        return CardForm(session: self, variables: variables)
+    }
+
+    /// Emits the "tokenise" native -> JS event on this session's dedicated host, notifying
+    /// the cardForm empty-surface controller that a tokenise request was made.
+    internal func emitTokenise(rootTag: Int) {
+        reactManager.paymentMethodModule.emit("tokenise", ["rootTag": rootTag])
+    }
+
+    /// Holds `completion` until the JS side answers via `PaymentMethodModule.returnTokenResult`.
+    internal func registerTokeniseCallback(rootTag: Int, completion: @escaping ([String: Any]?) -> Void) {
+        reactManager.paymentMethodModule.registerTokeniseCallback(rootTag: rootTag, completion: completion)
+    }
+
+    /// Session payload handed to every RN surface of this session:
+    /// `session = { sdk_auth = ..., vault_type = ..., vault_data = ... }`
+    internal var sessionProps: [String: Any] {
+        var props: [String: Any] = ["sdk_auth": sdkAuthorization]
+        if let vaultType = configuration.vaultType {
+            props["vault_type"] = vaultType
+        }
+        if let vaultData = configuration.vaultData {
+            props["vault_data"] = vaultData
+        }
+        return props
+    }
+
+    /// Serialized `hyperswitchConfiguration` for surface launch props. Encoded locally
+    /// (not via the main SDK's internal helpers) so this library stands alone.
+    internal var hyperswitchConfigurationDict: [String: Any]? {
+        guard let hyperswitchConfiguration,
+              let data = try? JSONEncoder().encode(hyperswitchConfiguration) else {
+            return nil
+        }
+        return try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+    }
+
+    /// Full launch props for an RN surface owned by this session, mirroring
+    /// `PaymentWidget`'s prop structure with an additional `session` payload.
+    internal func launchProps(type: String, configuration: [String: Any]?) -> [String: Any] {
+        return [
+            "type": type,
+            "from": "nativeWidget",
+            "configuration": configuration as Any,
+            "session": sessionProps,
+            "hyperswitchConfig": hyperswitchConfigurationDict as Any,
+            "sdkParams": PMContext.sdkParams(),
+        ]
+    }
+}

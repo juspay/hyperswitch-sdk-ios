@@ -16,9 +16,11 @@ Pod::Spec.new do |s|
 
   s.subspec 'core' do |core|
     core.source_files = 'hyperswitchSDK/Core/**/*.{m,swift,h}'
+    core.exclude_files = 'hyperswitchSDK/Core/HyperPaymentMethods/**/*'
     core.resources = ['hyperswitchSDK/Core/Resources/HyperOTA.plist', 'hyperswitchSDK/Core/Resources/hyperswitch.bundle']
     core.vendored_frameworks = 'frameworkgen/Frameworks/Core/*.xcframework'
     core.dependency 'hyperswitch-sdk-ios/common'
+    core.dependency 'hyperswitch-payment-methods-sdk-ios'
     core.dependency 'hyperswitch-ios-hermes', '0.79.1'
   end
 
