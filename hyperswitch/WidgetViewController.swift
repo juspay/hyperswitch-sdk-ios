@@ -168,7 +168,7 @@ class WidgetViewController: UIViewController {
             self.cvcWidget = CVCWidget(
                 configuration: configuration,
                 subscribe: { builder in
-                    builder.on(.cvcStatus) { event in
+                    builder.on(.cvcStatusChange) { event in
                         if case .cvcStatus(let info) = event.data {
                             print(info)
                         }
