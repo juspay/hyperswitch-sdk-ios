@@ -47,7 +47,7 @@ public class CardForm {
     /// `PaymentMethodModule.returnTokenResult` and is delivered to `completion`;
     /// one tokenise may be in flight per form at a time.
     public func tokenise(completion: @escaping (TokeniseResult) -> Void = { _ in }) {
-        let rootTag = emptyRootView?.surfaceRootTag?.intValue ?? -1
+        let rootTag = emptyRootView?.pmSurfaceRootTag?.intValue ?? -1
         session.registerTokeniseCallback(rootTag: rootTag) { raw in
             completion(TokeniseResult.from(raw))
         }

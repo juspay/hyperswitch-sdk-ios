@@ -4,8 +4,15 @@
 //
 //  Payment-method session entry point.
 //
+//  The `PaymentMethodSession` SDK is a separate library (`HyperswitchPaymentMethods`
+//  pod) with its own dedicated React host; the main SDK consumes it here and hands
+//  merchants a session off their existing `Hyperswitch` instance.
+//
 
 import Foundation
+#if canImport(HyperswitchPaymentMethods)
+import HyperswitchPaymentMethods  // separate payment-method session SDK, when built via pods
+#endif
 
 extension Hyperswitch {
 
@@ -20,9 +27,11 @@ extension Hyperswitch {
     /// ```
     ///
     /// Every call returns a **new** `PaymentMethodSession` that constructs its own
-    /// `RNViewManager` (own `RCTReactNativeFactory` → own `RCTHost` → own JS runtime),
-    /// i.e. every `initPaymentMethodSession` call results in a **new React host instance**
-    /// (`session1.hostInstanceId != session2.hostInstanceId`), never a shared/cached one.
+    /// `PaymentMethodHostManager` (own `RCTReactNativeFactory` → own `RCTHost` → own
+    /// JS runtime) — a dedicated host separate from the main SDK's `RNViewManager`,
+    /// i.e. every `initPaymentMethodSession` call results in a **new React host
+    /// instance** (`session1.hostInstanceId != session2.hostInstanceId`), never a
+    /// shared/cached one.
     ///
     /// - Parameters:
     ///   - sdkAuthorization: session authorisation token issued by the merchant backend.

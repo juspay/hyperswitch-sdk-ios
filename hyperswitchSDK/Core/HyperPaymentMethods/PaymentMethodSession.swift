@@ -7,14 +7,17 @@
 
 import Foundation
 import UIKit
+#if canImport(Hyperswitch)
+import Hyperswitch  // main SDK's public `HyperswitchConfiguration`, when built as a separate pod
+#endif
 
 /// A payment-method session created via
 /// `Hyperswitch.initPaymentMethodSession(sdkAuthorization:configuration:)`.
 ///
 /// Every instance owns a **separate React Native host** — it instantiates its own
-/// `RNViewManager` (a dedicated `RCTReactNativeFactory`) instead of using
-/// `RNViewManager.sharedInstance`, so every payment-method session runs on its own
-/// JS runtime, isolated from the main payment SDK and from other sessions.
+/// `PaymentMethodHostManager` (a dedicated `RCTReactNativeFactory`), never the
+/// main SDK's `RNViewManager.shared`, so every payment-method session runs on its
+/// own JS runtime, isolated from the main payment SDK and from other sessions.
 ///
 /// Follow the `PaymentSession` pattern: create one session per `sdkAuthorization`
 /// and bind UI widgets through `createCardForm()`.
@@ -29,16 +32,19 @@ public class PaymentMethodSession {
 
     /// Unique id of this session's dedicated React host — distinct for every session.
     /// `initPaymentMethodSession` calls it on a new `PaymentMethodSession` each time,
-    /// and each session constructs its OWN `RNViewManager` (own `RCTReactNativeFactory`
-    /// → own `RCTHost` → own JS runtime + own JS thread); `sharedInstance` is never used.
+    /// and each session constructs its OWN `PaymentMethodHostManager` (own
+    /// `RCTReactNativeFactory` → own `RCTHost` → own JS runtime + own JS thread);
+    /// the main SDK's shared host is never used.
     public let hostInstanceId: Int
 
-    /// Dedicated RN host for this session — never the shared manager.
+    /// Dedicated RN host for this session — never the main SDK's `RNViewManager`.
     /// It loads the separate `hyperswitch-payment-methods` JS bundle, so every
     /// payment-method session runs on its own isolated JS runtime.
-    internal let reactManager: RNViewManager
+    internal let reactManager: PaymentMethodHostManager
 
-    internal init(
+    /// Public: this SDK is a standalone library — sessions are created either via
+    /// `Hyperswitch.initPaymentMethodSession` (main SDK) or directly.
+    public init(
         sdkAuthorization: String,
         configuration: PaymentMethodSessionConfiguration,
         hyperswitchConfiguration: HyperswitchConfiguration?
@@ -54,10 +60,7 @@ public class PaymentMethodSession {
 
         // A fresh manager per session — a new RCTReactNativeFactory, hence a NEW
         // React host instance for every initPaymentMethodSession call.
-        self.reactManager = RNViewManager(
-            bundleName: "hyperswitch-payment-methods",
-            jsMainModuleName: "payment-methods"
-        )
+        self.reactManager = PaymentMethodHostManager()
     }
 
     /// Creates a `CardForm` instance backed by an empty RN view on this session's host.
@@ -93,19 +96,26 @@ public class PaymentMethodSession {
         return props
     }
 
+    /// Serialized `hyperswitchConfiguration` for surface launch props. Encoded locally
+    /// (not via the main SDK's internal helpers) so this library stands alone.
+    internal var hyperswitchConfigurationDict: [String: Any]? {
+        guard let hyperswitchConfiguration,
+              let data = try? JSONEncoder().encode(hyperswitchConfiguration) else {
+            return nil
+        }
+        return try? JSONSerialization.jsonObject(with: data) as? [String: Any]
+    }
+
     /// Full launch props for an RN surface owned by this session, mirroring
     /// `PaymentWidget`'s prop structure with an additional `session` payload.
     internal func launchProps(type: String, configuration: [String: Any]?) -> [String: Any] {
-        let hyperswitchConfiguration = try? hyperswitchConfiguration?.toDictionary()
-        let sdkParams = SDKParams.getSDKParams()
-
         return [
             "type": type,
             "from": "nativeWidget",
             "configuration": configuration as Any,
             "session": sessionProps,
-            "hyperswitchConfig": hyperswitchConfiguration as Any,
-            "sdkParams": sdkParams,
+            "hyperswitchConfig": hyperswitchConfigurationDict as Any,
+            "sdkParams": PMContext.sdkParams(),
         ]
     }
 }

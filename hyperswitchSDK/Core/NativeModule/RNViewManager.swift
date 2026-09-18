@@ -170,31 +170,11 @@ internal class RNFactoryDelegate: RCTDefaultReactNativeFactoryDelegate {
             manager.headlessModule.attach(to: shim)
             return shim
         }
-        if let shimType = moduleClass as? (NSObject & PaymentMethodModuleShim).Type,
-           let viewManager = manager as? RNViewManager {
-            let shim = shimType.init()
-            viewManager.paymentMethodModule.attach(to: shim)
-            return shim
-        }
         return nil
     }
 }
 
 internal class RNViewManagerDelegate: RNFactoryDelegate {
-
-    /// The JS bundle this manager's bridge should load (`hyperswitch` for the main
-    /// payment SDK; payment-method session hosts pass their dedicated bundle name).
-    /// This is the *output asset filename* (`hyperswitch-payment-methods.bundle`), not
-    /// the Metro entry-module path — see `jsMainModuleName` for that.
-    internal var bundleName = RNViewManagerDelegate.defaultBundleName
-
-    /// The Metro entry-module path for this bundle (its entry file's name, no
-    /// extension — `index` for `index.js`, `payment-methods` for `payment-methods.js`).
-    /// Only used in "LocalHosted" (Metro dev server) mode; the packaged-bundle cases
-    /// below key off `bundleName` (the asset filename) instead, which is unrelated.
-    internal var jsMainModuleName = "index"
-
-    internal static let defaultBundleName = "hyperswitch"
 
     override func sourceURL(for bridge: RCTBridge) -> URL? {
         return bundleURL()
@@ -203,23 +183,16 @@ internal class RNViewManagerDelegate: RNFactoryDelegate {
     override func bundleURL() -> URL? {
         switch Helper.getInfoPlist("HyperswitchSource") {
         case "LocalHosted":
-            return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: jsMainModuleName)
+            return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
         case "LocalBundle":
-            return bundleURL(for: bundleName, in: Bundle.main)
-                ?? bundleURL(for: RNViewManagerDelegate.defaultBundleName, in: Bundle.main)
+            return Bundle.main.url(forResource: "hyperswitch", withExtension: "bundle")
         default:
             #if canImport(HyperOTA)
-            if bundleName == RNViewManagerDelegate.defaultBundleName {
-                return OTAServices.shared.getBundleURL()
-            }
+            return OTAServices.shared.getBundleURL()
+            #else
+            return Bundle(for: RNViewManager.self).url(forResource: "hyperswitch", withExtension: "bundle")
             #endif
-            return bundleURL(for: bundleName, in: Bundle(for: RNViewManager.self))
-                ?? bundleURL(for: RNViewManagerDelegate.defaultBundleName, in: Bundle(for: RNViewManager.self))
         }
-    }
-
-    private func bundleURL(for name: String, in bundle: Bundle) -> URL? {
-        return bundle.url(forResource: name, withExtension: "bundle")
     }
 }
 
@@ -232,8 +205,6 @@ internal final class RNViewManager: NSObject, ReactHostManager {
 
     internal let hyperModule = HyperModuleImpl()
     internal let headlessModule = HyperHeadlessImpl()
-    /// Dedicated to payment-method session hosts only — never attached on the shared main-SDK host.
-    internal let paymentMethodModule = PaymentMethodModuleImpl()
     internal var responseHandler: RNResponseHandler?
     internal private(set) var rootView: UIView?
 
@@ -243,18 +214,8 @@ internal final class RNViewManager: NSObject, ReactHostManager {
         RCTReactNativeFactory(delegate: self.delegate)
     }()
 
-    /// Creates a manager whose React host loads the given JS bundle.
-    /// Defaults to the main `hyperswitch` bundle; payment-method session hosts pass
-    /// their dedicated `hyperswitch-payment-methods` bundle (and its Metro entry-module
-    /// name, `payment-methods`) so each session runs on a fully separate JS runtime.
-    internal init(
-        bundleName: String = RNViewManagerDelegate.defaultBundleName,
-        jsMainModuleName: String = "index"
-    ) {
-        let delegate = RNViewManagerDelegate()
-        delegate.bundleName = bundleName
-        delegate.jsMainModuleName = jsMainModuleName
-        self.delegate = delegate
+    private override init() {
+        self.delegate = RNViewManagerDelegate()
         super.init()
         self.delegate.dependencyProvider = RCTAppDependencyProvider()
         self.delegate.manager = self

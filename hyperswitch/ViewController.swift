@@ -16,8 +16,6 @@ class ViewController: UIViewController {
     private var reloadButtonConfiguration = UIButton.Configuration.plain()
     private var paymentSheetButton = UIButton()
     private var paymentSheetButtonConfiguration = UIButton.Configuration.plain()
-    private var paymentMethodManagementButton = UIButton()
-    private var paymentMethodManagementButtonConfig = UIButton.Configuration.plain()
     private var cardFormDemoButton = UIButton()
     private var cardFormDemoButtonConfig = UIButton.Configuration.plain()
     private var statusLabel = UILabel()
@@ -98,17 +96,6 @@ class ViewController: UIViewController {
     }
 
     @objc
-    func openPaymentMethodManagement(_ sender: Any) {
-
-        // Create an instance of PaymentMethodManagementViewController
-        let paymentMethodVC = PaymentMethodManagementViewController()
-
-        // Present the PaymentMethodManagementViewController
-        paymentMethodVC.modalPresentationStyle = .fullScreen
-        present(paymentMethodVC, animated: true)
-    }
-
-    @objc
     func openCardFormDemo(_ sender: Any) {
         let cardFormVC = CardFormDemoViewController()
         cardFormVC.modalPresentationStyle = .fullScreen
@@ -161,19 +148,6 @@ extension ViewController {
         paymentSheetButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
         paymentSheetButton.topAnchor.constraint(equalTo: reloadButton.bottomAnchor, constant: 80).isActive = true
 
-        paymentMethodManagementButton.setTitle("Payment Method Management", for: .normal)
-        paymentMethodManagementButton.setTitleColor(.white, for: .normal)
-        paymentMethodManagementButtonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 10)
-        paymentMethodManagementButton.configuration = paymentMethodManagementButtonConfig
-        paymentMethodManagementButton.backgroundColor = .systemBlue
-        paymentMethodManagementButton.layer.cornerRadius = 10
-        paymentMethodManagementButton.addTarget(self, action: #selector(openPaymentMethodManagement(_:)), for: .touchUpInside)
-        view.addSubview(paymentMethodManagementButton)
-        paymentMethodManagementButton.translatesAutoresizingMaskIntoConstraints = false
-        paymentMethodManagementButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60).isActive = true
-        paymentMethodManagementButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
-        paymentMethodManagementButton.topAnchor.constraint(equalTo: paymentSheetButton.bottomAnchor, constant: 80).isActive = true
-
         cardFormDemoButton.setTitle("Card Form Demo", for: .normal)
         cardFormDemoButton.setTitleColor(.white, for: .normal)
         cardFormDemoButtonConfig.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 20, bottom: 10, trailing: 10)
@@ -185,7 +159,7 @@ extension ViewController {
         cardFormDemoButton.translatesAutoresizingMaskIntoConstraints = false
         cardFormDemoButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60).isActive = true
         cardFormDemoButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
-        cardFormDemoButton.topAnchor.constraint(equalTo: paymentMethodManagementButton.bottomAnchor, constant: 20).isActive = true
+        cardFormDemoButton.topAnchor.constraint(equalTo: paymentSheetButton.bottomAnchor, constant: 80).isActive = true
         statusLabel.textAlignment = .center
         statusLabel.numberOfLines = 7
         statusLabel.font = .systemFont(ofSize: 18)
