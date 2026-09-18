@@ -8,11 +8,11 @@
 import Foundation
 
 public enum PaymentEventType: String, CaseIterable, Sendable {
-    case paymentMethodInfoCard = "PAYMENT_METHOD_INFO_CARD"
-    case paymentMethodStatus = "PAYMENT_METHOD_STATUS"
-    case formStatus = "FORM_STATUS"
-    case paymentMethodInfoBillingAddress = "PAYMENT_METHOD_INFO_BILLING_ADDRESS"
-    case cvcStatus = "CVC_STATUS"
+    case cardDetailsChange = "cardDetailsChange"
+    case paymentMethodChange = "paymentMethodChange"
+    case formStatusChange = "formStatusChange"
+    case billingDetailsChange = "billingDetailsChange"
+    case cvcStatusChange = "cvcStatusChange"
 }
 
 public struct PaymentEvent {

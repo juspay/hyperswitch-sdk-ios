@@ -17,6 +17,7 @@ public enum PaymentEventData {
 
     public struct CardInfo: Sendable {
         public let bin: String?
+        public let extendedBin: String?
         public let last4: String?
         public let brand: String?
         public let expiryMonth: String?
@@ -31,6 +32,7 @@ public enum PaymentEventData {
         static func from(_ map: [String: Any]) -> CardInfo {
             CardInfo(
                 bin: map["bin"] as? String,
+                extendedBin: map["extendedBin"] as? String,
                 last4: map["last4"] as? String,
                 brand: map["brand"] as? String,
                 expiryMonth: map["expiryMonth"] as? String,
@@ -108,15 +110,15 @@ public enum PaymentEventData {
 
     public static func from(type: String, payload: [String: Any]) -> PaymentEventData? {
         switch type {
-        case PaymentEventType.paymentMethodInfoCard.rawValue:
+        case PaymentEventType.cardDetailsChange.rawValue:
             return .cardInfo(.from(payload))
-        case PaymentEventType.paymentMethodStatus.rawValue:
+        case PaymentEventType.paymentMethodChange.rawValue:
             return .paymentMethodStatus(.from(payload))
-        case PaymentEventType.formStatus.rawValue:
+        case PaymentEventType.formStatusChange.rawValue:
             return .formStatus(.from(payload))
-        case PaymentEventType.paymentMethodInfoBillingAddress.rawValue:
+        case PaymentEventType.billingDetailsChange.rawValue:
             return .paymentMethodInfoAddress(.from(payload))
-        case PaymentEventType.cvcStatus.rawValue:
+        case PaymentEventType.cvcStatusChange.rawValue:
             return .cvcStatus(.from(payload))
         default:
             return nil

@@ -72,7 +72,7 @@ class ViewController: UIViewController {
             viewController: self,
             configuration: configuration,
             subscribe: { builder in
-                builder.on(.paymentMethodInfoCard) { event in
+                builder.on(.cardDetailsChange) { event in
                     if case .cardInfo(let info) = event.data {
                         print(info)
                     }
