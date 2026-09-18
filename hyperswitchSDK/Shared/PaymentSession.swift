@@ -34,8 +34,7 @@ public class PaymentSession {
         self.hyperswitchConfiguration = hyperswitchConfiguration
 
         if let hyperswitchConfiguration = hyperswitchConfiguration {
-            #if canImport(HyperOTA)
-            OTAServices.shared.initialize(publishableKey: hyperswitchConfiguration.publishableKey)
+            #if canImport(Airborne)
             LogManager.initialize(publishableKey: hyperswitchConfiguration.publishableKey)
             #endif
         }
