@@ -12,6 +12,9 @@ public final class Hyperswitch {
     public init(configuration: HyperswitchConfiguration) {  // MARK: async on superposition impl
         self.hyperswitchConfiguration = configuration
         // Task {} Superposition
+        #if canImport(React)
+        RNViewManager.shared.warmUp()
+        #endif
     }
 
     public func initPaymentSession(configuration: PaymentSessionConfiguration) async -> PaymentSession {

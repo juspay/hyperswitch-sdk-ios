@@ -43,6 +43,8 @@ class ViewController: UIViewController {
                     self?.statusLabel.text = "Connected to Server"
                 case .failure(let message):
                     self?.statusLabel.text = message
+                case .info(let message):
+                    self?.statusLabel.text = message
                 }
             }
             .store(in: &cancellables)
@@ -184,7 +186,6 @@ extension ViewController {
         cardFormDemoButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 60).isActive = true
         cardFormDemoButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -60).isActive = true
         cardFormDemoButton.topAnchor.constraint(equalTo: paymentMethodManagementButton.bottomAnchor, constant: 20).isActive = true
-
         statusLabel.textAlignment = .center
         statusLabel.numberOfLines = 7
         statusLabel.font = .systemFont(ofSize: 18)

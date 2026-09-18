@@ -23,7 +23,8 @@ internal extension PaymentSheet {
         configuration?["subscribedEvents"] = subscribedEvents
 
         /// Create a dictionary of hyperParams with app ID, sdkVersion, country, user agent, default view, and launch time.
-        let sdkParams = SDKParams.getSDKParams()
+        var sdkParams = SDKParams.getSDKParams()
+        sdkParams["sessionTag"] = sessionTag
 
         /// Create a dictionary of props to be sent to React Native with configuration, type, sdkAuthorization, publishable key, hyperParams, custom backend URL, themes, and custom parameters.
         let props: [String: Any] = [
@@ -33,7 +34,8 @@ internal extension PaymentSheet {
             "sdkParams": sdkParams,
             "configuration": configuration as Any,
         ]
-        guard let rootView = reactManager?.viewForModule("hyperSwitch", initialProperties: ["props": props]) else {
+        guard let rootView = RNViewManager.shared.viewForModule("hyperSwitch", initialProperties: ["props": props], owner: self) as UIView?
+        else {
             return UIView()
         }
 
@@ -48,7 +50,8 @@ internal extension PaymentSheet {
         let hyperswitchConfiguration = try? hyperswitchConfiguration?.toDictionary()
         let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
 
-        let sdkParams = SDKParams.getSDKParams()
+        var sdkParams = SDKParams.getSDKParams()
+        sdkParams["sessionTag"] = sessionTag
         var propsDict = props
         propsDict["subscribedEvents"] = subscribedEvents
 
@@ -61,7 +64,8 @@ internal extension PaymentSheet {
             "from": "rn",
         ]
 
-        guard let rootView = reactManager?.viewForModule("hyperSwitch", initialProperties: ["props": props]) else {
+        guard let rootView = RNViewManager.shared.viewForModule("hyperSwitch", initialProperties: ["props": props], owner: self) as UIView?
+        else {
             return UIView()
         }
 

@@ -13,9 +13,12 @@ public class CVCWidget: UIControl {
     private var configurationDict: [String: Any]?
     private var widgetReactTag: NSNumber?
     private var rootView: UIView?
+    private var initialProperties: [String: Any] = [:]
+    private var confirmSequence = 0
     private var cvcCallback: ((PaymentResult) -> Void)?
     private var subscribedEventNames: [String]?
-    private let reactManager = RNViewManager()
+    /// Stateless: one React root on the shared host, no session until confirm hands credentials over.
+    private var reactManager: RNViewManager { RNViewManager.shared }
 
     internal var paymentEventListener: PaymentEventListener?
 
@@ -73,9 +76,11 @@ public class CVCWidget: UIControl {
             "from": (configurationDict != nil) ? "rn" : "nativeWidget",
         ]
 
+        self.initialProperties = ["props": props]
         self.rootView = reactManager.viewForModule(
             "hyperSwitch",
-            initialProperties: ["props": props]
+            initialProperties: initialProperties,
+            owner: self
         )
         if let rootView = self.rootView {
             self.widgetReactTag = rootView.surfaceRootTag
@@ -94,24 +99,49 @@ public class CVCWidget: UIControl {
         }
     }
 
-    internal func awaitConfirmResult(_ handler: @escaping (PaymentResult) -> Void) {
-        cvcCallback = handler
-    }
-
     internal func resolveConfirmResult(_ result: PaymentResult) {
         let handler = cvcCallback
         cvcCallback = nil
         handler?(result)
     }
 
-    func confirm(sdkAuthorization: String, paymentToken: String) {
-        let payload: [String: Any] = [
-            "actionType": "CONFIRM_CVC_PAYMENT",
-            "rootTag": self.widgetReactTag ?? -1,
+    internal func confirm(
+        sdkAuthorization: String,
+        paymentToken: String,
+        resultHandler: @escaping (PaymentResult) -> Void
+    ) {
+        guard cvcCallback == nil else {
+            resultHandler(
+                .failed(
+                    error: NSError.hyperswitch(
+                        "ALREADY_IN_PROGRESS",
+                        "CVC payment already in progress for this widget"
+                    )
+                )
+            )
+            return
+        }
+        guard let surface = rootView?.hostedSurface else {
+            resultHandler(
+                .failed(
+                    error: NSError.hyperswitch(
+                        "WIDGET_UNAVAILABLE",
+                        "The CVC widget has no React root."
+                    )
+                )
+            )
+            return
+        }
+        cvcCallback = resultHandler
+        confirmSequence += 1
+        var inner = initialProperties["props"] as? [String: Any] ?? [:]
+        inner["cvcConfirm"] = [
+            "attempt": confirmSequence,
             "sdkAuthorization": sdkAuthorization,
             "paymentToken": paymentToken,
         ]
-        reactManager.hyperModule.emit("triggerWidgetAction", payload)
+        initialProperties["props"] = inner
+        surface.properties = initialProperties
     }
 
     internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {

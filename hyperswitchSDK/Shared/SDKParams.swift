@@ -15,11 +15,17 @@ class SDKParams {
     static let deviceModel: String = UIDevice.current.model
     static let osVersion: String = UIDevice.current.systemVersion
 
-    /// The web-view user agent. Creating a `WKWebView` must happen on the main thread,
-    /// so this returns `nil` off the main thread (the RN side tolerates a missing value).
+    /// The web-view user agent, read once. Creating a `WKWebView` must happen on the main
+    /// thread, so the first read off the main thread yields nil (the RN side tolerates a
+    /// missing value) and the value is filled in by the first read on it.
+    private static var cachedUserAgent: String?
+
     private static func currentUserAgent() -> String? {
-        guard Thread.isMainThread else { return nil }  // MARK: bailout since RN can handle.
-        return WKWebView().value(forKey: "userAgent") as? String
+        if let cachedUserAgent { return cachedUserAgent }
+        guard Thread.isMainThread else { return nil }
+        let userAgent = WKWebView().value(forKey: "userAgent") as? String
+        cachedUserAgent = userAgent
+        return userAgent
     }
 
     /// Safe-area insets of the key window (zero off the main thread / when unavailable).

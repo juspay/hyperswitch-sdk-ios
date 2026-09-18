@@ -58,6 +58,11 @@ RCT_EXPORT_MODULE()
   return [[_surfacePresenter surfaceForRootTag:rootTag.intValue] view];
 }
 
+- (id)surfaceForRootTag:(NSNumber *)rootTag
+{
+  return [_surfacePresenter surfaceForRootTag:rootTag.intValue];
+}
+
 - (void)emitEventWithName:(NSString *)name payload:(NSDictionary<NSString *, id> *)payload
 {
   if (!_eventEmitterCallback) {
@@ -69,12 +74,6 @@ RCT_EXPORT_MODULE()
     [self emitWidget:payload];
   } else if ([name isEqualToString:@"confirmEC"]) {
     [self emitConfirmEC:payload];
-  } else if ([name isEqualToString:@"triggerWidgetAction"]) {
-    [self emitTriggerWidgetAction:payload];
-  } else if ([name isEqualToString:@"updateIntentInit"]) {
-    [self emitUpdateIntentInit:payload];
-  } else if ([name isEqualToString:@"updateIntentComplete"]) {
-    [self emitUpdateIntentComplete:payload];
   }
 }
 

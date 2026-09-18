@@ -21,6 +21,7 @@ class HyperViewModel: ObservableObject {
         case loading
         case success
         case failure(String)
+        case info(String)
     }
 
     func preparePaymentSheet() {
@@ -81,14 +82,17 @@ class HyperViewModel: ObservableObject {
                 }
             },
             completion: { result in
+                let text: String
                 switch result {
                 case .success:
-                    print("updateIntent: success")
+                    text = "updateIntent → success"
                 case .cancelled:
-                    print("updateIntent: cancelled")
+                    text = "updateIntent → cancelled"
                 case .failure(let error):
-                    print("updateIntent: failed — \(error.localizedDescription)")
+                    text = "updateIntent → failed: \((error as NSError).domain) \(error.localizedDescription)"
                 }
+                print(text)
+                DispatchQueue.main.async { self.status = .info(text) }
             }
         )
     }

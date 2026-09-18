@@ -58,6 +58,11 @@ RCT_EXPORT_MODULE()
   return [[_surfacePresenter surfaceForRootTag:rootTag.intValue] view];
 }
 
+- (id)surfaceForRootTag:(NSNumber *)rootTag
+{
+  return [_surfacePresenter surfaceForRootTag:rootTag.intValue];
+}
+
 #pragma mark - NativeHyperHeadlessSpec
 
 - (void)getPaymentSession:(NSInteger)rootTag
