@@ -17,6 +17,12 @@ internal protocol ReactHostManager: AnyObject {
     var rootView: UIView? { get }
 }
 
+/// A React host that can create a root whose JS calls resolve to a native [owner]. The
+/// payments host and the payment methods host are separate realms with this in common.
+internal protocol SurfaceHost: AnyObject {
+    func viewForModule(_ moduleName: String, initialProperties: [String: Any]?, owner: AnyObject) -> UIView
+}
+
 /// Owner of a prefetch surface: receives the JS reply to an updateIntent round trip.
 internal protocol UpdateIntentReplyTarget: AnyObject {
     func onUpdateIntentReply(type: String, result: String)
@@ -77,7 +83,7 @@ internal final class HeadlessSurface: NSObject, RCTSurfaceDelegate {
     /// props are those it starts with, so pushes before then are not lost. A bundle that
     /// fails to load is a packaging defect: React Native ends the process (`RCTFatal`), as
     /// it does on Android, so no surface has to guard against it.
-    internal init(host: RNViewManager, moduleName: String, initialProperties: [String: Any], owner: AnyObject) {
+    internal init(host: SurfaceHost, moduleName: String, initialProperties: [String: Any], owner: AnyObject) {
         let view = host.viewForModule(moduleName, initialProperties: initialProperties, owner: owner)
         self.hostingView = view
         self.surface = view.hostedSurface
@@ -198,7 +204,7 @@ internal class RNViewManagerDelegate: RNFactoryDelegate {
 
 /// The one React host: one JS realm renders every surface of every session and widget.
 /// Every surface is one React root on it, told apart by root tag.
-internal final class RNViewManager: NSObject, ReactHostManager {
+internal final class RNViewManager: NSObject, ReactHostManager, SurfaceHost {
 
     /// Created on first use and kept for the life of the process.
     internal static let shared = RNViewManager()
