@@ -7,8 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D91C7AC8F6121B2D7890D66 /* PaymentMethodsModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87154136DB650D98B8597EB /* PaymentMethodsModule.swift */; };
 		139913B798F4478A85C0700F /* HyperTurboModule.mm in Sources */ = {isa = PBXBuildFile; fileRef = D8E057101BF84067AC180115 /* HyperTurboModule.mm */; };
+		1C2C7180999CF5D9B975FD56 /* PaymentMethodsHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82F12741B69371936F0A0EEC /* PaymentMethodsHost.swift */; };
 		1CC05B6C00564E2DB86ADEE6 /* HyperHeadlessTurboModule.mm in Sources */ = {isa = PBXBuildFile; fileRef = F8A50F38F5164A3DA5CF1FAB /* HyperHeadlessTurboModule.mm */; };
+		37B1574444344EC17CF4E36B /* PaymentMethodsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51360924C973EE39221ED7F /* PaymentMethodsViewController.swift */; };
 		4365207C2C8768B90006C856 /* ApplePayHandlerLite.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4365207B2C8768B90006C856 /* ApplePayHandlerLite.swift */; };
 		43E668682C084FB70094BD13 /* montserrat_extralight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668552C084FB60094BD13 /* montserrat_extralight.ttf */; };
 		43E668692C084FB70094BD13 /* montserrat_bolditalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668562C084FB70094BD13 /* montserrat_bolditalic.ttf */; };
@@ -30,6 +33,7 @@
 		43E668792C084FB70094BD13 /* montserrat_semibolditalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668662C084FB70094BD13 /* montserrat_semibolditalic.ttf */; };
 		43E6687A2C084FB70094BD13 /* montserrat_blackitalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 43E668672C084FB70094BD13 /* montserrat_blackitalic.ttf */; };
 		43F6051E2B45FA3300BAA90E /* PaymentSheetAppearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43F6051D2B45FA3300BAA90E /* PaymentSheetAppearance.swift */; };
+		489933F8C242F81C33BE3906 /* CardFormTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED170392D83D858AFBD08F4D /* CardFormTypes.swift */; };
 		4E0A93DE2CA2F29500E3A767 /* HyperUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A93DC2CA2F29500E3A767 /* HyperUIViewController.swift */; };
 		4E34835F2EA643DC007067EA /* CardinalProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E34835E2EA643D7007067EA /* CardinalProvider.swift */; };
 		4E8C83892E98CABF00A61749 /* AuthenticationSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E8C83882E98CABF00A61749 /* AuthenticationSession.swift */; };
@@ -46,6 +50,7 @@
 		4EEA67032D37B493000D4DC5 /* SDKParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA67022D37B487000D4DC5 /* SDKParams.swift */; };
 		4EEA67042D37B493000D4DC5 /* SDKParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EEA67022D37B487000D4DC5 /* SDKParams.swift */; };
 		52AABE56914A47D3822FEBDA /* ApplePayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7A29AACF3E64798AAEC6072 /* ApplePayView.swift */; };
+		572BBBF031C228DCB48BC5CB /* CardFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F10B1D80BD44833785DA8AF /* CardFieldView.swift */; };
 		61EB688481314069B806010C /* ApplePayButtonComponentView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A281578CEE6B47E59B7CE526 /* ApplePayButtonComponentView.mm */; };
 		663F68FC29CCC93C006E91BD /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663F68FB29CCC93C006E91BD /* APIClient.swift */; };
 		66486F92294355BD00150E4F /* hyperApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66486F91294355BD00150E4F /* hyperApp.swift */; };
@@ -144,6 +149,8 @@
 		79FA101E2F1E93B6006B33CF /* ClickToPayCheckoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FA101D2F1E93A1006B33CF /* ClickToPayCheckoutViewController.swift */; };
 		79FE01502E97C22800C5D94A /* PaymentSheetAppearance+Encodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE014F2E97C22800C5D94A /* PaymentSheetAppearance+Encodable.swift */; };
 		79FE01512E97C22800C5D94A /* PaymentSheetAppearance+Encodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE014F2E97C22800C5D94A /* PaymentSheetAppearance+Encodable.swift */; };
+		BE8774A5671F676F582E6761 /* PaymentMethodsTurboModule.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1062A219883CA74AE0F6DA50 /* PaymentMethodsTurboModule.mm */; };
+		C165DA8D37D88C077F8A3C93 /* CardForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2752C65355408D3318D18EB0 /* CardForm.swift */; };
 		CA99E0EE27BB584F60C63629 /* libPods-hyperswitch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CCA1FC8DE37B8F2B7E80D78 /* libPods-hyperswitch.a */; };
 		DC5D0114294731480017C67A /* PaymentSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D0111294731480017C67A /* PaymentSheet.swift */; };
 		DC5D0115294731480017C67A /* PaymentSheetView+SwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D0112294731480017C67A /* PaymentSheetView+SwiftUI.swift */; };
@@ -153,6 +160,7 @@
 		DC5D0125294847E90017C67A /* PaymentSheetView+UIKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D0124294847E90017C67A /* PaymentSheetView+UIKit.swift */; };
 		DC5D0127294853A90017C67A /* PaymentSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D0126294853A90017C67A /* PaymentSheetView.swift */; };
 		EEEC5FC9988B81D923E08719 /* Pods_hyperswitchAppClip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 06DD778FE73D7D7BC674262C /* Pods_hyperswitchAppClip.framework */; };
+		F67D6126E8BD01802847A6DF /* PaymentMethodSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786C2FE8F0D45CD96FAAA62C /* PaymentMethodSession.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -192,6 +200,8 @@
 /* Begin PBXFileReference section */
 		06DD778FE73D7D7BC674262C /* Pods_hyperswitchAppClip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hyperswitchAppClip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CCA1FC8DE37B8F2B7E80D78 /* libPods-hyperswitch.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-hyperswitch.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		1062A219883CA74AE0F6DA50 /* PaymentMethodsTurboModule.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = PaymentMethodsTurboModule.mm; sourceTree = "<group>"; };
+		2752C65355408D3318D18EB0 /* CardForm.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardForm.swift; sourceTree = "<group>"; };
 		27776607FD71549253487622 /* Pods-hyperswitchAppClip.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitchAppClip.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip.debug.xcconfig"; sourceTree = "<group>"; };
 		28A4D4A71DBA83DA981245A2 /* Pods-hyperswitch.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitch.release.xcconfig"; path = "Target Support Files/Pods-hyperswitch/Pods-hyperswitch.release.xcconfig"; sourceTree = "<group>"; };
 		2ADCE71720FB6C7AFA7CE81C /* Pods-hyperswitch.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitch.debug.xcconfig"; path = "Target Support Files/Pods-hyperswitch/Pods-hyperswitch.debug.xcconfig"; sourceTree = "<group>"; };
@@ -247,6 +257,7 @@
 		75AA28E82D47805800CD88A6 /* Environment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Environment.swift; sourceTree = "<group>"; };
 		75E692F92D5B28D70077C0F3 /* OTAServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OTAServices.swift; sourceTree = "<group>"; };
 		75E692FB2D5B2AB90077C0F3 /* HyperOTA.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = HyperOTA.plist; sourceTree = "<group>"; };
+		786C2FE8F0D45CD96FAAA62C /* PaymentMethodSession.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PaymentMethodSession.swift; sourceTree = "<group>"; };
 		7901E1C32EB4DBA6002A9EEE /* ClickToPayModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayModels.swift; sourceTree = "<group>"; };
 		7901E1C52EB4DBA6002A9EEE /* ClickToPaySession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPaySession.swift; sourceTree = "<group>"; };
 		7901E1C92EB4DCE2002A9EEE /* ClickToPayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayViewController.swift; sourceTree = "<group>"; };
@@ -301,7 +312,10 @@
 		79EAB0442C81D5AC006B40AD /* PaymentSession+Lite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSession+Lite.swift"; sourceTree = "<group>"; };
 		79FA101D2F1E93A1006B33CF /* ClickToPayCheckoutViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClickToPayCheckoutViewController.swift; sourceTree = "<group>"; };
 		79FE014F2E97C22800C5D94A /* PaymentSheetAppearance+Encodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSheetAppearance+Encodable.swift"; sourceTree = "<group>"; };
+		82F12741B69371936F0A0EEC /* PaymentMethodsHost.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PaymentMethodsHost.swift; sourceTree = "<group>"; };
+		8F10B1D80BD44833785DA8AF /* CardFieldView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardFieldView.swift; sourceTree = "<group>"; };
 		A281578CEE6B47E59B7CE526 /* ApplePayButtonComponentView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ApplePayButtonComponentView.mm; sourceTree = "<group>"; };
+		B87154136DB650D98B8597EB /* PaymentMethodsModule.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PaymentMethodsModule.swift; sourceTree = "<group>"; };
 		D8E057101BF84067AC180115 /* HyperTurboModule.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HyperTurboModule.mm; sourceTree = "<group>"; };
 		DC5D0111294731480017C67A /* PaymentSheet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PaymentSheet.swift; sourceTree = "<group>"; };
 		DC5D0112294731480017C67A /* PaymentSheetView+SwiftUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PaymentSheetView+SwiftUI.swift"; sourceTree = "<group>"; };
@@ -311,6 +325,8 @@
 		DC5D0124294847E90017C67A /* PaymentSheetView+UIKit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSheetView+UIKit.swift"; sourceTree = "<group>"; };
 		DC5D0126294853A90017C67A /* PaymentSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaymentSheetView.swift; sourceTree = "<group>"; };
 		E255954E5991025A1C336049 /* Pods-hyperswitchAppClip.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-hyperswitchAppClip.release.xcconfig"; path = "Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip.release.xcconfig"; sourceTree = "<group>"; };
+		ED170392D83D858AFBD08F4D /* CardFormTypes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardFormTypes.swift; sourceTree = "<group>"; };
+		F51360924C973EE39221ED7F /* PaymentMethodsViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PaymentMethodsViewController.swift; sourceTree = "<group>"; };
 		F7A29AACF3E64798AAEC6072 /* ApplePayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplePayView.swift; sourceTree = "<group>"; };
 		F8A50F38F5164A3DA5CF1FAB /* HyperHeadlessTurboModule.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HyperHeadlessTurboModule.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -436,6 +452,7 @@
 				66486F95294355BE00150E4F /* Assets.xcassets */,
 				43E668542C084F440094BD13 /* fonts */,
 				66486F97294355BE00150E4F /* Preview Content */,
+				F51360924C973EE39221ED7F /* PaymentMethodsViewController.swift */,
 			);
 			path = hyperswitch;
 			sourceTree = "<group>";
@@ -618,6 +635,17 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		D3BACE74651B88A3B7764806 /* NativeModule */ = {
+			isa = PBXGroup;
+			children = (
+				82F12741B69371936F0A0EEC /* PaymentMethodsHost.swift */,
+				B87154136DB650D98B8597EB /* PaymentMethodsModule.swift */,
+				1062A219883CA74AE0F6DA50 /* PaymentMethodsTurboModule.mm */,
+			);
+			name = NativeModule;
+			path = NativeModule;
+			sourceTree = "<group>";
+		};
 		DC5D010F294731030017C67A /* hyperswitchSDK */ = {
 			isa = PBXGroup;
 			children = (
@@ -625,6 +653,7 @@
 				79EAB09A2C81EEBC006B40AD /* Shared */,
 				790575ED2C85CF5E0097C6F4 /* CoreLite */,
 				4E8C83852E98CAAB00A61749 /* AuthenticationModule */,
+				E64678379D2A62BC9D9F5576 /* PaymentMethods */,
 			);
 			path = hyperswitchSDK;
 			sourceTree = "<group>";
@@ -662,6 +691,19 @@
 				7996A8322BA1FDD000394FAF /* hyperswitch.bundle */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		E64678379D2A62BC9D9F5576 /* PaymentMethods */ = {
+			isa = PBXGroup;
+			children = (
+				D3BACE74651B88A3B7764806 /* NativeModule */,
+				786C2FE8F0D45CD96FAAA62C /* PaymentMethodSession.swift */,
+				2752C65355408D3318D18EB0 /* CardForm.swift */,
+				8F10B1D80BD44833785DA8AF /* CardFieldView.swift */,
+				ED170392D83D858AFBD08F4D /* CardFormTypes.swift */,
+			);
+			name = PaymentMethods;
+			path = PaymentMethods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1002,6 +1044,14 @@
 				793451F62F96E4C700416A4B /* PaymentWidget.swift in Sources */,
 				43F6051E2B45FA3300BAA90E /* PaymentSheetAppearance.swift in Sources */,
 				DC5D0116294731480017C67A /* PaymentSheetConfiguration.swift in Sources */,
+				F67D6126E8BD01802847A6DF /* PaymentMethodSession.swift in Sources */,
+				C165DA8D37D88C077F8A3C93 /* CardForm.swift in Sources */,
+				572BBBF031C228DCB48BC5CB /* CardFieldView.swift in Sources */,
+				489933F8C242F81C33BE3906 /* CardFormTypes.swift in Sources */,
+				1C2C7180999CF5D9B975FD56 /* PaymentMethodsHost.swift in Sources */,
+				0D91C7AC8F6121B2D7890D66 /* PaymentMethodsModule.swift in Sources */,
+				BE8774A5671F676F582E6761 /* PaymentMethodsTurboModule.mm in Sources */,
+				37B1574444344EC17CF4E36B /* PaymentMethodsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
