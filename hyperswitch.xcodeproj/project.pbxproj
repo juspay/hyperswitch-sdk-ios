@@ -161,6 +161,15 @@
 		DC5D0127294853A90017C67A /* PaymentSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC5D0126294853A90017C67A /* PaymentSheetView.swift */; };
 		EEEC5FC9988B81D923E08719 /* Pods_hyperswitchAppClip.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 06DD778FE73D7D7BC674262C /* Pods_hyperswitchAppClip.framework */; };
 		F67D6126E8BD01802847A6DF /* PaymentMethodSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 786C2FE8F0D45CD96FAAA62C /* PaymentMethodSession.swift */; };
+		AA00000000000000000000A1 /* PaymentMethodManagementHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000000000000000000B1 /* PaymentMethodManagementHost.swift */; };
+		AA00000000000000000000A2 /* PaymentMethodManagementModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000000000000000000B2 /* PaymentMethodManagementModule.swift */; };
+		AA00000000000000000000A3 /* HyperPMMTurboModule.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA00000000000000000000B3 /* HyperPMMTurboModule.mm */; };
+		AA00000000000000000000A4 /* PaymentMethodManagement.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000000000000000000B4 /* PaymentMethodManagement.swift */; };
+		AA00000000000000000000A5 /* PaymentMethodManagementSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000000000000000000B5 /* PaymentMethodManagementSheet.swift */; };
+		AA00000000000000000000A6 /* PaymentMethodManagementWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000000000000000000B6 /* PaymentMethodManagementWidget.swift */; };
+		AA00000000000000000000A7 /* PMMViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000000000000000000B7 /* PMMViewController.swift */; };
+		AA00000000000000000000A8 /* hyperswitch-payment-method-management.bundle in Resources */ = {isa = PBXBuildFile; fileRef = AA00000000000000000000B8 /* hyperswitch-payment-method-management.bundle */; };
+		AA00000000000000000000A9 /* hyperswitch-payment-methods.bundle in Resources */ = {isa = PBXBuildFile; fileRef = AA00000000000000000000B9 /* hyperswitch-payment-methods.bundle */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -329,6 +338,15 @@
 		F51360924C973EE39221ED7F /* PaymentMethodsViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PaymentMethodsViewController.swift; sourceTree = "<group>"; };
 		F7A29AACF3E64798AAEC6072 /* ApplePayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ApplePayView.swift; sourceTree = "<group>"; };
 		F8A50F38F5164A3DA5CF1FAB /* HyperHeadlessTurboModule.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HyperHeadlessTurboModule.mm; sourceTree = "<group>"; };
+		AA00000000000000000000B1 /* PaymentMethodManagementHost.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PaymentMethodManagementHost.swift; sourceTree = "<group>"; };
+		AA00000000000000000000B2 /* PaymentMethodManagementModule.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PaymentMethodManagementModule.swift; sourceTree = "<group>"; };
+		AA00000000000000000000B3 /* HyperPMMTurboModule.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; path = HyperPMMTurboModule.mm; sourceTree = "<group>"; };
+		AA00000000000000000000B4 /* PaymentMethodManagement.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PaymentMethodManagement.swift; sourceTree = "<group>"; };
+		AA00000000000000000000B5 /* PaymentMethodManagementSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PaymentMethodManagementSheet.swift; sourceTree = "<group>"; };
+		AA00000000000000000000B6 /* PaymentMethodManagementWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PaymentMethodManagementWidget.swift; sourceTree = "<group>"; };
+		AA00000000000000000000B7 /* PMMViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PMMViewController.swift; sourceTree = "<group>"; };
+		AA00000000000000000000B8 /* hyperswitch-payment-method-management.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "hyperswitch-payment-method-management.bundle"; sourceTree = "<group>"; };
+		AA00000000000000000000B9 /* hyperswitch-payment-methods.bundle */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "hyperswitch-payment-methods.bundle"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -434,6 +452,7 @@
 		66486F90294355BD00150E4F /* hyperswitch */ = {
 			isa = PBXGroup;
 			children = (
+				AA00000000000000000000B7 /* PMMViewController.swift */,
 				79052A492C9057D60011804E /* AppDelegate.swift */,
 				66486F91294355BD00150E4F /* hyperApp.swift */,
 				66486F93294355BD00150E4F /* ContentView.swift */,
@@ -649,6 +668,7 @@
 		DC5D010F294731030017C67A /* hyperswitchSDK */ = {
 			isa = PBXGroup;
 			children = (
+				AA00000000000000000000C1 /* PaymentMethodManagement */,
 				79EAB09E2C81F0B9006B40AD /* Core */,
 				79EAB09A2C81EEBC006B40AD /* Shared */,
 				790575ED2C85CF5E0097C6F4 /* CoreLite */,
@@ -697,6 +717,7 @@
 			isa = PBXGroup;
 			children = (
 				D3BACE74651B88A3B7764806 /* NativeModule */,
+				AA00000000000000000000C4 /* Resources */,
 				786C2FE8F0D45CD96FAAA62C /* PaymentMethodSession.swift */,
 				2752C65355408D3318D18EB0 /* CardForm.swift */,
 				8F10B1D80BD44833785DA8AF /* CardFieldView.swift */,
@@ -704,6 +725,44 @@
 			);
 			name = PaymentMethods;
 			path = PaymentMethods;
+			sourceTree = "<group>";
+		};
+		AA00000000000000000000C1 /* PaymentMethodManagement */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000000000000000000C2 /* NativeModule */,
+				AA00000000000000000000C3 /* Resources */,
+				AA00000000000000000000B4 /* PaymentMethodManagement.swift */,
+				AA00000000000000000000B5 /* PaymentMethodManagementSheet.swift */,
+				AA00000000000000000000B6 /* PaymentMethodManagementWidget.swift */,
+			);
+			path = PaymentMethodManagement;
+			sourceTree = "<group>";
+		};
+		AA00000000000000000000C2 /* NativeModule */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000000000000000000B1 /* PaymentMethodManagementHost.swift */,
+				AA00000000000000000000B2 /* PaymentMethodManagementModule.swift */,
+				AA00000000000000000000B3 /* HyperPMMTurboModule.mm */,
+			);
+			path = NativeModule;
+			sourceTree = "<group>";
+		};
+		AA00000000000000000000C3 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000000000000000000B8 /* hyperswitch-payment-method-management.bundle */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		AA00000000000000000000C4 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000000000000000000B9 /* hyperswitch-payment-methods.bundle */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -795,6 +854,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA00000000000000000000A8 /* hyperswitch-payment-method-management.bundle in Resources */,
+				AA00000000000000000000A9 /* hyperswitch-payment-methods.bundle in Resources */,
 				66486F99294355BE00150E4F /* Preview Assets.xcassets in Resources */,
 				43E6686F2C084FB70094BD13 /* montserrat_extrabold.ttf in Resources */,
 				43E668682C084FB70094BD13 /* montserrat_extralight.ttf in Resources */,
@@ -967,6 +1028,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA00000000000000000000A1 /* PaymentMethodManagementHost.swift in Sources */,
+				AA00000000000000000000A2 /* PaymentMethodManagementModule.swift in Sources */,
+				AA00000000000000000000A3 /* HyperPMMTurboModule.mm in Sources */,
+				AA00000000000000000000A4 /* PaymentMethodManagement.swift in Sources */,
+				AA00000000000000000000A5 /* PaymentMethodManagementSheet.swift in Sources */,
+				AA00000000000000000000A6 /* PaymentMethodManagementWidget.swift in Sources */,
+				AA00000000000000000000A7 /* PMMViewController.swift in Sources */,
 				791A9A852FBCD46000A8D1EC /* SavedPaymentMethodsConfiguration.swift in Sources */,
 				793451FB2F96EB9F00416A4B /* CVCWidget.swift in Sources */,
 				79728FB92C3412BB00CA8C10 /* HeadlessViewController.swift in Sources */,
@@ -1405,7 +1473,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.hyperswitch.Clip;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG APPCLIP $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1444,6 +1512,7 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.hyperswitch.Clip;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "APPCLIP $(inherited)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
