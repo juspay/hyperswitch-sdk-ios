@@ -78,6 +78,13 @@ class NSDataBuffer : public facebook::jsi::Buffer {
   return missing.count > 0 ? [missing componentsJoinedByString:@", "] : nil;
 }
 
+/// Names of the chunk files in `directory`.
++ (NSArray<NSString *> *)chunkFilesIn:(NSString *)directory
+{
+  NSArray<NSString *> *files = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:directory error:nil] ?: @[];
+  return [files filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"SELF ENDSWITH '.chunk.bundle'"]];
+}
+
 #pragma mark - RCTHostDelegate
 
 // RCTReactNativeFactory is the host's delegate but does not implement this; RCTHost
@@ -91,12 +98,15 @@ class NSDataBuffer : public facebook::jsi::Buffer {
 
   NSFileManager *fileManager = [NSFileManager defaultManager];
   NSString *bundleDir = bundleURL.URLByDeletingLastPathComponent.path;
-  NSArray<NSString *> *bundleFiles = [fileManager contentsOfDirectoryAtPath:bundleDir error:nil] ?: @[];
 
+  // Which chunk files each directory holds: a subspec the app does not use (sentry,
+  // paypal, ...) leaves its chunk out, and the JS resolver must not ask for it.
   NSMutableDictionary *layout = [NSMutableDictionary dictionary];
   layout[@"bundleDir"] = bundleDir;
-  layout[@"bundleFiles"] = bundleFiles;
+  layout[@"bundleFiles"] = [HyperReactNativeFactory chunkFilesIn:bundleDir];
   layout[@"resourceDir"] = _resourceDirectory ?: [NSNull null];
+  layout[@"resourceFiles"] =
+      _resourceDirectory != nil ? [HyperReactNativeFactory chunkFilesIn:_resourceDirectory] : [NSNull null];
   NSData *layoutJSON = [NSJSONSerialization dataWithJSONObject:layout options:0 error:nil];
   if (layoutJSON != nil) {
     NSString *script = [NSString stringWithFormat:@"globalThis.__HYPERSWITCH_SCRIPTS__=%@;",
