@@ -15,8 +15,17 @@ Pod::Spec.new do |s|
   s.module_name               = 'Hyperswitch'
 
   s.subspec 'core' do |core|
-    core.source_files = 'hyperswitchSDK/Core/**/*.{m,swift,h}'
-    core.resources = ['hyperswitchSDK/Core/Resources/HyperOTA.plist', 'hyperswitchSDK/Core/Resources/hyperswitch.bundle']
+    core.source_files = 'hyperswitchSDK/Core/**/*.{m,swift,h}', 'hyperswitchSDK/Core/NativeModule/HyperReactNativeFactory.mm'
+    # Entry bundles, their chunk files (`<name>.<chunk>.chunk.bundle`) and images,
+    # all written by `yarn bundle:ios` (scripts/bundle.mjs).
+    core.resources = [
+      'hyperswitchSDK/Core/Resources/HyperOTA.plist',
+      'hyperswitchSDK/Core/Resources/*.bundle',
+      'hyperswitchSDK/Core/Resources/assets',
+    ]
+    # The chunk files are loaded by Re.Pack's ScriptManager native module
+    # (@callstack/repack). Like every autolinked module, it is built into
+    # frameworkgen/Frameworks/Core (callstack_repack, JWTDecode, SwiftyRSA).
     core.vendored_frameworks = 'frameworkgen/Frameworks/Core/*.xcframework'
     core.dependency 'hyperswitch-sdk-ios/common'
     core.dependency 'hyperswitch-ios-hermes', '0.79.1'

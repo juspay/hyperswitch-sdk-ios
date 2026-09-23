@@ -216,8 +216,15 @@ internal final class RNViewManager: NSObject, ReactHostManager, SurfaceHost {
 
     private let delegate: RNViewManagerDelegate
 
+    /// Evaluates the bundle's runtime chunk before the entry and tells the JS side where
+    /// on-demand chunks live (see HyperReactNativeFactory.h).
     internal lazy var factory: RCTReactNativeFactory = {
-        RCTReactNativeFactory(delegate: self.delegate)
+        HyperReactNativeFactory(
+            delegate: self.delegate,
+            resourceDirectory: Bundle(for: RNViewManager.self)
+                .url(forResource: "hyperswitch", withExtension: "bundle")?
+                .deletingLastPathComponent().path
+        )
     }()
 
     private override init() {

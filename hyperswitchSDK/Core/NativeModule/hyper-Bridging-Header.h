@@ -3,3 +3,4 @@
 #import <React/RCTUtils.h>
 #import <React/UIView+React.h>
 #import <React/RCTSurfaceHostingProxyRootView.h>
+#import "HyperReactNativeFactory.h"

@@ -85,3 +85,6 @@ DummyApp.tar.gz
 .vscode/
 
 Gemfile.lock
+# Images of the JS bundle (yarn bundle:ios): React Native resolves them under
+# assets/node_modules/..., which the node_modules/ rule above would hide.
+!hyperswitchSDK/Core/Resources/assets/node_modules/

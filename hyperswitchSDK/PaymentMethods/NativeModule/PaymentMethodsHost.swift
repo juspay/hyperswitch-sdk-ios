@@ -56,8 +56,15 @@ internal final class PaymentMethodsHost: NSObject, SurfaceHost {
 
     private let delegate: PaymentMethodsHostDelegate
 
+    /// Evaluates the bundle's runtime chunk before the entry and tells the JS side where
+    /// on-demand chunks live (see HyperReactNativeFactory.h).
     internal lazy var factory: RCTReactNativeFactory = {
-        RCTReactNativeFactory(delegate: self.delegate)
+        HyperReactNativeFactory(
+            delegate: self.delegate,
+            resourceDirectory: Bundle(for: PaymentMethodsHost.self)
+                .url(forResource: PaymentMethodsHost.bundleName, withExtension: "bundle")?
+                .deletingLastPathComponent().path
+        )
     }()
 
     private override init() {
