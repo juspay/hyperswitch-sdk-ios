@@ -229,6 +229,10 @@ internal final class RNViewManager: NSObject, ReactHostManager, SurfaceHost {
     /// before React Native sees the bundle, whose fatal error for a missing one ends the
     /// app; the SDK reports SDK_INIT_FAILED instead. Main thread.
     internal lazy var initFailure: NSError? = {
+        // The factory first: creating it sets React Native's feature flags, and resolving
+        // the bundle URL reads them (RCTBundleURLProvider). Read before they are set, the
+        // flags abort the app ("Feature flags were accessed before being overridden").
+        _ = factory
         guard let missing = HyperReactNativeFactory.missingFiles(
             bundleURL: delegate.bundleURL(),
             resourceDirectory: Self.resourceDirectory
