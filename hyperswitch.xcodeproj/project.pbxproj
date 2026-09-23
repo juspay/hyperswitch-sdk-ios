@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A1C0DE0000000000000000A1 /* HyperReactNativeFactory.mm in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000A2 /* HyperReactNativeFactory.mm */; };
 		0D91C7AC8F6121B2D7890D66 /* PaymentMethodsModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = B87154136DB650D98B8597EB /* PaymentMethodsModule.swift */; };
 		139913B798F4478A85C0700F /* HyperTurboModule.mm in Sources */ = {isa = PBXBuildFile; fileRef = D8E057101BF84067AC180115 /* HyperTurboModule.mm */; };
 		1C2C7180999CF5D9B975FD56 /* PaymentMethodsHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82F12741B69371936F0A0EEC /* PaymentMethodsHost.swift */; };
@@ -150,6 +149,7 @@
 		79FA101E2F1E93B6006B33CF /* ClickToPayCheckoutViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FA101D2F1E93A1006B33CF /* ClickToPayCheckoutViewController.swift */; };
 		79FE01502E97C22800C5D94A /* PaymentSheetAppearance+Encodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE014F2E97C22800C5D94A /* PaymentSheetAppearance+Encodable.swift */; };
 		79FE01512E97C22800C5D94A /* PaymentSheetAppearance+Encodable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE014F2E97C22800C5D94A /* PaymentSheetAppearance+Encodable.swift */; };
+		A1C0DE0000000000000000A1 /* HyperReactNativeFactory.mm in Sources */ = {isa = PBXBuildFile; fileRef = A1C0DE0000000000000000A2 /* HyperReactNativeFactory.mm */; };
 		BE8774A5671F676F582E6761 /* PaymentMethodsTurboModule.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1062A219883CA74AE0F6DA50 /* PaymentMethodsTurboModule.mm */; };
 		C165DA8D37D88C077F8A3C93 /* CardForm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2752C65355408D3318D18EB0 /* CardForm.swift */; };
 		CA99E0EE27BB584F60C63629 /* libPods-hyperswitch.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0CCA1FC8DE37B8F2B7E80D78 /* libPods-hyperswitch.a */; };
@@ -199,8 +199,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		A1C0DE0000000000000000A3 /* HyperReactNativeFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HyperReactNativeFactory.h; sourceTree = "<group>"; };
-		A1C0DE0000000000000000A2 /* HyperReactNativeFactory.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HyperReactNativeFactory.mm; sourceTree = "<group>"; };
 		06DD778FE73D7D7BC674262C /* Pods_hyperswitchAppClip.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_hyperswitchAppClip.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CCA1FC8DE37B8F2B7E80D78 /* libPods-hyperswitch.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-hyperswitch.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1062A219883CA74AE0F6DA50 /* PaymentMethodsTurboModule.mm */ = {isa = PBXFileReference; includeInIndex = 1; path = PaymentMethodsTurboModule.mm; sourceTree = "<group>"; };
@@ -317,6 +315,8 @@
 		79FE014F2E97C22800C5D94A /* PaymentSheetAppearance+Encodable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PaymentSheetAppearance+Encodable.swift"; sourceTree = "<group>"; };
 		82F12741B69371936F0A0EEC /* PaymentMethodsHost.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PaymentMethodsHost.swift; sourceTree = "<group>"; };
 		8F10B1D80BD44833785DA8AF /* CardFieldView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CardFieldView.swift; sourceTree = "<group>"; };
+		A1C0DE0000000000000000A2 /* HyperReactNativeFactory.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HyperReactNativeFactory.mm; sourceTree = "<group>"; };
+		A1C0DE0000000000000000A3 /* HyperReactNativeFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HyperReactNativeFactory.h; sourceTree = "<group>"; };
 		A281578CEE6B47E59B7CE526 /* ApplePayButtonComponentView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ApplePayButtonComponentView.mm; sourceTree = "<group>"; };
 		B87154136DB650D98B8597EB /* PaymentMethodsModule.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PaymentMethodsModule.swift; sourceTree = "<group>"; };
 		D8E057101BF84067AC180115 /* HyperTurboModule.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HyperTurboModule.mm; sourceTree = "<group>"; };
@@ -847,36 +847,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
-			outputPaths = (
-			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		A1C0DE0000000000000000A4 /* Copy Hyperswitch JS chunks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Hyperswitch JS chunks";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "set -e\n# The SDK's entry bundles are resources of this target; their chunk files and images\n# (written by `yarn bundle:ios`) change with every build, so they are copied here.\nSRC=\"$SRCROOT/hyperswitchSDK/Core/Resources\"\nDEST=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\nmkdir -p \"$DEST\"\nfor f in \"$SRC\"/*.chunk.bundle \"$SRC\"/hyperswitch-payment-methods.bundle; do\n  if [ -f \"$f\" ]; then cp \"$f\" \"$DEST/\"; fi\ndone\nif [ -d \"$SRC/assets\" ]; then\n  cp -R \"$SRC/assets\" \"$DEST/\"\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		4365207D2C8CE0690006C856 /* Bundle React Native code and images */ = {
@@ -929,13 +906,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitch/Pods-hyperswitch-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -950,17 +923,32 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A1C0DE0000000000000000A4 /* Copy Hyperswitch JS chunks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Hyperswitch JS chunks";
+			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-hyperswitchAppClip/Pods-hyperswitchAppClip-frameworks.sh\"\n";
+			shellScript = "set -e\n# The SDK's entry bundles are resources of this target; their chunk files and images\n# (written by `yarn bundle:ios`) change with every build, so they are copied here.\nSRC=\"$SRCROOT/hyperswitchSDK/Core/Resources\"\nDEST=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH\"\nmkdir -p \"$DEST\"\nfor f in \"$SRC\"/*.chunk.bundle \"$SRC\"/hyperswitch-payment-methods.bundle; do\n  if [ -f \"$f\" ]; then cp \"$f\" \"$DEST/\"; fi\ndone\nif [ -d \"$SRC/assets\" ]; then\n  cp -R \"$SRC/assets\" \"$DEST/\"\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		A829E61ECD24437F1813A93A /* [CP] Check Pods Manifest.lock */ = {
