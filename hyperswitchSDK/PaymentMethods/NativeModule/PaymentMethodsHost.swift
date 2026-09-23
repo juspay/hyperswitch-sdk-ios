@@ -59,13 +59,26 @@ internal final class PaymentMethodsHost: NSObject, SurfaceHost {
     /// Evaluates the bundle's runtime chunk before the entry and tells the JS side where
     /// on-demand chunks live (see HyperReactNativeFactory.h).
     internal lazy var factory: RCTReactNativeFactory = {
-        HyperReactNativeFactory(
-            delegate: self.delegate,
-            resourceDirectory: Bundle(for: PaymentMethodsHost.self)
-                .url(forResource: PaymentMethodsHost.bundleName, withExtension: "bundle")?
-                .deletingLastPathComponent().path
+        HyperReactNativeFactory(delegate: self.delegate, resourceDirectory: Self.resourceDirectory)
+    }()
+
+    /// Where the SDK's bundles and chunk files are packaged.
+    private static let resourceDirectory = Bundle(for: PaymentMethodsHost.self).resourcePath
+
+    /// Why this host cannot start: JavaScript it needs is missing from the app. Checked
+    /// before React Native sees the bundle, whose fatal error for a missing one ends the
+    /// app; the SDK reports SDK_INIT_FAILED instead. Main thread.
+    internal lazy var initFailure: NSError? = {
+        guard let missing = HyperReactNativeFactory.missingFiles(
+            bundleURL: delegate.bundleURL(),
+            resourceDirectory: Self.resourceDirectory
+        ) else { return nil }
+        return NSError.hyperswitch(
+            "SDK_INIT_FAILED",
+            "Hyperswitch SDK failed to initialise (payment methods): missing JavaScript: \(missing)"
         )
     }()
+
 
     private override init() {
         self.delegate = PaymentMethodsHostDelegate()
@@ -77,6 +90,7 @@ internal final class PaymentMethodsHost: NSObject, SurfaceHost {
     /// Boots the host, and with it the bundle, ahead of the first form. Idempotent.
     internal func warmUp() {
         DispatchQueue.main.async {
+            guard self.initFailure == nil else { return }
             self.factory.rootViewFactory.initializeReactHost(
                 launchOptions: nil,
                 bundleConfiguration: RCTBundleConfiguration.default(),
@@ -88,6 +102,8 @@ internal final class PaymentMethodsHost: NSObject, SurfaceHost {
     /// Creates one React root. [owner] is the native object every JS call carrying this
     /// root's tag resolves to; nothing else records which form or field a root belongs to.
     internal func viewForModule(_ moduleName: String, initialProperties: [String: Any]?, owner: AnyObject) -> UIView {
+        // No React root when the host cannot start; CardForm reports it through onError.
+        guard initFailure == nil else { return UIView() }
         let rootView = factory.rootViewFactory.view(
             withModuleName: moduleName,
             initialProperties: initialProperties

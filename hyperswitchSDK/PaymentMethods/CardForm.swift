@@ -68,6 +68,19 @@ public final class CardForm {
         ]
         props["locale"] = configuration.locale
 
+        /// A host that cannot start has no root to give: the form fails through onError,
+        /// on the next main-queue turn so a listener set right after init still hears it.
+        if let initFailure = host.initFailure {
+            self.surface = nil
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self, case .opening = self.phase else { return }
+                let message = initFailure.localizedDescription
+                self.settle(.failed(message))
+                self.onError?(CardFormError(message: message))
+            }
+            return
+        }
+
         /// A root that never joins a window. Stopping it is what ends the form in the bundle.
         self.surface = HeadlessSurface(
             host: host,

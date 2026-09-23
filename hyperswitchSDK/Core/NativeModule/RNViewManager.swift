@@ -219,13 +219,26 @@ internal final class RNViewManager: NSObject, ReactHostManager, SurfaceHost {
     /// Evaluates the bundle's runtime chunk before the entry and tells the JS side where
     /// on-demand chunks live (see HyperReactNativeFactory.h).
     internal lazy var factory: RCTReactNativeFactory = {
-        HyperReactNativeFactory(
-            delegate: self.delegate,
-            resourceDirectory: Bundle(for: RNViewManager.self)
-                .url(forResource: "hyperswitch", withExtension: "bundle")?
-                .deletingLastPathComponent().path
+        HyperReactNativeFactory(delegate: self.delegate, resourceDirectory: Self.resourceDirectory)
+    }()
+
+    /// Where the SDK's bundles and chunk files are packaged.
+    private static let resourceDirectory = Bundle(for: RNViewManager.self).resourcePath
+
+    /// Why this host cannot start: JavaScript it needs is missing from the app. Checked
+    /// before React Native sees the bundle, whose fatal error for a missing one ends the
+    /// app; the SDK reports SDK_INIT_FAILED instead. Main thread.
+    internal lazy var initFailure: NSError? = {
+        guard let missing = HyperReactNativeFactory.missingFiles(
+            bundleURL: delegate.bundleURL(),
+            resourceDirectory: Self.resourceDirectory
+        ) else { return nil }
+        return NSError.hyperswitch(
+            "SDK_INIT_FAILED",
+            "Hyperswitch SDK failed to initialise (payments): missing JavaScript: \(missing)"
         )
     }()
+
 
     private override init() {
         self.delegate = RNViewManagerDelegate()
@@ -239,6 +252,7 @@ internal final class RNViewManager: NSObject, ReactHostManager, SurfaceHost {
     /// `initPaymentSession` does not wait for JS evaluation. Idempotent.
     internal func warmUp() {
         DispatchQueue.main.async {
+            guard self.initFailure == nil else { return }
             self.factory.rootViewFactory.initializeReactHost(
                 launchOptions: nil,
                 bundleConfiguration: RCTBundleConfiguration.default(),
@@ -251,6 +265,9 @@ internal final class RNViewManager: NSObject, ReactHostManager, SurfaceHost {
     /// carrying this surface's root tag resolves to; it is attached at creation so no surface
     /// can exist without one.
     internal func viewForModule(_ moduleName: String, initialProperties: [String: Any]?, owner: AnyObject) -> UIView {
+        // No React root when the host cannot start: an empty view, and callers that
+        // report results check initFailure first.
+        guard initFailure == nil else { return UIView() }
         let rootView = factory.rootViewFactory.view(
             withModuleName: moduleName,
             initialProperties: initialProperties

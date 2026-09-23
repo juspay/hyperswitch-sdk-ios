@@ -33,9 +33,6 @@ class NSDataBuffer : public facebook::jsi::Buffer {
   NSData *data_;
 };
 
-NSString *const kChunkSuffix = @".chunk.bundle";
-NSString *const kRuntimeChunk = @"react-native";
-
 } // namespace
 
 @implementation HyperReactNativeFactory {
@@ -51,11 +48,34 @@ NSString *const kRuntimeChunk = @"react-native";
   return self;
 }
 
-+ (NSString *)runtimeChunkNameForBundle:(NSString *)bundleFileName
++ (NSArray<NSString *> *)initialChunks
 {
-  NSString *name = [bundleFileName hasSuffix:@".bundle"] ? [bundleFileName stringByDeletingPathExtension]
-                                                         : bundleFileName;
-  return [NSString stringWithFormat:@"%@.%@%@", name, kRuntimeChunk, kChunkSuffix];
+  return @[ @"hyperswitch.react-native.chunk.bundle", @"hyperswitch.vendors.chunk.bundle" ];
+}
+
++ (NSString *)missingFilesForBundleURL:(NSURL *)bundleURL resourceDirectory:(NSString *)resourceDirectory
+{
+  if (bundleURL == nil) {
+    return @"the entry bundle";
+  }
+  if (!bundleURL.isFileURL) {
+    return nil; // A development server serves it.
+  }
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+  NSMutableArray<NSString *> *missing = [NSMutableArray array];
+  if (![fileManager fileExistsAtPath:bundleURL.path]) {
+    [missing addObject:bundleURL.lastPathComponent];
+  }
+  NSString *bundleDir = bundleURL.URLByDeletingLastPathComponent.path;
+  for (NSString *chunk in self.initialChunks) {
+    BOOL inBundleDir = [fileManager fileExistsAtPath:[bundleDir stringByAppendingPathComponent:chunk]];
+    BOOL inResources = resourceDirectory != nil &&
+        [fileManager fileExistsAtPath:[resourceDirectory stringByAppendingPathComponent:chunk]];
+    if (!inBundleDir && !inResources) {
+      [missing addObject:chunk];
+    }
+  }
+  return missing.count > 0 ? [missing componentsJoinedByString:@", "] : nil;
 }
 
 #pragma mark - RCTHostDelegate
@@ -87,20 +107,21 @@ NSString *const kRuntimeChunk = @"react-native";
          inRuntime:runtime];
   }
 
-  NSString *runtimeName = [HyperReactNativeFactory runtimeChunkNameForBundle:bundleURL.lastPathComponent];
-  NSString *runtimePath = [bundleDir stringByAppendingPathComponent:runtimeName];
-  if (![fileManager fileExistsAtPath:runtimePath] && _resourceDirectory != nil) {
-    // The download and the packaged copy must come from the same SDK build, so OTA
-    // packages are expected to ship every chunk file.
-    NSString *packaged = [_resourceDirectory stringByAppendingPathComponent:runtimeName];
-    if ([fileManager fileExistsAtPath:packaged]) {
-      RCTLogWarn(@"[Hyperswitch] %@ has no %@; using the packaged copy", bundleDir, runtimeName);
-      runtimePath = packaged;
+  for (NSString *chunk in HyperReactNativeFactory.initialChunks) {
+    NSString *path = [bundleDir stringByAppendingPathComponent:chunk];
+    if (![fileManager fileExistsAtPath:path] && _resourceDirectory != nil) {
+      // The download and the packaged copy must come from the same SDK build, so OTA
+      // packages are expected to ship every chunk file.
+      NSString *packaged = [_resourceDirectory stringByAppendingPathComponent:chunk];
+      if ([fileManager fileExistsAtPath:packaged]) {
+        RCTLogWarn(@"[Hyperswitch] %@ has no %@; using the packaged copy", bundleDir, chunk);
+        path = packaged;
+      }
     }
-  }
-  NSData *runtimeChunk = [NSData dataWithContentsOfFile:runtimePath options:NSDataReadingMappedIfSafe error:nil];
-  if (runtimeChunk != nil) {
-    [self evaluate:runtimeChunk url:[NSURL fileURLWithPath:runtimePath].absoluteString inRuntime:runtime];
+    NSData *data = [NSData dataWithContentsOfFile:path options:NSDataReadingMappedIfSafe error:nil];
+    if (data != nil) {
+      [self evaluate:data url:[NSURL fileURLWithPath:path].absoluteString inRuntime:runtime];
+    }
   }
 }
 

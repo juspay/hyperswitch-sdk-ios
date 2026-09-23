@@ -16,6 +16,11 @@ extension PaymentSession {
         subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil,
         completion: @escaping (PaymentResult) -> Void
     ) {
+        if let initFailure = RNViewManager.shared.initFailure {
+            // Nothing to show: the sheet would never render.
+            completion(.failed(error: initFailure))
+            return
+        }
         let paymentSheet = PaymentSheet(
             paymentSessionConfiguration: paymentSessionConfiguration,
             hyperswitchConfiguration: hyperswitchConfiguration ?? nil,
@@ -40,6 +45,11 @@ extension PaymentSession {
         subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil,
         completion: @escaping (PaymentResult) -> Void
     ) {
+        if let initFailure = RNViewManager.shared.initFailure {
+            // Nothing to show: the sheet would never render.
+            completion(.failed(error: initFailure))
+            return
+        }
         let paymentSheet = PaymentSheet(
             paymentSessionConfiguration: paymentSessionConfiguration,
             hyperswitchConfiguration: hyperswitchConfiguration ?? nil
@@ -69,9 +79,12 @@ extension PaymentSession {
 
         onMain { [weak self] in
             guard let self = self else { return }
-            guard !self.reactRuntime.closed else {
-                let reason = "The payment session was closed"
-                let failure: NSDictionary = ["code": "SESSION_CLOSED", "message": reason]
+            let initFailure = RNViewManager.shared.initFailure
+            guard !self.reactRuntime.closed, initFailure == nil else {
+                let (code, reason) = self.reactRuntime.closed
+                    ? ("SESSION_CLOSED", "The payment session was closed")
+                    : ("SDK_INIT_FAILED", initFailure?.localizedDescription ?? "")
+                let failure: NSDictionary = ["code": code, "message": reason]
                 func_(
                     PaymentSessionHandlerImpl(
                         defaultMethod: failure,
@@ -79,7 +92,7 @@ extension PaymentSession {
                         allMethods: [],
                         sdkAuthorization: { "" },
                         resolveToken: { _, _, resultHandler in
-                            resultHandler(.failed(error: Self.error("SESSION_CLOSED", reason)))
+                            resultHandler(.failed(error: Self.error(code, reason)))
                         }
                     )
                 )
@@ -255,6 +268,10 @@ extension PaymentSession: UpdateIntentReplyTarget {
             guard let self = self else { return }
             guard self.reactRuntime.updateIntentAttempt == nil else {
                 completion(.failure(Self.error("ALREADY_IN_PROGRESS", "updateIntent already in progress")))
+                return
+            }
+            if let initFailure = RNViewManager.shared.initFailure {
+                completion(.failure(initFailure))
                 return
             }
             guard self.ensurePrefetchSurface() != nil else {
