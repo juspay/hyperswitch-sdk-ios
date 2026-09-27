@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HyperswitchAuthentication
 
 class AuthenticationViewModel: ObservableObject {
 

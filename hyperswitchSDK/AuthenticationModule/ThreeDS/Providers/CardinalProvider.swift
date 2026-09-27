@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import HyperswitchShared
 
-#if canImport(CardinalMobile)
+#if HYPERSWITCH_CARDINAL
 import CardinalMobile
 
 class CardinalProvider: ThreeDSProvider {

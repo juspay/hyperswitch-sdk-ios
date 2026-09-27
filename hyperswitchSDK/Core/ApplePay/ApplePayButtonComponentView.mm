@@ -7,6 +7,7 @@
 
 #ifdef RCT_NEW_ARCH_ENABLED
 
+#import <React/RCTComponentViewFactory.h>
 #import <React/RCTConversions.h>
 #import <React/RCTViewComponentView.h>
 
@@ -14,7 +15,8 @@
 #import <react/renderer/components/HyperswitchClientCoreSpec/EventEmitters.h>
 #import <react/renderer/components/HyperswitchClientCoreSpec/Props.h>
 
-#import "../NativeModule/HyperSwiftInterface.h"
+#import "HyperReactPrelude.h"
+#import "Hyperswitch-Swift.h"
 
 using namespace facebook::react;
 
@@ -24,6 +26,14 @@ using namespace facebook::react;
 @implementation ApplePayButtonComponentView {
   HSApplePayView *_view;
   BOOL _initialPropsApplied;
+}
+
+// The component registers itself where this class is linked (the payments SDK). client-core's
+// codegenConfig.ios.componentProvider is empty on purpose: codegen's list of components is
+// compiled into HyperswitchReactNative, which apps also use without the payments SDK.
++ (void)load
+{
+  [[RCTComponentViewFactory currentComponentViewFactory] registerComponentViewClass:self];
 }
 
 + (ComponentDescriptorProvider)componentDescriptorProvider

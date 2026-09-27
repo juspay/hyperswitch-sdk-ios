@@ -1,0 +1,55 @@
+frameworks:
+  HyperswitchShared: {}
+  HyperswitchReactNative:
+    depends: [HyperswitchShared]
+    react_native: true
+    npm:
+      - react-native-svg
+      - react-native-inappbrowser-reborn
+      - react-native-safe-area-context
+  Hyperswitch:
+    depends: [HyperswitchReactNative]
+  HyperswitchPaymentMethods:
+    depends: [HyperswitchReactNative]
+  HyperswitchPaymentMethodManagement:
+    depends: [HyperswitchReactNative]
+  HyperswitchScanCardPlugin:
+    depends: [HyperswitchReactNative]
+    npm: ["@juspay-tech/react-native-hyperswitch-scancard"]
+  HyperswitchNetcetera3DSPlugin:
+    depends: [HyperswitchReactNative]
+    npm: ["@juspay-tech/react-native-hyperswitch-netcetera-3ds"]
+  HyperswitchPayPalPlugin:
+    depends: [HyperswitchReactNative]
+    npm: ["@juspay-tech/react-native-hyperswitch-paypal"]
+  HyperswitchSentryPlugin:
+    depends: [HyperswitchReactNative]
+    npm: ["@sentry/react-native"]
+  HyperswitchAirbornePlugin:
+    depends: [HyperswitchShared]
+    pods:
+      HyperOTA: "0.0.8"
+  HyperswitchLite:
+    depends: [HyperswitchShared]
+  HyperswitchAuthentication:
+    depends: [HyperswitchShared]
+  HyperswitchAuthenticationNetcetera3DS:
+    depends: [HyperswitchAuthentication]
+    binaries: [ThreeDS_SDK]
+
+products:
+  Hyperswitch: [Hyperswitch]
+  HyperswitchPaymentMethods: [HyperswitchPaymentMethods]
+  HyperswitchPaymentMethodManagement: [HyperswitchPaymentMethodManagement]
+  HyperswitchScanCard: [HyperswitchScanCardPlugin]
+  HyperswitchNetcetera3DS: [HyperswitchNetcetera3DSPlugin]
+  HyperswitchPayPal: [HyperswitchPayPalPlugin]
+  HyperswitchSentry: [HyperswitchSentryPlugin]
+  HyperswitchAirborne: [HyperswitchAirbornePlugin]
+  HyperswitchLite: [HyperswitchLite]
+  HyperswitchAuthentication: [HyperswitchAuthentication]
+  HyperswitchAuthenticationNetcetera3DS: [HyperswitchAuthenticationNetcetera3DS]
+
+# Third-party xcframeworks whose code signature is removed when staged. SPM rejects an
+# expired signature;
+signature_strip_allowlist: [ThreeDS_SDK]

@@ -5,6 +5,8 @@
 //  Created by Harshit Srivastava on 29/10/25.
 //
 
+import HyperswitchShared
+
 public class ThreeDSSession {
     private let sessionProvider: ThreeDSSessionProvider
 

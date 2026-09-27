@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HyperswitchShared
 @preconcurrency import WebKit
 
 // MARK: - Internal Implementation

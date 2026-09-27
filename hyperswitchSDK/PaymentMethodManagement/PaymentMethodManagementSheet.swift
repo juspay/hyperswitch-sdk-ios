@@ -2,11 +2,12 @@
 //  PaymentMethodManagementSheet.swift
 //  Hyperswitch
 //
-//  The modal PMM surface: one React root on the PMM host, dismissed by the bundle's
-//  own exit call.
+//  Created by Saksham Sharma on 24/09/26.
 //
 
 import Foundation
+import HyperswitchReactNative
+import HyperswitchShared
 import UIKit
 
 internal final class PaymentMethodManagementSheet: PaymentMethodManagementEventTarget {

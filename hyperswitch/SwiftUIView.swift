@@ -5,6 +5,7 @@
 //  Created by Harshit Srivastava on 25/04/23.
 //
 
+import Hyperswitch
 import SwiftUI
 
 struct SwiftUIView: View {

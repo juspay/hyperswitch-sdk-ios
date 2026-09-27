@@ -8,6 +8,7 @@
 #ifdef RCT_NEW_ARCH_ENABLED
 
 #import <React/RCTBridgeModule.h>
+#import <React/RCTLog.h>
 #import <React/RCTFabricSurface.h>
 #import <React/RCTSurfacePresenter.h>
 #import <React/RCTSurfacePresenterStub.h>
@@ -19,7 +20,8 @@
 #import "HyperswitchClientCoreSpec/HyperswitchClientCoreSpec.h"
 #endif
 
-#import "HyperSwiftInterface.h"
+#import "HyperReactPrelude.h"
+#import "Hyperswitch-Swift.h"
 
 @interface HyperHeadless : NativeHyperHeadlessSpecBase <NativeHyperHeadlessSpec, HyperHeadlessShim>
 @end
@@ -86,6 +88,11 @@ RCT_EXPORT_MODULE()
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
     (const facebook::react::ObjCTurboModule::InitParams &)params
 {
+  if (_impl == nil) {
+    // Every exported module class resolves in every React host. Only the payments host
+    // attaches this module's implementation; elsewhere its methods do nothing.
+    RCTLogWarn(@"[Hyperswitch] HyperHeadless was requested from a React host that does not serve it; calls to it are ignored.");
+  }
   return std::make_shared<facebook::react::NativeHyperHeadlessSpecJSI>(params);
 }
 

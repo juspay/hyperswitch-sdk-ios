@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HyperswitchShared
 import UIKit
 
 public class AuthenticationSession {
@@ -38,6 +39,9 @@ public class AuthenticationSession {
     }
 
     public func initAuthenticationSession(clientSecret: String, profileId: String, authenticationId: String, merchantId: String) {
+        start(clientSecret: clientSecret, profileId: profileId, authenticationId: authenticationId, merchantId: merchantId)
+    }
+    internal func start(clientSecret: String, profileId: String?, authenticationId: String, merchantId: String) {
         self.clientSecret = clientSecret
         self.profileId = profileId
         self.authenticationId = authenticationId

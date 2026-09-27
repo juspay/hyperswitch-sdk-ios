@@ -2,10 +2,11 @@
 //  PaymentMethodManagement.swift
 //  Hyperswitch
 //
-//  Merchant-facing entry into Payment Methods Management.
+//  Created by Saksham Sharma on 24/09/26.
 //
 
 import Foundation
+import HyperswitchShared
 import UIKit
 
 public struct PaymentMethodManagementConfiguration {

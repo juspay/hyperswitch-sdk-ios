@@ -5,6 +5,7 @@
 //  Created by Shivam nan on 10/09/25.
 //
 
+import HyperswitchAuthentication
 import UIKit
 
 class AuthenticationViewController: UIViewController {

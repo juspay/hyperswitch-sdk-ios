@@ -12,7 +12,7 @@ import UIKit
 public class PaymentSheet {
 
     /// The initializer method that sets up the payment sheet with the required parameters.
-    internal required init(
+    package required init(
         paymentSessionConfiguration: PaymentSessionConfiguration,
         hyperswitchConfiguration: HyperswitchConfiguration? = nil,
         configuration: Configuration? = nil
@@ -22,19 +22,19 @@ public class PaymentSheet {
         self.configuration = configuration
     }
 
-    internal let paymentSessionConfiguration: PaymentSessionConfiguration
-    internal var hyperswitchConfiguration: HyperswitchConfiguration?
+    package let paymentSessionConfiguration: PaymentSessionConfiguration
+    package var hyperswitchConfiguration: HyperswitchConfiguration?
 
     /// The configuration object that holds the settings for the payment sheet.
-    internal let configuration: Configuration?
-    internal var completion: ((PaymentResult) -> Void)?
-    internal var subscribedEvents: [String]?
-    internal var paymentEventListener: PaymentEventListener?
-    internal var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
+    package let configuration: Configuration?
+    package var completion: ((PaymentResult) -> Void)?
+    package var subscribedEvents: [String]?
+    package var paymentEventListener: PaymentEventListener?
+    package var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
 
     /// Identity of the presenting session in JS (its prefetch root tag), if any.
-    internal var sessionTag: Int?
+    package var sessionTag: Int?
 
     /// The controller presenting this sheet, for dismissal when JS exits it.
-    internal weak var presentedViewController: UIViewController?
+    package weak var presentedViewController: UIViewController?
 }

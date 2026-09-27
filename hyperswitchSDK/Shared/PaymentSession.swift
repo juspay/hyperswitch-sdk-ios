@@ -13,6 +13,20 @@ import Foundation
     case failed(error: Error)
 }
 
+extension PaymentResult {
+    package static func from(status: String, code: String?, message: String?) -> PaymentResult {
+        switch status {
+        case "cancelled":
+            return .canceled(data: "cancelled")
+        case "failed", "requires_payment_method", "form_invalid":
+            let domain = (code?.isEmpty == false) ? code! : "UNKNOWN_ERROR"
+            return .failed(error: NSError.hyperswitch(domain, message ?? "An error has occurred."))
+        default:
+            return .completed(data: status)
+        }
+    }
+}
+
 public enum UpdateIntentResult {
     case success
     case cancelled
@@ -21,27 +35,19 @@ public enum UpdateIntentResult {
 
 public class PaymentSession {
 
-    internal var paymentSessionConfiguration: PaymentSessionConfiguration
-    internal var hyperswitchConfiguration: HyperswitchConfiguration?
+    package var paymentSessionConfiguration: PaymentSessionConfiguration
+    package var hyperswitchConfiguration: HyperswitchConfiguration?
 
-    #if canImport(React)
-    /// This session's surfaces on the shared React host.
-    internal let reactRuntime = PaymentSessionReactRuntime()
-    #endif
+    /// The payments SDK's state for this session (its surfaces on the React host), when the
+    /// app links that SDK.
+    package var runtime: (any PaymentSessionRuntime)?
 
     internal init(paymentSessionConfiguration: PaymentSessionConfiguration, hyperswitchConfiguration: HyperswitchConfiguration? = nil) {
         self.paymentSessionConfiguration = paymentSessionConfiguration
         self.hyperswitchConfiguration = hyperswitchConfiguration
-
-        if let hyperswitchConfiguration = hyperswitchConfiguration {
-            #if canImport(HyperOTA)
-            OTAServices.shared.initialize(publishableKey: hyperswitchConfiguration.publishableKey)
-            LogManager.initialize(publishableKey: hyperswitchConfiguration.publishableKey)
-            #endif
-        }
     }
 
-    internal func parseUpdateIntentResult(_ data: String) -> UpdateIntentResult {
+    package func parseUpdateIntentResult(_ data: String) -> UpdateIntentResult {
         guard
             let bytes = data.data(using: .utf8),
             let json = (try? JSONSerialization.jsonObject(with: bytes)) as? [String: String]
@@ -59,6 +65,23 @@ public class PaymentSession {
             return .failure(NSError.hyperswitch(code, message))
         default:
             return .success
+        }
+    }
+}
+
+extension PaymentSession {
+
+    public func updateIntent(
+        authorizationProvider: @escaping (@escaping (String) -> Void) -> Void,
+        completion: @escaping (UpdateIntentResult) -> Void
+    ) {
+        if let runtime = runtime {
+            runtime.updateIntent(of: self, authorizationProvider: authorizationProvider, completion: completion)
+            return
+        }
+        authorizationProvider { [weak self] sdkAuthorization in
+            self?.paymentSessionConfiguration = PaymentSessionConfiguration(sdkAuthorization: sdkAuthorization)
+            completion(.success)
         }
     }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class LogManager {
+package final class LogManager {
     private static var logsBatch: [LogPayload] = []
     private static var publishableKey: String = ""
     private static var loggingEndPoint: String?
@@ -25,7 +25,7 @@ final class LogManager {
         return logBatch.compactMap { $0.toJson() }
     }
 
-    static func initialize(publishableKey: String) {
+    package static func initialize(publishableKey: String) {
         queue.async {
             self.publishableKey = publishableKey
             self.loggingEndPoint = SDKEnvironment.loggingURL(for: publishableKey)
@@ -72,7 +72,7 @@ final class LogManager {
         }
     }
 
-    static func addLog(_ log: LogPayload) {
+    package static func addLog(_ log: LogPayload) {
         queue.async {
             logsBatch.append(log)
             debouncer.debounce {

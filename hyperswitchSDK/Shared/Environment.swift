@@ -7,10 +7,10 @@
 
 import Foundation
 
-enum SDKEnvironment {
+package enum SDKEnvironment {
     case PROD, SANDBOX
 
-    static func getEnvironment(_ publishableKey: String) -> SDKEnvironment {
+    package static func getEnvironment(_ publishableKey: String) -> SDKEnvironment {
         return publishableKey.contains("_snd_") ? .SANDBOX : .PROD
     }
 

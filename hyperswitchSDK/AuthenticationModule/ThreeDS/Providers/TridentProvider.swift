@@ -6,9 +6,10 @@
 //
 
 import Foundation
+import HyperswitchShared
 import UIKit
 
-#if canImport(Trident)
+#if HYPERSWITCH_TRIDENT
 import Trident
 
 //class Logger: TridentLoggerDelegate {

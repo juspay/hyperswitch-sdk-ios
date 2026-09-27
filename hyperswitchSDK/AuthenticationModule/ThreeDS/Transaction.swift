@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HyperswitchShared
 import UIKit
 
 public final class Transaction {
@@ -69,7 +70,7 @@ public class AuthenticationRequestParameters {
     final public let messageVersion: String?
     final public let sdkEncryptedData: String?
 
-    init(
+    package init(
         sdkTransactionID: String?,
         deviceData: String?,
         sdkEphemeralPublicKey: String?,

@@ -1,6 +1,0 @@
-framework module RNInAppBrowser {
-  umbrella header "RNInAppBrowser-umbrella.h"
-
-  export *
-  module * { export * }
-}

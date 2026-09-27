@@ -8,7 +8,7 @@
 import UIKit
 import WebKit
 
-class SDKParams {
+package class SDKParams {
     static let appId: String? = Bundle.main.bundleIdentifier
     static let sdkVersion: String = SDKVersion.current
     static let country: String? = NSLocale.current.regionCode
@@ -38,7 +38,7 @@ class SDKParams {
         return window?.safeAreaInsets ?? .zero
     }
 
-    static func getSDKParams() -> [String: Any?] {
+    package static func getSDKParams() -> [String: Any?] {
 
         let insets = safeAreaInsets()
 

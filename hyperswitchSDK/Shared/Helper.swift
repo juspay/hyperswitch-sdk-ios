@@ -7,9 +7,9 @@
 
 import Foundation
 
-enum Helper {
+package enum Helper {
 
-    static func getInfoPlist(_ key: String) -> String? {
+    package static func getInfoPlist(_ key: String) -> String? {
         guard let infoDictionary = Bundle.main.infoDictionary,
             let value = infoDictionary[key] as? String, !value.isEmpty
         else {
@@ -21,7 +21,7 @@ enum Helper {
     /// Dedicated serial queue protecting the read-then-write block
     private static let uuidQueue = DispatchQueue(label: "io.hyperswitch.helper.uuid")
 
-    static func persistentUUID(for flow: String) -> String {
+    package static func persistentUUID(for flow: String) -> String {
         uuidQueue.sync {
             /// never call this using another uuidQueue.sync (deadlock)
             let safeFlow = flow.lowercased().replacingOccurrences(of: " ", with: "_")
