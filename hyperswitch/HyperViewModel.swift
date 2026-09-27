@@ -7,6 +7,13 @@
 
 import SwiftUI
 
+#if APPCLIP
+import HyperswitchLite
+#else
+import Hyperswitch
+import HyperswitchPaymentMethodManagement
+#endif
+
 class HyperViewModel: ObservableObject {
 
     let backendUrl = URL(string: "http://localhost:5252")!

@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import HyperswitchReactNative
+import HyperswitchShared
 import UIKit
 
 extension PaymentSession {
@@ -247,7 +249,8 @@ extension PaymentSession: UpdateIntentReplyTarget {
         }
     }
 
-    public func updateIntent(
+    /// `updateIntent` for a session this SDK runs (see PaymentsRuntimeEntryPoint.swift).
+    internal func updateIntentOnReactHost(
         authorizationProvider: @escaping (@escaping (String) -> Void) -> Void,
         completion: @escaping (UpdateIntentResult) -> Void
     ) {

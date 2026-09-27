@@ -34,7 +34,9 @@ local.properties
 
 # IOS
 Pods/
-Podfile.lock
+
+Hyperswitch.xcodeproj/
+Hyperswitch.xcworkspace/
 
 # node.js
 #
@@ -67,8 +69,6 @@ buck-out/
 .vscode
 .vs
 
-DummyApp.xcworkspace/
-DummyApp.xcodeproj/
 build/
 
 Pods/
@@ -76,7 +76,6 @@ Pods/
 DerivedData/
 
 *.xcarchive
-DummyApp.tar.gz
 
 .xcode.env.local
 

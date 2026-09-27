@@ -6,7 +6,9 @@
 //
 
 import Foundation
-import React
+import HyperswitchReactNative
+import HyperswitchShared
+internal import React
 
 /// The contract with the Payment Methods bundle. Mirrors `hosted/protocol.ts` in
 /// hyperswitch-client-core; the two are told apart from a mismatch by `version`.

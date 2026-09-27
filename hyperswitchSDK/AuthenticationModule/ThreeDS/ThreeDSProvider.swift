@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HyperswitchShared
 import UIKit
 
 public protocol ThreeDSProvider {

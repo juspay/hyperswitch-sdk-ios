@@ -2,13 +2,13 @@
 //  PaymentMethodManagementModule.swift
 //  Hyperswitch
 //
-//  The contract between the hyperswitch-payment-method-management bundle and its native owners. Mirrors the
-//  payments `HyperModule` API surface, PMM-scoped: a sheet or widget root resolves by
-//  root tag through `SurfaceOwners`, so nothing here tracks surfaces itself.
+//  Created by Saksham Sharma on 24/09/26.
 //
 
 import Foundation
-import React
+import HyperswitchReactNative
+import HyperswitchShared
+internal import React
 
 /// The one component the pmm bundle registers.
 internal enum PMMProtocol {

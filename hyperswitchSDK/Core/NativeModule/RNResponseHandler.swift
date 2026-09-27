@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HyperswitchShared
 
 internal protocol RNResponseHandler {
     func didReceiveResponse(response: String?, error: Error?)

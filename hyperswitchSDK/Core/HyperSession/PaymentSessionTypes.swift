@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HyperswitchShared
 
 /// Represents a valid payment method with all details
 public struct PaymentMethod: Codable {

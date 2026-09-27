@@ -65,3 +65,19 @@ public struct OverrideEndpointConfiguration: Codable {
         self.customLoggingEndpoint = customLoggingEndpoint
     }
 }
+
+extension CustomEndpointConfiguration {
+    package var backendURL: String? {
+        switch self {
+        case .commonEndpoint(let endpoint): return endpoint + "/api"
+        case .overrideEndpoints(let endpoints): return endpoints.customBackendEndpoint
+        }
+    }
+
+    package var loggingURL: String? {
+        switch self {
+        case .commonEndpoint(let endpoint): return endpoint + "/api/logs/sdk"
+        case .overrideEndpoints(let endpoints): return endpoints.customLoggingEndpoint
+        }
+    }
+}

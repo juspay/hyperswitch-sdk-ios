@@ -2,7 +2,7 @@
 //  HyperPMMTurboModule.mm
 //  Hyperswitch
 //
-//  Bridges the PMM realm's TurboModule (`HyperPMMModule`) to the Swift implementation.
+//  Created by Saksham Sharma on 24/09/26.
 //
 
 #ifdef RCT_NEW_ARCH_ENABLED
@@ -17,7 +17,8 @@
 #import "HyperswitchClientCoreSpec/HyperswitchClientCoreSpec.h"
 #endif
 
-#import "../../Core/NativeModule/HyperSwiftInterface.h"
+#import "HyperReactPrelude.h"
+#import "HyperswitchPaymentMethodManagement-Swift.h"
 
 @interface HyperPMMModule
     : NativeHyperPMMModuleSpecBase <NativeHyperPMMModuleSpec, PaymentMethodManagementModuleShim>

@@ -6,21 +6,9 @@
 //
 
 import Foundation
-import React
-
-extension PaymentResult {
-    internal static func from(status: String, code: String?, message: String?) -> PaymentResult {
-        switch status {
-        case "cancelled":
-            return .canceled(data: "cancelled")
-        case "failed", "requires_payment_method", "form_invalid":
-            let domain = (code?.isEmpty == false) ? code! : "UNKNOWN_ERROR"
-            return .failed(error: NSError.hyperswitch(domain, message ?? "An error has occurred."))
-        default:
-            return .completed(data: status)
-        }
-    }
-}
+import HyperswitchReactNative
+import HyperswitchShared
+internal import React
 
 @objc(HyperModuleShim)
 internal protocol HyperModuleShim: NSObjectProtocol {

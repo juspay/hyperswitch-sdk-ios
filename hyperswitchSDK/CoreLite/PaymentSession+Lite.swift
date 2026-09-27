@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HyperswitchShared
 import UIKit
 
 extension PaymentSession {
@@ -21,20 +22,5 @@ extension PaymentSession {
             configuration: configuration
         )
         paymentSheet.presentLite(from: viewController, completion: completion)
-    }
-}
-
-extension PaymentSession {
-
-    internal func activateRuntime() async {}  //no-op
-
-    public func updateIntent(
-        authorizationProvider: @escaping (@escaping (String) -> Void) -> Void,
-        completion: @escaping (UpdateIntentResult) -> Void
-    ) {
-        authorizationProvider { [weak self] sdkAuthorization in
-            self?.paymentSessionConfiguration = PaymentSessionConfiguration(sdkAuthorization: sdkAuthorization)
-            completion(.success)
-        }
     }
 }

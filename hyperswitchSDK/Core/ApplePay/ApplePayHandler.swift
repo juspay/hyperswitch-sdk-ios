@@ -6,8 +6,9 @@
 //
 
 import Foundation
+import HyperswitchShared
 import PassKit
-import React
+internal import React
 
 internal class ApplePayHandler: NSObject {
 

@@ -7,7 +7,10 @@
 
 import Foundation
 
-internal class LogBuilder {
+package class LogBuilder {
+
+    package init() {}
+
     private var timestamp: String = ""
     private var logType: LogType = .INFO
     private var component: String = "MOBILE"
@@ -31,7 +34,7 @@ internal class LogBuilder {
     private var paymentExperience: String? = nil
     private var source: String = ""
 
-    func setLogType(_ logType: String) -> LogBuilder {
+    package func setLogType(_ logType: String) -> LogBuilder {
         switch logType.uppercased() {
         case "ERROR":
             self.logType = .ERROR
@@ -48,42 +51,42 @@ internal class LogBuilder {
         return self
     }
 
-    func setClientCoreVersion(_ clientCoreVersion: String) -> LogBuilder {
+    package func setClientCoreVersion(_ clientCoreVersion: String) -> LogBuilder {
         self.clientCoreVersion = clientCoreVersion
         return self
     }
 
-    func setValue(_ value: String) -> LogBuilder {
+    package func setValue(_ value: String) -> LogBuilder {
         self.value = value
         return self
     }
 
-    func setEventName(_ eventName: EventName) -> LogBuilder {
+    package func setEventName(_ eventName: EventName) -> LogBuilder {
         self.eventName = eventName
         return self
     }
 
-    func setCategory(_ category: LogCategory) -> LogBuilder {
+    package func setCategory(_ category: LogCategory) -> LogBuilder {
         self.category = category
         return self
     }
 
-    func setPaymentId(_ paymentId: String) -> LogBuilder {
+    package func setPaymentId(_ paymentId: String) -> LogBuilder {
         self.paymentId = paymentId
         return self
     }
 
-    func setAuthenticationId(_ authenticationId: String) -> LogBuilder {
+    package func setAuthenticationId(_ authenticationId: String) -> LogBuilder {
         self.authenticationId = authenticationId
         return self
     }
 
-    func setSessionId(_ sessionId: String) -> LogBuilder {
+    package func setSessionId(_ sessionId: String) -> LogBuilder {
         self.sessionId = sessionId
         return self
     }
 
-    func build() -> LogPayload {
+    package func build() -> LogPayload {
         self.timestamp = String(Int(Date().timeIntervalSince1970 * 1000))
         return LogPayload(
             timestamp: timestamp,

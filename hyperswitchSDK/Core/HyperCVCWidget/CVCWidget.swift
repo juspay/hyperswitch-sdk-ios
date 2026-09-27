@@ -6,6 +6,9 @@
 //
 
 import Foundation
+import HyperswitchReactNative
+import HyperswitchShared
+import UIKit
 
 public class CVCWidget: UIControl {
 

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HyperswitchShared
 
 public enum TransactionError: Error, LocalizedError {
     case authReqParamGenerationFailed(String, Error?)

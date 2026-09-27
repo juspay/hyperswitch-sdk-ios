@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HyperswitchShared
 
 public enum ThreeDSProviderType: String, CaseIterable {
     case netcetera = "Netcetera"

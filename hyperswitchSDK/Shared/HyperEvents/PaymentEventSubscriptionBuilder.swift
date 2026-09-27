@@ -16,7 +16,7 @@ public final class PaymentEventSubscriptionBuilder {
         handlers[eventType] = handler
     }
 
-    internal func build() -> (subscription: PaymentEventSubscription, listener: PaymentEventListener) {
+    package func build() -> (subscription: PaymentEventSubscription, listener: PaymentEventListener) {
         let dispatch: [String: (PaymentEvent) -> Void] = Dictionary(
             uniqueKeysWithValues: handlers.map { ($0.key.rawValue, $0.value) }
         )
@@ -40,6 +40,10 @@ public struct PaymentEventSubscription: Sendable {
     }
 }
 
-internal struct PaymentEventListener {
-    let onPaymentEvent: (PaymentEvent) -> Void
+package struct PaymentEventListener {
+    package let onPaymentEvent: (PaymentEvent) -> Void
+
+    package init(onPaymentEvent: @escaping (PaymentEvent) -> Void) {
+        self.onPaymentEvent = onPaymentEvent
+    }
 }

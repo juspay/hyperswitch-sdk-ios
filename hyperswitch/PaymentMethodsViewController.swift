@@ -5,6 +5,8 @@
 //  Created by Harshit Srivastava on 21/09/26.
 //
 
+import Hyperswitch
+import HyperswitchPaymentMethods
 import UIKit
 
 final class PaymentMethodsViewController: UIViewController {

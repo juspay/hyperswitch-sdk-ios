@@ -13,10 +13,10 @@ private protocol HyperswitchConfigurationSchema {
 }
 
 public struct HyperswitchConfiguration: HyperswitchConfigurationSchema, Codable {
-    let publishableKey: String
-    let profileId: String?
-    let customEndpoints: CustomEndpointConfiguration?
-    let environment: HyperswitchEnvironment?
+    package let publishableKey: String
+    package let profileId: String?
+    package let customEndpoints: CustomEndpointConfiguration?
+    package let environment: HyperswitchEnvironment?
 
     public init(
         publishableKey: String,
@@ -33,10 +33,10 @@ public struct HyperswitchConfiguration: HyperswitchConfigurationSchema, Codable 
 
 public struct HyperswitchPlatformConfiguration: HyperswitchConfigurationSchema, Codable {
     let platformPublishableKey: String
-    let publishableKey: String
-    let profileId: String?
-    let customEndpoints: CustomEndpointConfiguration?
-    let environment: HyperswitchEnvironment?
+    package let publishableKey: String
+    package let profileId: String?
+    package let customEndpoints: CustomEndpointConfiguration?
+    package let environment: HyperswitchEnvironment?
 
     public init(
         platformPublishableKey: String,

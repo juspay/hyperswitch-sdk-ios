@@ -6,9 +6,11 @@
 //
 
 import Foundation
-import React
-import ReactAppDependencyProvider
-import React_RCTAppDelegate
+import HyperswitchReactNative
+import HyperswitchShared
+internal import React
+internal import ReactAppDependencyProvider
+internal import React_RCTAppDelegate
 
 internal final class PaymentMethodsHostDelegate: RCTDefaultReactNativeFactoryDelegate {
 
@@ -70,11 +72,7 @@ internal final class PaymentMethodsHost: NSObject, SurfaceHost {
     /// Boots the host, and with it the bundle, ahead of the first form. Idempotent.
     internal func warmUp() {
         DispatchQueue.main.async {
-            self.factory.rootViewFactory.initializeReactHost(
-                launchOptions: nil,
-                bundleConfiguration: RCTBundleConfiguration.default(),
-                devMenuConfiguration: RCTDevMenuConfiguration.default()
-            )
+            self.factory.initializeHost()
         }
     }
 

@@ -1,10 +1,11 @@
 //
-//  SwiftUIview.swift
+//  SwiftUIView.swift
 //  hyperswitch
 //
 //  Created by Harshit Srivastava on 25/10/24.
 //
 
+import HyperswitchLite
 import SwiftUI
 
 struct SwiftUIView: View {

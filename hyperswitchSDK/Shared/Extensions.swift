@@ -36,21 +36,21 @@ internal extension UIColor {
     }
 }
 
-internal extension String {
-    func toJSON() -> Any? {
+extension String {
+    package func toJSON() -> Any? {
         guard let data = self.data(using: .utf8, allowLossyConversion: false) else { return nil }
         return try? JSONSerialization.jsonObject(with: data, options: .mutableContainers)
     }
 }
 
-internal extension NSError {
-    static func hyperswitch(_ code: String, _ message: String) -> NSError {
+extension NSError {
+    package static func hyperswitch(_ code: String, _ message: String) -> NSError {
         NSError(domain: code, code: 0, userInfo: [NSLocalizedDescriptionKey: message, "message": message])
     }
 }
 
-internal extension Encodable {
-    func toDictionary() throws -> [String: Any] {
+extension Encodable {
+    package func toDictionary() throws -> [String: Any] {
         let data = try JSONEncoder().encode(self)
         guard let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw NSError(domain: "Encoding", code: 0)

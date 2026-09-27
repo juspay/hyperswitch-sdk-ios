@@ -17,7 +17,8 @@
 #import "HyperswitchClientCoreSpec/HyperswitchClientCoreSpec.h"
 #endif
 
-#import "../../Core/NativeModule/HyperSwiftInterface.h"
+#import "HyperReactPrelude.h"
+#import "HyperswitchPaymentMethods-Swift.h"
 
 @interface HyperPaymentMethodsModule
     : NativeHyperPaymentMethodsSpecBase <NativeHyperPaymentMethodsSpec, PaymentMethodsModuleShim>

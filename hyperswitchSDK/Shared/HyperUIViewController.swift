@@ -8,20 +8,20 @@
 import Foundation
 import UIKit
 
-internal class HyperUIViewController: UIViewController {
-    internal var paymentSheet: PaymentSheet?
+package class HyperUIViewController: UIViewController {
+    package var paymentSheet: PaymentSheet?
 
-    internal override var shouldAutorotate: Bool {
+    package override var shouldAutorotate: Bool {
         return false
     }
-    internal override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    package override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
         return UIInterfaceOrientationMask.portrait
     }
-    internal override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+    package override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
         return UIInterfaceOrientation.portrait
     }
-    internal override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {}
-    internal override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {}
-    internal override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {}
-    internal override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {}
+    package override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {}
+    package override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {}
+    package override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {}
+    package override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {}
 }

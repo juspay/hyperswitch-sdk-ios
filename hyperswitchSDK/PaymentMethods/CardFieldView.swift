@@ -6,7 +6,8 @@
 //
 
 import Foundation
-import React
+import HyperswitchShared
+internal import React
 import UIKit
 
 /// One field of a `CardForm`. Get one from the form and place it like any other view. What

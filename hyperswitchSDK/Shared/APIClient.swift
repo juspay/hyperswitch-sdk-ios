@@ -7,7 +7,7 @@
 
 import Foundation
 
-@objc internal class APIClient: NSObject {
+@objc package class APIClient: NSObject {
 
     @objc(sharedClient) public static let shared: APIClient = {
         let client = APIClient()

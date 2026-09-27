@@ -6,7 +6,8 @@
 //
 
 import Foundation
-import React
+import HyperswitchShared
+internal import React
 
 /// Extension on the PaymentSheet class to handle the presentation of the payment sheet view.
 internal extension PaymentSheet {

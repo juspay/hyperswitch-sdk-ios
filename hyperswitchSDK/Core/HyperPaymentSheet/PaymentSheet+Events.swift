@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HyperswitchShared
 
 extension PaymentSheet {
     internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {

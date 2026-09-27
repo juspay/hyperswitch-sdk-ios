@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HyperswitchShared
 import SwiftUI
 
 /// Extension on the PaymentSheet class to provide a SwiftUI integration for presenting the payment sheet.

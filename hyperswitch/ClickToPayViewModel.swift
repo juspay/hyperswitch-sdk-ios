@@ -5,6 +5,7 @@
 //  Created by Harshit Srivastava on 31/10/25.
 //
 
+import HyperswitchAuthentication
 import SwiftUI
 
 class ClickToPayViewModel: ObservableObject {

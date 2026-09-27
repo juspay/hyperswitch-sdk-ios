@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>HyperswitchSource</key>
-	<string>LocalBundle</string>
+	<string>Framework</string>
 	<key>HyperswitchSourceIP</key>
 	<string></string>
 	<key>NSAppTransportSecurity</key>

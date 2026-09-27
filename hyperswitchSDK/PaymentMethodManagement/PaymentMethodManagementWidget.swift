@@ -2,12 +2,12 @@
 //  PaymentMethodManagementWidget.swift
 //  Hyperswitch
 //
-//  The embeddable PMM surface: one React root on the PMM host placed anywhere in a
-//  merchant layout. Native → JS confirm goes out as `triggerWidgetAction`; the bundle's
-//  replies come back by root tag through `SurfaceOwners`.
+//  Created by Saksham Sharma on 24/09/26.
 //
 
 import Foundation
+import HyperswitchReactNative
+import HyperswitchShared
 import UIKit
 
 public class PaymentMethodManagementWidget: UIControl {

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HyperswitchShared
 
 public enum AuthenticationError: Error, LocalizedError {
     case noProviderAvailable(String)

@@ -5,6 +5,9 @@
 //  Created by Harshit Srivastava on 25/05/26.
 //
 
+import HyperswitchShared
+internal import React
+import UIKit
 import WebKit
 
 final internal class HeadlessWebView: NSObject, WKNavigationDelegate, WKUIDelegate, WKScriptMessageHandler {

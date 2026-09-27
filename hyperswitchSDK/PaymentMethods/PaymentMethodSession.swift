@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HyperswitchShared
 
 public struct PaymentMethodSessionConfiguration {
     internal let sdkAuthorization: String

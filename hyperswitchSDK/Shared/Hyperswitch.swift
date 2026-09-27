@@ -1,25 +1,26 @@
 //
 //  Hyperswitch.swift
-//  HyperswitchCore
+//  Hyperswitch
 //
 //  Created by Harshit Srivastava on 17/05/26.
 //
 
+import Foundation
+
 public final class Hyperswitch {
 
-    internal let hyperswitchConfiguration: HyperswitchConfiguration
+    package let hyperswitchConfiguration: HyperswitchConfiguration
 
     public init(configuration: HyperswitchConfiguration) {  // MARK: async on superposition impl
         self.hyperswitchConfiguration = configuration
+        LogManager.initialize(publishableKey: configuration.publishableKey)
         // Task {} Superposition
-        #if canImport(React)
-        RNViewManager.shared.warmUp()
-        #endif
+        PaymentsRuntime.entry?.warmUp(configuration: configuration)
     }
 
     public func initPaymentSession(configuration: PaymentSessionConfiguration) async -> PaymentSession {
         let session = PaymentSession(paymentSessionConfiguration: configuration, hyperswitchConfiguration: hyperswitchConfiguration)
-        await session.activateRuntime()
+        await PaymentsRuntime.entry?.activate(session)
         return session
     }
 }

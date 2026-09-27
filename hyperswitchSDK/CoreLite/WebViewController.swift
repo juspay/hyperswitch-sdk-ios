@@ -5,14 +5,24 @@
 //  Created by Harshit Srivastava on 30/08/24.
 //
 
+import HyperswitchShared
 import UIKit
 @preconcurrency import WebKit
 
-#if canImport(HyperswitchScanCard)
+#if HYPERSWITCH_LITE_SCANCARD
 import HyperswitchScanCard
 #endif
 
-internal class WebViewController: HyperUIViewController {
+internal class WebViewController: UIViewController {
+
+    // Portrait only, and touches stay in the sheet, like the React Native sheet's controller.
+    override var shouldAutorotate: Bool { false }
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .portrait }
+    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation { .portrait }
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {}
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {}
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {}
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {}
 
     private let applePayPaymentHandler = ApplePayHandlerLite()
 
@@ -146,7 +156,7 @@ extension WebViewController: WKScriptMessageHandler {
             )
         }
         if message.name == "launchScanCard" {
-            #if canImport(HyperswitchScanCard)
+            #if HYPERSWITCH_LITE_SCANCARD
             DispatchQueue.main.async {
                 var message: [String: Any] = [:]
                 var callback: [String: Any] = [:]

@@ -21,7 +21,7 @@ struct ViewControllerKey: EnvironmentKey {
 
 @available(iOS 13.0, *)
 extension EnvironmentValues {
-    var viewController: UIViewController? {
+    package var viewController: UIViewController? {
         get { return self[ViewControllerKey.self].value }
         set { self[ViewControllerKey.self].value = newValue }
     }

@@ -5,6 +5,7 @@
 //  Created by Harshit Srivastava on 20/06/24.
 //
 
+import HyperswitchShared
 import PassKit
 import UIKit
 

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import HyperswitchShared
 import PassKit
 
 typealias ApplePayCallback = ([[String: Any]]) -> Void

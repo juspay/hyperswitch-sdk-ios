@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct LogPayload: Codable {
+package struct LogPayload: Codable {
     let timestamp: String
     let log_type: LogType
     let component: String
@@ -41,15 +41,15 @@ struct LogPayload: Codable {
     }
 }
 
-enum LogType: String, Codable {
+package enum LogType: String, Codable {
     case DEBUG, INFO, ERROR, WARNING
 }
 
-enum LogCategory: String, Codable {
+package enum LogCategory: String, Codable {
     case API, USER_ERROR, USER_EVENT, MERCHANT_EVENT, OTA_LIFE_CYCLE
 }
 
-enum EventName: String, Codable {
+package enum EventName: String, Codable {
     case hyperOTAInit = "HYPER_OTA_INIT"
     case hyperOTAFinish = "HYPER_OTA_FINISH"
     case hyperOTAEvent = "HYPER_OTA_EVENT"
