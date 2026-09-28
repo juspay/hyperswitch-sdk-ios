@@ -47,12 +47,15 @@ end
 
 # 2. The Swift interfaces merchants compile against (public, and private, which a compiler
 #    prefers when present) import only system modules and our own frameworks, and name nothing
-#    internal: merchants compile without React Native or any vendor SDK. Only a module of our
-#    own Swift package reads the package interface.
+#    internal: merchants compile without React Native or any vendor SDK. No package interface
+#    ships (xcframework.rb removes them).
 allowed_imports = ours + %w[Foundation Swift UIKit SwiftUI PassKit WebKit Combine _Concurrency _StringProcessing _SwiftConcurrencyShims]
 ours.each do |framework|
   Dir.glob(File.join(xcframeworks.fetch(framework), '*/*.framework/Modules/*.swiftmodule/*.swiftinterface')).each do |interface|
-    next if interface.end_with?('.package.swiftinterface')
+    if interface.end_with?('.package.swiftinterface')
+      fail!("#{framework}: ships #{File.basename(interface)}")
+      next
+    end
 
     text = File.read(interface)
     aliases = text[/swift-module-flags:.*$/].to_s.scan(/-module-alias (\S+)=(\S+)/).to_h
