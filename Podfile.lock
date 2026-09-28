@@ -2041,6 +2041,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
+  - Trident3DS (1.0.5)
   - Yoga (0.0.0)
 
 DEPENDENCIES:
@@ -2127,6 +2128,7 @@ DEPENDENCIES:
   - RNInAppBrowser (from `../node_modules/react-native-inappbrowser-reborn`)
   - "RNSentry (from `../node_modules/@sentry/react-native`)"
   - RNSVG (from `../node_modules/react-native-svg`)
+  - Trident3DS (= 1.0.5)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -2134,6 +2136,7 @@ SPEC REPOS:
     - HyperCore
     - HyperOTA
     - PayPal
+    - Trident3DS
 
 EXTERNAL SOURCES:
   FBLazyVector:
@@ -2387,8 +2390,9 @@ SPEC CHECKSUMS:
   RNInAppBrowser: 904d24dc75e8e6c6c98a3160329192608946f9df
   RNSentry: 05416a82b0363c6ba68c63afa206fd3bd411cafd
   RNSVG: 6cae8d4082913be2eb43eaec2a456222c42195ed
+  Trident3DS: 33309139c3fe90d9391f9996fdb5ad55e9ed77d4
   Yoga: fe50ab299e578f397fef753cf309c6703a4db29b
 
-PODFILE CHECKSUM: b7d1dd37e05059c767be748b774387bb784cac14
+PODFILE CHECKSUM: 5404b6e5045daafb993683f3381b4f94cf614645
 
 COCOAPODS: 1.16.2

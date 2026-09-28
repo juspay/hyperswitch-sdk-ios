@@ -32,11 +32,12 @@ xcframeworks.each do |name, path|
 end
 
 # 1. No Objective-C class is defined by two binaries: the runtime would pick one at random.
+class_owners = {}
 IOS_SLICES.each do |slice|
-  owners = Hash.new { |hash, key| hash[key] = [] }
+  owners = class_owners[slice] = Hash.new { |hash, key| hash[key] = [] }
   xcframeworks.each do |name, path|
     binary = slices(path)[slice] or next
-    macho_lines('nm', '-gU', '-arch', 'arm64', binary).each do |line|
+    macho_lines('nm', '-U', '-arch', 'arm64', binary).each do |line|
       klass = line[/_OBJC_CLASS_\$_(\S+)/, 1] or next
       owners[klass] << name unless klass.start_with?('PodsDummy_')
     end
@@ -129,6 +130,31 @@ ours.each do |framework|
   slices(xcframeworks.fetch(framework)).each do |slice, binary|
     version = capture!('/usr/libexec/PlistBuddy', '-c', 'Print :CFBundleShortVersionString', File.join(File.dirname(binary), 'Info.plist')).strip
     fail!("#{framework} (#{slice}) is version #{version}, not #{sdk_version}") unless version == sdk_version
+  end
+end
+
+# 7. Every class the SDK finds at runtime by name (NSClassFromString("Name"): the payments
+#    runtime, the optional providers) is defined by a framework we build, so a renamed class
+#    cannot switch off an optional part unnoticed.
+looked_up = Dir.glob(File.join(IOS, 'hyperswitchSDK/**/*.swift')).flat_map do |source|
+  File.read(source).scan(/NSClassFromString\("(\w+)"\)/).flatten
+end.uniq
+fail!('found no classes the SDK looks up by name in hyperswitchSDK') if looked_up.empty?
+class_owners.each do |slice, owners|
+  looked_up.each do |klass|
+    fail!("#{slice}: #{klass}, which the SDK looks up by name, is not defined in any framework we build") unless (owners.fetch(klass, []) & ours).any?
+  end
+end
+
+# 8. The SDK's Swift sources use no compilation condition of their own (`#if FLAG`): the
+#    frameworks are built once, by us, so code behind a condition our build does not set never
+#    ships. Optional parts are found at runtime instead (check 7). CardinalMobile cannot be
+#    redistributed, so its provider stays behind its flag until it ships as a product.
+unset_allowed = %w[HYPERSWITCH_CARDINAL]
+Dir.glob(File.join(IOS, 'hyperswitchSDK/**/*.swift')).each do |source|
+  File.read(source).scan(/^\s*#(?:if|elseif)\s+(.*)$/).flatten.each do |condition|
+    flags = condition.gsub(/\b\w+\([^)]*\)/, '').scan(/\b[A-Za-z_]\w*\b/) - %w[DEBUG true false] - unset_allowed
+    flags.each { |flag| fail!("#{source.delete_prefix("#{IOS}/")}: `#if #{condition.strip}` uses #{flag}, which the SDK build does not set") }
   end
 end
 

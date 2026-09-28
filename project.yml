@@ -156,6 +156,20 @@ targets:
       - path: hyperswitchSDK/PrivacyInfo.xcprivacy
         buildPhase: resources
 
+  HyperswitchLiteScanCard:
+    templates: [SharedFramework]
+    sources:
+      - path: hyperswitchSDK/LitePlugins/ScanCard
+      - path: hyperswitchSDK/PrivacyInfo.xcprivacy
+        buildPhase: resources
+    dependencies:
+      - target: HyperswitchLite
+        embed: false
+      # Staged by frameworkgen/build.sh bootstrap from what the ScanCard plugin links
+      # (products.yml `binaries`).
+      - framework: build/vendor/HyperswitchScanCard.xcframework
+        embed: false
+
   HyperswitchAuthentication:
     templates: [SharedFramework]
     sources:
@@ -177,6 +191,17 @@ targets:
       - framework: build/vendor/ThreeDS_SDK.xcframework
         embed: false
 
+  # Links Trident through its pod (see the Podfile).
+  HyperswitchAuthenticationTrident3DS:
+    templates: [SharedFramework]
+    sources:
+      - path: hyperswitchSDK/AuthenticationProviders/Trident3DS
+      - path: hyperswitchSDK/PrivacyInfo.xcprivacy
+        buildPhase: resources
+    dependencies:
+      - target: HyperswitchAuthentication
+        embed: false
+
   HyperswitchDemo:
     type: application
     platform: iOS
@@ -192,6 +217,7 @@ targets:
       - target: HyperswitchAirbornePlugin
       - target: HyperswitchAuthentication
       - target: HyperswitchAuthenticationNetcetera3DS
+      - target: HyperswitchAuthenticationTrident3DS
       - target: HyperswitchDemoAppClip
     settings:
       base:
@@ -224,6 +250,8 @@ targets:
     dependencies:
       - target: HyperswitchShared
       - target: HyperswitchLite
+      - target: HyperswitchLiteScanCard
+      - framework: build/vendor/HyperswitchScanCard.xcframework
     settings:
       base:
         PRODUCT_NAME: hyperswitchAppClip
@@ -257,8 +285,10 @@ schemes:
         HyperswitchSentryPlugin: all
         HyperswitchAirbornePlugin: all
         HyperswitchLite: all
+        HyperswitchLiteScanCard: all
         HyperswitchAuthentication: all
         HyperswitchAuthenticationNetcetera3DS: all
+        HyperswitchAuthenticationTrident3DS: all
     archive:
       config: Release
   HyperswitchDemo:

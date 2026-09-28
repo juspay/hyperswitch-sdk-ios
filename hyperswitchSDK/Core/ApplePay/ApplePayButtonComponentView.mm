@@ -5,8 +5,6 @@
 //  Created by Harshit Srivastava on 01/08/26.
 //
 
-#ifdef RCT_NEW_ARCH_ENABLED
-
 #import <React/RCTComponentViewFactory.h>
 #import <React/RCTConversions.h>
 #import <React/RCTViewComponentView.h>
@@ -94,5 +92,3 @@ using namespace facebook::react;
 }
 
 @end
-
-#endif // RCT_NEW_ARCH_ENABLED

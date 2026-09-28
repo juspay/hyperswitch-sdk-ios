@@ -16,13 +16,10 @@ package protocol HyperswitchOTAProviding: NSObjectProtocol {
 }
 
 package enum OTAProvider {
-    /// The class name the Airborne plugin registers its provider under.
-    static let className = "HyperswitchAirborneOTAProvider"
-
     /// The Airborne plugin's provider, started for [publishableKey], or nil when the app does
     /// not link the plugin.
     package static func start(publishableKey: String, baseBundle: Bundle) -> (any HyperswitchOTAProviding)? {
-        guard let providerType = NSClassFromString(className) as? HyperswitchOTAProviding.Type else { return nil }
+        guard let providerType = NSClassFromString("HyperswitchAirborneOTAProvider") as? HyperswitchOTAProviding.Type else { return nil }
         return providerType.init(publishableKey: publishableKey, baseBundle: baseBundle)
     }
 }

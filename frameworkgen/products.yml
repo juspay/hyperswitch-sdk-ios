@@ -31,11 +31,18 @@ frameworks:
       HyperOTA: "0.0.8"
   HyperswitchLite:
     depends: [HyperswitchShared]
+  HyperswitchLiteScanCard:
+    depends: [HyperswitchLite]
+    binaries: [HyperswitchScanCard]
   HyperswitchAuthentication:
     depends: [HyperswitchShared]
   HyperswitchAuthenticationNetcetera3DS:
     depends: [HyperswitchAuthentication]
     binaries: [ThreeDS_SDK]
+  HyperswitchAuthenticationTrident3DS:
+    depends: [HyperswitchAuthentication]
+    pods:
+      Trident3DS: "1.0.5"
 
 products:
   Hyperswitch: [Hyperswitch]
@@ -47,8 +54,10 @@ products:
   HyperswitchSentry: [HyperswitchSentryPlugin]
   HyperswitchAirborne: [HyperswitchAirbornePlugin]
   HyperswitchLite: [HyperswitchLite]
+  HyperswitchLiteScanCard: [HyperswitchLiteScanCard]
   HyperswitchAuthentication: [HyperswitchAuthentication]
   HyperswitchAuthenticationNetcetera3DS: [HyperswitchAuthenticationNetcetera3DS]
+  HyperswitchAuthenticationTrident3DS: [HyperswitchAuthenticationTrident3DS]
 
 # Third-party xcframeworks whose code signature is removed when staged. SPM rejects an
 # expired signature;

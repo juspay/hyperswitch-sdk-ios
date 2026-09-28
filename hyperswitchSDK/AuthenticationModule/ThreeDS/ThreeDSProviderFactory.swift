@@ -52,7 +52,7 @@ public class ThreeDSProviderFactory {
     private static func tryCreateProvider(type: ThreeDSProviderType) -> ThreeDSProvider? {
         switch type {
         case .netcetera:
-            let entry = NSClassFromString(ThreeDSProviderType.netceteraClassName) as? ThreeDSProviderEntry.Type
+            let entry = NSClassFromString("HyperswitchNetceteraThreeDSProvider") as? ThreeDSProviderEntry.Type
             return entry?.makeProvider()
 
         case .cardinal:
@@ -63,11 +63,8 @@ public class ThreeDSProviderFactory {
             #endif
 
         case .trident:
-            #if HYPERSWITCH_TRIDENT
-            return TridentProvider()
-            #else
-            return nil
-            #endif
+            let entry = NSClassFromString("HyperswitchTridentThreeDSProvider") as? ThreeDSProviderEntry.Type
+            return entry?.makeProvider()
         }
     }
 
@@ -76,13 +73,9 @@ public class ThreeDSProviderFactory {
     }
 }
 
-/// A 3DS provider shipped as a product of its own (HyperswitchAuthenticationNetcetera3DS). The
-/// product registers a class conforming to this under a known Objective-C name.
+/// A 3DS provider shipped as a product of its own (HyperswitchAuthenticationNetcetera3DS,
+/// HyperswitchAuthenticationTrident3DS). The product registers a class conforming to this under
+/// a known Objective-C name.
 package protocol ThreeDSProviderEntry: AnyObject {
     static func makeProvider() -> ThreeDSProvider
-}
-
-extension ThreeDSProviderType {
-    /// The Objective-C name of HyperswitchAuthenticationNetcetera3DS's `ThreeDSProviderEntry`.
-    static let netceteraClassName = "HyperswitchNetceteraThreeDSProvider"
 }

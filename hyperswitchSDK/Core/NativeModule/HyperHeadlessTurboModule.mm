@@ -5,8 +5,6 @@
 //  Created by Harshit Srivastava on 01/08/26.
 //
 
-#ifdef RCT_NEW_ARCH_ENABLED
-
 #import <React/RCTBridgeModule.h>
 #import <React/RCTLog.h>
 #import <React/RCTFabricSurface.h>
@@ -97,5 +95,3 @@ RCT_EXPORT_MODULE()
 }
 
 @end
-
-#endif // RCT_NEW_ARCH_ENABLED
