@@ -93,8 +93,14 @@ end
 post_install do |installer|
   react_native_post_install(installer, AUTOLINKING[:react_native_path], :mac_catalyst_enabled => false)
 
+  # Pods compiled into our frameworks name their sources relative to client-core in __FILE__.
+  macro_prefix_map = "-fmacro-prefix-map=#{File.realpath(File.join(__dir__, '..'))}/="
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
+      %w[OTHER_CFLAGS OTHER_CPLUSPLUSFLAGS].each do |key|
+        flags = Array(config.build_settings[key] || '$(inherited)').join(' ')
+        config.build_settings[key] = "#{flags} #{macro_prefix_map}"
+      end
       # Library evolution is for our frameworks' public Swift API only. CocoaPods copies the
       # frameworks' BUILD_LIBRARY_FOR_DISTRIBUTION=YES onto the pods they link.
       config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'NO'

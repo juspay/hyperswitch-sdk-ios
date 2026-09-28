@@ -32,7 +32,9 @@ targetTemplates:
         GENERATE_INFOPLIST_FILE: YES
         BUILD_LIBRARY_FOR_DISTRIBUTION: YES
         SKIP_INSTALL: NO
-        DEFINES_MODULE: YES
+        # Swift-only public API: the Swift module is all merchants import, so no Clang module map
+        # (there is no umbrella header to build one from).
+        DEFINES_MODULE: NO
         ENABLE_MODULE_VERIFIER: NO
         DYLIB_INSTALL_NAME_BASE: "@rpath"
         LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
@@ -45,7 +47,10 @@ targetTemplates:
         # frameworks' public API is Swift only. (swift-driver accepts but does not forward
         # -emit-clang-header-min-access, hence -Xfrontend.)
         SWIFT_INSTALL_OBJC_HEADER: NO
-        OTHER_SWIFT_FLAGS: "$(inherited) -Xfrontend -emit-clang-header-min-access -Xfrontend internal -alias-module-names-in-module-interface"
+        OTHER_SWIFT_FLAGS: "$(inherited) -Xfrontend -emit-clang-header-min-access -Xfrontend internal -alias-module-names-in-module-interface -Xfrontend -empty-abi-descriptor"
+        # __FILE__ (React Native's asserts and logs) names sources relative to client-core, not
+        # the path on the machine that built the framework.
+        OTHER_CFLAGS: "$(inherited) -fmacro-prefix-map=$(SRCROOT)/=ios/"
         HEADER_SEARCH_PATHS: "$(inherited) $(SRCROOT)/hyperswitchSDK/Include"
   # An SDK that runs on React Native: payments, payment methods, payment method management.
   ReactNativeSDK:

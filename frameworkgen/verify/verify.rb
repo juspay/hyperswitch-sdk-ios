@@ -2,7 +2,6 @@ require_relative '../lib/frameworkgen'
 include FrameworkGen
 
 VERIFY = File.join(BUILD, 'verify')
-SIMULATOR = ENV.fetch('VERIFY_SIMULATOR', 'iPhone 17 Pro')
 
 SDKS = {
   'Hyperswitch' => 'VERIFY_PAYMENTS',
@@ -68,7 +67,7 @@ selected.each do |name|
   log = File.join(BUILD, 'frameworkgen', 'logs', "verify-#{name}.log")
   common = ['-project', File.join(VERIFY, 'Verify.xcodeproj'), '-scheme', app, '-derivedDataPath', File.join(VERIFY, 'dd')]
   steps = {
-    'simulator' => ['xcodebuild', 'build', *common, '-configuration', 'Release', '-destination', "platform=iOS Simulator,name=#{SIMULATOR}"],
+    'simulator' => ['xcodebuild', 'build', *common, '-configuration', 'Release', '-destination', 'generic/platform=iOS Simulator'],
     'device' => ['xcodebuild', 'build', *common, '-configuration', 'Release', '-destination', 'generic/platform=iOS', 'CODE_SIGNING_ALLOWED=NO'],
   }
   File.write(log, "")

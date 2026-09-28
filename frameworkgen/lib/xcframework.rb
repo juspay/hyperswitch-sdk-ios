@@ -15,3 +15,7 @@ frameworks.each do |framework|
   command += ['-output', File.join(ARTIFACTS, "#{framework}.xcframework")]
   run!(*command)
 end
+
+# The package interface lists `package` declarations for the modules of our own Swift package,
+# which build from source: no compiler outside it reads one.
+FileUtils.rm_f(Dir.glob(File.join(ARTIFACTS, '*.xcframework/*/*.framework/Modules/*.swiftmodule/*.package.swiftinterface')))
