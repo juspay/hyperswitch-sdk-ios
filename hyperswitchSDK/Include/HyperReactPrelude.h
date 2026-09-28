@@ -12,8 +12,4 @@
 #import <UIKit/UIKit.h>
 #import <WebKit/WebKit.h>
 #import <React/RCTBridge.h>
-#import <React/RCTBridgeModule.h>
-#import <React/RCTSurface.h>
-#import <React/RCTSurfaceDelegate.h>
-#import <React/RCTSurfaceStage.h>
 #import <React_RCTAppDelegate/RCTDefaultReactNativeFactoryDelegate.h>

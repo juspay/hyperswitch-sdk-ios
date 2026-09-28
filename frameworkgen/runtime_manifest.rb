@@ -17,18 +17,22 @@ module FrameworkGen
   # package [linked] into that framework. A package of any other framework registers its
   # components itself, where they are linked (the payments SDK's ApplePayButtonComponentView,
   # the PayPal plugin's PaypalButtonComponentView), and sets codegenConfig.ios.componentProvider
-  # to {}. This reads what codegen wrote, so it holds whatever codegen reads to write it.
+  # to {}. This reads what codegen wrote, so it holds whatever codegen reads to write it; a line
+  # of the list it cannot read fails too, so a change in codegen's format cannot pass unseen.
   def self.check_codegen_providers!(installer, linked)
     generated = File.join(installer.sandbox.root.dirname.to_s, 'build/generated/ios')
     offending = %w[RCTThirdPartyComponentsProvider.mm RCTModuleProviders.mm].flat_map do |name|
       file = Dir.glob(File.join(generated, '**', name)).first
-      unless file
-        Pod::UI.warn "Codegen's #{name} is not under #{generated}; update FrameworkGen.check_codegen_providers!."
+      list = file && File.read(file)[/@\{\n(.*?)^\s*\};/m, 1]
+      entries = list.to_s.lines.map(&:strip).reject(&:empty?)
+      entries.map! { |entry| [entry, entry[%r{\A@"[^"]+"\s*:.*,\s*//\s*(\S+)\z}, 1]] }
+      if list.nil? || entries.any? { |_, package| package.nil? }
+        problem = if !file then 'missing' elsif !list then 'no @{ } list' else 'unknown line format' end
+        Pod::UI.warn "Cannot read codegen's #{name} under #{generated} (#{problem}); " \
+                     'update FrameworkGen.check_codegen_providers!.'
         exit 1
       end
-      File.readlines(file).grep(/^\s*@"[^"]+"\s*:/).filter_map do |entry|
-        entry.strip unless linked.include?(entry[%r{//\s*(\S+)\s*$}, 1])
-      end
+      entries.filter_map { |entry, package| entry unless linked.include?(package) }
     end
     return if offending.empty?
 

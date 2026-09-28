@@ -16,8 +16,8 @@ COMBOS = {
   'Payments' => %w[Hyperswitch],
   'PaymentMethods' => %w[HyperswitchPaymentMethods],
   'PaymentMethodManagement' => %w[HyperswitchPaymentMethodManagement],
-  'Lite' => %w[HyperswitchLite],
-  'Authentication' => %w[HyperswitchAuthentication HyperswitchAuthenticationNetcetera3DS],
+  'Lite' => %w[HyperswitchLite HyperswitchLiteScanCard],
+  'Authentication' => %w[HyperswitchAuthentication HyperswitchAuthenticationNetcetera3DS HyperswitchAuthenticationTrident3DS],
   'All' => products.keys,
 }.freeze
 unknown = COMBOS.values.flatten.uniq - products.keys

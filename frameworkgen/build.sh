@@ -25,7 +25,7 @@ step() {
     render) ruby "$LIB/render_package.rb" ;;
     verify) ruby "$IOS/frameworkgen/verify/verify.rb" ;;
     all) for s in bootstrap archive xcframework stage guards package render; do step "$s"; done ;;
-    *) sed -n '2,15p' "$0" >&2; exit 64 ;;
+    *) echo "usage: $0 [bootstrap|archive|xcframework|stage|guards|package|render|verify|all]..." >&2; exit 64 ;;
   esac
 }
 

@@ -5,8 +5,6 @@
 //  Created by Harshit Srivastava on 21/09/26.
 //
 
-#ifdef RCT_NEW_ARCH_ENABLED
-
 #import <React/RCTBridgeModule.h>
 #import <React/RCTSurfacePresenter.h>
 #import <React/RCTSurfacePresenterStub.h>
@@ -85,5 +83,3 @@ RCT_EXPORT_MODULE()
 }
 
 @end
-
-#endif

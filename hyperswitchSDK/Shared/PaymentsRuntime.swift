@@ -25,11 +25,8 @@ package protocol PaymentSessionRuntime: AnyObject {
 }
 
 enum PaymentsRuntime {
-    /// The Objective-C name of the payments SDK's `PaymentsRuntimeEntry`.
-    static let className = "HyperswitchPaymentsRuntime"
-
     /// The payments SDK's entry point, or nil when the app does not link it.
     static var entry: PaymentsRuntimeEntry.Type? {
-        NSClassFromString(className) as? PaymentsRuntimeEntry.Type
+        NSClassFromString("HyperswitchPaymentsRuntime") as? PaymentsRuntimeEntry.Type
     }
 }

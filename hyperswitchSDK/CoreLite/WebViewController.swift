@@ -9,10 +9,6 @@ import HyperswitchShared
 import UIKit
 @preconcurrency import WebKit
 
-#if HYPERSWITCH_LITE_SCANCARD
-import HyperswitchScanCard
-#endif
-
 internal class WebViewController: UIViewController {
 
     // Portrait only, and touches stay in the sheet, like the React Native sheet's controller.
@@ -31,8 +27,6 @@ internal class WebViewController: UIViewController {
     private var popupWebView: WKWebView?
     private var props: [String: Any]?
     private var completion: ((PaymentResult) -> Void)?
-
-    typealias scanCallback = ([[String: Any]]) -> Void
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -155,29 +149,12 @@ extension WebViewController: WKScriptMessageHandler {
                 }
             )
         }
-        if message.name == "launchScanCard" {
-            #if HYPERSWITCH_LITE_SCANCARD
+        if message.name == "launchScanCard", let scanner = LiteCardScanning.scanner {
             DispatchQueue.main.async {
-                var message: [String: Any] = [:]
-                var callback: [String: Any] = [:]
-                let cardScanSheet = CardScanSheet()
-                cardScanSheet.present(from: self) { result in
-                    switch result {
-                    case .completed(let card as ScannedCard?):
-                        message["pan"] = card?.pan
-                        message["expiryMonth"] = card?.expiryMonth
-                        message["expiryYear"] = card?.expiryYear
-                        callback["status"] = "Succeeded"
-                        callback["data"] = message
-                    case .canceled:
-                        callback["status"] = "Cancelled"
-                    case .failed(_):
-                        callback["status"] = "Failed"
-                    }
-                    self.sendPropsToJS(props: ["scanCardData": callback])
+                scanner.scan(from: self) { result in
+                    self.sendPropsToJS(props: ["scanCardData": result])
                 }
             }
-            #endif
         }
         if message.name == "exitPaymentSheet" {
             do {

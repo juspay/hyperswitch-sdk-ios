@@ -6,11 +6,27 @@
 //
 
 import Foundation
-import HyperswitchShared
+import HyperswitchAuthentication
+internal import Trident
 import UIKit
 
-#if HYPERSWITCH_TRIDENT
-import Trident
+// Trident declares types of the same names; unqualified, these are HyperswitchAuthentication's.
+typealias AuthenticationRequestParameters = HyperswitchAuthentication.AuthenticationRequestParameters
+typealias ChallengeParameters = HyperswitchAuthentication.ChallengeParameters
+typealias ChallengeStatusReceiver = HyperswitchAuthentication.ChallengeStatusReceiver
+typealias CompletionEvent = HyperswitchAuthentication.CompletionEvent
+typealias ProtocolErrorEvent = HyperswitchAuthentication.ProtocolErrorEvent
+typealias RuntimeErrorEvent = HyperswitchAuthentication.RuntimeErrorEvent
+typealias Transaction = HyperswitchAuthentication.Transaction
+
+/// How HyperswitchAuthentication finds this provider when the app links the
+/// HyperswitchAuthenticationTrident3DS product.
+@objc(HyperswitchTridentThreeDSProvider)
+final class TridentProviderEntry: NSObject, ThreeDSProviderEntry {
+    static func makeProvider() -> ThreeDSProvider {
+        TridentProvider()
+    }
+}
 
 //class Logger: TridentLoggerDelegate {
 //    public func trackEvent(withLevel level: String, label: String, value: [String : Any], category: String, subcategory: String) {
@@ -153,5 +169,3 @@ class TridentChallengeStatusAdapter: Trident.ChallengeStatusReceiver {
         receiver.runtimeError(ourEvent)
     }
 }
-
-#endif
