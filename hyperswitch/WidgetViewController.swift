@@ -142,8 +142,13 @@ class WidgetViewController: UIViewController {
             configuration.netceteraSDKApiKey = netceteraApiKey
         }
 
+        var widgetConfiguration = configuration
+        widgetConfiguration.subscriptionEvents = [.paymentMethodChange, .cardDetailsChange, .formStatusChange, .billingDetailsChange]
+        var cvcConfiguration = configuration
+        cvcConfiguration.subscriptionEvents = [.cvcStatusChange]
+
         if let paymentSession = hyperViewModel.paymentSession {
-            self.paymentWidget = PaymentWidget(paymentSession: paymentSession, configuration: configuration) { paymentResult in
+            self.paymentWidget = PaymentWidget(paymentSession: paymentSession, configuration: widgetConfiguration) { paymentResult in
                 switch paymentResult {
                 case .completed(let data):
                     print(["type": "completed", "message": data])
@@ -156,6 +161,19 @@ class WidgetViewController: UIViewController {
                     self.statusLabel.text = "failed → \(error)"
                 }
             }
+            self.paymentWidget?.onChange { event in
+                switch event.eventName {
+                case "paymentMethodChange": print("payment method:", event.payload)
+                case "cardDetailsChange": print("card:", event.payload)
+                case "formStatusChange": print("form status:", event.payload)
+                case "billingDetailsChange": print("billing:", event.payload)
+                default: break
+                }
+            }
+            // Lifecycle events need no subscription and never reach onChange.
+            self.paymentWidget?.onReady { print("payment widget ready") }
+            self.paymentWidget?.onFocus { print("payment widget focus") }
+            self.paymentWidget?.onBlur { print("payment widget blur") }
             self.paymentWidget?.shouldProceedWithPayment { paymentRequestData, callback in
                 switch paymentRequestData.paymentMethodType {
                 case .applePay:
@@ -166,16 +184,13 @@ class WidgetViewController: UIViewController {
                     callback(true)
                 }
             }
-            self.cvcWidget = CVCWidget(
-                configuration: configuration,
-                subscribe: { builder in
-                    builder.on(.cvcStatusChange) { event in
-                        if case .cvcStatus(let info) = event.data {
-                            print(info)
-                        }
-                    }
-                }
-            )
+            self.cvcWidget = CVCWidget(configuration: cvcConfiguration)
+            self.cvcWidget?.onChange { event in
+                if event.eventName == "cvcStatusChange" { print("cvc:", event.payload) }
+            }
+            self.cvcWidget?.onReady { print("cvc widget ready") }
+            self.cvcWidget?.onFocus { print("cvc widget focus") }
+            self.cvcWidget?.onBlur { print("cvc widget blur") }
             if let cvcWidget = cvcWidget {
                 contentView.addSubview(cvcWidget)
                 cvcWidget.translatesAutoresizingMaskIntoConstraints = false

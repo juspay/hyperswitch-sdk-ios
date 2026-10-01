@@ -92,7 +92,9 @@ public enum PaymentEventData {
     }
 
     public struct CvcStatus: Sendable {
+        @available(*, deprecated, message: "No longer sent (always false); use the CVC widget's onFocus/onBlur")
         public let isCvcFocused: Bool
+        @available(*, deprecated, message: "No longer sent (always false); use the CVC widget's onFocus/onBlur")
         public let isCvcBlur: Bool
         public let isCvcEmpty: Bool
         public let isCvcComplete: Bool

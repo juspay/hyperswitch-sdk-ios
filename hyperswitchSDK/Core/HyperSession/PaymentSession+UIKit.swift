@@ -12,10 +12,13 @@ import UIKit
 
 extension PaymentSession {
 
+    /// Presents the sheet. Events listed in `configuration.subscriptionEvents` go to `onChange`;
+    /// `subscribe` is the deprecated per-event form.
     public func presentPaymentSheet(
         viewController: UIViewController,
         configuration: PaymentSheet.Configuration? = nil,
         subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil,
+        onChange: ((PaymentEvent) -> Void)? = nil,
         completion: @escaping (PaymentResult) -> Void
     ) {
         let paymentSheet = PaymentSheet(
@@ -32,6 +35,7 @@ extension PaymentSession {
             paymentSheet.subscribedEvents = subscription.subscribedEventStrings()
             paymentSheet.paymentEventListener = builtListener
         }
+        paymentSheet.events.onChange = onChange
         paymentSheet.present(from: viewController, completion: completion)
     }
 
@@ -40,6 +44,7 @@ extension PaymentSession {
         viewController: UIViewController,
         params: [String: Any],
         subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil,
+        onChange: ((PaymentEvent) -> Void)? = nil,
         completion: @escaping (PaymentResult) -> Void
     ) {
         let paymentSheet = PaymentSheet(
@@ -55,6 +60,7 @@ extension PaymentSession {
             paymentSheet.subscribedEvents = subscription.subscribedEventStrings()
             paymentSheet.paymentEventListener = builtListener
         }
+        paymentSheet.events.onChange = onChange
         paymentSheet.presentWithParams(from: viewController, props: params, completion: completion)
     }
 

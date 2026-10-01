@@ -7,11 +7,13 @@
 
 import Foundation
 
+/// Legacy per-event subscription. Prefer `Configuration.subscriptionEvents` plus `onChange`.
 public final class PaymentEventSubscriptionBuilder {
     private var handlers: [PaymentEventType: (PaymentEvent) -> Void] = [:]
 
     public init() {}
 
+    @available(*, deprecated, message: "List the event in Configuration.subscriptionEvents and handle it in onChange")
     public func on(_ eventType: PaymentEventType, _ handler: @escaping (PaymentEvent) -> Void) {
         handlers[eventType] = handler
     }
@@ -22,7 +24,7 @@ public final class PaymentEventSubscriptionBuilder {
         )
         let subscription = PaymentEventSubscription(eventTypes: Array(handlers.keys))
         let listener = PaymentEventListener { event in
-            dispatch[event.type]?(event)
+            dispatch[event.eventName]?(event)
         }
         return (subscription, listener)
     }

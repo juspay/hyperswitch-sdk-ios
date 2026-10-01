@@ -30,6 +30,7 @@ public class PaymentSheet {
     package var completion: ((PaymentResult) -> Void)?
     package var subscribedEvents: [String]?
     package var paymentEventListener: PaymentEventListener?
+    package let events = PaymentEventHub()
     package var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
 
     /// Identity of the presenting session in JS (its prefetch root tag), if any.
