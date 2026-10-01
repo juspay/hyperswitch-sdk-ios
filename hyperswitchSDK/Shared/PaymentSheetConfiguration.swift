@@ -104,6 +104,9 @@ extension PaymentSheet {
         /// Hide the card nickname input field regardless of the mandate / save-card state. Defaults to false.
         public var hideCardNicknameField: Bool?
 
+        /// Events delivered to `onChange`. Nothing is emitted for events not listed here.
+        public var subscriptionEvents: [PaymentEventType]?
+
         // MARK: - Placeholder
 
         public struct PlaceHolder: Encodable {

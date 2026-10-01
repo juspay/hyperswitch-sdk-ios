@@ -24,6 +24,7 @@ public class CVCWidget: UIControl {
     private var reactManager: RNViewManager { RNViewManager.shared }
 
     internal var paymentEventListener: PaymentEventListener?
+    private let events = PaymentEventHub()
 
     public init(
         configuration: PaymentSheet.Configuration? = nil,
@@ -64,13 +65,38 @@ public class CVCWidget: UIControl {
         fatalError("init(coder:) has not been implemented")
     }
 
+    /// Receives every event listed in `configuration.subscriptionEvents`; switch on `event.eventName`.
+    /// Can be set at any time; events emitted before it is set are dropped.
+    public func onChange(_ handler: @escaping (PaymentEvent) -> Void) {
+        events.onChange = handler
+    }
+
+    /// Fires once the widget has finished loading (payment methods fetched); no subscription needed.
+    /// Set after that, it is called at once.
+    public func onReady(_ handler: @escaping () -> Void) {
+        events.onReady = handler
+    }
+
+    /// Fires when focus enters the widget (moving between its fields does not re-fire); no subscription needed.
+    public func onFocus(_ handler: @escaping () -> Void) {
+        events.onFocus = handler
+    }
+
+    /// Fires when focus leaves the widget entirely (moving between its fields does not fire); no subscription needed.
+    public func onBlur(_ handler: @escaping () -> Void) {
+        events.onBlur = handler
+    }
+
     private func commonInit() {
 
         let sdkParams = SDKParams.getSDKParams()
 
         var nativeConfig = try? configuration?.toDictionary()
-        nativeConfig?["subscribedEvents"] = self.subscribedEventNames
-        configurationDict?["subscribedEvents"] = self.subscribedEventNames
+        nativeConfig = SubscribedEvents.normalize(nativeConfig, adding: subscribedEventNames)
+        // Only a dictionary the caller passed; creating one here would flip `from` to "rn".
+        if configurationDict != nil {
+            configurationDict = SubscribedEvents.normalize(configurationDict, adding: subscribedEventNames)
+        }
 
         let props: [String: Any] = [
             "type": "cvcWidget",
@@ -148,12 +174,6 @@ public class CVCWidget: UIControl {
     }
 
     internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {
-        guard let listener = paymentEventListener else { return }
-        let event = PaymentEvent(type: type, payload: payload)
-        if Thread.isMainThread {
-            listener.onPaymentEvent(event)
-        } else {
-            DispatchQueue.main.async { listener.onPaymentEvent(event) }
-        }
+        events.dispatch(type: type, payload: payload, legacyListener: paymentEventListener)
     }
 }

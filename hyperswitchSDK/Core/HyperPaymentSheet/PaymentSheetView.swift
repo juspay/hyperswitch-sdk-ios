@@ -20,8 +20,7 @@ internal extension PaymentSheet {
         let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
 
         /// Get the configuration dictionary from the configuration object.
-        var configuration = try? self.configuration?.toDictionary()
-        configuration?["subscribedEvents"] = subscribedEvents
+        let configuration = SubscribedEvents.normalize(try? self.configuration?.toDictionary(), adding: subscribedEvents)
 
         /// Create a dictionary of hyperParams with app ID, sdkVersion, country, user agent, default view, and launch time.
         var sdkParams = SDKParams.getSDKParams()
@@ -53,8 +52,7 @@ internal extension PaymentSheet {
 
         var sdkParams = SDKParams.getSDKParams()
         sdkParams["sessionTag"] = sessionTag
-        var propsDict = props
-        propsDict["subscribedEvents"] = subscribedEvents
+        let propsDict = SubscribedEvents.normalize(props, adding: subscribedEvents) ?? props
 
         let props: [String: Any] = [
             "type": "payment",

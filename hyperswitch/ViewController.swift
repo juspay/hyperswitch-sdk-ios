@@ -69,14 +69,18 @@ class ViewController: UIViewController {
             configuration.netceteraSDKApiKey = netceteraApiKey
         }
 
+        configuration.subscriptionEvents = [.paymentMethodChange, .cardDetailsChange, .formStatusChange]
+
         hyperViewModel.paymentSession?.presentPaymentSheet(
             viewController: self,
             configuration: configuration,
-            subscribe: { builder in
-                builder.on(.cardDetailsChange) { event in
-                    if case .cardInfo(let info) = event.data {
-                        print(info)
-                    }
+            onChange: { event in
+                // One handler for every subscribed event; branch on its name.
+                switch event.eventName {
+                case "cardDetailsChange": print("card:", event.payload)
+                case "paymentMethodChange": print("payment method:", event.payload)
+                case "formStatusChange": print("form status:", event.payload)
+                default: print(event.eventName, event.payload)
                 }
             },
             completion: { result in
