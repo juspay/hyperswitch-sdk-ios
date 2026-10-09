@@ -122,7 +122,20 @@ class WidgetViewController: UIViewController {
         }
     }
 
+    private func detachPaymentWidget() {
+        paymentWidget?.removeFromSuperview()
+        paymentWidget = nil
+        cvcWidget?.removeFromSuperview()
+        cvcWidget = nil
+        confirmButton.removeFromSuperview()
+        elementConfirmButton.removeFromSuperview()
+        handler = nil
+        paymentToken = nil
+        paymentMethodId = nil
+    }
+
     func attachPaymentWidget() {
+        detachPaymentWidget()
 
         var configuration = PaymentSheet.Configuration()
         configuration.primaryButtonLabel = "Purchase ($2.00)"
@@ -143,17 +156,17 @@ class WidgetViewController: UIViewController {
         }
 
         if let paymentSession = hyperViewModel.paymentSession {
-            self.paymentWidget = PaymentWidget(paymentSession: paymentSession, configuration: configuration) { paymentResult in
+            self.paymentWidget = PaymentWidget(paymentSession: paymentSession, configuration: configuration) { [weak self] paymentResult in
                 switch paymentResult {
                 case .completed(let data):
                     print(["type": "completed", "message": data])
-                    self.statusLabel.text = "completed → \(data)"
+                    self?.statusLabel.text = "completed → \(data)"
                 case .canceled(let data):
                     print(["type": "canceled", "message": data])
-                    self.statusLabel.text = "canceled → \(data)"
+                    self?.statusLabel.text = "canceled → \(data)"
                 case .failed(let error):
                     print(["type": "failed", "message": "\(error)"])
-                    self.statusLabel.text = "failed → \(error)"
+                    self?.statusLabel.text = "failed → \(error)"
                 }
             }
             self.paymentWidget?.shouldProceedWithPayment { paymentRequestData, callback in
