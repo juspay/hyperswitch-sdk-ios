@@ -123,7 +123,11 @@ class HyperViewModel: ObservableObject {
                     let profileId = json["profileId"] as? String
                 else {
                     let serverMessage = (json["error"] as? [String: Any])?["message"] as? String
-                    throw NSError(domain: "API Error", code: 500, userInfo: [NSLocalizedDescriptionKey: serverMessage ?? "Missing required fields"])
+                    throw NSError(
+                        domain: "API Error",
+                        code: 500,
+                        userInfo: [NSLocalizedDescriptionKey: serverMessage ?? "Missing required fields"]
+                    )
                 }
 
                 let hyperswitchConfiguration = HyperswitchConfiguration(publishableKey: publishableKey, profileId: profileId)
