@@ -46,7 +46,7 @@ public struct CardFieldState: Equatable {
 
     internal init?(_ payload: [String: Any]) {
         guard let raw = payload["elementType"] as? String,
-              let elementType = CardElementType(rawValue: raw)
+            let elementType = CardElementType(rawValue: raw)
         else { return nil }
         self.elementType = elementType
         isEmpty = payload["empty"] as? Bool ?? true
@@ -118,7 +118,7 @@ public struct TokenizeError: Error, Equatable {
     /// From the bundle's answer to a tokenize command (`CommandResultPayload`).
     internal init(commandResult payload: [String: Any]) {
         guard payload["ok"] as? Bool == true,
-              let result = payload["result"] as? [String: Any]
+            let result = payload["result"] as? [String: Any]
         else {
             let message = payload["message"] as? String ?? "The card could not be tokenized."
             self = .failure(TokenizeError(kind: .api, code: "tokenization_failed", message: message))

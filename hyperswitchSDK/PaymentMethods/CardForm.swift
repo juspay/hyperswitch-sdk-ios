@@ -203,7 +203,7 @@ extension CardForm: PaymentMethodsEventTarget {
 
         case PaymentMethodsProtocol.FormEvent.commandResult:
             guard let pending = pendingTokenize,
-                  pending.id == payload["commandId"] as? String
+                pending.id == payload["commandId"] as? String
             else { return }
             pendingTokenize = nil
             pending.resume(TokenizeResult(commandResult: payload))
