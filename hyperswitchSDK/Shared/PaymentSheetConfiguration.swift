@@ -41,9 +41,6 @@ extension PaymentSheet {
         /// Toggle to show/hide the pay button. Defaults to true for the full PaymentSheet.
         public var displayPayButton: Bool?
 
-        /// Keep the pay button pinned to the bottom of the sheet. Defaults to false.
-        public var stickyPayButton: Bool?
-
         /// Toggle to disable Hyperswitch branding.
         public var disableBranding: Bool?
 

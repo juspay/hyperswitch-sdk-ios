@@ -85,7 +85,7 @@ internal final class PaymentMethodsModuleImpl: NSObject {
         let map = (payload as? [String: Any]) ?? [:]
         onMain {
             guard let surface = self.shim?.surface(forRootTag: rootTag),
-                  let target = SurfaceOwners.owner(of: surface) as? PaymentMethodsEventTarget
+                let target = SurfaceOwners.owner(of: surface) as? PaymentMethodsEventTarget
             else { return }
             target.paymentMethodsEvent(eventName, payload: map)
         }

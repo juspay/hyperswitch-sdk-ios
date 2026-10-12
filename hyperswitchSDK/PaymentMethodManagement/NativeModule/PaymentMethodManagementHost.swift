@@ -38,7 +38,10 @@ internal final class PaymentMethodManagementHostDelegate: RCTDefaultReactNativeF
         case "LocalBundle":
             return Bundle.main.url(forResource: PaymentMethodManagementHost.bundleName, withExtension: "bundle")
         default:
-            return Bundle(for: PaymentMethodManagementHost.self).url(forResource: PaymentMethodManagementHost.bundleName, withExtension: "bundle")
+            return Bundle(for: PaymentMethodManagementHost.self).url(
+                forResource: PaymentMethodManagementHost.bundleName,
+                withExtension: "bundle"
+            )
         }
     }
 }

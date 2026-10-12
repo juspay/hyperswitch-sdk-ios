@@ -53,7 +53,7 @@ final class PaymentMethodsViewController: UIViewController {
                 baseUrl: backendUrl
             )
             guard let publishableKey = json["publishableKey"] as? String,
-                  let sdkAuthorization = json["sdkAuthorization"] as? String
+                let sdkAuthorization = json["sdkAuthorization"] as? String
             else {
                 statusLabel.text = "The server did not return a session: \(json)"
                 return
