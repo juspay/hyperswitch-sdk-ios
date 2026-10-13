@@ -91,6 +91,8 @@ class HyperViewModel: ObservableObject {
                             completion("")  //needs to be handled
                         }
                     }
+                } else {
+                    completion("")
                 }
             },
             completion: { result in
