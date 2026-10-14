@@ -20,8 +20,6 @@ internal class WebViewController: UIViewController {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {}
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {}
 
-    private let applePayPaymentHandler = ApplePayHandlerLite()
-
     private let baseUrl = URL(string: "https://beta.hyperswitch.io/mobile/1.7.4/index.html")
     private var webView: WKWebView = WKWebView()
     private var popupWebView: WKWebView?
@@ -139,7 +137,7 @@ extension WebViewController: WKScriptMessageHandler {
             guard let body = message.body as? String else {
                 return
             }
-            applePayPaymentHandler.startPayment(
+            ApplePayHandlerLite().startPayment(
                 rnMessage: body,
                 rnCallback: { props in
                     let applePayProps = [

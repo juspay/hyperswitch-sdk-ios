@@ -27,7 +27,6 @@ internal class HyperModuleImpl: NSObject {
 
     internal weak var host: ReactHostManager?
 
-    private let applePayPaymentHandler = ApplePayHandler()
     private var presentCallback: (([Any]?) -> Void)? = nil
 
     internal var onAddPaymentMethod: (() -> Void)?
@@ -73,7 +72,9 @@ internal class HyperModuleImpl: NSObject {
 
     @objc(launchApplePay:callback:)
     internal func launchApplePay(_ rnMessage: String, _ rnCallback: @escaping ([Any]?) -> Void) {
-        applePayPaymentHandler.startPayment(rnMessage: rnMessage, rnCallback: rnCallback, presentCallback: self.presentCallback)
+        let presentCallback = self.presentCallback
+        self.presentCallback = nil
+        ApplePayHandler().startPayment(rnMessage: rnMessage, rnCallback: rnCallback, presentCallback: presentCallback)
     }
 
     @objc(startApplePay:callback:)
@@ -94,11 +95,13 @@ internal class HyperModuleImpl: NSObject {
     internal func exitPaymentsheet(_ reactTag: NSNumber, _ status: String, _ code: String?, _ message: String?, _ reset: Bool) {
         let result = PaymentResult.from(status: status, code: code, message: message)
         withPaymentSheet(reactTag) { vc, sheet in
+            let completion = sheet?.completion
+            sheet?.completion = nil
             guard let vc = vc else {
-                sheet?.completion?(result)
+                completion?(result)
                 return
             }
-            vc.dismiss(animated: false) { sheet?.completion?(result) }
+            vc.dismiss(animated: false) { completion?(result) }
         }
     }
 
@@ -294,8 +297,40 @@ internal class HyperModuleImpl: NSObject {
 
     private func withPaymentSheet(_ rootTag: NSNumber, _ block: @escaping (UIViewController?, PaymentSheet?) -> Void) {
         resolveOwner(rootTag) { owner in
-            let sheet = owner as? PaymentSheet
+            if let owner {
+                let sheet = owner as? PaymentSheet
+                block(sheet?.presentedViewController, sheet)
+                return
+            }
+            let sheet = self.topmostPresentedPaymentSheet().flatMap { sheet -> PaymentSheet? in
+                guard let tag = sheet.presentedViewController?.view.surfaceRootTag,
+                      let surface = self.shim?.surface(forRootTag: tag),
+                      SurfaceOwners.owner(of: surface) === sheet
+                else { return sheet }
+                return nil
+            }
             block(sheet?.presentedViewController, sheet)
         }
+    }
+
+    private func topmostPresentedPaymentSheet() -> PaymentSheet? {
+        let windows = UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .sorted { $0.isKeyWindow && !$1.isKeyWindow }
+        for window in windows {
+            var found: PaymentSheet?
+            var current = window.rootViewController
+            while let vc = current {
+                if let sheet = (vc as? HyperUIViewController)?.paymentSheet {
+                    found = sheet
+                }
+                current = vc.presentedViewController
+            }
+            if let found {
+                return found
+            }
+        }
+        return nil
     }
 }

@@ -15,6 +15,8 @@ internal class ApplePayHandler: NSObject {
     var paymentStatus: PKPaymentAuthorizationStatus? = .failure
     var callback: RCTResponseSenderBlock?
 
+    private var retainedSelf: ApplePayHandler?
+
     internal func startPayment(rnMessage: String, rnCallback: @escaping RCTResponseSenderBlock, presentCallback: RCTResponseSenderBlock?) {
 
         callback = rnCallback
@@ -23,35 +25,30 @@ internal class ApplePayHandler: NSObject {
 
         guard let dict = rnMessage.toJSON() as? [String: AnyObject] else {
             presentCallback?([])
-            callback?([["status": "Failed", "message": "ApplePay: missing field payment_request_data"]])
-            callback = nil
+            complete(["status": "Failed", "message": "ApplePay: missing field payment_request_data"])
             return
         }
 
         guard let payment_request_data = dict["payment_request_data"] else {
             presentCallback?([])
-            callback?([["status": "Failed", "message": "ApplePay: missing field payment_request_data"]])
-            callback = nil
+            complete(["status": "Failed", "message": "ApplePay: missing field payment_request_data"])
             return
         }
 
         guard let countryCode = payment_request_data["country_code"] as? String else {
             presentCallback?([])
-            callback?([["status": "Failed", "message": "ApplePay: missing field country_code"]])
-            callback = nil
+            complete(["status": "Failed", "message": "ApplePay: missing field country_code"])
             return
         }
 
         guard let currencyCode = payment_request_data["currency_code"] as? String else {
             presentCallback?([])
-            callback?([["status": "Failed", "message": "ApplePay: missing field currency_code"]])
-            callback = nil
+            complete(["status": "Failed", "message": "ApplePay: missing field currency_code"])
             return
         }
         guard let total = payment_request_data["total"] as? [String: AnyObject] else {
             presentCallback?([])
-            callback?([["status": "Failed", "message": "ApplePay: missing field total"]])
-            callback = nil
+            complete(["status": "Failed", "message": "ApplePay: missing field total"])
             return
         }
 
@@ -60,46 +57,56 @@ internal class ApplePayHandler: NSObject {
             let type = total["type"] as? String
         else {
             presentCallback?([])
-            callback?([["status": "Failed", "message": "ApplePay: missing fields amount, label, type"]])
-            callback = nil
+            complete(["status": "Failed", "message": "ApplePay: missing fields amount, label, type"])
             return
         }
 
         guard let merchant_capabilities_array = payment_request_data["merchant_capabilities"] as? [String] else {
             presentCallback?([])
-            callback?([["status": "Failed", "message": "ApplePay: missing field merchant_capabilities"]])
-            callback = nil
+            complete(["status": "Failed", "message": "ApplePay: missing field merchant_capabilities"])
             return
         }
 
         guard let merchantIdentifier = payment_request_data["merchant_identifier"] as? String else {
             presentCallback?([])
-            callback?([["status": "Failed", "message": "ApplePay: missing field merchant_identifier"]])
-            callback = nil
+            complete(["status": "Failed", "message": "ApplePay: missing field merchant_identifier"])
             return
         }
 
         guard let supported_networks_array = payment_request_data["supported_networks"] as? [String] else {
             presentCallback?([])
-            callback?([["status": "Failed", "message": "ApplePay: missing field supported_networks"]])
-            callback = nil
+            complete(["status": "Failed", "message": "ApplePay: missing field supported_networks"])
             return
         }
 
         let supportedNetworks = supported_networks_array.compactMap { (string) -> PKPaymentNetwork? in
-            switch string {
-            case "visa":
-                return .visa
-            case "masterCard":
-                return .masterCard
-            case "amex":
-                return .amex
-            case "discover":
-                return .discover
-            case "quicPay":
-                return .quicPay
-            default:
+            switch string.lowercased() {
+            case "amex": return .amex
+            case "bancomat":
+                if #available(iOS 16.0, *) { return .bancomat }
                 return nil
+            case "bancontact":
+                if #available(iOS 16.0, *) { return .bancontact }
+                return nil
+            case "cartesbancaires": return .cartesBancaires
+            case "chinaunionpay": return .chinaUnionPay
+            case "dankort": return .dankort
+            case "discover": return .discover
+            case "eftpos": return .eftpos
+            case "electron": return .electron
+            case "elo": return .elo
+            case "girocard": return .girocard
+            case "interac": return .interac
+            case "jcb": return .JCB
+            case "mada": return .mada
+            case "maestro": return .maestro
+            case "mastercard": return .masterCard
+            case "mir": return .mir
+            case "privatelabel": return .privateLabel
+            case "quicpay": return .quicPay
+            case "visa": return .visa
+            case "vpay": return .vPay
+            default: return nil
             }
         }
 
@@ -124,8 +131,15 @@ internal class ApplePayHandler: NSObject {
         paymentRequest.requiredShippingContactFields = requiredShippingContactFields ?? []
         paymentRequest.requiredBillingContactFields = requiredBillingContactFields ?? []
         paymentRequest.supportedNetworks = supportedNetworks
+        paymentRequest.merchantCapabilities = []
         for val in merchant_capabilities_array {
-            paymentRequest.merchantCapabilities = (val == "supports3DS") ? .threeDSecure : .debit
+            switch val {
+            case "supports3DS": paymentRequest.merchantCapabilities.insert(.threeDSecure)
+            case "supportsCredit": paymentRequest.merchantCapabilities.insert(.credit)
+            case "supportsDebit": paymentRequest.merchantCapabilities.insert(.debit)
+            case "supportsEMV": paymentRequest.merchantCapabilities.insert(.emv)
+            default: break
+            }
         }
 
         /// Create and present the PKPaymentAuthorizationController
@@ -135,21 +149,27 @@ internal class ApplePayHandler: NSObject {
             PKPaymentAuthorizationViewController(paymentRequest: paymentRequest) != nil
         else {
             presentCallback?([])
-            callback?([["status": "Failed", "message": "ApplePay: cannot make payments"]])
-            callback = nil
+            complete(["status": "Failed", "message": "ApplePay: cannot make payments"])
             return
         }
         let paymentController = PKPaymentAuthorizationController(paymentRequest: paymentRequest)
         paymentController.delegate = self
+        retainedSelf = self
         paymentController.present(completion: { presented in
             presentCallback?([])
             if presented {
                 self.paymentStatus = nil
             } else {
-                self.callback?([["status": "Failed", "message": "ApplePay: unable to present"]])
-                self.callback = nil
+                self.complete(["status": "Failed", "message": "ApplePay: unable to present"])
+                self.retainedSelf = nil
             }
         })
+    }
+
+    private func complete(_ result: [String: Any]) {
+        guard let callback else { return }
+        self.callback = nil
+        callback([result])
     }
 }
 
@@ -179,34 +199,35 @@ extension ApplePayHandler: PKPaymentAuthorizationControllerDelegate {
         default: paymentType = "unknown"
         }
 
-        self.callback?(
+        complete(
             [
-                [
-                    "status": "Success",
-                    "payment_data": dataString,
-                    "payment_method": [
-                        "type": paymentType,
-                        "network": payment.token.paymentMethod.network ?? "",
-                        "display_name": payment.token.paymentMethod.displayName ?? "",
-                    ],
-                    "transaction_identifier": payment.token.transactionIdentifier,
-                    "billing_contact": convertPKContactToDictionary(payment.billingContact),
-                    "shipping_contact": convertPKContactToDictionary(payment.shippingContact),
-                ]
+                "status": "Success",
+                "payment_data": dataString,
+                "payment_method": [
+                    "type": paymentType,
+                    "network": payment.token.paymentMethod.network ?? "",
+                    "display_name": payment.token.paymentMethod.displayName ?? "",
+                ],
+                "transaction_identifier": payment.token.transactionIdentifier,
+                "billing_contact": convertPKContactToDictionary(payment.billingContact),
+                "shipping_contact": convertPKContactToDictionary(payment.shippingContact),
             ]
         )
-        self.callback = nil
         completion(PKPaymentAuthorizationResult(status: paymentStatus ?? .failure, errors: errors))
     }
     /// Handle completion of the payment authorization flow
+    // NOTE: PassKit can call this twice for one presentation (Home pressed as the sheet appears).
+    // Clearing the delegate drops the second call; complete() guards the callback.
     internal func paymentAuthorizationControllerDidFinish(_ controller: PKPaymentAuthorizationController) {
+        controller.delegate = nil
         controller.dismiss {
             DispatchQueue.main.async {
                 if self.paymentStatus == .failure {
-                    self.callback?([["status": "Failed", "message": "ApplePay: payment failed"]])
+                    self.complete(["status": "Failed", "message": "ApplePay: payment failed"])
                 } else if self.paymentStatus == nil {
-                    self.callback?([["status": "Cancelled"]])
+                    self.complete(["status": "Cancelled"])
                 }
+                self.retainedSelf = nil
             }
         }
     }
