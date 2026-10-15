@@ -1,51 +1,5 @@
-//
-//  PaymentEventSubscriptionBuilder.swift
-//  Hyperswitch
-//
-//  Created by Harshit Srivastava on 21/04/26.
-//
-
 import Foundation
 
-/// Legacy per-event subscription. Prefer `Configuration.subscriptionEvents` plus `onChange`.
-public final class PaymentEventSubscriptionBuilder {
-    private var handlers: [PaymentEventType: (PaymentEvent) -> Void] = [:]
-
-    public init() {}
-
-    @available(*, deprecated, message: "List the event in Configuration.subscriptionEvents and handle it in onChange")
-    public func on(_ eventType: PaymentEventType, _ handler: @escaping (PaymentEvent) -> Void) {
-        handlers[eventType] = handler
-    }
-
-    package func build() -> (subscription: PaymentEventSubscription, listener: PaymentEventListener) {
-        let dispatch: [String: (PaymentEvent) -> Void] = Dictionary(
-            uniqueKeysWithValues: handlers.map { ($0.key.rawValue, $0.value) }
-        )
-        let subscription = PaymentEventSubscription(eventTypes: Array(handlers.keys))
-        let listener = PaymentEventListener { event in
-            dispatch[event.eventName]?(event)
-        }
-        return (subscription, listener)
-    }
-}
-
-public struct PaymentEventSubscription: Sendable {
-    public let eventTypes: [PaymentEventType]
-
-    public func isSubscribed(_ rawType: String) -> Bool {
-        eventTypes.contains { $0.rawValue == rawType }
-    }
-
-    public func subscribedEventStrings() -> [String] {
-        eventTypes.map(\.rawValue)
-    }
-}
-
 package struct PaymentEventListener {
-    package let onPaymentEvent: (PaymentEvent) -> Void
-
-    package init(onPaymentEvent: @escaping (PaymentEvent) -> Void) {
-        self.onPaymentEvent = onPaymentEvent
-    }
+    let onPaymentEvent: (PaymentEvent) -> Void
 }

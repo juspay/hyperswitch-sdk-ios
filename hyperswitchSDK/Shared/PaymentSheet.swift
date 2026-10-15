@@ -28,8 +28,6 @@ public class PaymentSheet {
     /// The configuration object that holds the settings for the payment sheet.
     package let configuration: Configuration?
     package var completion: ((PaymentResult) -> Void)?
-    package var subscribedEvents: [String]?
-    package var paymentEventListener: PaymentEventListener?
     package let events = PaymentEventHub()
     package var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
 

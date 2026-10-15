@@ -10,7 +10,7 @@ import HyperswitchShared
 
 extension PaymentSheet {
     internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {
-        events.dispatch(type: type, payload: payload, legacyListener: paymentEventListener)
+        events.dispatch(type: type, payload: payload)
     }
 
     public func shouldProceedWithPayment(_ callback: @escaping (PaymentRequestData, @escaping (Bool) -> Void) -> Void) {

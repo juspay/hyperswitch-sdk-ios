@@ -92,18 +92,12 @@ public enum PaymentEventData {
     }
 
     public struct CvcStatus: Sendable {
-        @available(*, deprecated, message: "No longer sent (always false); use the CVC widget's onFocus/onBlur")
-        public let isCvcFocused: Bool
-        @available(*, deprecated, message: "No longer sent (always false); use the CVC widget's onFocus/onBlur")
-        public let isCvcBlur: Bool
         public let isCvcEmpty: Bool
         public let isCvcComplete: Bool
 
         static func from(_ map: [String: Any]) -> CvcStatus {
             let source = (map["cvcStatus"] as? [String: Any]) ?? map
             return CvcStatus(
-                isCvcFocused: source["isCvcFocused"] as? Bool ?? false,
-                isCvcBlur: source["isCvcBlur"] as? Bool ?? false,
                 isCvcEmpty: source["isCvcEmpty"] as? Bool ?? true,
                 isCvcComplete: source["isCvcComplete"] as? Bool ?? false
             )

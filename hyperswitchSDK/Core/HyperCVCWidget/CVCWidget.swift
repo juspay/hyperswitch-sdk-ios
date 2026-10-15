@@ -19,44 +19,26 @@ public class CVCWidget: UIControl {
     private var initialProperties: [String: Any] = [:]
     private var confirmSequence = 0
     private var cvcCallback: ((PaymentResult) -> Void)?
-    private var subscribedEventNames: [String]?
     /// Stateless: one React root on the shared host, no session until confirm hands credentials over.
     private var reactManager: RNViewManager { RNViewManager.shared }
 
-    internal var paymentEventListener: PaymentEventListener?
     private let events = PaymentEventHub()
 
     public init(
-        configuration: PaymentSheet.Configuration? = nil,
-        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil
+        configuration: PaymentSheet.Configuration? = nil
     ) {
         self.configuration = configuration
         self.configurationDict = nil
-        if let subscribe {
-            let builder = PaymentEventSubscriptionBuilder()
-            subscribe(builder)
-            let (subscription, listener) = builder.build()
-            self.paymentEventListener = listener
-            self.subscribedEventNames = subscription.subscribedEventStrings()
-        }
         super.init(frame: .zero)
         commonInit()
     }
 
     //MARK: pass through
     public init(
-        configurationDict: [String: Any]?,
-        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil
+        configurationDict: [String: Any]?
     ) {
         self.configuration = nil
         self.configurationDict = configurationDict
-        if let subscribe {
-            let builder = PaymentEventSubscriptionBuilder()
-            subscribe(builder)
-            let (subscription, listener) = builder.build()
-            self.paymentEventListener = listener
-            self.subscribedEventNames = subscription.subscribedEventStrings()
-        }
         super.init(frame: .zero)
         commonInit()
     }
@@ -91,12 +73,7 @@ public class CVCWidget: UIControl {
 
         let sdkParams = SDKParams.getSDKParams()
 
-        var nativeConfig = try? configuration?.toDictionary()
-        nativeConfig = SubscribedEvents.normalize(nativeConfig, adding: subscribedEventNames)
-        // Only a dictionary the caller passed; creating one here would flip `from` to "rn".
-        if configurationDict != nil {
-            configurationDict = SubscribedEvents.normalize(configurationDict, adding: subscribedEventNames)
-        }
+        let nativeConfig = try? configuration?.toDictionary()
 
         let props: [String: Any] = [
             "type": "cvcWidget",
@@ -174,6 +151,6 @@ public class CVCWidget: UIControl {
     }
 
     internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {
-        events.dispatch(type: type, payload: payload, legacyListener: paymentEventListener)
+        events.dispatch(type: type, payload: payload)
     }
 }

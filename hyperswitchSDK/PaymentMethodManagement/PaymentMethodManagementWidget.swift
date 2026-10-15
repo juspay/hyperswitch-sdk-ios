@@ -16,31 +16,21 @@ public class PaymentMethodManagementWidget: UIControl {
     private var widgetReactTag: NSNumber?
     private var rootView: UIView?
     private var tokenizeCallback: ((PaymentResult) -> Void)?
-    private var subscribedEventNames: [String]?
     internal var paymentEventListener: PaymentEventListener?
 
     internal init(
         hyperswitchConfiguration: HyperswitchConfiguration,
         sdkAuthorization: String,
         configuration: PaymentSheet.Configuration? = nil,
-        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil,
         host: PaymentMethodManagementHost = .shared
     ) {
         self.host = host
-        if let subscribe {
-            let builder = PaymentEventSubscriptionBuilder()
-            subscribe(builder)
-            let built = builder.build()
-            self.paymentEventListener = built.listener
-            self.subscribedEventNames = built.subscription.subscribedEventStrings()
-        }
         super.init(frame: .zero)
 
         let props = PMMProps.make(
             hyperswitchConfiguration: hyperswitchConfiguration,
             sdkAuthorization: sdkAuthorization,
             configuration: configuration,
-            subscribedEvents: subscribedEventNames,
             type: PMMProtocol.widgetType,
             from: "nativeWidget"
         )

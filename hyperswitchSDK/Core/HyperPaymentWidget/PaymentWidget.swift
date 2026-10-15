@@ -23,27 +23,17 @@ public class PaymentWidget: UIControl {
     private var confirmCompletion: ((PaymentResult) -> Void)?
     private var confirmInFlight = false
     private var shouldProceedWithPaymentCallback: ((PaymentRequestData, @escaping (Bool) -> Void) -> Void)?
-    private var subscribedEventNames: [String]?
     private var reactManager: RNViewManager { RNViewManager.shared }
-    internal var paymentEventListener: PaymentEventListener?
     private let events = PaymentEventHub()
 
     public init(
         paymentSession: PaymentSession,
         configuration: PaymentSheet.Configuration? = nil,
-        completion: @escaping ((PaymentResult) -> Void),
-        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil
+        completion: @escaping ((PaymentResult) -> Void)
     ) {
         self.paymentSession = paymentSession
         self.configuration = configuration
         self.configurationDict = nil
-        if let subscribe {
-            let builder = PaymentEventSubscriptionBuilder()
-            subscribe(builder)
-            let (subscription, listener) = builder.build()
-            self.paymentEventListener = listener
-            self.subscribedEventNames = subscription.subscribedEventStrings()
-        }
         self.initCallback = completion
         super.init(frame: .zero)
         commonInit()
@@ -52,19 +42,11 @@ public class PaymentWidget: UIControl {
     public init(
         paymentSession: PaymentSession,
         configurationDict: [String: Any]?,
-        completion: @escaping ((PaymentResult) -> Void),
-        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil
+        completion: @escaping ((PaymentResult) -> Void)
     ) {
         self.paymentSession = paymentSession
         self.configuration = nil
         self.configurationDict = configurationDict
-        if let subscribe {
-            let builder = PaymentEventSubscriptionBuilder()
-            subscribe(builder)
-            let (subscription, listener) = builder.build()
-            self.paymentEventListener = listener
-            self.subscribedEventNames = subscription.subscribedEventStrings()
-        }
         self.initCallback = completion
         super.init(frame: .zero)
         commonInit()
@@ -109,12 +91,7 @@ public class PaymentWidget: UIControl {
 
         var nativeConfig = try? configuration?.toDictionary()
         nativeConfig?["hideConfirmButton"] = true  // MARK: replace with `displayPayButton`
-        nativeConfig = SubscribedEvents.normalize(nativeConfig, adding: subscribedEventNames)
         configurationDict?["hideConfirmButton"] = true  // MARK: replace with `displayPayButton`
-        // Only a dictionary the caller passed; creating one here would flip `from` to "rn".
-        if configurationDict != nil {
-            configurationDict = SubscribedEvents.normalize(configurationDict, adding: subscribedEventNames)
-        }
 
         let props: [String: Any] = [
             "type": "widgetPaymentSheet",
@@ -232,6 +209,6 @@ public class PaymentWidget: UIControl {
     }
 
     internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {
-        events.dispatch(type: type, payload: payload, legacyListener: paymentEventListener)
+        events.dispatch(type: type, payload: payload)
     }
 }

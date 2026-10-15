@@ -24,12 +24,10 @@ internal enum PMMProps {
         hyperswitchConfiguration: HyperswitchConfiguration,
         sdkAuthorization: String,
         configuration: PaymentSheet.Configuration?,
-        subscribedEvents: [String]?,
         type: String,
         from: String?
     ) -> [String: Any] {
-        var configurationDict = try? configuration?.toDictionary()
-        configurationDict?["subscribedEvents"] = subscribedEvents
+        let configurationDict = try? configuration?.toDictionary()
 
         var props: [String: Any] = [
             "type": type,
@@ -70,30 +68,19 @@ public final class PaymentMethodManagement {
     public func present(
         from viewController: UIViewController,
         configuration: PaymentSheet.Configuration? = nil,
-        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil,
         completion: @escaping (PaymentResult) -> Void
     ) {
-        var subscribedEvents: [String]? = nil
-        var listener: PaymentEventListener? = nil
-        if let subscribe {
-            let builder = PaymentEventSubscriptionBuilder()
-            subscribe(builder)
-            let built = builder.build()
-            subscribedEvents = built.subscription.subscribedEventStrings()
-            listener = built.listener
-        }
         let props = PMMProps.make(
             hyperswitchConfiguration: hyperswitchConfiguration,
             sdkAuthorization: sessionConfiguration.sdkAuthorization,
             configuration: configuration,
-            subscribedEvents: subscribedEvents,
             type: PMMProtocol.sheetType,
             from: nil
         )
         let sheet = PaymentMethodManagementSheet(
             host: host,
             props: props,
-            paymentEventListener: listener,
+            paymentEventListener: nil,
             completion: completion
         )
         sheet.present(from: viewController)
@@ -105,14 +92,12 @@ public final class PaymentMethodManagement {
     /// (web parity with `hyper.confirmTokenization`) from any merchant-owned button;
     /// the view stays mounted for retry until a result resolves.
     public func widget(
-        configuration: PaymentSheet.Configuration? = nil,
-        subscribe: ((PaymentEventSubscriptionBuilder) -> Void)? = nil
+        configuration: PaymentSheet.Configuration? = nil
     ) -> PaymentMethodManagementWidget {
         PaymentMethodManagementWidget(
             hyperswitchConfiguration: hyperswitchConfiguration,
             sdkAuthorization: sessionConfiguration.sdkAuthorization,
             configuration: configuration,
-            subscribe: subscribe,
             host: host
         )
     }

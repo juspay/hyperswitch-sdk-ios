@@ -20,7 +20,7 @@ internal extension PaymentSheet {
         let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
 
         /// Get the configuration dictionary from the configuration object.
-        let configuration = SubscribedEvents.normalize(try? self.configuration?.toDictionary(), adding: subscribedEvents)
+        let configuration = try? self.configuration?.toDictionary()
 
         /// Create a dictionary of hyperParams with app ID, sdkVersion, country, user agent, default view, and launch time.
         var sdkParams = SDKParams.getSDKParams()
@@ -45,21 +45,20 @@ internal extension PaymentSheet {
 
     /// Method to get the root view for the payment sheet with custom parameters.
     /// - Note: Used by Flutter and React Native Wrappers to send separate props.
-    func getRootViewWithParams(props: [String: Any]) -> UIView {
+    func getRootViewWithParams(props configuration: [String: Any]) -> UIView {
 
         let hyperswitchConfiguration = try? hyperswitchConfiguration?.toDictionary()
         let paymentSessionConfiguration = try? paymentSessionConfiguration.toDictionary()
 
         var sdkParams = SDKParams.getSDKParams()
         sdkParams["sessionTag"] = sessionTag
-        let propsDict = SubscribedEvents.normalize(props, adding: subscribedEvents) ?? props
 
         let props: [String: Any] = [
             "type": "payment",
             "hyperswitchConfig": hyperswitchConfiguration as Any,
             "paymentSessionConfig": paymentSessionConfiguration as Any,
             "sdkParams": sdkParams,
-            "configuration": propsDict,
+            "configuration": configuration,
             "from": "rn",
         ]
 
