@@ -16,7 +16,9 @@ public enum CardElementType: String, CaseIterable {
 }
 
 /// What is known about the card without knowing the card. The number and the security code
-/// are never part of any value this SDK hands out.
+/// are never part of any value this SDK hands out. While the card is being entered, `bin` and
+/// `extendedBin` are the most of it that is reported; `last4` is nil until the form has
+/// tokenized, and is then set on the `TokenizedCard`.
 public struct CardDetails: Equatable {
     public let bin: String?
     public let extendedBin: String?
@@ -94,6 +96,17 @@ public struct TokenizedCard {
     public var paymentMethodToken: String? { tokens["payment_method_token"] }
 }
 
+/// Tokens stand for a card, so they stay out of anything that prints or dumps this.
+extension TokenizedCard: CustomStringConvertible, CustomDebugStringConvertible, CustomReflectable {
+    public var description: String {
+        "TokenizedCard(vaultType: \(vaultType ?? "nil"), tokens: \(tokens.keys.sorted()), card: \(String(describing: card)))"
+    }
+    public var debugDescription: String { description }
+    public var customMirror: Mirror {
+        Mirror(self, children: ["vaultType": vaultType as Any, "tokens": tokens.keys.sorted(), "card": card as Any])
+    }
+}
+
 public struct TokenizeError: Error, Equatable {
     public enum Kind: String {
         /// The card as entered cannot be tokenized; the fields say why.
@@ -139,8 +152,9 @@ public struct TokenizeError: Error, Equatable {
 
         let data = result["data"] as? [String: Any] ?? [:]
         var tokens: [String: String] = [:]
+        /// A token is text. Anything else a vault put there is not passed on.
         for (name, value) in data["tokens"] as? [String: Any] ?? [:] {
-            tokens[name] = value as? String ?? String(describing: value)
+            if let value = value as? String { tokens[name] = value }
         }
         self = .success(
             TokenizedCard(
@@ -167,6 +181,8 @@ public struct CardFieldOptions {
     public var unstyled: Bool?
     /// Read by the CVC field only.
     public var cvcIcon: CvcIcon?
+    /// This field drawn differently from the rest of the form.
+    public var style: CardFieldStyle?
 
     public init(
         placeholder: String? = nil,
@@ -174,7 +190,8 @@ public struct CardFieldOptions {
         labelBehavior: LabelBehavior? = nil,
         errorDisplay: ErrorDisplay? = nil,
         unstyled: Bool? = nil,
-        cvcIcon: CvcIcon? = nil
+        cvcIcon: CvcIcon? = nil,
+        style: CardFieldStyle? = nil
     ) {
         self.placeholder = placeholder
         self.label = label
@@ -182,6 +199,7 @@ public struct CardFieldOptions {
         self.errorDisplay = errorDisplay
         self.unstyled = unstyled
         self.cvcIcon = cvcIcon
+        self.style = style
     }
 
     internal var props: [String: Any] {
@@ -192,6 +210,7 @@ public struct CardFieldOptions {
         props["errorDisplay"] = errorDisplay?.rawValue
         props["unstyled"] = unstyled
         props["cvcIcon"] = cvcIcon?.rawValue
+        props["styles"] = style.flatMap { try? $0.toDictionary() }
         return props
     }
 }

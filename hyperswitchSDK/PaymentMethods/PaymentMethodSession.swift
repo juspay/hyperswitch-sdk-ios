@@ -17,6 +17,13 @@ public struct PaymentMethodSessionConfiguration {
     }
 }
 
+/// A secret, so it stays out of anything that prints or dumps this.
+extension PaymentMethodSessionConfiguration: CustomStringConvertible, CustomDebugStringConvertible, CustomReflectable {
+    public var description: String { "PaymentMethodSessionConfiguration(sdkAuthorization: [redacted])" }
+    public var debugDescription: String { description }
+    public var customMirror: Mirror { Mirror(self, children: [:]) }
+}
+
 /// A payment method session: the place card forms come from.
 public final class PaymentMethodSession {
 

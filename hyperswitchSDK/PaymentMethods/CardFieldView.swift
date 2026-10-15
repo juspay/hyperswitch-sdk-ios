@@ -12,7 +12,7 @@ import UIKit
 
 /// One field of a `CardForm`. Get one from the form and place it like any other view. What
 /// is typed into it cannot be read back; `state` says whether it is complete and valid.
-public final class CardFieldView: UIView {
+public class CardFieldView: UIView {
 
     public let elementType: CardElementType
 
@@ -28,7 +28,8 @@ public final class CardFieldView: UIView {
     private let form: CardForm
     private var contentHeight: CGFloat = 0
 
-    internal init(form: CardForm, host: PaymentMethodsHost, elementType: CardElementType, options: CardFieldOptions) {
+    /// Use `CardNumberField`, `CardExpiryField`, `CardCvcField` or `CardholderNameField`.
+    internal init(form: CardForm, elementType: CardElementType, options: CardFieldOptions) {
         self.form = form
         self.elementType = elementType
         super.init(frame: .zero)
@@ -39,7 +40,7 @@ public final class CardFieldView: UIView {
         props["formId"] = form.formId
         props["elementType"] = elementType.rawValue
 
-        let rootView = host.viewForModule(
+        let rootView = form.host.viewForModule(
             PaymentMethodsProtocol.fieldComponent,
             initialProperties: ["props": props],
             owner: self
@@ -59,8 +60,12 @@ public final class CardFieldView: UIView {
     }
 
     required init?(coder: NSCoder) {
-        fatalError("Get a CardFieldView from a CardForm.")
+        fatalError("init(coder:) has not been implemented")
     }
+
+    /// What a log or a debugger prints for this view says which field it is and nothing more.
+    public override var description: String { "CardFieldView(\(elementType.rawValue))" }
+    public override var debugDescription: String { description }
 
     /// The height its content asked for, so the view sizes itself in a stack or with
     /// Auto Layout; a height constraint of your own still wins.
@@ -108,5 +113,49 @@ extension CardFieldView: PaymentMethodsEventTarget {
         default:
             break
         }
+    }
+}
+
+/// The card number.
+public final class CardNumberField: CardFieldView {
+    public init(form: CardForm, options: CardFieldOptions = CardFieldOptions()) {
+        super.init(form: form, elementType: .cardNumber, options: options)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+/// The expiry date.
+public final class CardExpiryField: CardFieldView {
+    public init(form: CardForm, options: CardFieldOptions = CardFieldOptions()) {
+        super.init(form: form, elementType: .cardExpiry, options: options)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+/// The security code.
+public final class CardCvcField: CardFieldView {
+    public init(form: CardForm, options: CardFieldOptions = CardFieldOptions()) {
+        super.init(form: form, elementType: .cardCvc, options: options)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+/// The name on the card.
+public final class CardholderNameField: CardFieldView {
+    public init(form: CardForm, options: CardFieldOptions = CardFieldOptions()) {
+        super.init(form: form, elementType: .cardholderName, options: options)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

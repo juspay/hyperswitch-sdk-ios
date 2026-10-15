@@ -10,16 +10,28 @@ import HyperswitchReactNative
 import HyperswitchShared
 import UIKit
 
-/// One card form. It hands out its fields as views to place anywhere; they are one form
-/// because this object made them, with nothing to link or register. The card lives as long
+/// One card form. Make its fields with `CardNumberField(form:)` and its like, and place them
+/// anywhere; they are one form because they were made with this one. The card lives as long
 /// as this object does: releasing it clears the card. Use from the main thread.
 public final class CardForm {
 
     public struct Configuration {
         public var locale: String?
+        /// How every field of this form looks.
+        public var appearance: CardFormAppearance?
+        /// Lets the platform offer a card it has saved. Off by default: a card field in
+        /// these SDKs otherwise tells the platform it holds a one-time code, which keeps
+        /// the keyboard's own suggestions away from it.
+        public var autofill: Bool
 
-        public init(locale: String? = nil) {
+        public init(
+            locale: String? = nil,
+            appearance: CardFormAppearance? = nil,
+            autofill: Bool = false
+        ) {
             self.locale = locale
+            self.appearance = appearance
+            self.autofill = autofill
         }
     }
 
@@ -47,10 +59,14 @@ public final class CardForm {
 
     private var phase = Phase.opening
     /// Commands reach the bundle only once it listens, which the form's first word proves.
+    /// What waits here must not hold the form: a form that never opens would then keep itself,
+    /// and the card with it, for good.
     private var whenSettled: [() -> Void] = []
+    /// Asked for before the form opened, so not yet in `pendingTokenize`.
+    private var waitingTokenizes: [UUID: (TokenizeResult) -> Void] = [:]
     private var pendingTokenize: (id: String, resume: (TokenizeResult) -> Void)?
 
-    private let host: PaymentMethodsHost
+    internal let host: PaymentMethodsHost
     private var surface: HeadlessSurface?
 
     internal init(
@@ -69,6 +85,8 @@ public final class CardForm {
             "sdkAuthorization": sessionConfiguration.sdkAuthorization,
         ]
         props["locale"] = configuration.locale
+        props["appearance"] = configuration.appearance.flatMap { try? $0.toDictionary() }
+        props["autofill"] = configuration.autofill
 
         /// A root that never joins a window. Stopping it is what ends the form in the bundle.
         self.surface = HeadlessSurface(
@@ -80,6 +98,11 @@ public final class CardForm {
     }
 
     deinit {
+        /// Nobody is left to answer these, and an `await` that is never answered never returns.
+        let released = TokenizeResult.failure(.local("form_released", "The card form was released."))
+        pendingTokenize?.resume(released)
+        waitingTokenizes.values.forEach { $0(released) }
+
         let surface = self.surface
         if Thread.isMainThread {
             surface?.stop()
@@ -88,37 +111,26 @@ public final class CardForm {
         }
     }
 
-    // MARK: Fields
-
-    public func cardNumberField(_ options: CardFieldOptions = CardFieldOptions()) -> CardFieldView {
-        CardFieldView(form: self, host: host, elementType: .cardNumber, options: options)
-    }
-
-    public func cardExpiryField(_ options: CardFieldOptions = CardFieldOptions()) -> CardFieldView {
-        CardFieldView(form: self, host: host, elementType: .cardExpiry, options: options)
-    }
-
-    public func cardCvcField(_ options: CardFieldOptions = CardFieldOptions()) -> CardFieldView {
-        CardFieldView(form: self, host: host, elementType: .cardCvc, options: options)
-    }
-
-    public func cardholderNameField(_ options: CardFieldOptions = CardFieldOptions()) -> CardFieldView {
-        CardFieldView(form: self, host: host, elementType: .cardholderName, options: options)
-    }
-
     // MARK: Tokenize
 
     /// Sends the card to the vault and returns its token. Never throws: a card that cannot
     /// be tokenized is a `.failure`, and the fields show why.
     public func tokenize() async -> TokenizeResult {
         await withCheckedContinuation { continuation in
-            onMain { self.tokenize { continuation.resume(returning: $0) } }
+            tokenize { continuation.resume(returning: $0) }
         }
     }
 
     public func tokenize(completion: @escaping (TokenizeResult) -> Void) {
-        onMain {
-            self.whenFormSettles {
+        onMain { [weak self] in
+            guard let self else {
+                completion(.failure(.local("form_released", "The card form was released.")))
+                return
+            }
+            let waiting = UUID()
+            self.waitingTokenizes[waiting] = completion
+            self.whenFormSettles { [weak self] in
+                guard let self, let completion = self.waitingTokenizes.removeValue(forKey: waiting) else { return }
                 if case .failed(let message) = self.phase {
                     completion(.failure(.local("form_unavailable", message)))
                     return
@@ -137,9 +149,9 @@ public final class CardForm {
     // MARK: Internal
 
     internal func send(fieldCommand name: String, for elementType: CardElementType) {
-        onMain {
-            self.whenFormSettles {
-                guard case .ready = self.phase else { return }
+        onMain { [weak self] in
+            self?.whenFormSettles { [weak self] in
+                guard let self, case .ready = self.phase else { return }
                 self.send([
                     "commandId": UUID().uuidString,
                     "name": name,

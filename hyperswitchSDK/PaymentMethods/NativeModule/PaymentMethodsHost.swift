@@ -32,14 +32,17 @@ internal final class PaymentMethodsHostDelegate: RCTDefaultReactNativeFactoryDel
     }
 
     override func bundleURL() -> URL? {
+        #if DEBUG
         switch Helper.getInfoPlist("HyperswitchSource") {
         case "LocalHosted":
             return RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: PaymentMethodsHost.entryFile)
         case "LocalBundle":
             return Bundle.main.url(forResource: PaymentMethodsHost.bundleName, withExtension: "bundle")
         default:
-            return Bundle(for: PaymentMethodsHost.self).url(forResource: PaymentMethodsHost.bundleName, withExtension: "bundle")
+            break
         }
+        #endif
+        return Bundle(for: PaymentMethodsHost.self).url(forResource: PaymentMethodsHost.bundleName, withExtension: "bundle")
     }
 }
 
