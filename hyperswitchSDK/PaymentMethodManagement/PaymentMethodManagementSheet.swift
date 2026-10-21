@@ -68,8 +68,9 @@ internal final class PaymentMethodManagementSheet: PaymentMethodManagementEventT
     internal func pmmNonTerminalResult(_ result: PaymentResult) {}
 
     internal func pmmPaymentEvent(type: String, payload: [String: Any]) {
-        guard let listener = paymentEventListener else { return }
-        let event = PaymentEvent(eventName: type, payload: payload)
+        guard let listener = paymentEventListener,
+              let eventName = PaymentEventType(rawValue: type) else { return }
+        guard let event = PaymentEvent(eventName: eventName, rawPayload: payload) else { return }
         listener.onPaymentEvent(event)
     }
 }

@@ -75,11 +75,11 @@ class ViewController: UIViewController {
             viewController: self,
             configuration: configuration,
             onChange: { event in
-                // One handler for every subscribed event; branch on its name.
-                switch event.eventName {
-                case "cardDetailsChange": print("card:", event.payload)
-                case "paymentMethodChange": print("payment method:", event.payload)
-                case "formStatusChange": print("form status:", event.payload)
+                // One handler for every subscribed event; match its typed payload.
+                switch event.payload {
+                case .cardDetailsChange(let payload): print("card brand:", payload.brand ?? "")
+                case .paymentMethodChange(let payload): print("payment method:", payload.paymentMethod, "saved:", payload.isSavedPaymentMethod)
+                case .formStatusChange(let payload): print("form status:", payload.status)
                 default: print(event.eventName, event.payload)
                 }
             },

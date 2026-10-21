@@ -47,7 +47,7 @@ public class CVCWidget: UIControl {
         fatalError("init(coder:) has not been implemented")
     }
 
-    /// Receives every event listed in `configuration.subscriptionEvents`; switch on `event.eventName`.
+    /// Receives every event listed in `configuration.subscriptionEvents`; pattern-match on `event.payload` for typed fields.
     /// Can be set at any time; events emitted before it is set are dropped.
     public func onChange(_ handler: @escaping (PaymentEvent) -> Void) {
         events.onChange = handler

@@ -16,20 +16,27 @@ public enum PaymentEventType: String, CaseIterable, Codable, Sendable {
     case cvcStatusChange
 }
 
-/// Delivered to `onChange`; switch on `eventName`, read `data` for the typed payload.
-public struct PaymentEvent {
-    public let eventName: String
-    public let payload: [String: Any]
-
-    public var data: PaymentEventData? {
-        PaymentEventData.from(type: eventName, payload: payload)
+/// Delivered to `onChange`; pattern-match on the typed payload for its fields.
+public struct PaymentEvent: Sendable {
+    public let payload: PaymentEventData
+    public var eventName: PaymentEventType {
+        switch payload {
+        case .cardDetailsChange: return .cardDetailsChange
+        case .paymentMethodChange: return .paymentMethodChange
+        case .formStatusChange: return .formStatusChange
+        case .billingDetailsChange: return .billingDetailsChange
+        case .cvcStatusChange: return .cvcStatusChange
+        }
     }
 
-    public init(eventName: String, payload: [String: Any]) {
-        self.eventName = eventName
+    public init(payload: PaymentEventData) {
         self.payload = payload
     }
 
+    package init?(eventName: PaymentEventType, rawPayload: [String: Any]) {
+        guard let payload = PaymentEventData.from(type: eventName, payload: rawPayload) else { return nil }
+        self.init(payload: payload)
+    }
 }
 
 /// Event handlers of one element (or sheet), read when each event arrives. Lifecycle events
@@ -56,7 +63,8 @@ package final class PaymentEventHub {
             case "focus": self.onFocus?()
             case "blur": self.onBlur?()
             default:
-                let event = PaymentEvent(eventName: type, payload: payload)
+                guard let eventName = PaymentEventType(rawValue: type) else { return }
+                guard let event = PaymentEvent(eventName: eventName, rawPayload: payload) else { return }
                 self.onChange?(event)
             }
         }

@@ -162,11 +162,11 @@ class WidgetViewController: UIViewController {
                 }
             }
             self.paymentWidget?.onChange { event in
-                switch event.eventName {
-                case "paymentMethodChange": print("payment method:", event.payload)
-                case "cardDetailsChange": print("card:", event.payload)
-                case "formStatusChange": print("form status:", event.payload)
-                case "billingDetailsChange": print("billing:", event.payload)
+                switch event.payload {
+                case .paymentMethodChange(let payload): print("payment method:", payload.paymentMethod, "saved:", payload.isSavedPaymentMethod)
+                case .cardDetailsChange(let payload): print("card brand:", payload.brand ?? "")
+                case .formStatusChange(let payload): print("form status:", payload.status)
+                case .billingDetailsChange(let payload): print("billing country:", payload.country ?? "")
                 default: break
                 }
             }
@@ -186,7 +186,9 @@ class WidgetViewController: UIViewController {
             }
             self.cvcWidget = CVCWidget(configuration: cvcConfiguration)
             self.cvcWidget?.onChange { event in
-                if event.eventName == "cvcStatusChange" { print("cvc:", event.payload) }
+                if case .cvcStatusChange(let payload) = event.payload {
+                    print("cvc complete:", payload.cvcStatus.isCvcComplete)
+                }
             }
             self.cvcWidget?.onReady { print("cvc widget ready") }
             self.cvcWidget?.onFocus { print("cvc widget focus") }
