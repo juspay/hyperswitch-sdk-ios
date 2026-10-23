@@ -104,6 +104,11 @@ post_install do |installer|
       # Library evolution is for our frameworks' public Swift API only. CocoaPods copies the
       # frameworks' BUILD_LIBRARY_FOR_DISTRIBUTION=YES onto the pods they link.
       config.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'NO'
+      # Xcode 27 min deployment target updated to iOS 15
+      deployment_target = config.build_settings['IPHONEOS_DEPLOYMENT_TARGET']
+      if deployment_target && Gem::Version.new(deployment_target) < Gem::Version.new(min_ios_version_supported)
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = min_ios_version_supported
+      end
       # Xcode 26.4+ cannot build fmt as C++20.
       config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17' if target.name == 'fmt'
     end
