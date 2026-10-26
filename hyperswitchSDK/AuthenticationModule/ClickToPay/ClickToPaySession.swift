@@ -255,8 +255,10 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
     }
 
     private func initHtml(requestId: String) -> String {
-        let backendUrlParam = customBackendUrl.map { "customBackendUrl: \"\($0)\"," } ?? ""
-        let logUrlParam = customLogUrl.map { "customLogUrl: \"\($0)\"," } ?? ""
+        let hyperOptions = ClickToPayJS.object([
+            "customBackendUrl": customBackendUrl,
+            "customLogUrl": customLogUrl,
+        ])
 
         return """
                 <!DOCTYPE html>
@@ -282,10 +284,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                                   return;
                               }
 
-                              window.hyperInstance = Hyper.init("\(publishableKey)", {
-                                  \(backendUrlParam)
-                                  \(logUrlParam)
-                              });
+                              window.hyperInstance = Hyper.init(\(ClickToPayJS.string(publishableKey)), \(hyperOptions));
 
                               postResult({ success: true });
                           } catch (error) {
@@ -415,12 +414,12 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let jsCode = """
                     (async function() {
                         try {
-                            const authenticationSession = window.hyperInstance.initAuthenticationSession({
-                                  clientSecret: "\(clientSecret)",
-                                  profileId: "\(profileId)",
-                                  authenticationId: "\(authenticationId)",
-                                  merchantId: "\(merchantId)",
-                            });
+                            const authenticationSession = window.hyperInstance.initAuthenticationSession(\(ClickToPayJS.object([
+                                "clientSecret": clientSecret,
+                                "profileId": profileId,
+                                "authenticationId": authenticationId,
+                                "merchantId": merchantId,
+                            ])));
 
                             window.ClickToPaySession = await authenticationSession.initClickToPaySession({
                                 request3DSAuthentication: \(request3DSAuthentication),
@@ -516,14 +515,14 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let jsCode = """
                     (async function() {
                         try {
-                            const authenticationSession = window.hyperInstance.initAuthenticationSession({
-                                    clientSecret: "\(clientSecret)",
-                                    profileId: "\(profileId)",
-                                    authenticationId: "\(authenticationId)",
-                                    merchantId: "\(merchantId)",
-                                });
+                            const authenticationSession = window.hyperInstance.initAuthenticationSession(\(ClickToPayJS.object([
+                                "clientSecret": clientSecret,
+                                "profileId": profileId,
+                                "authenticationId": authenticationId,
+                                "merchantId": merchantId,
+                            ])));
                             window.DCTPSession = await authenticationSession.initClickToPayDCTPSession({
-                                token: \(token)
+                                token: \(ClickToPayJS.json(token))
                             });
 
                             const data = window.DCTPSession && window.DCTPSession.error
@@ -612,12 +611,12 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let jsCode = """
                     (async function() {
                         try {
-                            const authenticationSession = window.hyperInstance.initAuthenticationSession({
-                                  clientSecret: "\(clientSecret)",
-                                  profileId: "\(profileId)",
-                                  authenticationId: "\(authenticationId)",
-                                  merchantId: "\(merchantId)",
-                            });
+                            const authenticationSession = window.hyperInstance.initAuthenticationSession(\(ClickToPayJS.object([
+                                "clientSecret": clientSecret,
+                                "profileId": profileId,
+                                "authenticationId": authenticationId,
+                                "merchantId": merchantId,
+                            ])));
 
                             window.ClickToPaySession = await authenticationSession.getActiveClickToPaySession();
 
@@ -682,14 +681,10 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
                 self?.pendingRequests[requestId] = continuation
             }
 
-            let emailParam = request.email.map { "email: \"\($0)\"" } ?? ""
-
             let jsCode = """
                                (async function() {
                                     try {
-                                        const isCustomerPresent = await window.DCTPSession.isCustomerPresent({
-                                            \(emailParam)
-                                        });
+                                        const isCustomerPresent = await window.DCTPSession.isCustomerPresent(\(ClickToPayJS.object(["email": request.email])));
                                         window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
                                             requestId: "\(requestId)",
                                             data: isCustomerPresent
@@ -945,9 +940,7 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
             let jsCode = """
                 (async function() {
                                     try {
-                                        const cards = await window.ClickToPaySession.validateCustomerAuthentication({
-                                            value: "\(otpValue)"
-                                        });
+                                        const cards = await window.ClickToPaySession.validateCustomerAuthentication(\(ClickToPayJS.object(["value": otpValue])));
                                         window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
                                             requestId: "\(requestId)",
                                             data: cards
@@ -1122,10 +1115,10 @@ internal class ClickToPaySessionImpl: NSObject, ClickToPaySession, WKNavigationD
 
                  (async function() {
                                     try {
-                                        const checkoutResponse = await window.ClickToPaySession.checkoutWithCard({
-                                            srcDigitalCardId: "\(request.srcDigitalCardId)",
-                                            rememberMe: \(request.rememberMe ?? false)
-                                        });
+                                        const checkoutResponse = await window.ClickToPaySession.checkoutWithCard(\(ClickToPayJS.object([
+                                            "srcDigitalCardId": request.srcDigitalCardId,
+                                            "rememberMe": request.rememberMe ?? false,
+                                        ])));
                                         window.webkit.messageHandlers.HSInterface.postMessage(JSON.stringify({
                                             requestId: "\(requestId)",
                                             data: checkoutResponse
