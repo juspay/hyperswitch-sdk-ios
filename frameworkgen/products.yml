@@ -28,7 +28,7 @@ frameworks:
   HyperswitchAirbornePlugin:
     depends: [HyperswitchShared]
     pods:
-      HyperOTA: "0.0.8"
+      Airborne: "0.45.0"
   HyperswitchLite:
     depends: [HyperswitchShared]
   HyperswitchLiteScanCard:
