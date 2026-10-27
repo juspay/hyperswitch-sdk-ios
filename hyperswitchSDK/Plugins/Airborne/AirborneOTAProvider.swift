@@ -7,34 +7,57 @@
 //
 
 import Foundation
-internal import HyperOTA
+import Airborne
 import HyperswitchShared
 
 @objc(HyperswitchAirborneOTAProvider)
-internal final class AirborneOTAProvider: NSObject, HyperswitchOTAProviding {
+internal final class AirborneOTAProvider: NSObject, HyperswitchOTAProviding, AirborneDelegate {
 
-    private let services: HyperOTAServices
+    private var services: AirborneServices?
     private let baseBundle: Bundle
-    private let logger = EventLogger()
+    private let bundleName: String
+    private let ns: String
 
     required init(publishableKey: String, baseBundle: Bundle) {
         let configKey = PluginSupport.isSandbox(publishableKey: publishableKey) ? "sandBoxReleaseConfigURL" : "releaseConfigURL"
-        let payload =
-            [
-                "clientId": Self.plist("clientId") ?? "",
-                "namespace": Self.plist("namespace") ?? "",
-                "forceUpdate": true,
-                "localAssets": (Self.plist(configKey) ?? "releaseConfigURL") == "releaseConfigURL",
-                "fileName": Self.plist("fileName") ?? "",
-                "releaseConfigURL": (Self.plist(configKey) ?? "") + "/mobile-ota/ios/" + SDKVersion.current + "/config.json",
-            ] as [String: Any]
+        let releaseConfigURL = (Self.plist(configKey) ?? "") + "/mobile-ota/ios/" + SDKVersion.current + "/config.json"
         self.baseBundle = baseBundle
-        self.services = HyperOTAServices(payload: payload, loggerDelegate: logger, baseBundle: baseBundle)
+        self.bundleName = Self.plist("fileName") ?? "hyperswitch.bundle"
+        self.ns = Self.plist("namespace") ?? "hyperswitch"
         super.init()
+        self.services = AirborneServices(releaseConfigURL: releaseConfigURL, delegate: self)
     }
 
     func bundleURL() -> URL? {
-        services.bundleURL() ?? baseBundle.url(forResource: "hyperswitch", withExtension: "bundle")
+        services?.getIndexBundlePath() ?? baseBundle.url(forResource: "hyperswitch", withExtension: "bundle")
+    }
+
+    // MARK: - AirborneDelegate
+
+    func namespace() -> String {
+        return ns
+    }
+
+    func bundle() -> Bundle {
+        return baseBundle
+    }
+
+    func indexBundleName() -> String {
+        return bundleName
+    }
+
+    func onEvent(level: String, label: String, key: String, value: [String: Any], category: String, subcategory: String) {
+        let eventData: [String: Any] = [
+            "label": label,
+            "value": JSONSerialization.isValidJSONObject(["key": value]) ? value : String(describing: value),
+            "key": key,
+            "category": category,
+            "subcategory": subcategory,
+        ]
+        if let jsonData = try? JSONSerialization.data(withJSONObject: eventData, options: []),
+           let jsonString = String(data: jsonData, encoding: .utf8) {
+            PluginSupport.logOTAEvent(key: key.isEmpty ? label : key, level: level, value: jsonString)
+        }
     }
 
     /// A value of this plugin's HyperOTA.plist.
@@ -46,56 +69,5 @@ internal final class AirborneOTAProvider: NSObject, HyperswitchOTAProviding {
             return nil
         }
         return value
-    }
-}
-
-/// Forwards HyperOTA's events to the SDK's native log.
-internal final class EventLogger: NSObject, HPJPLoggerDelegate {
-    private func isJSONSerializable(_ value: Any) -> Bool {
-        return JSONSerialization.isValidJSONObject(["key": value])
-    }
-
-    private func addLog(eventData: [String: Any], logLevel: String, key: String?) {
-        guard let jsonData = try? JSONSerialization.data(withJSONObject: eventData, options: []),
-            let jsonString = String(data: jsonData, encoding: .utf8)
-        else {
-            print("Error: JSON data encoding failed.")
-            return
-        }
-        PluginSupport.logOTAEvent(key: key, level: logLevel, value: jsonString)
-    }
-
-    func trackEvent(
-        withLevel logLevel: String,
-        label eventLabel: String,
-        key eventKey: String? = nil,
-        value eventValue: Any,
-        category eventCategory: String,
-        subcategory eventSubcategory: String
-    ) {
-        let eventData: [String: Any] = [
-            "label": eventLabel,
-            "value": isJSONSerializable(eventValue) ? eventValue : String(describing: eventValue),
-            "key": eventKey ?? "",
-            "category": eventCategory,
-            "subcategory": eventSubcategory,
-        ]
-        addLog(eventData: eventData, logLevel: logLevel, key: eventKey)
-    }
-
-    func trackEvent(
-        withLevel logLevel: String,
-        label eventLabel: String,
-        value eventValue: Any,
-        category eventCategory: String,
-        subcategory eventSubcategory: String
-    ) {
-        let eventData: [String: Any] = [
-            "label": eventLabel,
-            "value": isJSONSerializable(eventValue) ? eventValue : String(describing: eventValue),
-            "category": eventCategory,
-            "subcategory": eventSubcategory,
-        ]
-        addLog(eventData: eventData, logLevel: logLevel, key: eventLabel)
     }
 }
