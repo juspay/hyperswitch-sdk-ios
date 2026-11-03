@@ -142,6 +142,7 @@ class WidgetViewController: UIViewController {
         configuration.savedPaymentSheetHeaderLabel = "Payment methods"
         configuration.paymentSheetHeaderLabel = "Select payment method"
         configuration.displaySavedPaymentMethods = true
+        configuration.paymentMethodsConfig = DemoPaymentMessages.make()
 
         var appearance = PaymentSheet.Appearance()
         appearance.font.base = UIFont(name: "montserrat", size: UIFont.systemFontSize)

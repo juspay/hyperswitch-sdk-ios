@@ -170,13 +170,206 @@ extension PaymentSheet {
 
         // MARK: - Payment method messaging
 
-        public struct PaymentMethodConfig: Encodable {
-            public init(paymentMethod: String, message: String? = nil) {
-                self.paymentMethod = paymentMethod
+        /// Hyperswitch `payment_method` values.
+        public enum PaymentMethod: String, Encodable {
+            case card
+            case cardRedirect = "card_redirect"
+            case payLater = "pay_later"
+            case wallet
+            case bankRedirect = "bank_redirect"
+            case bankTransfer = "bank_transfer"
+            case crypto
+            case bankDebit = "bank_debit"
+            case reward
+            case realTimePayment = "real_time_payment"
+            case upi
+            case voucher
+            case giftCard = "gift_card"
+            case openBanking = "open_banking"
+            case mobilePayment = "mobile_payment"
+            case networkToken = "network_token"
+        }
+
+        /// Hyperswitch `payment_method_type` values.
+        public enum PaymentMethodType: String, Encodable {
+            case ach
+            case affirm
+            case afterpayClearpay = "afterpay_clearpay"
+            case alfamart
+            case aliPay = "ali_pay"
+            case aliPayHk = "ali_pay_hk"
+            case alma
+            case amazonPay = "amazon_pay"
+            case paysera
+            case applePay = "apple_pay"
+            case atome
+            case bacs
+            case bancontactCard = "bancontact_card"
+            case becs
+            case benefit
+            case bizum
+            case blik
+            case bluecode
+            case boleto
+            case bcaBankTransfer = "bca_bank_transfer"
+            case bniVa = "bni_va"
+            case breadpay
+            case briVa = "bri_va"
+            case bhnCardNetwork = "bhn_card_network"
+            case cardRedirect = "card_redirect"
+            case cimbVa = "cimb_va"
+            case classic
+            case credit
+            case cryptoCurrency = "crypto_currency"
+            case cashapp
+            case dana
+            case danamonVa = "danamon_va"
+            case debit
+            case duitNow = "duit_now"
+            case efecty
+            case eft
+            case eftDebitOrder = "eft_debit_order"
+            case eps
+            case flexiti
+            case fps
+            case evoucher
+            case giropay
+            case givex
+            case googlePay = "google_pay"
+            case goPay = "go_pay"
+            case gcash
+            case ideal
+            case interac
+            case indomaret
+            case klarna
+            case kakaoPay = "kakao_pay"
+            case localBankRedirect = "local_bank_redirect"
+            case mandiriVa = "mandiri_va"
+            case knet
+            case mbWay = "mb_way"
+            case mobilePay = "mobile_pay"
+            case momo
+            case momoAtm = "momo_atm"
+            case multibanco
+            case neteller
+            case onlineBankingThailand = "online_banking_thailand"
+            case onlineBankingCzechRepublic = "online_banking_czech_republic"
+            case onlineBankingFinland = "online_banking_finland"
+            case onlineBankingFpx = "online_banking_fpx"
+            case onlineBankingPoland = "online_banking_poland"
+            case onlineBankingSlovakia = "online_banking_slovakia"
+            case oxxo
+            case pagoEfectivo = "pago_efectivo"
+            case permataBankTransfer = "permata_bank_transfer"
+            case openBankingUk = "open_banking_uk"
+            case payBright = "pay_bright"
+            case payjustnow
+            case paypal
+            case paze
+            case pix
+            case pixKey = "pix_key"
+            case pixEmv = "pix_emv"
+            case pixQr = "pix_qr"
+            case pixAutomaticoQr = "pix_automatico_qr"
+            case pixAutomaticoPush = "pix_automatico_push"
+            case paySafeCard = "pay_safe_card"
+            case przelewy24
+            case promptPay = "prompt_pay"
+            case pse
+            case qris
+            case redCompra = "red_compra"
+            case redPagos = "red_pagos"
+            case samsungPay = "samsung_pay"
+            case sepa
+            case sepaBankTransfer = "sepa_bank_transfer"
+            case sepaGuarenteedDebit = "sepa_guarenteed_debit"
+            case skrill
+            case sofort
+            case swish
+            case touchNGo = "touch_n_go"
+            case trustly
+            case twint
+            case upiCollect = "upi_collect"
+            case upiIntent = "upi_intent"
+            case upiQr = "upi_qr"
+            case vipps
+            case vietQr = "viet_qr"
+            case venmo
+            case walley
+            case wero
+            case weChatPay = "we_chat_pay"
+            case sevenEleven = "seven_eleven"
+            case lawson
+            case miniStop = "mini_stop"
+            case familyMart = "family_mart"
+            case seicomart
+            case payEasy = "pay_easy"
+            case localBankTransfer = "local_bank_transfer"
+            case mifinity
+            case openBankingPis = "open_banking_pis"
+            case directCarrierBilling = "direct_carrier_billing"
+            case instantBankTransfer = "instant_bank_transfer"
+            case instantBankTransferFinland = "instant_bank_transfer_finland"
+            case instantBankTransferPoland = "instant_bank_transfer_poland"
+            case revolutPay = "revolut_pay"
+            case indonesianBankTransfer = "indonesian_bank_transfer"
+            case openBanking = "open_banking"
+            case networkToken = "network_token"
+            case payshap
+            case payshapProxy = "payshap_proxy"
+            case ted
+        }
+
+        public enum MessageDisplayMode: String, Encodable {
+            case customMessage = "custom_message"
+            case defaultSdkMessage = "default_sdk_message"
+            case hidden
+        }
+        public enum FontWeight: String, Encodable {
+            case regular = "400", medium = "500", semibold = "600", bold = "700"
+        }
+        public enum FontStyle: String, Encodable { case normal, italic }
+        public enum TextDecoration: String, Encodable { case none, underline }
+
+        /// Message for one payment method type; it wins over its payment method's message.
+        public struct PaymentMethodTypeConfig: Encodable {
+            public init(paymentMethodType: PaymentMethodType, message: PaymentMethodMessage? = nil) {
+                self.paymentMethodType = paymentMethodType
                 self.message = message
             }
-            public var paymentMethod: String
-            public var message: String?
+
+            public var paymentMethodType: PaymentMethodType
+            public var message: PaymentMethodMessage?
+
+            public func encode(to encoder: Encoder) throws {
+                try PaymentMessageWire.MethodType(self).encode(to: encoder)
+            }
+        }
+
+        public struct PaymentMethodConfig: Encodable {
+            public init(
+                paymentMethod: PaymentMethod,
+                message: PaymentMethodMessage? = nil,
+                paymentMethodTypes: [PaymentMethodTypeConfig]? = nil
+            ) {
+                self.paymentMethod = paymentMethod
+                self.message = message
+                self.paymentMethodTypes = paymentMethodTypes
+            }
+
+            public var paymentMethod: PaymentMethod
+            public var message: PaymentMethodMessage?
+            /// Not supported for `.card`.
+            public var paymentMethodTypes: [PaymentMethodTypeConfig]?
+
+            /// Every action in this payment method's message and its type messages.
+            var elements: [MessageElement] {
+                ([message] + (paymentMethodTypes ?? []).map(\.message)).flatMap { $0?.value?.elements ?? [] }
+            }
+
+            public func encode(to encoder: Encoder) throws {
+                try PaymentMessageWire.Method(self).encode(to: encoder)
+            }
         }
 
         /// Visibility for redirection messaging.

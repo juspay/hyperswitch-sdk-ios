@@ -86,7 +86,7 @@ public class PaymentWidget: UIControl {
 
         var nativeConfig = try? configuration?.toDictionary()
         nativeConfig?["hideConfirmButton"] = true  // MARK: replace with `displayPayButton`
-        nativeConfig?["subscribedEvents"] = subscribedEventNames
+        nativeConfig?["subscribedEvents"] = (subscribedEventNames ?? []) + [PaymentMessageActions.eventName]
         configurationDict?["hideConfirmButton"] = true  // MARK: replace with `displayPayButton`
         configurationDict?["subscribedEvents"] = subscribedEventNames
 
@@ -206,6 +206,7 @@ public class PaymentWidget: UIControl {
     }
 
     internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {
+        if PaymentMessageActions.dispatch(configuration: configuration, type: type, payload: payload) { return }
         guard let listener = paymentEventListener else { return }
         let event = PaymentEvent(type: type, payload: payload)
         if Thread.isMainThread {
