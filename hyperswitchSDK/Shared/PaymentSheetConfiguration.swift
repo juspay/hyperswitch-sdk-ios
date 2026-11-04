@@ -325,11 +325,42 @@ extension PaymentSheet {
             case defaultSdkMessage = "default_sdk_message"
             case hidden
         }
-        public enum FontWeight: String, Encodable {
-            case regular = "400", medium = "500", semibold = "600", bold = "700"
-        }
-        public enum FontStyle: String, Encodable { case normal, italic }
         public enum TextDecoration: String, Encodable { case none, underline }
+
+        public struct MessageElementStyle {
+            public var color: UIColor?
+            /// Size, weight and italic are used; the SDK typography supplies the family and scale.
+            public var font: UIFont?
+            public var textDecoration: TextDecoration?
+
+            public init(color: UIColor? = nil, font: UIFont? = nil, textDecoration: TextDecoration? = nil) {
+                self.color = color
+                self.font = font
+                self.textDecoration = textDecoration
+            }
+        }
+
+        public struct MessageElementStyles: Encodable {
+            public let action: MessageElementStyle?
+            public init(action: MessageElementStyle? = nil) {
+                self.action = action
+            }
+        }
+
+        /// Immutable action definition; the callback never enters the encoded configuration.
+        public struct MessageElement {
+            package let label: String
+            package let style: MessageElementStyle?
+            package let onTap: () -> Void
+
+            public static func action(
+                label: String,
+                style: MessageElementStyle? = nil,
+                onTap: @escaping () -> Void
+            ) -> MessageElement {
+                MessageElement(label: label, style: style, onTap: onTap)
+            }
+        }
 
         /// Message for one payment method type; it wins over its payment method's message.
         public struct PaymentMethodTypeConfig: Encodable {
@@ -340,10 +371,6 @@ extension PaymentSheet {
 
             public var paymentMethodType: PaymentMethodType
             public var message: PaymentMethodMessage?
-
-            public func encode(to encoder: Encoder) throws {
-                try PaymentMessageWire.MethodType(self).encode(to: encoder)
-            }
         }
 
         public struct PaymentMethodConfig: Encodable {
@@ -361,15 +388,6 @@ extension PaymentSheet {
             public var message: PaymentMethodMessage?
             /// Not supported for `.card`.
             public var paymentMethodTypes: [PaymentMethodTypeConfig]?
-
-            /// Every action in this payment method's message and its type messages.
-            var elements: [MessageElement] {
-                ([message] + (paymentMethodTypes ?? []).map(\.message)).flatMap { $0?.value?.elements ?? [] }
-            }
-
-            public func encode(to encoder: Encoder) throws {
-                try PaymentMessageWire.Method(self).encode(to: encoder)
-            }
         }
 
         /// Visibility for redirection messaging.

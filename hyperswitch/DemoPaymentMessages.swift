@@ -7,7 +7,7 @@ enum DemoPaymentMessages {
         let terms = Configuration.MessageElement.action(
             label: "Terms & Conditions",
             style: Configuration.MessageElementStyle(textDecoration: .underline),
-            onClick: { print("[HyperswitchDemo] Terms & Conditions tapped") }
+            onTap: { print("[HyperswitchDemo] Terms & Conditions tapped") }
         )
         let privacy = Configuration.MessageElement.action(
             label: "Privacy Policy",
@@ -15,7 +15,7 @@ enum DemoPaymentMessages {
                 color: UIColor(red: 5.0 / 255.0, green: 112.0 / 255.0, blue: 222.0 / 255.0, alpha: 1),
                 textDecoration: .underline
             ),
-            onClick: { print("[HyperswitchDemo] Privacy Policy tapped") }
+            onTap: { print("[HyperswitchDemo] Privacy Policy tapped") }
         )
         let message = Configuration.PaymentMethodMessage(
             value: "Please review the \(terms) and \(privacy).\nPlease review before paying."

@@ -8,9 +8,17 @@ package enum PaymentMessageActions {
     @discardableResult
     package static func dispatch(configuration: PaymentSheet.Configuration?, type: String, payload: [String: Any]) -> Bool {
         guard type == eventName else { return false }
-        guard let key = payload["key"] as? String else { return true }
-        let element = configuration?.paymentMethodsConfig?.flatMap(\.elements).first { $0.key == key }
-        if payload["type"] as? String == "action" { element?.onClick() }
+        /* The key is `id_index`: the message's random id, then the action's index in it. */
+        guard payload["type"] as? String == "action",
+            let parts = (payload["key"] as? String)?.split(separator: "_"),
+            parts.count == 2, let index = Int(parts[1])
+        else { return true }
+        let message = configuration?.paymentMethodsConfig?
+            .flatMap { [$0.message] + ($0.paymentMethodTypes ?? []).map(\.message) }
+            .first { $0?.id == String(parts[0]) }
+        if let elements = message??.value?.elements, elements.indices.contains(index) {
+            elements[index].onTap()
+        }
         return true
     }
 }
