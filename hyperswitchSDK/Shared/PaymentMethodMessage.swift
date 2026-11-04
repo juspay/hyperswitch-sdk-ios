@@ -2,12 +2,11 @@ import Foundation
 import UIKit
 
 extension PaymentSheet.Configuration {
-    /// Typed content retains callbacks locally; only labels and styles are encoded.
+    /// Typed content retains callbacks locally; only text and styles are encoded.
     public struct PaymentMethodMessage: Encodable {
-        /// Random, so interpolated text cannot guess an action key (`{{id_index}}`).
-        package let id = String((0..<8).map { _ in "abcdefghijklmnopqrstuvwxyz0123456789".randomElement()! })
         public let value: MessageContent?
-        public let displayMode: MessageDisplayMode
+        /// Unset fields of a payment method type's message come from its payment method's message.
+        public let displayMode: MessageDisplayMode?
         public let elementStyles: MessageElementStyles?
 
         public init(
@@ -16,7 +15,7 @@ extension PaymentSheet.Configuration {
             elementStyles: MessageElementStyles? = nil
         ) {
             self.value = value
-            self.displayMode = displayMode ?? (value == nil ? .defaultSdkMessage : .customMessage)
+            self.displayMode = displayMode
             self.elementStyles = elementStyles
         }
     }

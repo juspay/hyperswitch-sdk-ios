@@ -206,7 +206,10 @@ public class PaymentWidget: UIControl {
     }
 
     internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {
-        if PaymentMessageActions.dispatch(configuration: configuration, type: type, payload: payload) { return }
+        /* A widget built from a raw configuration dictionary leaves message actions to its host. */
+        if configuration != nil, PaymentMessageActions.dispatch(configuration: configuration, type: type, payload: payload) {
+            return
+        }
         guard let listener = paymentEventListener else { return }
         let event = PaymentEvent(type: type, payload: payload)
         if Thread.isMainThread {

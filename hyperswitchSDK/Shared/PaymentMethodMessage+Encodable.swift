@@ -1,47 +1,39 @@
 import UIKit
 
-/* Callbacks stay in the typed content retained by the owning sheet/widget; only labels,
-   styles and `{{id_index}}` keys are encoded. */
+/* Callbacks stay in the typed content retained by the owning sheet/widget; only text,
+   labels and styles are encoded. */
 
-// MARK: - PaymentMethodMessage -> { displayMode, value, elementStyles, elements: { action } }
+// MARK: - PaymentMethodMessage -> { displayMode, elementStyles, value: [segment] }
 
 extension PaymentSheet.Configuration.PaymentMethodMessage {
     private enum Keys: String, CodingKey {
-        case displayMode, value, elementStyles, elements
-    }
-    private enum ElementKeys: String, CodingKey {
-        case action
-    }
-    private enum ActionKeys: String, CodingKey {
-        case key, label, style
+        case displayMode, value, elementStyles
     }
 
     public func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: Keys.self)
-        try c.encode(displayMode, forKey: .displayMode)
+        try c.encodeIfPresent(displayMode, forKey: .displayMode)
         try c.encodeIfPresent(elementStyles, forKey: .elementStyles)
-        guard let value else { return }
+        try c.encodeIfPresent(value?.parts, forKey: .value)
+    }
+}
 
-        var text = ""
-        var index = 0
-        for part in value.parts {
-            switch part {
-            case .text(let literal): text += literal
-            case .element:
-                text += "{{\(id)_\(index)}}"
-                index += 1
-            }
-        }
-        try c.encode(text, forKey: .value)
+// MARK: - MessageContent.Part -> { text } or { text, tappable, style }
 
-        guard !value.elements.isEmpty else { return }
-        var group = c.nestedContainer(keyedBy: ElementKeys.self, forKey: .elements)
-        var actions = group.nestedUnkeyedContainer(forKey: .action)
-        for (index, element) in value.elements.enumerated() {
-            var action = actions.nestedContainer(keyedBy: ActionKeys.self)
-            try action.encode("\(id)_\(index)", forKey: .key)
-            try action.encode(element.label, forKey: .label)
-            try action.encodeIfPresent(element.style, forKey: .style)
+extension PaymentSheet.Configuration.MessageContent.Part: Encodable {
+    private enum Keys: String, CodingKey {
+        case text, tappable, style
+    }
+
+    package func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: Keys.self)
+        switch self {
+        case .text(let text):
+            try c.encode(text, forKey: .text)
+        case .element(let element):
+            try c.encode(element.label, forKey: .text)
+            try c.encode(true, forKey: .tappable)
+            try c.encodeIfPresent(element.style, forKey: .style)
         }
     }
 }

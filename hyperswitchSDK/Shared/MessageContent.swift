@@ -31,12 +31,16 @@ extension PaymentSheet.Configuration {
                 parts.reserveCapacity(interpolationCount * 2 + 1)
             }
 
-            public mutating func appendLiteral(_ literal: String) { parts.append(.text(literal)) }
+            public mutating func appendLiteral(_ literal: String) { appendText(literal) }
             public mutating func appendInterpolation(_ element: MessageElement) { parts.append(.element(element)) }
-            public mutating func appendInterpolation(_ text: String) { parts.append(.text(text)) }
+            public mutating func appendInterpolation(_ text: String) { appendText(text) }
             /// Numbers and other plain values are interpolated as text.
             public mutating func appendInterpolation<T: CustomStringConvertible>(_ value: T) {
-                parts.append(.text(value.description))
+                appendText(value.description)
+            }
+
+            private mutating func appendText(_ text: String) {
+                if !text.isEmpty { parts.append(.text(text)) }
             }
         }
     }
