@@ -148,6 +148,11 @@ RCT_EXPORT_MODULE()
   [_impl emitPaymentEvent:@(rootTag) eventType:eventType payload:payload];
 }
 
+- (void)emitMessageAction:(NSInteger)rootTag index:(NSInteger)index
+{
+  [_impl emitMessageAction:@(rootTag) index:@(index)];
+}
+
 - (void)onUpdateIntentEvent:(NSInteger)rootTag
                   eventType:(NSString *)eventType
                      result:(JS::NativeHyperModule::PaymentExitResult &)result

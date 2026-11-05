@@ -164,12 +164,23 @@ internal class HyperModuleImpl: NSObject {
     internal func emitPaymentEvent(_ rootTag: NSNumber, _ eventType: String, _ payload: NSDictionary) {
         let map = (payload as? [String: Any]) ?? [:]
         resolveSubscribingTarget(rootTag) { target in
-            if let widget = target as? PaymentWidget {
+            if let widget = target as? PaymentWidget, widget.paymentEventListener != nil {
                 widget.dispatchPaymentEvent(type: eventType, payload: map)
             } else if let cvc = target as? CVCWidget, cvc.paymentEventListener != nil {
                 cvc.dispatchPaymentEvent(type: eventType, payload: map)
-            } else if let sheet = target as? PaymentSheet {
+            } else if let sheet = target as? PaymentSheet, sheet.paymentEventListener != nil {
                 sheet.dispatchPaymentEvent(type: eventType, payload: map)
+            }
+        }
+    }
+
+    @objc(emitMessageAction:index:)
+    internal func emitMessageAction(_ rootTag: NSNumber, _ index: NSNumber) {
+        resolveSubscribingTarget(rootTag) { target in
+            if let widget = target as? PaymentWidget {
+                widget.runMessageAction(index.intValue)
+            } else if let sheet = target as? PaymentSheet {
+                sheet.runMessageAction(index.intValue)
             }
         }
     }

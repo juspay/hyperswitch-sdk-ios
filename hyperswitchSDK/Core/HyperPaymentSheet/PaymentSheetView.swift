@@ -21,7 +21,7 @@ internal extension PaymentSheet {
 
         /// Get the configuration dictionary from the configuration object.
         var configuration = try? self.configuration?.toDictionary()
-        configuration?["subscribedEvents"] = (subscribedEvents ?? []) + [PaymentMessageActions.eventName]
+        configuration?["subscribedEvents"] = subscribedEvents
 
         /// Create a dictionary of hyperParams with app ID, sdkVersion, country, user agent, default view, and launch time.
         var sdkParams = SDKParams.getSDKParams()

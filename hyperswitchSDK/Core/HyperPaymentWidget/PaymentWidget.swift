@@ -86,7 +86,7 @@ public class PaymentWidget: UIControl {
 
         var nativeConfig = try? configuration?.toDictionary()
         nativeConfig?["hideConfirmButton"] = true  // MARK: replace with `displayPayButton`
-        nativeConfig?["subscribedEvents"] = (subscribedEventNames ?? []) + [PaymentMessageActions.eventName]
+        nativeConfig?["subscribedEvents"] = subscribedEventNames
         configurationDict?["hideConfirmButton"] = true  // MARK: replace with `displayPayButton`
         configurationDict?["subscribedEvents"] = subscribedEventNames
 
@@ -205,11 +205,11 @@ public class PaymentWidget: UIControl {
         .hyperswitch(domain, message)
     }
 
+    internal func runMessageAction(_ index: Int) {
+        PaymentMessageActions.run(configuration: configuration, index: index)
+    }
+
     internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {
-        /* A widget built from a raw configuration dictionary leaves message actions to its host. */
-        if configuration != nil, PaymentMessageActions.dispatch(configuration: configuration, type: type, payload: payload) {
-            return
-        }
         guard let listener = paymentEventListener else { return }
         let event = PaymentEvent(type: type, payload: payload)
         if Thread.isMainThread {
