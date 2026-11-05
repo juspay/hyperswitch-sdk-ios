@@ -55,6 +55,7 @@ class ViewController: UIViewController {
         configuration.savedPaymentSheetHeaderLabel = "Payment methods"
         configuration.paymentSheetHeaderLabel = "Select payment method"
         configuration.displaySavedPaymentMethods = true
+        configuration.paymentMethodsConfig = DemoPaymentMessages.make()
         configuration.hideCardNicknameField = false
 
         var appearance = PaymentSheet.Appearance()

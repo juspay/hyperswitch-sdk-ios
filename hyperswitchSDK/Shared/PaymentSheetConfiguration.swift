@@ -170,13 +170,266 @@ extension PaymentSheet {
 
         // MARK: - Payment method messaging
 
-        public struct PaymentMethodConfig: Encodable {
-            public init(paymentMethod: String, message: String? = nil) {
-                self.paymentMethod = paymentMethod
+        /// Hyperswitch `payment_method` values.
+        public enum PaymentMethod: String, Encodable {
+            case card
+            case cardRedirect = "card_redirect"
+            case payLater = "pay_later"
+            case wallet
+            case bankRedirect = "bank_redirect"
+            case bankTransfer = "bank_transfer"
+            case crypto
+            case bankDebit = "bank_debit"
+            case reward
+            case realTimePayment = "real_time_payment"
+            case upi
+            case voucher
+            case giftCard = "gift_card"
+            case openBanking = "open_banking"
+            case mobilePayment = "mobile_payment"
+            case networkToken = "network_token"
+        }
+
+        /// Hyperswitch `payment_method_type` values.
+        public enum PaymentMethodType: String, Encodable {
+            case ach
+            case affirm
+            case afterpayClearpay = "afterpay_clearpay"
+            case alfamart
+            case aliPay = "ali_pay"
+            case aliPayHk = "ali_pay_hk"
+            case alma
+            case amazonPay = "amazon_pay"
+            case paysera
+            case applePay = "apple_pay"
+            case atome
+            case bacs
+            case bancontactCard = "bancontact_card"
+            case becs
+            case benefit
+            case bizum
+            case blik
+            case bluecode
+            case boleto
+            case bcaBankTransfer = "bca_bank_transfer"
+            case bniVa = "bni_va"
+            case breadpay
+            case briVa = "bri_va"
+            case bhnCardNetwork = "bhn_card_network"
+            case cardRedirect = "card_redirect"
+            case cimbVa = "cimb_va"
+            case classic
+            case credit
+            case cryptoCurrency = "crypto_currency"
+            case cashapp
+            case dana
+            case danamonVa = "danamon_va"
+            case debit
+            case duitNow = "duit_now"
+            case efecty
+            case eft
+            case eftDebitOrder = "eft_debit_order"
+            case eps
+            case flexiti
+            case fps
+            case evoucher
+            case giropay
+            case givex
+            case googlePay = "google_pay"
+            case goPay = "go_pay"
+            case gcash
+            case ideal
+            case interac
+            case indomaret
+            case klarna
+            case kakaoPay = "kakao_pay"
+            case localBankRedirect = "local_bank_redirect"
+            case mandiriVa = "mandiri_va"
+            case knet
+            case mbWay = "mb_way"
+            case mobilePay = "mobile_pay"
+            case momo
+            case momoAtm = "momo_atm"
+            case multibanco
+            case neteller
+            case onlineBankingThailand = "online_banking_thailand"
+            case onlineBankingCzechRepublic = "online_banking_czech_republic"
+            case onlineBankingFinland = "online_banking_finland"
+            case onlineBankingFpx = "online_banking_fpx"
+            case onlineBankingPoland = "online_banking_poland"
+            case onlineBankingSlovakia = "online_banking_slovakia"
+            case oxxo
+            case pagoEfectivo = "pago_efectivo"
+            case permataBankTransfer = "permata_bank_transfer"
+            case openBankingUk = "open_banking_uk"
+            case payBright = "pay_bright"
+            case payjustnow
+            case paypal
+            case paze
+            case pix
+            case pixKey = "pix_key"
+            case pixEmv = "pix_emv"
+            case pixQr = "pix_qr"
+            case pixAutomaticoQr = "pix_automatico_qr"
+            case pixAutomaticoPush = "pix_automatico_push"
+            case paySafeCard = "pay_safe_card"
+            case przelewy24
+            case promptPay = "prompt_pay"
+            case pse
+            case qris
+            case redCompra = "red_compra"
+            case redPagos = "red_pagos"
+            case samsungPay = "samsung_pay"
+            case sepa
+            case sepaBankTransfer = "sepa_bank_transfer"
+            case sepaGuarenteedDebit = "sepa_guarenteed_debit"
+            case skrill
+            case sofort
+            case swish
+            case touchNGo = "touch_n_go"
+            case trustly
+            case twint
+            case upiCollect = "upi_collect"
+            case upiIntent = "upi_intent"
+            case upiQr = "upi_qr"
+            case vipps
+            case vietQr = "viet_qr"
+            case venmo
+            case walley
+            case wero
+            case weChatPay = "we_chat_pay"
+            case sevenEleven = "seven_eleven"
+            case lawson
+            case miniStop = "mini_stop"
+            case familyMart = "family_mart"
+            case seicomart
+            case payEasy = "pay_easy"
+            case localBankTransfer = "local_bank_transfer"
+            case mifinity
+            case openBankingPis = "open_banking_pis"
+            case directCarrierBilling = "direct_carrier_billing"
+            case instantBankTransfer = "instant_bank_transfer"
+            case instantBankTransferFinland = "instant_bank_transfer_finland"
+            case instantBankTransferPoland = "instant_bank_transfer_poland"
+            case revolutPay = "revolut_pay"
+            case indonesianBankTransfer = "indonesian_bank_transfer"
+            case openBanking = "open_banking"
+            case networkToken = "network_token"
+            case payshap
+            case payshapProxy = "payshap_proxy"
+            case ted
+        }
+
+        public enum MessageDisplayMode: String, Encodable {
+            case customMessage = "custom_message"
+            case defaultSdkMessage = "default_sdk_message"
+            case hidden
+        }
+        public enum TextDecoration: String, Encodable { case none, underline }
+
+        public struct MessageElementStyle {
+            public var color: UIColor?
+            /// Size, weight and italic are used; the SDK typography supplies the family and scale.
+            public var font: UIFont?
+            public var textDecoration: TextDecoration?
+
+            public init(color: UIColor? = nil, font: UIFont? = nil, textDecoration: TextDecoration? = nil) {
+                self.color = color
+                self.font = font
+                self.textDecoration = textDecoration
+            }
+        }
+
+        public struct MessageElementStyles: Encodable {
+            public let action: MessageElementStyle?
+            public init(action: MessageElementStyle? = nil) {
+                self.action = action
+            }
+        }
+
+        /// One piece of a message: plain text, or an action when it has `onTap`.
+        /// The callback never enters the encoded configuration.
+        public struct MessageElement: Encodable {
+            package let label: String
+            package let style: MessageElementStyle?
+            package let onTap: (() -> Void)?
+
+            package init(label: String, style: MessageElementStyle? = nil, onTap: (() -> Void)? = nil) {
+                self.label = label
+                self.style = style
+                self.onTap = onTap
+            }
+
+            public static func action(
+                label: String,
+                style: MessageElementStyle? = nil,
+                onTap: @escaping () -> Void
+            ) -> MessageElement {
+                MessageElement(label: label, style: style, onTap: onTap)
+            }
+
+            private enum CodingKeys: String, CodingKey {
+                case text, tappable, style
+            }
+
+            public func encode(to encoder: Encoder) throws {
+                var container = encoder.container(keyedBy: CodingKeys.self)
+                try container.encode(label, forKey: .text)
+                if onTap != nil {
+                    try container.encode(true, forKey: .tappable)
+                }
+                try container.encodeIfPresent(style, forKey: .style)
+            }
+        }
+
+        /// Typed content retains callbacks locally; only text and styles are encoded.
+        public struct PaymentMethodMessage: Encodable {
+            public let value: MessageContent?
+            /// Unset fields of a payment method type's message come from its payment method's message.
+            public let displayMode: MessageDisplayMode?
+            public let elementStyles: MessageElementStyles?
+
+            public init(
+                value: MessageContent? = nil,
+                displayMode: MessageDisplayMode? = nil,
+                elementStyles: MessageElementStyles? = nil
+            ) {
+                self.value = value
+                self.displayMode = displayMode
+                self.elementStyles = elementStyles
+            }
+
+            package func tap(at index: Int, text: String) {
+                value?.tap(at: index, text: text)
+            }
+        }
+
+        /// Message for one payment method type; it wins over its payment method's message.
+        public struct PaymentMethodTypeConfig: Encodable {
+            public init(paymentMethodType: PaymentMethodType, message: PaymentMethodMessage? = nil) {
+                self.paymentMethodType = paymentMethodType
                 self.message = message
             }
-            public var paymentMethod: String
-            public var message: String?
+
+            public var paymentMethodType: PaymentMethodType
+            public var message: PaymentMethodMessage?
+        }
+
+        public struct PaymentMethodConfig: Encodable {
+            public init(
+                paymentMethod: PaymentMethod,
+                message: PaymentMethodMessage? = nil,
+                paymentMethodTypes: [PaymentMethodTypeConfig]? = nil
+            ) {
+                self.paymentMethod = paymentMethod
+                self.message = message
+                self.paymentMethodTypes = paymentMethodTypes
+            }
+
+            public var paymentMethod: PaymentMethod
+            public var message: PaymentMethodMessage?
+            /// Not supported for `.card`.
+            public var paymentMethodTypes: [PaymentMethodTypeConfig]?
         }
 
         /// Visibility for redirection messaging.
@@ -299,5 +552,21 @@ extension PaymentSheet {
                 public var groupByPaymentMethods: Bool?
             }
         }
+    }
+}
+
+extension PaymentSheet.Configuration {
+    /// Runs a tapped message action. `paymentMethodType` is empty when the shown text is the
+    /// payment method's own message; `index` is the segment's position in that message and
+    /// `text` what it showed, so a segment with other text is not run.
+    package func messageTapped(paymentMethod: String, paymentMethodType: String, index: Int, text: String) {
+        guard let config = paymentMethodsConfig?.first(where: { $0.paymentMethod.rawValue == paymentMethod }) else {
+            return
+        }
+        let message =
+            paymentMethodType.isEmpty
+            ? config.message
+            : config.paymentMethodTypes?.first { $0.paymentMethodType.rawValue == paymentMethodType }?.message
+        message?.tap(at: index, text: text)
     }
 }
