@@ -347,11 +347,18 @@ extension PaymentSheet {
             }
         }
 
-        /// Immutable action definition; the callback never enters the encoded configuration.
-        public struct MessageElement {
+        /// One piece of a message: plain text, or an action when it has `onTap`.
+        /// The callback never enters the encoded configuration.
+        public struct MessageElement: Encodable {
             package let label: String
             package let style: MessageElementStyle?
-            package let onTap: () -> Void
+            package let onTap: (() -> Void)?
+
+            package init(label: String, style: MessageElementStyle? = nil, onTap: (() -> Void)? = nil) {
+                self.label = label
+                self.style = style
+                self.onTap = onTap
+            }
 
             public static func action(
                 label: String,
@@ -359,6 +366,41 @@ extension PaymentSheet {
                 onTap: @escaping () -> Void
             ) -> MessageElement {
                 MessageElement(label: label, style: style, onTap: onTap)
+            }
+
+            private enum CodingKeys: String, CodingKey {
+                case text, tappable, style
+            }
+
+            public func encode(to encoder: Encoder) throws {
+                var container = encoder.container(keyedBy: CodingKeys.self)
+                try container.encode(label, forKey: .text)
+                if onTap != nil {
+                    try container.encode(true, forKey: .tappable)
+                }
+                try container.encodeIfPresent(style, forKey: .style)
+            }
+        }
+
+        /// Typed content retains callbacks locally; only text and styles are encoded.
+        public struct PaymentMethodMessage: Encodable {
+            public let value: MessageContent?
+            /// Unset fields of a payment method type's message come from its payment method's message.
+            public let displayMode: MessageDisplayMode?
+            public let elementStyles: MessageElementStyles?
+
+            public init(
+                value: MessageContent? = nil,
+                displayMode: MessageDisplayMode? = nil,
+                elementStyles: MessageElementStyles? = nil
+            ) {
+                self.value = value
+                self.displayMode = displayMode
+                self.elementStyles = elementStyles
+            }
+
+            package func tap(at index: Int, text: String) {
+                value?.tap(at: index, text: text)
             }
         }
 
@@ -510,5 +552,21 @@ extension PaymentSheet {
                 public var groupByPaymentMethods: Bool?
             }
         }
+    }
+}
+
+extension PaymentSheet.Configuration {
+    /// Runs a tapped message action. `paymentMethodType` is empty when the shown text is the
+    /// payment method's own message; `index` is the segment's position in that message and
+    /// `text` what it showed, so a segment with other text is not run.
+    package func messageTapped(paymentMethod: String, paymentMethodType: String, index: Int, text: String) {
+        guard let config = paymentMethodsConfig?.first(where: { $0.paymentMethod.rawValue == paymentMethod }) else {
+            return
+        }
+        let message =
+            paymentMethodType.isEmpty
+            ? config.message
+            : config.paymentMethodTypes?.first { $0.paymentMethodType.rawValue == paymentMethodType }?.message
+        message?.tap(at: index, text: text)
     }
 }

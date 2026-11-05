@@ -148,9 +148,17 @@ RCT_EXPORT_MODULE()
   [_impl emitPaymentEvent:@(rootTag) eventType:eventType payload:payload];
 }
 
-- (void)emitMessageAction:(NSInteger)rootTag index:(NSInteger)index
+- (void)emitMessageAction:(NSInteger)rootTag
+              paymentMethod:(NSString *)paymentMethod
+          paymentMethodType:(NSString *)paymentMethodType
+                      index:(NSInteger)index
+                       text:(NSString *)text
 {
-  [_impl emitMessageAction:@(rootTag) index:@(index)];
+  [_impl emitMessageAction:@(rootTag)
+             paymentMethod:paymentMethod
+         paymentMethodType:paymentMethodType
+                     index:@(index)
+                      text:text];
 }
 
 - (void)onUpdateIntentEvent:(NSInteger)rootTag

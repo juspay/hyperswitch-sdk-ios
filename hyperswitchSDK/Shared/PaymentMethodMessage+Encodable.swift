@@ -14,27 +14,7 @@ extension PaymentSheet.Configuration.PaymentMethodMessage {
         var c = encoder.container(keyedBy: Keys.self)
         try c.encodeIfPresent(displayMode, forKey: .displayMode)
         try c.encodeIfPresent(elementStyles, forKey: .elementStyles)
-        try c.encodeIfPresent(value?.parts, forKey: .value)
-    }
-}
-
-// MARK: - MessageContent.Part -> { text } or { text, tappable, style }
-
-extension PaymentSheet.Configuration.MessageContent.Part: Encodable {
-    private enum Keys: String, CodingKey {
-        case text, tappable, style
-    }
-
-    package func encode(to encoder: Encoder) throws {
-        var c = encoder.container(keyedBy: Keys.self)
-        switch self {
-        case .text(let text):
-            try c.encode(text, forKey: .text)
-        case .element(let element):
-            try c.encode(element.label, forKey: .text)
-            try c.encode(true, forKey: .tappable)
-            try c.encodeIfPresent(element.style, forKey: .style)
-        }
+        try c.encodeIfPresent(value, forKey: .value)
     }
 }
 

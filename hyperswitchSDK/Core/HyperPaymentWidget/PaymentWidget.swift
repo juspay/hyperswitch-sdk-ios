@@ -205,10 +205,6 @@ public class PaymentWidget: UIControl {
         .hyperswitch(domain, message)
     }
 
-    internal func runMessageAction(_ index: Int) {
-        PaymentMessageActions.run(configuration: configuration, index: index)
-    }
-
     internal func dispatchPaymentEvent(type: String, payload: [String: Any]) {
         guard let listener = paymentEventListener else { return }
         let event = PaymentEvent(type: type, payload: payload)
@@ -217,5 +213,13 @@ public class PaymentWidget: UIControl {
         } else {
             DispatchQueue.main.async { listener.onPaymentEvent(event) }
         }
+    }
+}
+
+extension PaymentWidget: MessageActionOwner {
+    func messageTapped(paymentMethod: String, paymentMethodType: String, index: Int, text: String) {
+        configuration?.messageTapped(
+            paymentMethod: paymentMethod, paymentMethodType: paymentMethodType, index: index, text: text
+        )
     }
 }
