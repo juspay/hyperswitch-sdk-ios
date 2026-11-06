@@ -39,10 +39,10 @@ Pod::Spec.new do |s|
     netcetera3ds.dependency 'hyperswitch-sdk-ios/core'
   end
 
-  s.subspec 'airborne' do |airborne|
-    airborne.dependency 'HyperOTA', '0.0.8'
-    airborne.dependency 'hyperswitch-sdk-ios/core'
-  end
+  # s.subspec 'airborne' do |airborne|
+  #   airborne.dependency 'HyperOTA', '0.0.8'
+  #   airborne.dependency 'hyperswitch-sdk-ios/core'
+  # end
 
   s.subspec 'common' do |common|
     common.source_files = 'hyperswitchSDK/Shared/**/*.{m,swift,h}'
