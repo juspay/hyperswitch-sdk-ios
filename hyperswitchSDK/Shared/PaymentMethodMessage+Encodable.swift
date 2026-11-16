@@ -34,15 +34,20 @@ extension PaymentSheet.Configuration.MessageElementStyle: Encodable {
     public func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: Keys.self)
         try c.encodeIfPresent(color?.hex(), forKey: .color)
+        var weight = fontWeight?.rawValue
         if let font {
             let descriptor = font.fontDescriptor
-            let traits = descriptor.object(forKey: .traits) as? [UIFontDescriptor.TraitKey: Any]
-            let isBold = descriptor.symbolicTraits.contains(.traitBold)
-            let weight = traits?[.weight] as? CGFloat ?? (isBold ? UIFont.Weight.bold : .regular).rawValue
-            let nearest = Self.weights.min { abs($0.0.rawValue - weight) < abs($1.0.rawValue - weight) }
+            if weight == nil {
+                let traits = descriptor.object(forKey: .traits) as? [UIFontDescriptor.TraitKey: Any]
+                let isBold = descriptor.symbolicTraits.contains(.traitBold)
+                weight = traits?[.weight] as? CGFloat ?? (isBold ? UIFont.Weight.bold : .regular).rawValue
+            }
             try c.encode(Double(font.pointSize), forKey: .fontSize)
-            try c.encodeIfPresent(nearest?.1, forKey: .fontWeight)
             try c.encode(descriptor.symbolicTraits.contains(.traitItalic) ? "italic" : "normal", forKey: .fontStyle)
+        }
+        if let weight, weight.isFinite {
+            let nearest = Self.weights.min { abs($0.0.rawValue - weight) < abs($1.0.rawValue - weight) }
+            try c.encodeIfPresent(nearest?.1, forKey: .fontWeight)
         }
         try c.encodeIfPresent(textDecoration, forKey: .textDecoration)
     }

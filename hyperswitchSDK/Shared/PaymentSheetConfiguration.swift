@@ -331,11 +331,20 @@ extension PaymentSheet {
             public var color: UIColor?
             /// Size, weight and italic are used; the SDK typography supplies the family and scale.
             public var font: UIFont?
+            /// Overrides the weight in `font` without changing size or italic style.
+            /// When both `fontWeight` and `font` are nil, the weight is inherited.
+            public var fontWeight: UIFont.Weight?
             public var textDecoration: TextDecoration?
 
-            public init(color: UIColor? = nil, font: UIFont? = nil, textDecoration: TextDecoration? = nil) {
+            public init(
+                color: UIColor? = nil,
+                font: UIFont? = nil,
+                fontWeight: UIFont.Weight? = nil,
+                textDecoration: TextDecoration? = nil
+            ) {
                 self.color = color
                 self.font = font
+                self.fontWeight = fontWeight
                 self.textDecoration = textDecoration
             }
         }

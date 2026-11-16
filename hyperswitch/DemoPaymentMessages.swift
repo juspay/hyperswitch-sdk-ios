@@ -6,7 +6,7 @@ enum DemoPaymentMessages {
         typealias Configuration = PaymentSheet.Configuration
         let terms = Configuration.MessageElement.action(
             label: "Terms & Conditions",
-            style: Configuration.MessageElementStyle(textDecoration: .underline),
+            style: Configuration.MessageElementStyle(fontWeight: .semibold, textDecoration: .underline),
             onTap: { print("[HyperswitchDemo] Terms & Conditions tapped") }
         )
         let privacy = Configuration.MessageElement.action(
