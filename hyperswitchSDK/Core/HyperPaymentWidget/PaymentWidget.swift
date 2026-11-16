@@ -215,3 +215,11 @@ public class PaymentWidget: UIControl {
         }
     }
 }
+
+extension PaymentWidget: MessageActionOwner {
+    func messageTapped(paymentMethod: String, paymentMethodType: String, index: Int, text: String) {
+        configuration?.messageTapped(
+            paymentMethod: paymentMethod, paymentMethodType: paymentMethodType, index: index, text: text
+        )
+    }
+}

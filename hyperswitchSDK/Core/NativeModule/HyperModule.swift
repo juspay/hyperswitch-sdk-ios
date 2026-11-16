@@ -22,6 +22,11 @@ internal protocol HyperModuleShim: NSObjectProtocol {
     func surface(forRootTag rootTag: NSNumber) -> AnyObject?
 }
 
+/// A surface whose configuration holds payment method message actions.
+internal protocol MessageActionOwner: AnyObject {
+    func messageTapped(paymentMethod: String, paymentMethodType: String, index: Int, text: String)
+}
+
 @objc(HyperModuleImpl)
 internal class HyperModuleImpl: NSObject {
 
@@ -171,6 +176,17 @@ internal class HyperModuleImpl: NSObject {
             } else if let sheet = target as? PaymentSheet, sheet.paymentEventListener != nil {
                 sheet.dispatchPaymentEvent(type: eventType, payload: map)
             }
+        }
+    }
+
+    @objc(emitMessageAction:paymentMethod:paymentMethodType:index:text:)
+    internal func emitMessageAction(
+        _ rootTag: NSNumber, _ paymentMethod: String, _ paymentMethodType: String, _ index: NSNumber, _ text: String
+    ) {
+        resolveOwner(rootTag) { owner in
+            (owner as? MessageActionOwner)?.messageTapped(
+                paymentMethod: paymentMethod, paymentMethodType: paymentMethodType, index: index.intValue, text: text
+            )
         }
     }
 

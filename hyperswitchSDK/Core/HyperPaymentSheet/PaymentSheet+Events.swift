@@ -35,3 +35,11 @@ extension PaymentSheet {
         }
     }
 }
+
+extension PaymentSheet: MessageActionOwner {
+    func messageTapped(paymentMethod: String, paymentMethodType: String, index: Int, text: String) {
+        configuration?.messageTapped(
+            paymentMethod: paymentMethod, paymentMethodType: paymentMethodType, index: index, text: text
+        )
+    }
+}
